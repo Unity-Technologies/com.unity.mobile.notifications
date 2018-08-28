@@ -1,0 +1,55 @@
+variables:
+  SDK_URL: "https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" 
+  ANDROID_HOME: "$CI_PROJECT_DIR/package/android-sdk" 
+  ANDROID_VERSION: 26 
+  ANDROID_BUILD_TOOLS_VERSION: 26.0.2
+
+
+stages:
+ - build
+ - publish
+
+build:
+  stage: build
+  tags:
+  - darwin
+  only:
+  - master
+  before_script:
+  - ./project/prepare_env.sh
+  script:
+  - ./project/build_package.sh
+  artifacts:
+    paths:
+    - com.unity.mobile.notifications/Runtime/Android/Plugins/Android
+  after_script:
+  - /opt/post_build_script.sh    
+
+build_docs:
+  stage: build
+  tags:
+  - darwin
+  only:
+  - master
+  - tags
+  script:
+  - ./project/build_docs.sh
+  artifacts:
+    paths:
+    - com.unity.mobile.notifications/Documentation~
+  after_script:
+   - /opt/post_build_script.sh    
+
+publish:
+  stage: publish
+  tags:
+  - darwin
+  only:
+  - master
+  - tags
+  script:
+  - ./project/publish_package.sh
+  after_script:
+  - /opt/post_build_script.sh    
+
+  

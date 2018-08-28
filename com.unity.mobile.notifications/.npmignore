@@ -1,0 +1,14 @@
+artifacts/**
+build/**
+.DS_Store
+.npmrc
+.npmignore
+.gitignore
+QAReport.md
+QAReport.md.meta
+.gitlab-ci.yml
+Doxyfile
+Doxyfile.meta
+logo.png
+Tests/**
+DoxygenLayout~.xml

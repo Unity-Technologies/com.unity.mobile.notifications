@@ -1,0 +1,11 @@
+{
+    "name": "Unity.Notifications.iOS",
+    "references": [],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "iOS",
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
