@@ -1,0 +1,13 @@
+{
+    "name": "Unity.Notifications.Editor",
+    "references": [
+        "Unity.Notifications.Android",
+        "Unity.Notifications.iOS"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
