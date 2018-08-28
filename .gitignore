@@ -1,0 +1,6 @@
+/build
+.npmrc
+DockerFile
+project/androidnotifications/build/*
+.idea
+.gradle
