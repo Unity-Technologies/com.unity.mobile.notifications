@@ -4,3 +4,4 @@ DockerFile
 project/androidnotifications/build/*
 .idea
 .gradle
+com.unity.mobile.notifications/Documentation/*

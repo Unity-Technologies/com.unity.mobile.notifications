@@ -2,5 +2,5 @@
 set -xeuo pipefail
 
 brew install doxygen
-cd com.unity.android.notifications
+cd com.unity.mobile.notifications
 doxygen Doxyfile

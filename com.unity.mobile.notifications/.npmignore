@@ -9,3 +9,5 @@ QAReport.md.meta
 .gitlab-ci.yml
 Doxyfile
 Doxyfile.meta
+logo.png
+Tests/**
