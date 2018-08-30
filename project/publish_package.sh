@@ -5,7 +5,7 @@ cd com.unity.mobile.notifications
 ls
 ls Runtime/Plugins/Android/
 
-if [ -f Runtime/Plugins/Android/androidnotifications-release.aar ];
+if [ -f Runtime/Android/Plugins/Android/androidnotifications-release.aar ];
 then
     echo "Built AAR package found in Plugins folder."
 else
