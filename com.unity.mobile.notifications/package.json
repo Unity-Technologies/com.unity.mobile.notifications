@@ -1,7 +1,7 @@
 {
 	"name": "com.unity.mobile.notifications",
 	"displayName":"Mobile Notifications",
-	"version": "0.9.3-preview",
+	"version": "0.9.4-preview",
 	"unity": "2018.2",
 	"description": "Replace this string with your own description of the package. This description appears in the Package Manager window when the user selects this package from the list. \n\nFor best results, use this text to summarize: \n\u25AA What the package does \n\u25AA How it can benefit the user \n\nNote: Special formatting characters are supported, including line breaks ('\\n') and bullets ('\\u25AA').",
 	"keywords": ["Android", "iOS", "Notifications", "Mobile"],

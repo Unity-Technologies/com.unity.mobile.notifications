@@ -36,7 +36,7 @@ afterEvaluate {
             from('build/outputs/aar') {
                 include '*-release.aar'
             }
-            into '../../com.unity.mobile.notifications/Runtime/Plugins/Android'
+            into '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android'
         }
     }
 }

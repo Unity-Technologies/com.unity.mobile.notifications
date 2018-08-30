@@ -21,7 +21,7 @@ build:
   - ./project/build_package.sh
   artifacts:
     paths:
-    - com.unity.mobile.notifications/Runtime/Plugins/Android/
+    - com.unity.mobile.notifications/Runtime/Android/Plugins/Android
   after_script:
   - /opt/post_build_script.sh    
 
