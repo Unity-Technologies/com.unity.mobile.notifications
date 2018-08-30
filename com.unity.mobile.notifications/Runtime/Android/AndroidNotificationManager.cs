@@ -103,6 +103,9 @@ namespace Unity.Notifications.Android
         BigTextStyle = 2
     }
 
+    /// <summary>
+    /// The AndroidNotification is used schedule a local notification, which includes the content of the notification.
+    /// </summary>
     public struct AndroidNotification
     {
         /// <summary>
