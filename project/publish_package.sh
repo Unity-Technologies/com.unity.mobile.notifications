@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
-cd com.unity.android.notifications
+cd com.unity.mobile.notifications
 ls
 ls Runtime/Plugins/Android/
 
