@@ -3,7 +3,7 @@ set -xeuo pipefail
 
 cd com.unity.mobile.notifications
 ls
-ls Runtime/Plugins/Android/
+ls Runtime/Android/Plugins/Android/
 
 if [ -f Runtime/Android/Plugins/Android/androidnotifications-release.aar ];
 then
