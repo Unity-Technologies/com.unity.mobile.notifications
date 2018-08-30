@@ -581,7 +581,7 @@ namespace Unity.Notifications.iOS
     /// <remarks>
     /// This method must be called before you attempt to schedule any local notifications. If \"Request Authorization on App Launch\" is enabled in
     /// \"Edit -> Project Settings -> Mobile Notification Settings\" this method will be caled automatically when the app launches. You might call this method again to determine the current
-    /// authorizations tatus or the DeviceToken for Push Notifications, but the UI system prompt will not be shown if the user has already granted or denied authorization for this app.
+    /// authorizations status or the DeviceToken for Push Notifications, but the UI system prompt will not be shown if the user has already granted or denied authorization for this app.
     /// </remarks>
     /// <example>
     /// using (var req = new RequestAuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
@@ -733,7 +733,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Removes the specified notification from Notification Center.
         /// </summary>
-        static void RemoveDeliveredNotification(string identifier)
+        public static void RemoveDeliveredNotification(string identifier)
         {
             if (!Initialize())
                 return;
