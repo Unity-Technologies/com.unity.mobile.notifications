@@ -157,7 +157,6 @@ namespace Unity.Notifications.Android
 
             if (notificationEditorManager.iOSNotificationEditorSettings == null)
             {
-                Debug.Log("notificationEditorManager.iOSNotificationEditorSettings == null");
                 notificationEditorManager.iOSNotificationEditorSettings = new List<NotificationEditorSetting>()
                 {
                     new NotificationEditorSetting(
@@ -395,7 +394,7 @@ namespace Unity.Notifications.Android
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
-            var icons = UnityAndroidNotificationEditorManager.Initialize().GenerateDrawableResourcesForExport();
+            var icons = UnityNotificationEditorManager.Initialize().GenerateDrawableResourcesForExport();
 
             var directories = Directory.GetDirectories(projectPath);
             foreach (var icon in icons)

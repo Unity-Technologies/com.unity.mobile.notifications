@@ -277,7 +277,6 @@ namespace Unity.Notifications.Android
 
 		void RemoveIcondDataElement(ReorderableList list)
 		{
-			Debug.Log("Remove!");
 			var i = UnityNotificationEditorManager.Initialize();
 			i.RemoveDrawableResource(list.index);
 			
