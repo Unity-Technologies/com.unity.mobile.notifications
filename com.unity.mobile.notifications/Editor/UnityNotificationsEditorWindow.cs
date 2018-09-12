@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -11,7 +12,8 @@ public class UnityNotificationsEditorWindow : EditorWindow
 	
 	[MenuItem ("Edit/Project Settings/Mobile Notification Settings")]
 	public static void  ShowWindow () {
-		EditorWindow.GetWindow(typeof(UnityNotificationsEditorWindow));
+		var type = Type.GetType("UnityEditor.InspectorWindow,UnityEditor.dll");
+		GetWindow<UnityNotificationsEditorWindow>("Mobile Notifications", true, type);
 	}
 	
 	void OnGUI () {		
