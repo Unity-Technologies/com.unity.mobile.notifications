@@ -4,37 +4,31 @@
 
 **Supported features:**
 
-- Schedule local repeatable or one-time notifications
-- Cancel scheduled or already displayed notifications
--  Android specific:
+- Schedule local repeatable or one-time notifications.
+- Cancel scheduled or already displayed notifications.
+- Android: 
   - Create and modify notification channels/categories on Android Oreo and above
   - Set custom notification icons.
-
-- iOS specific:
+- iOS:
   - Use the Apple Push Notification Service  (APNs) to send remote notifications.
-  - Modify remote notification content if they are received when the app is running.
-  - Group notification into threads (iOS 12 only)
-
+  - Modify remote notification content if they are received while the app is running.
+  - Group notification into threads (only  supported on iOS 12+)
 
 
 **Requirements:**
 
-- Supports Android 4.1 (API 16)/iOS 10 and above.
-- Compatible with Unity 2018.2 and above.
+- Supports Android 4.1 (API 16)/iOS 10 and newer.
+- Compatible with Unity 2018.2 and newer.
 
 ## Summary:
 
-The runtime API is split into two classes AndroidNotificationManager and iOSNotificationManager which respectively can be used to schedule local notification for Android and iOS respectively.
-
-TODO
-
-## Examples:
+The runtime API is split into two classes AndroidNotificationCenter and iOSNotificationCenter which respectively can be used to schedule and manage notifications for Android and iOS respectively. You can 
 
 **Android:**
 
 - **Create a notification channel:**
 
-  Every local notification must belong to a notificatiuon channel, notification channels are only supported by the system on Android Oreo (9.0) and above. On previous versions the channel behaviour is simultate, therefore settings such as priority  (`Importance`) should be set on the channel.
+  Every local notification must belong to a notification channel, notification channels are only supported by the system on Android Oreo (9.0) and above. On previous versions the channel behaviour is simulate, therefore settings such as priority  (`Importance`) should be set on the channel.
 
   ```
   var c = new AndroidNotificationChannel()
@@ -44,7 +38,7 @@ TODO
       Importance = Importance.High,
       Description = "Generic notifications",
   }
-  AndroidNotificationManager.RegisterNotficationChannel(c);
+  AndroidNotificationCenter.RegisterNotficationChannel(c);
   ```
 
 - **Send a simple notification:**
@@ -68,7 +62,7 @@ TODO
   
   // When scheduling each notification is assigned an unique identifier number
   // which can later be used to track notifications status or cancel it.
-  var identifier = AndroidNotificationManager.SendNotification(n, "channel_id");
+  var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
   
   //You can check if the notification was already delivered and perform an action
   //depending on the result. However notification status can only be tracked on Android //Marshmallow (6.0)  and anove.
@@ -84,7 +78,7 @@ TODO
   }
   else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unknown)
   {
-      var identifier = AndroidNotificationManager.SendNotification(n, "channel_id");
+      var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
   }
   
   
@@ -92,10 +86,10 @@ TODO
 
 - **Handling received notifications when the app is running**
 
-  You can subscribe to the *AndroidNotificationManager.OnNotificationReceived* even to receive callbacks whenever a notification is delivered if the app is running.
+  You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* even to receive callbacks whenever a notification is delivered if the app is running.
 
   ```
-  AndroidNotificationManager.OnNotificationReceived +=(int identifier, AndroidNotification notification, string channel)
+  AndroidNotificationCenter.OnNotificationReceived +=(int identifier, AndroidNotification notification, string channel)
   {
   	var msg = "Notification received : " + identifier + "\n";
   	msg += "\n Notification received: ";
@@ -116,7 +110,7 @@ TODO
 
 
 
-  The user migh only grants permission for certain notification features (in this case we requested the permission to show UI Alert dialogs and show a badge on the app icon) in this case *RequestAuthorizationRequest.Granted* would still be *True* and you can check the actual authorization status by *iOSNotificationManager.GetNotificationSettings*. 
+  The user migh only grants permission for certain notification features (in this case we requested the permission to show UI Alert dialogs and show a badge on the app icon) in this case *RequestAuthorizationRequest.Granted* would still be *True* and you can check the actual authorization status by *iOSNotificationCenter.GetNotificationSettings*. 
 
 
 
@@ -167,14 +161,14 @@ TODO
   	Trigger = timeTrigger,
   };
   		
-  iOSNotificationManager.ScheduleNotification(notification);
+  iOSNotificationCenter.ScheduleNotification(notification);
   
   // You can cancel the notification if wasn't yet triggered:
-  iOSNotificationManager.RemoveScheduledNotification(notification.Identifier);
+  iOSNotificationCenter.RemoveScheduledNotification(notification.Identifier);
   
   //If the notification was already displayed to the user, you can remove it from the 
   //Notification Center:
-  iOSNotificationManager.RemoveDeliveredNotification(notification.Identifier)
+  iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier)
   
   ```
 
@@ -236,7 +230,7 @@ TODO
   // In this case you need to subscribe to the `OnNotificationReceived` which will be 
   // called whenever a local or a remote notification is received (irregardless if it's shown in the foregound).
   
-  iOSNotificationManager.OnNotificationReceived += notification =>
+  iOSNotificationCenter.OnNotificationReceived += notification =>
   {
   	var msg = "Notification received : " + notification.Identifier + "\n";
   	msg += "\n Notification received: ";
@@ -254,7 +248,7 @@ TODO
   // show an alert for it you'll have to schedule a local notification using the remote 
   // notifications content:
   
-  iOSNotificationManager.OnRemoteNotificationReceived += notification =>
+  iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
   {
   	// When a remote notification is received modify it's contents and show it
       // after 1 second.
@@ -275,7 +269,7 @@ TODO
   		ThreadIdentifier = notification.ThreadIdentifier,
   		Trigger = timeTrigger,
   	};
-  	iOSNotificationManager.ScheduleNotification(n);
+  	iOSNotificationCenter.ScheduleNotification(n);
   			
   	Debug.Log("Rescheduled remote notifications with id: " + notification.Identifier);
   
