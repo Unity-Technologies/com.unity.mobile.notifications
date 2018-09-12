@@ -15,27 +15,27 @@ namespace Unity.Notifications.iOS
     public enum AuthorizationStatus
     {
         /// <summary>
-        /// The user has not yet made a choice regarding whether the application may post user notifications.
+        /// The user has not yet made a choice regarding whether the application may post notifications.
         /// </summary>
         AuthorizationStatusNotDetermined = 0,
         /// <summary>
-        /// The application is not authorized to post user notifications.
+        /// The application is not authorized to post notifications.
         /// </summary>
         AuthorizationStatusDenied,
         /// <summary>
-        /// The application is authorized to post user notifications.
+        /// The application is authorized to post notifications.
         /// </summary>
         AuthorizationStatusAuthorized
     }
     
 
     /// <summary>
-    /// Enum indicating the current status of a notification setting.
+    /// Enum indicating the current status of a notification setting. 
     /// </summary>
     public enum NotificationSetting
     {
         /// <summary>
-        /// The application does not support this notification type.
+        /// The app does not support this notification setting.
         /// </summary>
         NotificationSettingNotSupported  = 0,
         
@@ -153,7 +153,7 @@ namespace Unity.Notifications.iOS
     /// iOSNotificationSettings  contains the current authorization status and notification-related settings for your app. Your app must receive authorization to schedule notifications.
     /// </summary>
     /// <remarks>
-    /// Use this struct to determine what notification-related actions your app is allowed to perform byt the user. This information should be used to enable, disable, or adjust your app's notification-related behaviors.
+    /// Use this struct to determine what notification-related actions your app is allowed to perform by the user. This information should be used to enable, disable, or adjust your app's notification-related behaviors.
     /// The system enforces your app's settings by preventing denied interactions from occurring.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential)]
@@ -168,7 +168,7 @@ namespace Unity.Notifications.iOS
         internal int soundSetting;
         
         /// <summary>
-        /// When the value set to is set to AuthorizationStatusAuthorized your app is allowed to schedule and receive local and remote notifications.
+        /// When the value is set to AuthorizationStatusAuthorized your app is allowed to schedule and receive local and remote notifications.
         /// </summary>
         /// <remarks>
         /// When authorized, use the alertSetting, badgeSetting, and soundSetting properties to specify which types of interactions are allowed.
@@ -214,7 +214,7 @@ namespace Unity.Notifications.iOS
     /// <remarks>
     /// Create an instance of this class when you want to schedule the delivery of a local notification. It contains the entire notification  payload to be delivered
     /// (which corresponds to UNNotificationContent) and  also the NotificationTrigger object with the conditions that trigger the delivery of the notification.
-    /// To schedule the delivery of your notification, pass an instance of this class to the iOSNotificationManager.ScheduleNotification method.
+    /// To schedule the delivery of your notification, pass an instance of this class to the iOSNotificationCenter.ScheduleNotification method.
     /// </remarks>
     public class iOSNotification
     {
@@ -243,7 +243,7 @@ namespace Unity.Notifications.iOS
         /// An identifier that you use to group related notifications together.
         /// </summary>
         /// <remarks>
-        /// Automatic notification grouping according to the thread idenfitier is only supported on iOS 12+.
+        /// Automatic notification grouping according to the thread identifier is only supported on iOS 12+.
         /// </remarks>
         public string ThreadIdentifier
         {
@@ -282,7 +282,7 @@ namespace Unity.Notifications.iOS
         /// Whether the notification alert should be shown when the app is open.
         /// </summary>
         /// <remarks>
-        /// Subscribe to the iOSNotificationManager.OnNotificationReceived even to receive a callback when the notification is triggered.
+        /// Subscribe to the iOSNotificationCenter.OnNotificationReceived even to receive a callback when the notification is triggered.
         /// </remarks>
         public bool ShowInForeground
         {
@@ -317,7 +317,7 @@ namespace Unity.Notifications.iOS
         /// The conditions that trigger the delivery of the notification.
         /// </summary>
         /// <remarks>
-        /// For notification that were already delivered and whose instance was returned by [[iOSNotificationManager.OnRemoteNotificationReceived]] or [[iOSNotificationManager.OnRemoteNotificationReceived]]
+        /// For notification that were already delivered and whose instance was returned by [[iOSNotificationCenter.OnRemoteNotificationReceived]] or [[iOSNotificationCenter.OnRemoteNotificationReceived]]
         /// use this property to determine what caused the delivery to occur. You can do this by comparing the trigger object type to any of the notification trigger types that implement it, such as
         /// [[iOSNotificationLocationTrigger]], [[iOSNotificationPushTrigger]], [[iOSNotificationTimeIntervalTrigger]], [[iOSNotificationCalendarTrigger]]
         /// </remarks>
@@ -332,9 +332,9 @@ namespace Unity.Notifications.iOS
                 {
                     var trigger = (iOSNotificationTimeIntervalTrigger) value;
                     data.triggerType = iOSNotificationTimeIntervalTrigger.Type;
-                    data.timeTriggerInterval = trigger.m_timeInterval;
+                    data.timeTriggerInterval = trigger.timeInterval;
 
-                    if (trigger.m_timeInterval > 60)
+                    if (trigger.timeInterval > 60)
                     {
                         data.repeats = trigger.Repeats;
                     }
@@ -383,7 +383,7 @@ namespace Unity.Notifications.iOS
                 {
                     trigger = new iOSNotificationTimeIntervalTrigger()
                     {
-                        m_timeInterval = data.timeTriggerInterval,
+                        timeInterval = data.timeTriggerInterval,
                         Repeats = data.repeats
                     };
                 }
@@ -542,14 +542,14 @@ namespace Unity.Notifications.iOS
     {
         public static int Type { get { return 0; }}
         
-        internal int m_timeInterval;
+        internal int timeInterval;
         
         public TimeSpan TimeInterval
         {
-            get { return TimeSpan.FromMilliseconds(m_timeInterval); }
+            get { return TimeSpan.FromMilliseconds(timeInterval); }
             set
             {
-                m_timeInterval = (int) value.TotalSeconds;
+                timeInterval = (int) value.TotalSeconds;
             }
         }
         public bool Repeats { get; set; }
@@ -618,7 +618,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// A globally unique token that identifies this device to Apple Push Notification Network. Send this token to the server that you use to generate remote notifications.
         /// Your server must pass this token unmodified back to APNs when sending those remote notifications.
-        /// This property will be empty if you set the [[registerForRemoteNotifications]] to false when creating the Authorization requests or if the app fails registereing with the APN.
+        /// This property will be empty if you set the [[registerForRemoteNotifications]] to false when creating the Authorization requests or if the app fails registering with the APN.
         /// </summary>
         public string DeviceToken { get; private set; }
 
@@ -637,7 +637,7 @@ namespace Unity.Notifications.iOS
             iOSNotificationsWrapper.RegisterAuthorizationRequestCallback();
             iOSNotificationsWrapper.RequestAuthorization((int)authorizationOption, registerForRemoteNotifications);
             
-            iOSNotificationManager.OnAuthorizationRequestCompleted += data =>
+            iOSNotificationCenter.OnAuthorizationRequestCompleted += data =>
                 {
                     Debug.Log("            iOSNotificationsWrapper.onAuthenticationRequestFinished += data => ");
                     IsFinished = data.finished;
@@ -663,11 +663,11 @@ namespace Unity.Notifications.iOS
     
     
     /// <summary>
-    /// Use the iOSNotificationManager to register notification channels and schedule local notifications.
+    /// Use the iOSNotificationCenter to register notification channels and schedule local notifications.
     /// </summary>
-    public class iOSNotificationManager
+    public class iOSNotificationCenter
     {
-        private static bool m_initialized;
+        private static bool initialized;
         
         public delegate void NotificationReceivedCallback(iOSNotification notification);
 
@@ -677,7 +677,7 @@ namespace Unity.Notifications.iOS
         public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
 
         /// <summary>
-        /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foregeound,
+        /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
         /// if you subscribe to this event remote notification will not be shown while the app is in foreground and if you still want
         /// to show it to the user you will have to schedule a local notification with the data received from this callback.
         /// If you want remote notifications to be shown automatically subscribe to the [[OnNotificationReceived]] even instead and check the
@@ -712,11 +712,11 @@ namespace Unity.Notifications.iOS
                         return false;
             #endif
 
-            if (m_initialized)
+            if (initialized)
                 return true;
             
             iOSNotificationsWrapper.RegisterOnReceivedCallback();
-            return m_initialized = true;
+            return initialized = true;
         }
 
         /// <summary>
@@ -799,7 +799,6 @@ namespace Unity.Notifications.iOS
 
             return iOSNotifications.ToArray();
         }
-
 
 
         /// <summary>

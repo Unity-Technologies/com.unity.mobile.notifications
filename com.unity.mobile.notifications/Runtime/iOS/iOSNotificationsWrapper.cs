@@ -33,7 +33,6 @@ namespace Unity.Notifications.iOS
 
 		[DllImport("__Internal")]
 		private static extern void _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestCallback callback);
-
 		
 		[DllImport("__Internal")]
 		private static extern IntPtr _GetNotificationSettings();
@@ -101,10 +100,8 @@ namespace Unity.Notifications.iOS
 			Debug.Log("smt, smth1!!");
 			iOSAuthorizationRequestData data;
 			data = (iOSAuthorizationRequestData)Marshal.PtrToStructure(authRequestDataPtr, typeof(iOSAuthorizationRequestData));
-			Debug.Log("\n data.finished: " + data.finished + "    data.granted:" + data.granted +"    data.error:" +  data.error);
-////			throw new Exception("SMNth SMth not finished!");
-//			
-			iOSNotificationManager.onFinishedAuthorizationRequest(data);
+		
+			iOSNotificationCenter.onFinishedAuthorizationRequest(data);
 		}
 
 		[MonoPInvokeCallback(typeof(NotificationReceivedCallback))]
@@ -113,7 +110,7 @@ namespace Unity.Notifications.iOS
 			iOSNotificationData data;
 			data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
 			
-			iOSNotificationManager.onReceivedRemoteNotification(data);
+			iOSNotificationCenter.onReceivedRemoteNotification(data);
 		}
 
 
@@ -123,7 +120,7 @@ namespace Unity.Notifications.iOS
 			iOSNotificationData data;
 			data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
 			
-			iOSNotificationManager.onSentNotification(data);
+			iOSNotificationCenter.onSentNotification(data);
 		}
 		
 		public static void RequestAuthorization(int options, bool registerRemote)

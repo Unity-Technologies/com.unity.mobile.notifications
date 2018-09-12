@@ -11,6 +11,9 @@ namespace Unity.Notifications.Android
     /// The level of interruption of this notification channel.
     /// The importance of a notification is used to determine how much the notification should interrupt the user (visually and audibly). The higher the importance of a notification, the more interruptive the notification will be.
     /// </summary>
+    /// <remarks>
+    /// The exact behaviour of each importance level might vary depending on the device and OS version on devices running Android 7.1 or older.
+    /// </remarks>
     public enum Importance
     {
         /// <summary>
@@ -19,7 +22,7 @@ namespace Unity.Notifications.Android
         None = 0,
         
         /// <summary>
-        /// Low importance, notification is shown everywhere, but is not intrusive.
+        /// Low importance, notification is shown everywhere, but is not intrusive. 
         /// </summary>
         Low = 2,
 
@@ -114,8 +117,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Title
         {
-            get { return m_title; }
-            set { m_title = value; }
+            get { return title; }
+            set { title = value; }
         }
 
         /// <summary>
@@ -124,8 +127,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Text
         {
-            get { return m_text; }
-            set { m_text = value; }
+            get { return text; }
+            set { text = value; }
         }
         
         /// <summary>
@@ -135,8 +138,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string SmallIcon
         {
-            get { return m_SmallIcon; }
-            set { m_SmallIcon = value; }
+            get { return smallIcon; }
+            set { smallIcon = value; }
         }
 
         /// <summary>
@@ -147,14 +150,14 @@ namespace Unity.Notifications.Android
             get
             {
                 DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                return origin.AddMilliseconds(m_fireTime).ToLocalTime();
+                return origin.AddMilliseconds(fireTime).ToLocalTime();
             }
             set
             {
                 DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
                 TimeSpan diff = value.ToUniversalTime() - origin;
 
-                m_fireTime = (long) Math.Floor(diff.TotalMilliseconds);
+                fireTime = (long) Math.Floor(diff.TotalMilliseconds);
             }
         }
 
@@ -164,13 +167,13 @@ namespace Unity.Notifications.Android
         /// </summary>
         public TimeSpan? RepeatInterval
         {
-            get { return  TimeSpan.FromMilliseconds(m_repeatInterval); }
+            get { return  TimeSpan.FromMilliseconds(repeatInterval); }
             set
             {
                 if (value != null)
-                    m_repeatInterval = (long)value.Value.TotalMilliseconds;
+                    repeatInterval = (long)value.Value.TotalMilliseconds;
                 else
-                    m_repeatInterval = -1L;
+                    repeatInterval = -1L;
             }
         }
 
@@ -181,8 +184,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string LargeIcon
         {
-            get { return m_largeIcon; }
-            set { m_largeIcon = value; }
+            get { return largeIcon; }
+            set { largeIcon = value; }
         }
 
         /// <summary>
@@ -191,8 +194,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public NotificationStyle Style
         {
-            get { return (NotificationStyle) m_style; }
-            set { m_style = (int) value; }
+            get { return (NotificationStyle) style; }
+            set { style = (int) value; }
         }
 
         /// <summary>
@@ -203,24 +206,24 @@ namespace Unity.Notifications.Android
         {
             get
             {
-                if (m_color < 0)
+                if (color < 0)
                     return null;
 
-                int a = (m_color >> 24) & 0xff;
-                int r = (m_color >> 16) & 0xff;
-                int g = (m_color >> 8) & 0xff;
-                int b = (m_color) & 0xff;
+                int a = (color >> 24) & 0xff;
+                int r = (color >> 16) & 0xff;
+                int g = (color >> 8) & 0xff;
+                int b = (color) & 0xff;
 
                 return new Color32((byte) a, (byte) r, (byte) g, (byte) b);
             }
             set
             {
                 if (value == null)
-                    m_color = -1;
+                    color = -1;
                 else
                 {
                     var color32 = (Color32) value.Value;
-                    m_color = (color32.a & 0xff) << 24 | (color32.r & 0xff) << 16 | (color32.g & 0xff) << 8 |
+                    color = (color32.a & 0xff) << 24 | (color32.r & 0xff) << 16 | (color32.g & 0xff) << 8 |
                               (color32.b & 0xff);
                 }
             }
@@ -232,8 +235,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public int Number
         {
-            get { return m_number; }
-            set { m_number = value; }
+            get { return number; }
+            set { number = value; }
         }
 
         /// <summary>
@@ -242,8 +245,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public bool ShouldAutoCancel
         {
-            get { return m_shouldAutoCancel; }
-            set { m_shouldAutoCancel = value; }
+            get { return shouldAutoCancel; }
+            set { shouldAutoCancel = value; }
         }
 
         /// <summary>
@@ -251,43 +254,43 @@ namespace Unity.Notifications.Android
         /// </summary>
         public bool UsesStopwatch
         {
-            get { return m_usesStopwatch; }
-            set { m_usesStopwatch = value; }
+            get { return usesStopwatch; }
+            set { usesStopwatch = value; }
         }
 
-        internal string m_title;
-        internal string m_text;
+        internal string title;
+        internal string text;
         
-        internal string m_SmallIcon;
-        internal long m_fireTime;
-        internal bool m_shouldAutoCancel;
+        internal string smallIcon;
+        internal long fireTime;
+        internal bool shouldAutoCancel;
 
-        internal string m_largeIcon;
+        internal string largeIcon;
 
-        internal int m_style;
-        internal int m_color;
+        internal int style;
+        internal int color;
 
-        internal int m_number;
-        internal bool m_usesStopwatch;
-        internal long m_repeatInterval;
+        internal int number;
+        internal bool usesStopwatch;
+        internal long repeatInterval;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
         /// </summary>
         public AndroidNotification(String title, String text, DateTime fireTime)
         {
-            m_title = title;
-            m_text = text;
+            this.title = title;
+            this.text = text;
 
-            m_repeatInterval = -1;
-            m_SmallIcon = "";
-            m_shouldAutoCancel = false;
-            m_largeIcon = "";
-            m_style = (int) NotificationStyle.None;
-            m_color = -1;
-            m_number = -1;
-            m_usesStopwatch = false;
-            m_fireTime = -1;
+            repeatInterval = -1;
+            smallIcon = "";
+            shouldAutoCancel = false;
+            largeIcon = "";
+            style = (int) NotificationStyle.None;
+            color = -1;
+            number = -1;
+            usesStopwatch = false;
+            this.fireTime = -1;
             
             this.FireTime = fireTime;
         }
@@ -295,6 +298,9 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create a repeatable notification struct with all optional fields set to default values.
         /// </summary>
+        /// <remarks>
+        /// There is a minimum period of 1 minute for repeating notifications.
+        /// </remarks>
         public AndroidNotification(String title, String text, DateTime fireTime, TimeSpan repeatInterval)
             : this(title, text, fireTime)
         {
@@ -316,17 +322,17 @@ namespace Unity.Notifications.Android
         /// </summary>
         public AndroidNotificationChannel(string id, string title, string description, Importance importance)
         {
-            m_id = id;
-            m_title = title;
-            m_description = description;
-            m_importance = (int) importance;
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.importance = (int) importance;
 
-            m_canBypassDnd = false;
-            m_canShowBadge = true;
-            m_enableLights = false;
-            m_enableVibration = true;
-            m_lockscreenVisibility = (int) LockScreenVisibility.Public;
-            m_vibrationPattern = null;
+            canBypassDnd = false;
+            canShowBadge = true;
+            enableLights = false;
+            enableVibration = true;
+            lockscreenVisibility = (int) LockScreenVisibility.Public;
+            vibrationPattern = null;
         }
 
         /// <summary>
@@ -335,8 +341,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Id
         {
-            get { return m_id; }
-            set { m_id = value; }
+            get { return id; }
+            set { id = value; }
         }
 
         /// <summary>
@@ -344,8 +350,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Name
         {
-            get { return m_title; }
-            set { m_title = value; }
+            get { return title; }
+            set { title = value; }
         }
 
         /// <summary>
@@ -353,8 +359,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Description
         {
-            get { return m_description; }
-            set { m_description = value; }
+            get { return description; }
+            set { description = value; }
         }
 
         /// <summary>
@@ -369,8 +375,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public Importance Importance
         {
-            get { return (Importance) m_importance; }
-            set { m_importance = (int) value; }
+            get { return (Importance) importance; }
+            set { importance = (int) value; }
         }
 
         /// <summary>
@@ -379,8 +385,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public bool CanBypassDnd
         {
-            get { return m_canBypassDnd; }
-            set { m_canBypassDnd = value; }
+            get { return canBypassDnd; }
+            set { canBypassDnd = value; }
         }
 
         /// <summary>
@@ -388,8 +394,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public bool CanShowBadge
         {
-            get { return m_canShowBadge; }
-            set { m_canShowBadge = value; }
+            get { return canShowBadge; }
+            set { canShowBadge = value; }
         }
 
         /// <summary>
@@ -398,8 +404,8 @@ namespace Unity.Notifications.Android
         /// </summary>/
         public bool EnableLights
         {
-            get { return m_enableLights; }
-            set { m_enableLights = value; }
+            get { return enableLights; }
+            set { enableLights = value; }
         }
 
         /// <summary>
@@ -408,8 +414,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public bool EnableVibration
         {
-            get { return m_enableVibration; }
-            set { m_enableVibration = value; }
+            get { return enableVibration; }
+            set { enableVibration = value; }
         }
 
         /// <summary>
@@ -418,8 +424,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public LockScreenVisibility LockScreenVisibility
         {
-            get { return (LockScreenVisibility) m_lockscreenVisibility; }
-            set { m_lockscreenVisibility = (int) value; }
+            get { return (LockScreenVisibility) lockscreenVisibility; }
+            set { lockscreenVisibility = (int) value; }
         }
 
         /// <summary>
@@ -427,8 +433,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public long[] VibrationPattern
         {
-            get { return m_vibrationPattern; }
-            set { m_vibrationPattern = value; }
+            get { return vibrationPattern; }
+            set { vibrationPattern = value; }
         }
         
         /// <summary>
@@ -439,23 +445,23 @@ namespace Unity.Notifications.Android
             get { return Importance != Importance.None; }
         }
 
-        internal string m_id;
-        internal string m_title;
-        internal string m_description;
-        internal int m_importance;
+        internal string id;
+        internal string title;
+        internal string description;
+        internal int importance;
 
-        internal bool m_canBypassDnd;
-        internal bool m_canShowBadge;
-        internal bool m_enableLights;
-        internal bool m_enableVibration;
-        internal int m_lockscreenVisibility;
-        internal long[] m_vibrationPattern;
+        internal bool canBypassDnd;
+        internal bool canShowBadge;
+        internal bool enableLights;
+        internal bool enableVibration;
+        internal int lockscreenVisibility;
+        internal long[] vibrationPattern;
     }
 
     /// <summary>
-    /// Use the AndroidNotificationManager to register notification channels and schedule local notifications.
+    /// Use the AndroidNotificationCenter to register notification channels and schedule local notifications.
     /// </summary>
-    public class AndroidNotificationManager
+    public class AndroidNotificationCenter
     {
         public delegate void NotificationReceivedCallback(int id, AndroidNotification notification, string channel);
 
@@ -470,14 +476,14 @@ namespace Unity.Notifications.Android
         const string DEFAULT_APP_ICON_ADAPTIVE = "ic_launcher_foreground";
         const string DEFAULT_APP_ICON_LEGACY = "app_icon";
 
-        static AndroidJavaObject m_notificationManager;
+        static AndroidJavaObject notificationManager;
         static int AndroidSDK;
         
-        static bool m_initialized;
+        static bool initialized;
 
         static bool Initialize()
         {
-            if (m_initialized)
+            if (initialized)
                 return true;
 
             #if UNITY_EDITOR || !UNITY_ANDROID
@@ -491,14 +497,14 @@ namespace Unity.Notifications.Android
             AndroidJavaClass managerClass =
                 new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
 
-            m_notificationManager =
+            notificationManager =
                 managerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, activity);
-            m_notificationManager.Call("setNotificationCallback", new NotificationCallback());
+            notificationManager.Call("setNotificationCallback", new NotificationCallback());
 
             AndroidJavaClass buildVersion = new AndroidJavaClass("android.os.Build$VERSION");
             AndroidSDK = buildVersion.GetStatic<int>("SDK_INT");
 
-            return m_initialized = true;
+            return initialized = true;
         }
 
         /// <summary>
@@ -516,30 +522,30 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            if (string.IsNullOrEmpty(channel.m_id))
+            if (string.IsNullOrEmpty(channel.id))
             {
                 throw new Exception("Cannot register notification channel, the channel ID is not specified.");
             }
-            else if (string.IsNullOrEmpty(channel.m_id))
+            else if (string.IsNullOrEmpty(channel.id))
             {
-                throw new Exception(string.Format("Cannot register notification channel: {} , the channel Name is not set.", channel.m_id));
+                throw new Exception(string.Format("Cannot register notification channel: {} , the channel Name is not set.", channel.id));
             }
-            else if (string.IsNullOrEmpty(channel.m_description))
+            else if (string.IsNullOrEmpty(channel.description))
             {
-                throw new Exception(string.Format("Cannot register notification channel: {} , the channel Description is not set.", channel.m_id));
+                throw new Exception(string.Format("Cannot register notification channel: {} , the channel Description is not set.", channel.id));
             }
             
-            m_notificationManager.Call("registerNotificationChannel",
-                channel.m_id,
-                channel.m_title,
-                Enum.IsDefined(typeof(Importance), channel.m_importance) ? channel.m_importance : (int)Importance.Default,
-                channel.m_description,
-                channel.m_enableLights,
-                channel.m_enableVibration,
-                channel.m_canBypassDnd,
-                channel.m_canShowBadge,
-                channel.m_vibrationPattern,
-                Enum.IsDefined(typeof(LockScreenVisibility), channel.m_lockscreenVisibility) ? channel.m_lockscreenVisibility : (int)LockScreenVisibility.Public
+            notificationManager.Call("registerNotificationChannel",
+                channel.id,
+                channel.title,
+                Enum.IsDefined(typeof(Importance), channel.importance) ? channel.importance : (int)Importance.Default,
+                channel.description,
+                channel.enableLights,
+                channel.enableVibration,
+                channel.canBypassDnd,
+                channel.canShowBadge,
+                channel.vibrationPattern,
+                Enum.IsDefined(typeof(LockScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
             );
         }
 
@@ -565,7 +571,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            m_notificationManager.Call("cancelPendingNotificationIntent", id);
+            notificationManager.Call("cancelPendingNotificationIntent", id);
         }
 
         /// <summary>
@@ -578,7 +584,7 @@ namespace Unity.Notifications.Android
                 return;
 
             AndroidJavaObject androidNotificationManager =
-                m_notificationManager.Call<AndroidJavaObject>("getNotificationManager");
+                notificationManager.Call<AndroidJavaObject>("getNotificationManager");
             androidNotificationManager.Call("cancel", id);
         }
 
@@ -601,7 +607,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            m_notificationManager.Call("cancelAllPendingNotificationIntents");
+            notificationManager.Call("cancelAllPendingNotificationIntents");
         }
 
         /// <summary>
@@ -613,7 +619,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            m_notificationManager.Call("cancelAllNotifications");
+            notificationManager.Call("cancelAllNotifications");
         }
 
         /// <summary>
@@ -626,23 +632,23 @@ namespace Unity.Notifications.Android
 
             List<AndroidNotificationChannel> channels = new List<AndroidNotificationChannel>();
 
-            var androidChannels = m_notificationManager.Call<AndroidJavaObject[]>("getNotificationChannels");
+            var androidChannels = notificationManager.Call<AndroidJavaObject[]>("getNotificationChannels");
 
             foreach (var channel in androidChannels)
             {
                 var ch = new AndroidNotificationChannel();
-                ch.m_id = channel.Get<string>("id");
-                ch.m_title = channel.Get<string>("name");
-                ch.m_importance = channel.Get<int>("importance");
+                ch.id = channel.Get<string>("id");
+                ch.title = channel.Get<string>("name");
+                ch.importance = channel.Get<int>("importance");
 
-                ch.m_description = channel.Get<string>("description");
+                ch.description = channel.Get<string>("description");
 
-                ch.m_enableLights = channel.Get<bool>("enableLights");
-                ch.m_enableVibration = channel.Get<bool>("enableVibration");
-                ch.m_canBypassDnd = channel.Get<bool>("canBypassDnd");
-                ch.m_canShowBadge = channel.Get<bool>("canShowBadge");
-                ch.m_vibrationPattern = channel.Get<long[]>("vibrationPattern");
-                ch.m_lockscreenVisibility = channel.Get<int>("lockscreenVisibility");
+                ch.enableLights = channel.Get<bool>("enableLights");
+                ch.enableVibration = channel.Get<bool>("enableVibration");
+                ch.canBypassDnd = channel.Get<bool>("canBypassDnd");
+                ch.canShowBadge = channel.Get<bool>("canShowBadge");
+                ch.vibrationPattern = channel.Get<long[]>("vibrationPattern");
+                ch.lockscreenVisibility = channel.Get<int>("lockscreenVisibility");
 
                 channels.Add(ch);
             }
@@ -667,7 +673,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            if (m_notificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
+            if (notificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
                 SendNotification(id, notification, channel);
         }
 
@@ -692,62 +698,62 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static NotificationStatus CheckScheduledNotificationStatus(int id)
         {
-            var status = m_notificationManager.Call<int>("checkNotificationStatus", id);
+            var status = notificationManager.Call<int>("checkNotificationStatus", id);
             return (NotificationStatus) status;
         }
 
         internal static void SendNotification(int id, AndroidNotification notification, string channel)
         {
-            if (notification.m_fireTime < 0L)
+            if (notification.fireTime < 0L)
             {
                 Debug.LogError("Failed to schedule notification, it did not contain a valid FireTime");
             }
 
             AndroidJavaClass managerClass =
                 new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-            AndroidJavaObject activity = m_notificationManager.Get<AndroidJavaObject>("mActivity");
+            AndroidJavaObject activity = notificationManager.Get<AndroidJavaObject>("mActivity");
 
             AndroidJavaObject notificationIntent =
                 new AndroidJavaObject("android.content.Intent", activity, managerClass);
 
-            AndroidJavaObject androidContext = m_notificationManager.Get<AndroidJavaObject>("mContext");
+            AndroidJavaObject androidContext = notificationManager.Get<AndroidJavaObject>("mContext");
 
-            int smallIconId = m_notificationManager.CallStatic<int>("findResourceidInContextByName",
-                notification.m_SmallIcon, androidContext, activity);
-            int largeIconId = m_notificationManager.CallStatic<int>("findResourceidInContextByName",
-                notification.m_largeIcon, androidContext, activity);
+            int smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
+                notification.smallIcon, androidContext, activity);
+            int largeIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
+                notification.largeIcon, androidContext, activity);
 
 
             if (smallIconId == 0)
             {
-                smallIconId = m_notificationManager.CallStatic<int>("findResourceidInContextByName",
+                smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
                     DEFAULT_APP_ICON_ADAPTIVE, androidContext, activity);
 
                 if (smallIconId == 0)
                 {
-                    smallIconId = m_notificationManager.CallStatic<int>("findResourceidInContextByName",
+                    smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
                         DEFAULT_APP_ICON_LEGACY, androidContext, activity);
                 }
             }
 
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channel);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.m_title);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.m_text);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.title);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.text);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIcon", smallIconId);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.m_shouldAutoCancel);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.m_usesStopwatch);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", notification.m_fireTime);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.m_repeatInterval);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.shouldAutoCancel);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.usesStopwatch);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", notification.fireTime);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.repeatInterval);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIcon", largeIconId);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.m_style);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.m_color);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.m_number);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);
 
-            Debug.Log(" --- m_notificationManager.Call(scheduleNotificationIntent, notificationIntent);");
+            Debug.Log(" --- notificationManager.Call(scheduleNotificationIntent, notificationIntent);");
 
 
-            m_notificationManager.Call("scheduleNotificationIntent", notificationIntent);
+            notificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
 
         /// <summary>
@@ -758,7 +764,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            m_notificationManager.Call("deleteNotificationChannel", id);
+            notificationManager.Call("deleteNotificationChannel", id);
         }
 
         class NotificationCallback : AndroidJavaProxy
@@ -773,16 +779,16 @@ namespace Unity.Notifications.Android
 
                 var id = notificationIntent.Call<int>("getIntExtra", "id", -1);
                 var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
-                notification.m_title = notificationIntent.Call<string>("getStringExtra", "textTitle");
-                notification.m_text = notificationIntent.Call<string>("getStringExtra", "textContent");
-                notification.m_shouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
-                notification.m_usesStopwatch =
+                notification.title = notificationIntent.Call<string>("getStringExtra", "textTitle");
+                notification.text = notificationIntent.Call<string>("getStringExtra", "textContent");
+                notification.shouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
+                notification.usesStopwatch =
                     notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
-                notification.m_fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
-                notification.m_repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
-                notification.m_style = notificationIntent.Call<int>("getIntExtra", "style", -1);
-                notification.m_color = notificationIntent.Call<int>("getIntExtra", "color", -1);
-                notification.m_number = notificationIntent.Call<int>("getIntExtra", "number", -1);
+                notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
+                notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
+                notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
+                notification.color = notificationIntent.Call<int>("getIntExtra", "color", -1);
+                notification.number = notificationIntent.Call<int>("getIntExtra", "number", -1);
 
                 OnNotificationReceived(id, notification, channel);
             }
