@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Boo.Lang;
 using Unity.Notifications.iOS;
 using UnityEngine;
 using UnityEditor;
@@ -22,8 +23,8 @@ namespace Unity.Notifications.Android
 		private ReorderableList m_ReorderableList;
 				
 		protected const int kSlotSize = 64;
-		protected const float kHeaderHeight = 80;
-		protected const int kMaxElementHeight = 116;
+		protected const int kHeaderHeight = 80;
+
 		protected const int kMaxPreviewSize = 64;
 		protected const int kIconSpacing = 8;
 		protected const float kPadding = 12f;
@@ -36,6 +37,26 @@ namespace Unity.Notifications.Android
 		
 		public int toolbarInt = 0;
 		public string[] toolbarStrings = new string[] {"Android", "iOS"};
+		
+		private string infoStringAndroid =
+			"Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +
+			"Small icons can only be  composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels. \n" +
+			"Large icons can contain any colors but must be not smaller than 192x192 pixels.";
+
+		private string infoStringiOS = " ";
+
+
+		
+		[Flags]
+		private enum PresentationOptionEditor
+		{
+			None  = 0,
+			Badge = 1 << 0,
+			Sound = 1 << 1,
+			Alert = 1 << 2,
+			All = ~0,
+		}
+
 		
 		void OnEnable()
 		{
@@ -308,101 +329,109 @@ namespace Unity.Notifications.Android
 			serializedObject.UpdateIfRequiredOrScript();
 			toolbarInt = GUILayout.Toolbar(toolbarInt, toolbarStrings);
 
+			var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
+			headerMsgStyle.alignment = TextAnchor.UpperCenter;
+			headerMsgStyle.fontSize = 10;
+			headerMsgStyle.wordWrap = true;
+		
+			var headerRect = GetContentRect(
+				new Rect(kPadding, 20, rect.width - kPadding, toolbarInt == 0 ? kHeaderHeight : 0),
+				kPadding,
+				kPadding
+			);
+
+			var bodyRect = GetContentRect(
+				new Rect(kPadding, headerRect.bottom, rect.width - kPadding, rect.height - headerRect.height),
+				kPadding,
+				kPadding
+			);
+
+			var viewRect = GetContentRect(
+				new Rect(rect.x, rect.y, rect.width,
+					headerRect.height + m_ReorderableList.GetHeight() + kPadding * 2),
+				kPadding * -1,
+				kPadding
+			);
+
+			
 			if (toolbarInt == 0)
 			{
-
-				var headerRect = GetContentRect(
-					new Rect(kPadding, 10, rect.width - kPadding, kHeaderHeight),
-					kPadding,
-					kPadding
-				);
-
-				var bodyRect = GetContentRect(
-					new Rect(kPadding, headerRect.bottom, rect.width - kPadding, rect.height - headerRect.height),
-					kPadding,
-					kPadding
-				);
-
-				var viewRect = GetContentRect(
-					new Rect(rect.x, rect.y, rect.width,
-						headerRect.height + m_ReorderableList.GetHeight() + kPadding * 2),
-					kPadding * -1,
-					kPadding
-				);
+				DrawHeader(headerRect, infoStringAndroid, headerMsgStyle);
 
 				m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
-
-				DrawHeader(headerRect);
-
 				m_ReorderableList.DoList(bodyRect);
-
 				GUI.EndScrollView();
 			}
 			else
 			{
-				
+				var settingsPanelRect = bodyRect;//GetContentRect(rect, kPadding, kPadding);
+
 				var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettings;
 				if (settings == null)
 					return;
 
-				var longestLabel = settings.Find( s =>  s.label.Length == settings.Max(v => v.label.Length));
-//				
-//
-//
-				var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
-				var minSize = styleLabel.CalcSize(new GUIContent(longestLabel.label));
+				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
+				var longestLabel = settingsFlat.Find( s =>  s.label.Length == settingsFlat.Max(v => v.label.Length));//
 
-				styleLabel.fixedWidth = minSize.x;
-//				
-//
 				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
-//				styleToggle.stretchWidth = true;
-////				styleToggle.wordWrap = true;
-//				styleToggle.alignment = TextAnchor.MiddleCenter;
-
-				
+				styleToggle.alignment = TextAnchor.MiddleRight;
+			
 				var styleDropwDown = new GUIStyle(GUI.skin.GetStyle("Button"));
-				styleDropwDown.fixedWidth = 90f;
-//				styleDropwDown.stretchWidth = true;
-//				styleDropwDown.alignment = TextAnchor.MiddleCenter;
+				styleDropwDown.fixedWidth = kSlotSize * 2.5f;
 
 				
-				for (var i = 0; i < settings.Count; i++)
-				{
-					var setting = settings[i];
-					
-					
-					Rect r = EditorGUILayout.BeginHorizontal();
-					GUILayout.Label(new GUIContent( setting.label, setting.tooltip), styleLabel);
-
-					if (setting.val.GetType() == typeof(bool))
-					{
-						setting.val = (object)EditorGUILayout.Toggle((bool)setting.val, styleToggle);
-					}
-					else if (setting.val.GetType() == typeof(PresentationOption))
-					{
-						setting.val =
-							(object) EditorGUILayout.EnumFlagsField((PresentationOption) setting.val, styleDropwDown);
-					}
-					EditorGUILayout.EndHorizontal();
-				}		
+				GUI.BeginGroup(settingsPanelRect);
+				DrawSettingsElementList(settings, false, styleToggle, styleDropwDown, settingsPanelRect);
+				GUI.EndGroup();
 			}
 		}
 
+		private void DrawSettingsElementList(List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
+		{
+			foreach (var setting in settings)
+			{
+				EditorGUI.BeginDisabledGroup(disabled);
+				Rect r = EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(layer * 10);
+				
+				var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
+				
+				var width = rect.width - kSlotSize * 3 - layer * 10;
+
+				styleLabel.fixedWidth = width;
+				styleLabel.wordWrap = true;
+
+				
+				GUILayout.Label(new GUIContent(setting.label, setting.tooltip), styleLabel);
+
+				if (setting.val.GetType() == typeof(bool))
+				{
+					setting.val = (object)EditorGUILayout.Toggle((bool)setting.val, styleToggle);
+				}
+				else if (setting.val.GetType() == typeof(PresentationOption))
+				{
+					setting.val =
+						(PresentationOption) EditorGUILayout.EnumFlagsField((PresentationOptionEditor) setting.val, styleDropwDown);
+				}
+				EditorGUILayout.EndHorizontal();
+				EditorGUI.EndDisabledGroup();
+
+				bool dependentDisabled = false;
+				if (setting.val is bool)
+					dependentDisabled = !(bool) setting.val;
+				
+				if (setting.dependentSettings != null)
+				{
+					layer++;
+					DrawSettingsElementList(setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
+				}
+			}
+		}
 
 		
-		private void DrawHeader(Rect headerRect)
-		{
-			var infoStr =
-				"Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +
-				"Small icons can only be  composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels. \n" +
-				"Large icons can contain any colors but must be not smaller than 192x192 pixels.";
-			
-			var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
-			headerMsgStyle.alignment = TextAnchor.UpperCenter;
-			headerMsgStyle.fontSize = 10;
-			
-			EditorGUI.TextArea(headerRect, infoStr, headerMsgStyle);
+		private void DrawHeader(Rect headerRect, string infoStr, GUIStyle style)
+		{						
+			EditorGUI.TextArea(headerRect, infoStr, style);
         }
 	
 		public static Rect GetContentRect(Rect rect, float paddingVertical = 0, float paddingHorizontal = 0)

@@ -104,14 +104,17 @@ namespace Unity.Notifications.Android
         public string tooltip;
         public object val;
         public bool writeToPlist;
+
+        public List<NotificationEditorSetting> dependentSettings;
         
-        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist  = true)
+        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist  = true, List<NotificationEditorSetting> dependentSettings = null)
         {
             this.key = key;
             this.label = label;
             this.tooltip = tooltip;
             this.val = val;
             this.writeToPlist = writeToPlist;
+            this.dependentSettings = dependentSettings;
         }
     }
     
@@ -123,7 +126,31 @@ namespace Unity.Notifications.Android
 
         [SerializeField] 
         public List<NotificationEditorSetting> iOSNotificationEditorSettings;
+
+
+        private void FlattenList(List<NotificationEditorSetting> source, List<NotificationEditorSetting> target)
+        {
+            foreach (var setting in source)
+            {
+                target.Add(setting);
+
+                if (setting.dependentSettings != null)
+                {
+                    FlattenList(setting.dependentSettings, target);
+                }
+            }
+        }
         
+        public List<NotificationEditorSetting> iOSNotificationEditorSettingsFlat
+        {
+            get
+            {
+                var target = new List<NotificationEditorSetting>();
+                FlattenList(iOSNotificationEditorSettings, target);
+                return target;
+            }
+        }
+
         [SerializeField]
         public List<DrawableResourceData> TrackedResourceAssets = new List<DrawableResourceData>();
 
@@ -162,38 +189,46 @@ namespace Unity.Notifications.Android
                     new NotificationEditorSetting(
                         "UnityNotificationRequestAuthorizationOnAppLaunch", 
                         "Request Authorization on App Launch",
-                        "TODO",
-                        true),
+                        "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorizatio popup immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
+                        true,
+                        dependentSettings: new List<NotificationEditorSetting>()
+                        {
+                            new NotificationEditorSetting(
+                                "UnityNotificationDefaultAuthorizationOptions", 
+                                "Default Notification Presentation Options",
+                                "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Slternatively you can specify them when creating a `AuthorizationRequest` from a script.",
+                                PresentationOption.NotificationPresentationOptionBadge    | PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
+                            
+                            new NotificationEditorSetting(
+                                "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
+                                "Register for Remote Notifications on App Launch",
+                                "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
+                                false,
+                                dependentSettings: new List<NotificationEditorSetting>()
+                                {
+                                    new NotificationEditorSetting("UnityRemoteNotificationForegroundPresentationOptions",
+                                        "Remote Notification Foreground Presentation Options",
+                                        "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorisation to use them (the user might change it at any time). ",
+                                        PresentationOption.NotificationPresentationOptionBadge    | PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
+                                }),
                     
-                    new NotificationEditorSetting(
-                        "UnityNotificationDefaultPresentationOptions", 
-                        "Default Notification Presentation Options",
-                        "TODO",
-                        PresentationOption.NotificationPresentationOptionBadge    | PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
-
+                        }),
                     
-                    new NotificationEditorSetting(
-                        "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                        "Register for Remote Notifications on App Launch",
-                        "TODO",
+                    new NotificationEditorSetting("UnityUseLocationNotificationTrigger",
+                        "Include CoreLocation framework",
+                        "If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.",
+                        false,
                         false),
-                    new NotificationEditorSetting("UnityRemoteNotificationForegroundPresentationOptions",
-                        "Remote Notification Foreground Presentation Options",
-                        "TODO",
-                        PresentationOption.NotificationPresentationOptionBadge    | PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
+
                     new NotificationEditorSetting("UnityAPSReleaseEnvironment",
                         "Enable release environment for APS",
-                        "TODO",
+                        "Enable this when signing the app with a production certificate.",
                         false,
-                        false)
-
-
+                        false),
                 };
                 
                 EditorUtility.SetDirty(notificationEditorManager);
-//                notificationEditorManager.Update();
             }
-            
             
             return notificationEditorManager;
         }

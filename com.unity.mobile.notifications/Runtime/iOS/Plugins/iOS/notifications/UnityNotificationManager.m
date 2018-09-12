@@ -16,26 +16,12 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[UnityNotificationManager alloc] init];
-        
-#if !UNITY_USES_REMOTE_NOTIFICATIONS
-        NSLog(@"UNITY_USES_REMOTE_NOTIFICATIONS == FALSE!!!");
-#endif
-        
-//        sharedInstance.settingsWrapper = malloc(sizeof(NotificationSettingWrapper));
-//        [sharedInstance UpdateNotificationSettings];
-//        UnityRegisterAppDelegateListener(self);
     });
     
-    // TODO probably need to update these things in a more sensible way:
     [sharedInstance updateNotificationSettings];
     [sharedInstance updateScheduledNotificationList];
 
     return sharedInstance;
-}
-
-- (void)requestAuthorizationInternal
-{
-//    [self requestAuthorization: UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge];
 }
 
 - (void)checkAuthorizationFinished
@@ -49,8 +35,10 @@
     {
         self.authData -> deviceToken = [self.deviceToken UTF8String];
         self.onAuthorizationCompletionCallback(self.authData);
+        
+        free(self.authData);
+        self.authData = NULL;
     }
-
 }
 
 - (void)requestAuthorization: (NSInteger)authorizationOptions : (BOOL) registerRemote
@@ -87,51 +75,12 @@
     }];
 }
 
-//- (void)scheduleLocalNotification
-//{
-//    if(!SYSTEM_VERSION_10_OR_ABOVE )
-//        return;
-//    
-//}
-//
-
-
-//- (void) UpdateNotificationSettings
-//{
-//    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-//
-//    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-//        self.settingsWrapper -> authorizationStatus = settings.authorizationStatus;
-//        self.settingsWrapper -> notificationSetting = settings.notificationCenterSetting;
-//        self.settingsWrapper -> lockScreenSetting = settings.lockScreenSetting;
-//        self.settingsWrapper -> carPlaySetting = settings.carPlaySetting;
-//        self.settingsWrapper -> alertSetting = settings.alertSetting;
-//        self.settingsWrapper -> badgeSetting = settings.badgeSetting;
-//        self.settingsWrapper -> soundSetting = settings.soundSetting;
-//    }];
-//}
-//
-
-// DELEGATE STUFF:: TODO REMOVE
-
-////...........Handling delegate methods for UserNotifications........
-
-
-
 //Called when a notification is delivered to a foreground app.
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
     
     if (self.onNotificationReceivedCallback != NULL )
         self.onNotificationReceivedCallback([UnityNotificationManager UNNotificationToiOSNotificationData:notification]);
-    
-
-//    UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge
-    
-//    int a = UNNotificationPresentationOptionAlert;
-//    int b = UNNotificationPresentationOptionSound;
-//    int c = UNNotificationPresentationOptionBadge;
-//    int s = (int)UNNotificationPresentationOptionNone;
-    
+        
     BOOL showInForeground;
     NSInteger presentationOptions;
     
@@ -247,7 +196,6 @@
         notificationData -> threadIdentifier = " ";
     
      //0 - time, 1 - calendar, 2 - location, 3 - push.
-    // TODO initialize proper values!
     if ([ request.trigger isKindOfClass:[UNTimeIntervalNotificationTrigger class]])
     {
         notificationData -> triggerType = TIME_TRIGGER;
@@ -282,14 +230,4 @@
     
     return [UnityNotificationManager UNNotificationRequestToiOSNotificationData : request];
 }
-
-
-
-//- (BOOL)hasAuthorizationForNotificationType: (int) type
-//{
-//    // UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge
-//
-//    return self.authorizationOptions & (1 << type);
-//}
-
 @end

@@ -5,9 +5,11 @@
 //  Created by Paulius on 26/07/2018.
 //  Copyright © 2018 Unity Technologies. All rights reserved.
 //
-
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
+
+#ifdef defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+    #import <CoreLocation/CoreLocation.h>
+#endif
 
 #import "UnityNotificationManager.h"
 #import "UnityNotificationWrapper.h"
@@ -16,29 +18,38 @@ AuthorizationRequestResponse req_callback;
 DATA_CALLBACK g_notificationReceivedCallback;
 DATA_CALLBACK g_remoteNotificationCallback;
 
+void _FreeUnmanagedStruct(void* ptr)
+{
+    if (ptr != NULL)
+    {
+        free(ptr);
+        ptr = NULL;
+    }
+}
+
 void onNotificationReceived(struct iOSNotificationData* data)
 {
-    printf("\n - onNotificationReceived /n");
     if (g_notificationReceivedCallback != NULL)
+    {
         g_notificationReceivedCallback(data);
-    
+        _FreeUnmanagedStruct(data);
+    }
 }
 
 void onRemoteNotificationReceived(struct iOSNotificationData* data)
 {
-    printf("\n - onRemoteNotificationReceived /n");
     if (g_remoteNotificationCallback != NULL)
+    {
         g_remoteNotificationCallback(data);
+        _FreeUnmanagedStruct(data);
+    }
 }
 
 void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
 {
-    NSLog(@"UnityPlugin: _SetAuthorizationRequestReceivedDelegate(%p)", callback);
-    
     req_callback = callback;
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     manager.onAuthorizationCompletionCallback = req_callback;
-
 }
 
 //void onAuthorizationRequestCompletion(BOOL granted)
@@ -49,7 +60,6 @@ void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
 
 void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
 {
-    NSLog(@"UnityPlugin: _SetNotificationReceivedDelegate(%p)", callback);
     g_notificationReceivedCallback = callback;
     
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
@@ -58,7 +68,6 @@ void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
 
 void _SetRemoteNotificationReceivedDelegate(DATA_CALLBACK callback)
 {
-    NSLog(@"UnityPlugin: _SetRemoteNotificationReceivedDelegate(%p)", callback);
     g_remoteNotificationCallback = callback;
     
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
@@ -102,12 +111,8 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     if (data->threadIdentifier != NULL)
         content.threadIdentifier = [NSString stringWithUTF8String:data->threadIdentifier];
     
-    // TODO add way to specify
+    // TODO add a way to specify custom sounds.
     content.sound = [UNNotificationSound defaultSound];
-    
-    // Deliver the notification in five seconds.
-//    UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
-//                                                  triggerWithTimeInterval:data->timeTriggerFireTime repeats: repeats];
     
     UNNotificationTrigger* trigger;
     
@@ -135,21 +140,16 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     }
     else if ( data->triggerType == 2)
     {
-        if (NSClassFromString(@"CLLocationManager"))
-        {
-            CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
+#ifdef defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
             
-            CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter:center
+        CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter:center
                                                                          radius:data->locationTriggerRadius identifier:@"Headquarters"];
-            region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
-            region.notifyOnExit = data->locationTriggerNotifyOnExit;
+        region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
+        region.notifyOnExit = data->locationTriggerNotifyOnExit;
             
-            trigger = [UNLocationNotificationTrigger triggerWithRegion:region repeats:NO];
-        }
-        else
-        {
-            //TODO Handle
-        }
+        trigger = [UNLocationNotificationTrigger triggerWithRegion:region repeats:NO];
+#endif
     }
     else
     {

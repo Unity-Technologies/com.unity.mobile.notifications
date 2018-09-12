@@ -60,10 +60,10 @@ namespace Unity.Notifications.iOS
 		
 		[DllImport("__Internal")]
 		internal static extern void _RemoveAllDeliveredNotifications();
+		
+		[DllImport("__Internal")]
+		internal static extern void _FreeUnmanagedStruct(IntPtr ptr);
 
-
-
-//
 
 		internal delegate void AuthorizationRequestCallback(IntPtr authdata);
 		internal static AuthorizationRequestCallback onAuthenticationRequestFinished;
@@ -76,77 +76,97 @@ namespace Unity.Notifications.iOS
 		
 		public static void RegisterAuthorizationRequestCallback()
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			onAuthenticationRequestFinished = new AuthorizationRequestCallback(AuthorizationRequestReceived);
 			_SetAuthorizationRequestReceivedDelegate(onAuthenticationRequestFinished);
+#endif
 		}
 
 
 		public static void RegisterOnReceivedRemoteNotificationCallback()
 		{
-
+#if UNITY_IOS && !UNITY_EDITOR
 			onRemoteNotificationReceived = new NotificationReceivedCallback(RemoteNotificationReceived);
 			_SetRemoteNotificationReceivedDelegate(onRemoteNotificationReceived);
+#endif
 		}
 		
 		public static void RegisterOnReceivedCallback()
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			onNotificationReceived = new NotificationReceivedCallback(NotificationReceived);
 			_SetNotificationReceivedDelegate(onNotificationReceived);
+#endif
 		}
 		
 		[MonoPInvokeCallback(typeof(AuthorizationRequestCallback))]
 		public static void AuthorizationRequestReceived(IntPtr authRequestDataPtr)
 		{
-			Debug.Log("smt, smth1!!");
+#if UNITY_IOS && !UNITY_EDITOR
 			iOSAuthorizationRequestData data;
 			data = (iOSAuthorizationRequestData)Marshal.PtrToStructure(authRequestDataPtr, typeof(iOSAuthorizationRequestData));
 		
 			iOSNotificationCenter.onFinishedAuthorizationRequest(data);
+#endif
 		}
 
 		[MonoPInvokeCallback(typeof(NotificationReceivedCallback))]
 		public static void RemoteNotificationReceived(IntPtr notificationDataPtr)
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			iOSNotificationData data;
 			data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
-			
+
 			iOSNotificationCenter.onReceivedRemoteNotification(data);
+#endif
 		}
 
 
 		[MonoPInvokeCallback(typeof(NotificationReceivedCallback))]
 		public static void NotificationReceived(IntPtr notificationDataPtr)
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			iOSNotificationData data;
 			data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
 			
 			iOSNotificationCenter.onSentNotification(data);
+#endif
 		}
 		
 		public static void RequestAuthorization(int options, bool registerRemote)
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			_RequestAuthorization(options, registerRemote);
+#endif
 		}
 
 		public static iOSNotificationSettings GetNotificationSettings()
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			iOSNotificationSettings settings;
+
 			IntPtr ptr = _GetNotificationSettings();
 			settings = (iOSNotificationSettings) Marshal.PtrToStructure(ptr, typeof(iOSNotificationSettings));
-			return settings;
+			_FreeUnmanagedStruct(ptr);
+	
+				return settings;
+#endif
+			return new iOSNotificationSettings();
 		}
 
 		public static void ScheduleLocalNotification(iOSNotificationData data)
 		{
-			// Initialize unmanged memory to hold the struct.
+#if UNITY_IOS && !UNITY_EDITOR
 			IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(data));
 			Marshal.StructureToPtr(data, ptr, false);
 
 			_ScheduleLocalNotification(ptr);
+#endif
 		}
 
 		public static iOSNotificationData[] GetDeliveredNotificationData()
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			var size = _GetDeliveredNotificationDataCount();
 
 			var dataList = new List<iOSNotificationData>();
@@ -159,14 +179,18 @@ namespace Unity.Notifications.iOS
 				{
 					data = (iOSNotificationData) Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
 					dataList.Add(data);
+					_FreeUnmanagedStruct(ptr);
 				}
 			}
 
 			return dataList.ToArray();
+#endif
+			return null;
 		}
 
 		public static iOSNotificationData[] GetScheduledNotificationData()
 		{
+#if UNITY_IOS && !UNITY_EDITOR
 			var size = _GetScheduledNotificationDataCount();
 
 			var dataList = new List<iOSNotificationData>();
@@ -179,10 +203,13 @@ namespace Unity.Notifications.iOS
 				{
 					data = (iOSNotificationData) Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
 					dataList.Add(data);
+					_FreeUnmanagedStruct(ptr);
 				}
 			}
 
 			return dataList.ToArray();
+#endif
+			return new iOSNotificationData[]{};
 		}
 
 	}
