@@ -168,6 +168,16 @@ public class UnityNotificationManager extends BroadcastReceiver
         PendingIntent tapIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
         intent.putExtra("tapIntent", tapIntent);
 
+        SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
+        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+
+        idsSet.add(Integer.toString(id));
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSet);
+        editor.apply();
+
+
         if (repeatInterval <= 0)
         {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -181,7 +191,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
         else
         {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, fireTime, repeatInterval, PendingIntent.getBroadcast(mActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, fireTime, repeatInterval, PendingIntent.getBroadcast(mActivity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
         }
     }
 
@@ -277,20 +287,17 @@ public class UnityNotificationManager extends BroadcastReceiver
             int priority;
             switch (fakeNotificationChannel.importance)
             {
-                case NotificationManager.IMPORTANCE_MAX:
-                    priority = Notification.PRIORITY_MAX;
-                    break;
                 case NotificationManager.IMPORTANCE_HIGH:
                     priority = Notification.PRIORITY_MAX;
                     break;
                 case NotificationManager.IMPORTANCE_DEFAULT:
-                    priority = Notification.PRIORITY_MAX;
+                    priority = Notification.PRIORITY_DEFAULT;
                     break;
-                case NotificationManager.IMPORTANCE_MIN:
-                    priority = Notification.PRIORITY_MAX;
+                case NotificationManager.IMPORTANCE_LOW:
+                    priority = Notification.PRIORITY_LOW;
                     break;
                 case NotificationManager.IMPORTANCE_NONE:
-                    priority = Notification.PRIORITY_MAX;
+                    priority = Notification.PRIORITY_MIN;
                     break;
                 default:
                     priority = Notification.PRIORITY_DEFAULT;
@@ -452,13 +459,11 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public void cancelAllPendingNotificationIntents()
     {
-        SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
-        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        int[] ids = this.getScheduledNotificationIDs();
 
-        for (String id : idsSet)
+        for (int id : ids)
         {
-            int idInt = Integer.parseInt(id);
-            cancelPendingNotificationIntent(idInt);
+            cancelPendingNotificationIntent(id);
         }
     }
 
@@ -470,6 +475,15 @@ public class UnityNotificationManager extends BroadcastReceiver
         if (broadcast != null)
         {
             broadcast.cancel();
+
+            SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
+            Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+
+            idsSet.remove(Integer.toString(requestCode));
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSet);
+            editor.apply();
         }
     }
 
