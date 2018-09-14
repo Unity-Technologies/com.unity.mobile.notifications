@@ -16,29 +16,38 @@ AuthorizationRequestResponse req_callback;
 DATA_CALLBACK g_notificationReceivedCallback;
 DATA_CALLBACK g_remoteNotificationCallback;
 
+void _FreeUnmanagedStruct(void* ptr)
+{
+    if (ptr != NULL)
+    {
+        free(ptr);
+        ptr = NULL;
+    }
+}
+
 void onNotificationReceived(struct iOSNotificationData* data)
 {
-    printf("\n - onNotificationReceived /n");
     if (g_notificationReceivedCallback != NULL)
+    {
         g_notificationReceivedCallback(data);
-    
+        _FreeUnmanagedStruct(data);
+    }
 }
 
 void onRemoteNotificationReceived(struct iOSNotificationData* data)
 {
-    printf("\n - onRemoteNotificationReceived /n");
     if (g_remoteNotificationCallback != NULL)
+    {
         g_remoteNotificationCallback(data);
+        _FreeUnmanagedStruct(data);
+    }
 }
 
 void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
 {
-    NSLog(@"UnityPlugin: _SetAuthorizationRequestReceivedDelegate(%p)", callback);
-    
     req_callback = callback;
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     manager.onAuthorizationCompletionCallback = req_callback;
-
 }
 
 //void onAuthorizationRequestCompletion(BOOL granted)
@@ -49,7 +58,6 @@ void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
 
 void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
 {
-    NSLog(@"UnityPlugin: _SetNotificationReceivedDelegate(%p)", callback);
     g_notificationReceivedCallback = callback;
     
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
@@ -58,7 +66,6 @@ void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
 
 void _SetRemoteNotificationReceivedDelegate(DATA_CALLBACK callback)
 {
-    NSLog(@"UnityPlugin: _SetRemoteNotificationReceivedDelegate(%p)", callback);
     g_remoteNotificationCallback = callback;
     
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];

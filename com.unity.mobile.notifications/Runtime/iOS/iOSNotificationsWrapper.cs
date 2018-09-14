@@ -60,10 +60,10 @@ namespace Unity.Notifications.iOS
 		
 		[DllImport("__Internal")]
 		internal static extern void _RemoveAllDeliveredNotifications();
+		
+		[DllImport("__Internal")]
+		internal static extern void _FreeUnmanagedStruct(IntPtr ptr);
 
-
-
-//
 
 		internal delegate void AuthorizationRequestCallback(IntPtr authdata);
 		internal static AuthorizationRequestCallback onAuthenticationRequestFinished;
@@ -97,7 +97,6 @@ namespace Unity.Notifications.iOS
 		[MonoPInvokeCallback(typeof(AuthorizationRequestCallback))]
 		public static void AuthorizationRequestReceived(IntPtr authRequestDataPtr)
 		{
-			Debug.Log("smt, smth1!!");
 			iOSAuthorizationRequestData data;
 			data = (iOSAuthorizationRequestData)Marshal.PtrToStructure(authRequestDataPtr, typeof(iOSAuthorizationRequestData));
 		
@@ -109,7 +108,7 @@ namespace Unity.Notifications.iOS
 		{
 			iOSNotificationData data;
 			data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
-			
+
 			iOSNotificationCenter.onReceivedRemoteNotification(data);
 		}
 
@@ -133,6 +132,7 @@ namespace Unity.Notifications.iOS
 			iOSNotificationSettings settings;
 			IntPtr ptr = _GetNotificationSettings();
 			settings = (iOSNotificationSettings) Marshal.PtrToStructure(ptr, typeof(iOSNotificationSettings));
+			_FreeUnmanagedStruct(ptr);
 			return settings;
 		}
 
@@ -159,6 +159,7 @@ namespace Unity.Notifications.iOS
 				{
 					data = (iOSNotificationData) Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
 					dataList.Add(data);
+					_FreeUnmanagedStruct(ptr);
 				}
 			}
 
@@ -179,6 +180,7 @@ namespace Unity.Notifications.iOS
 				{
 					data = (iOSNotificationData) Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
 					dataList.Add(data);
+					_FreeUnmanagedStruct(ptr);
 				}
 			}
 
