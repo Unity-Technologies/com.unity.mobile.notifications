@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Notifications.Android;
@@ -20,43 +21,62 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 		#if UNITY_IOS
 		if (buildTarget == BuildTarget.iOS) {
 			
-			string projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
+			var projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
 				
-			PBXProject proj = new PBXProject ();
+			var proj = new PBXProject ();
 			proj.ReadFromString (File.ReadAllText (projPath));			
-			string target = proj.TargetGuidByName ("Unity-iPhone");
+			var target = proj.TargetGuidByName ("Unity-iPhone");
+			
+			var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettingsFlat;
 
-
-			var useReleaseAPSEnvSetting = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettings
+			var useReleaseAPSEnvSetting = settings
 				.Find(i => i.key == "UnityAPSReleaseEnvironment");
 			var useReleaseAPSEnv = false;
 			
 			if (useReleaseAPSEnvSetting != null)
 				useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.val;
+
+			var needLocationFramework = settings
+				.Find(i => i.key == "UnityUseLocationNotificationTrigger") != null;;
 			
 			proj.AddFrameworkToProject(target, "UserNotifications.framework", useReleaseAPSEnv);
 			
+			if (needLocationFramework)
+				proj.AddFrameworkToProject(target, "CoreLocation.framework", false);
+			
 			File.WriteAllText (projPath, proj.WriteToString ());
 			
-			string pbxPath = PBXProject.GetPBXProjectPath(path);
+			var pbxPath = PBXProject.GetPBXProjectPath(path);
 			var capManager = new ProjectCapabilityManager(pbxPath, string.Format("{0}.entitlements", PlayerSettings.productName), "Unity-iPhone");
 			capManager.AddPushNotifications(true);
 			capManager.WriteToFile();
 			
 			// Get plist
-			string plistPath = path + "/Info.plist";
-			PlistDocument plist = new PlistDocument();
+			var plistPath = path + "/Info.plist";
+			var plist = new PlistDocument();
 			plist.ReadFromString(File.ReadAllText(plistPath));
        
 			// Get root
-			PlistElementDict rootDict = plist.root;
+			var rootDict = plist.root;
 			
-			var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettings;
+			var requiredVersion = new Version(8, 0);
+			bool hasMinOSVersion;
+			
+			try
+			{
+				var currentVersion = new Version(PlayerSettings.iOS.targetOSVersionString);
+				hasMinOSVersion = currentVersion >= requiredVersion;
+			}
+			catch (Exception)
+			{
+				hasMinOSVersion = false;
+			}
+			
+			if (!hasMinOSVersion)
+				Debug.Log("UserNotifications is only available on iOS 10 and above, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
 
 			foreach (var setting in settings)
-			{
-				Debug.Log(string.Format("setting: {0} val: {1}", setting.key, setting.val.ToString()));
-				
+			{				
 				if (setting.val.GetType() == typeof(bool))
 					rootDict.SetBoolean(setting.key, (bool) setting.val);
 				else if (setting.val.GetType() == typeof(PresentationOption))
@@ -69,6 +89,10 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			//Get Preprocessor.h
 			var preprocessorPath = path + "/Classes/Preprocessor.h";
 			var preprocessor = File.ReadAllText(preprocessorPath);
+
+			if (needLocationFramework)
+				if (preprocessor.Contains("UNITY_USES_LOCATION"))
+					preprocessor = preprocessor.Replace("UNITY_USES_LOCATION 0", "UNITY_USES_LOCATION 1");
 						
 			preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
 			File.WriteAllText(preprocessorPath, preprocessor);
