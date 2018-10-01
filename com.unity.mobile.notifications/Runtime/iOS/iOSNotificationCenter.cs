@@ -584,7 +584,7 @@ namespace Unity.Notifications.iOS
     /// authorizations status or the DeviceToken for Push Notifications, but the UI system prompt will not be shown if the user has already granted or denied authorization for this app.
     /// </remarks>
     /// <example>
-    /// using (var req = new RequestAuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
+    /// using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
     /// {
     ///     while (!req.IsFinished)
     ///     {
@@ -599,7 +599,7 @@ namespace Unity.Notifications.iOS
     ///     Debug.Log(res);
     /// }
     /// </example>
-    public class RequestAuthorizationRequest : IDisposable
+    public class AuthorizationRequest : IDisposable
     {
         /// <summary>
         /// 
@@ -631,7 +631,7 @@ namespace Unity.Notifications.iOS
         /// <param name="authorizationOption"> The authorization options your app is requesting. You may multiple options to request authorization for multiple items. Request only the authorization options that you plan to use.</param>
         /// <param name="registerForRemoteNotifications"> Set this to true to initiate the registration process with Apple Push Notification service after the user has granted authorization
         /// If registration succeeds the DeviceToken property will be set. You should pass this token along to the server you use to generate remote notifications for the device. </param>
-        public RequestAuthorizationRequest(AuthorizationOption authorizationOption, bool registerForRemoteNotifications)
+        public AuthorizationRequest(AuthorizationOption authorizationOption, bool registerForRemoteNotifications)
         {
             
             iOSNotificationsWrapper.RegisterAuthorizationRequestCallback();
