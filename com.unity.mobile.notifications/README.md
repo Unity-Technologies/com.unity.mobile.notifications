@@ -106,20 +106,13 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 
 - **Request authorization:**
 
-  Request the system for permission to post local notification and receive remote notification. After completion you can retrieve the retrieve the *DeviceToken* ig you created the requests with *registerForRemoteNotifications* set to true and the app succesful registered on the APN. Which can be ued to send push notifications to the device. See [Apple Developer Site](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1) on how to add push notification support to your app. 
+  Request the system for permission to post local and receive remote notifications. After completion you can retrieve the *DeviceToken* if you created the request with *registerForRemoteNotifications* set to true and the app succesful registered on the APN. It can be ued to send push notifications to the device. See [Apple Developer Site](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1) on how to add push notification support to your app. 
 
-
-
-  The user migh only grants permission for certain notification features (in this case we requested the permission to show UI Alert dialogs and show a badge on the app icon) in this case *RequestAuthorizationRequest.Granted* would still be *True* and you can check the actual authorization status by *iOSNotificationCenter.GetNotificationSettings*. 
-
-
+  The user migh only grants permission for certain notification features (in samle below we requested the permission to show UI Alert dialogs and show a badge on the app icon) in this case *RequestAuthorizationRequest.Granted* would still be *True* and you can check the actual authorization status by *iOSNotificationCenter.GetNotificationSettings*. 
 
   Alternatively you can enable *Request Authorization on App Launch* in *Edit -> Project Settings -> Mobile Notification Settings* then the app will automatically request for authorization when it's launched. Afterwards you might call this method again to determine the current authorization status but the UI system prompt will not be shown again if the user has already granted or denied authorization for this app.
-
-
-
   ```
-  using (var req = new RequestAuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
+  using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
   {
   	while (!req.IsFinished)
   	{
@@ -136,8 +129,8 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   
   ```
 
-- **To Send a Simple and Cancel Notification in X seconds:**
 
+- **To Send a Simple and Cancel Notification in X seconds:**
   ```
   var timeTrigger = new iOSNotificationTimeIntervalTrigger()
   {
@@ -169,8 +162,8 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   //If the notification was already displayed to the user, you can remove it from the 
   //Notification Center:
   iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier)
-  
   ```
+
 
 - **Other triggers:**
 
@@ -206,8 +199,8 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   	NotifyOnEntry = true,
   	NotifyOnExit = false,
   }
-  
   ```
+
 
 
 - **Handling received notifications when the app is running **
@@ -219,17 +212,17 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   // in the foreground an alert will not be shown for that notification.
   // If you wish the notification to behave the same way as if the the app was not running
   // you need to enable this `ShowInForeground` when scheduling the notification:"
-  
+
   notification.ShowInForeground = True
-  
+
   // In this case you will also need to specify it's 'ForegroundPresentationOption'
   notification.ForegroundPresentationOption = (PresentationOption.NotificationPresentationOptionSound | PresentationOption.NotificationPresentationOptionAlert)
-  
+
   // Alternatively you might wish to perform some other action, like displaying the 
   // notification content using the in-game UI, when the notification is triggered.
   // In this case you need to subscribe to the `OnNotificationReceived` which will be 
   // called whenever a local or a remote notification is received (irregardless if it's shown in the foregound).
-  
+
   iOSNotificationCenter.OnNotificationReceived += notification =>
   {
   	var msg = "Notification received : " + notification.Identifier + "\n";
@@ -241,13 +234,13 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   	msg += "\n .Subtitle: " + notification.Subtitle;
   	Debug.Log(msg);
   };
-  
+
   // When receiving remote notification while the app is running you might wish modify the // remote notification content or not show it at all. You can do this by subscribing 
   // to the `OnRemoteNotificationReceived` event. Please note that if you do this remote
   // notifications will never be displayed when the app is running. If you still wish to 
   // show an alert for it you'll have to schedule a local notification using the remote 
   // notifications content:
-  
+
   iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
   {
   	// When a remote notification is received modify it's contents and show it
@@ -272,7 +265,7 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   	iOSNotificationCenter.ScheduleNotification(n);
   			
   	Debug.Log("Rescheduled remote notifications with id: " + notification.Identifier);
-  
+
   };
   ```
 

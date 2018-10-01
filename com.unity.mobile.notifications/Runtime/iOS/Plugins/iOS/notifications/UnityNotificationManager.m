@@ -204,7 +204,6 @@
         notificationData -> threadIdentifier = " ";
     
      //0 - time, 1 - calendar, 2 - location, 3 - push.
-    // TODO initialize proper values!
     if ([ request.trigger isKindOfClass:[UNTimeIntervalNotificationTrigger class]])
     {
         notificationData -> triggerType = TIME_TRIGGER;
