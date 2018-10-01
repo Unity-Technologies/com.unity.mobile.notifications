@@ -80,15 +80,7 @@
     
     if (self.onNotificationReceivedCallback != NULL )
         self.onNotificationReceivedCallback([UnityNotificationManager UNNotificationToiOSNotificationData:notification]);
-    
-
-//    UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge
-    
-//    int a = UNNotificationPresentationOptionAlert;
-//    int b = UNNotificationPresentationOptionSound;
-//    int c = UNNotificationPresentationOptionBadge;
-//    int s = (int)UNNotificationPresentationOptionNone;
-    
+        
     BOOL showInForeground;
     NSInteger presentationOptions;
     
