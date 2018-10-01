@@ -39,12 +39,12 @@
                         
                         NSInteger remoteForegroundPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityRemoteNotificationForegroundPresentationOptions"] integerValue] ;
                         
-                        NSInteger defaultPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationDefaultPresentationOptions"] integerValue] ;
+                        NSInteger defaultAuthorizationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationDefaultAuthorizationOptions"] integerValue] ;
                         
                         if (authorizeOnLaunch)
                         {
                             UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-                            [manager requestAuthorization:defaultPresentationOptions : registerRemoteOnLaunch];
+                            [manager requestAuthorization:defaultAuthorizationOptions : registerRemoteOnLaunch];
                             manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
                         }
 
