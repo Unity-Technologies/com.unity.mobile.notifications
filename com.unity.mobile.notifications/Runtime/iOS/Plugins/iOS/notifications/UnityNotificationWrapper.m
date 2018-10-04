@@ -126,21 +126,21 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
         if ( data->calendarTriggerYear >= 0)
             date.year = data->calendarTriggerYear;
         if (data->calendarTriggerMonth >= 0)
-            date.hour = data->calendarTriggerMonth;
+            date.month = data->calendarTriggerMonth;
         if (data->calendarTriggerDay >= 0)
-            date.hour = data->calendarTriggerDay;
+            date.day = data->calendarTriggerDay;
         if (data->calendarTriggerHour >= 0)
             date.hour = data->calendarTriggerHour;
         if (data->calendarTriggerMinute >= 0)
-            date.hour = data->calendarTriggerMinute;
+            date.minute = data->calendarTriggerMinute;
         if (data->calendarTriggerSecond >= 0)
-            date.hour = data->calendarTriggerSecond;
+            date.second = data->calendarTriggerSecond;
         
         trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:data->repeats];
     }
     else if ( data->triggerType == 2)
     {
-#ifdef defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
         CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
             
         CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter:center
