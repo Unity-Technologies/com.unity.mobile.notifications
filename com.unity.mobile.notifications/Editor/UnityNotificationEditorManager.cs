@@ -118,6 +118,7 @@ namespace Unity.Notifications.Android
         }
     }
     
+    [HelpURL("Packages/com.unity.mobile.notifications/documentation.html")]
     internal class UnityNotificationEditorManager : ScriptableObject
     {
         
@@ -195,7 +196,7 @@ namespace Unity.Notifications.Android
                         {
                             new NotificationEditorSetting(
                                 "UnityNotificationDefaultAuthorizationOptions", 
-                                "Default Notification Presentation Options",
+                                "Default Notification Authorization Options",
                                 "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Slternatively you can specify them when creating a `AuthorizationRequest` from a script.",
                                 PresentationOption.NotificationPresentationOptionBadge    | PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
                             

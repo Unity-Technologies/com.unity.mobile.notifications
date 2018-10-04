@@ -44,8 +44,8 @@ typedef struct iOSNotificationData
     float locationTriggerCenterX;
     float locationTriggerCenterY;
     float locationTriggerRadius;
-    BOOL locationTriggerNotifyOnEntry;
-    BOOL locationTriggerNotifyOnExit;
+    bool locationTriggerNotifyOnEntry;
+    bool locationTriggerNotifyOnExit;
     
     //Calendar trigger
     int calendarTriggerYear;

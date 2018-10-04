@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Unity.Notifications.Android;
 
+#if !UNITY_2018_3_OR_NEWER
 public class UnityNotificationsEditorWindow : EditorWindow
 {
 
@@ -15,7 +16,7 @@ public class UnityNotificationsEditorWindow : EditorWindow
 		var type = Type.GetType("UnityEditor.InspectorWindow,UnityEditor.dll");
 		GetWindow<UnityNotificationsEditorWindow>("Mobile Notifications", true, type);
 	}
-	
+
 	void OnGUI () {		
 		
 
@@ -31,8 +32,8 @@ public class UnityNotificationsEditorWindow : EditorWindow
 		this.minSize = new Vector2(_editor.GetMinimumEditorWidth(), 0f);
 
 		var rect = new Rect(0f, 0f, this.position.width, this.position.height);
-		_editor.OnInspectorGUI(rect);
+		_editor.OnInspectorGUI(rect, true);
 		
 	}
 }
-
+#endif

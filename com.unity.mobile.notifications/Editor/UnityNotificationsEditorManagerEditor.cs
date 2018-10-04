@@ -28,6 +28,8 @@ namespace Unity.Notifications.Android
 		protected const int kMaxPreviewSize = 64;
 		protected const int kIconSpacing = 8;
 		protected const float kPadding = 12f;
+		protected const float kToolbarHeight = 20f;
+
 		
 		private GUIContent identifierLabelText = new GUIContent("Identifier");
 		private GUIContent typeLabelText = new GUIContent("Type");
@@ -42,10 +44,19 @@ namespace Unity.Notifications.Android
 			"Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +
 			"Small icons can only be  composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels. \n" +
 			"Large icons can contain any colors but must be not smaller than 192x192 pixels.";
-
-		private string infoStringiOS = " ";
-
-
+		
+		
+#if UNITY_2018_3_OR_NEWER
+		[SettingsProvider]
+		static SettingsProvider CreateMobileNotificationsSettingsProvider()
+		{
+			var provider = new AssetSettingsProvider("Project/Mobile Notification Settings", UnityNotificationEditorManager.Initialize())
+			{
+				label = "Mobile Notification Settings",
+			};
+			return provider;
+		}
+#endif
 		
 		[Flags]
 		private enum PresentationOptionEditor
@@ -161,9 +172,6 @@ namespace Unity.Notifications.Android
 			var elementRect = rect;
 			
             int slotHeight = kSlotSize;
-            int previewWidth = kSlotSize;
-            int previewHeight = kSlotSize;
-
 
 			if (drawableResourceDataRef != null)
 			{
@@ -317,25 +325,20 @@ namespace Unity.Notifications.Android
 		{
 			if (m_Target == null)
 				return;
-			
-			m_ReorderableList.DoLayoutList();
+
+			var rect = new Rect(10f, 0f, EditorGUIUtility.currentViewWidth - 300f, 400f);
+			OnInspectorGUI(rect);
 		}
 		
-		public void OnInspectorGUI(Rect rect)
+		public void OnInspectorGUI(Rect rect, bool drawInInspector = false)
 		{
 			if (m_Target == null)
 				return;
 			
 			serializedObject.UpdateIfRequiredOrScript();
-			toolbarInt = GUILayout.Toolbar(toolbarInt, toolbarStrings);
-
-			var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
-			headerMsgStyle.alignment = TextAnchor.UpperCenter;
-			headerMsgStyle.fontSize = 10;
-			headerMsgStyle.wordWrap = true;
 		
 			var headerRect = GetContentRect(
-				new Rect(kPadding, 20, rect.width - kPadding, toolbarInt == 0 ? kHeaderHeight : 0),
+				new Rect(kPadding, kToolbarHeight + kPadding, rect.width - kPadding, toolbarInt == 0 ? kHeaderHeight : 0),
 				kPadding,
 				kPadding
 			);
@@ -348,19 +351,30 @@ namespace Unity.Notifications.Android
 
 			var viewRect = GetContentRect(
 				new Rect(rect.x, rect.y, rect.width,
-					headerRect.height + m_ReorderableList.GetHeight() + kPadding * 2),
+					headerRect.height + m_ReorderableList.GetHeight() + kSlotSize),
 				kPadding * -1,
 				kPadding
 			);
+
+			if (drawInInspector)
+				m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
+
+			var toolBaRect = new Rect(rect.x, rect.y, rect.width, kToolbarHeight);
+			toolbarInt = GUI.Toolbar(toolBaRect,toolbarInt, toolbarStrings);
+
+			var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
+			headerMsgStyle.alignment = TextAnchor.UpperCenter;
+			headerMsgStyle.fontSize = 10;
+			headerMsgStyle.wordWrap = true;
 
 			
 			if (toolbarInt == 0)
 			{
 				DrawHeader(headerRect, infoStringAndroid, headerMsgStyle);
 
-				m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
 				m_ReorderableList.DoList(bodyRect);
-				GUI.EndScrollView();
+				if (!drawInInspector)
+					EditorGUILayout.GetControlRect(true, headerRect.height + m_ReorderableList.GetHeight() + kSlotSize);
 			}
 			else
 			{
@@ -371,19 +385,20 @@ namespace Unity.Notifications.Android
 					return;
 
 				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
-				var longestLabel = settingsFlat.Find( s =>  s.label.Length == settingsFlat.Max(v => v.label.Length));//
 
 				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
 				styleToggle.alignment = TextAnchor.MiddleRight;
 			
 				var styleDropwDown = new GUIStyle(GUI.skin.GetStyle("Button"));
 				styleDropwDown.fixedWidth = kSlotSize * 2.5f;
-
 				
 				GUI.BeginGroup(settingsPanelRect);
 				DrawSettingsElementList(settings, false, styleToggle, styleDropwDown, settingsPanelRect);
 				GUI.EndGroup();
 			}
+			if (drawInInspector)
+				GUI.EndScrollView();
+
 		}
 
 		private void DrawSettingsElementList(List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)

@@ -28,6 +28,17 @@
         sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         
+        [nc addObserverForName:UIApplicationDidBecomeActiveNotification
+                        object:nil
+                         queue:[NSOperationQueue mainQueue]
+                    usingBlock:^(NSNotification *notification) {
+                    
+                        UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+                        [manager updateScheduledNotificationList];
+                        [manager updateDeliveredNotificationList];
+                        [manager updateNotificationSettings];
+                    }];
+
         [nc addObserverForName:UIApplicationDidFinishLaunchingNotification
                         object:nil
                          queue:[NSOperationQueue mainQueue]

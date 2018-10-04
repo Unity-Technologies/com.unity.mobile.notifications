@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using AOT;
 using UnityEngine;
 
+#pragma warning disable 649
 namespace Unity.Notifications.iOS
 {
 	[StructLayout(LayoutKind.Sequential)]
@@ -20,7 +21,7 @@ namespace Unity.Notifications.iOS
 	{
 
 		[DllImport("__Internal")]
-		private static extern void _RequestAuthorization(int options, bool registerForRemote);
+		private static extern void _RequestAuthorization(Int32 options, bool registerForRemote);
 
 		[DllImport("__Internal")]
 		private static extern void _ScheduleLocalNotification(IntPtr ptr);
@@ -38,16 +39,16 @@ namespace Unity.Notifications.iOS
 		private static extern IntPtr _GetNotificationSettings();
 
 		[DllImport("__Internal")]
-		private static extern int _GetScheduledNotificationDataCount();
+		private static extern Int32 _GetScheduledNotificationDataCount();
 		
 		[DllImport("__Internal")]
-		private static extern IntPtr _GetScheduledNotificationDataAt(int index);
+		private static extern IntPtr _GetScheduledNotificationDataAt(Int32 index);
 		
 		[DllImport("__Internal")]
-		private static extern int _GetDeliveredNotificationDataCount();
+		private static extern Int32 _GetDeliveredNotificationDataCount();
 		
 		[DllImport("__Internal")]
-		private static extern IntPtr _GetDeliveredNotificationDataAt(int index);
+		private static extern IntPtr _GetDeliveredNotificationDataAt(Int32 index);
 
 		[DllImport("__Internal")]
 		internal static extern void _RemoveScheduledNotification(string identifier);
@@ -59,7 +60,14 @@ namespace Unity.Notifications.iOS
 		internal static extern void _RemoveDeliveredNotification(string identifier);
 		
 		[DllImport("__Internal")]
+		internal static extern void _SetApplicationBadge(Int32 badge);
+		
+		[DllImport("__Internal")]
+		internal static extern Int32 _GetApplicationBadge();
+		
+		[DllImport("__Internal")]
 		internal static extern void _RemoveAllDeliveredNotifications();
+
 		
 		[DllImport("__Internal")]
 		internal static extern void _FreeUnmanagedStruct(IntPtr ptr);
@@ -212,5 +220,21 @@ namespace Unity.Notifications.iOS
 			return new iOSNotificationData[]{};
 		}
 
+		public static void SetApplicationBadge(int badge)
+		{
+#if UNITY_IOS && !UNITY_EDITOR
+			_SetApplicationBadge(badge);
+#endif
+		}
+		
+		public static int GetApplicationBadge()
+		{
+#if UNITY_IOS && !UNITY_EDITOR
+			return _GetApplicationBadge();
+#endif
+			return 0;
+		}
+
 	}
 }
+#pragma warning restore 649
