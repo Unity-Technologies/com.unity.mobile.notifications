@@ -1,10 +1,7 @@
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using AOT;
 using UnityEngine;
 
 namespace Unity.Notifications.iOS
@@ -99,6 +96,14 @@ namespace Unity.Notifications.iOS
         /// </summary>
         NotificationPresentationOptionAlert = 1 << 2,
     }
+
+    internal enum NotificationTriggerType
+    {
+        TimeTrigger = 0, 
+        CalendarTrigger = 10,
+        LocationTrigger = 20,
+        PushTrigger = 3
+    }
     
     [StructLayout(LayoutKind.Sequential)]
     internal struct iOSNotificationData
@@ -106,21 +111,21 @@ namespace Unity.Notifications.iOS
         public string identifier;
         public string title;
         public string body;
-        public int badge;
+        public Int32 badge;
         public string subtitle;
         public string categoryIdentifier;
         public string threadIdentifier;
 
         //Custom information
         public bool showInForeground;
-        public int showInForegroundPresentationOptions;
+        public Int32 showInForegroundPresentationOptions;
         
         // Trigger
-        public int triggerType; //0 - time, 1 - calendar, 2 - location, 3 - push.
+        public Int32 triggerType;
         public bool repeats;
         
         //Time trigger
-        public int timeTriggerInterval;
+        public Int32 timeTriggerInterval;
 
         //Location trigger
         public float locationTriggerCenterX;
@@ -130,12 +135,12 @@ namespace Unity.Notifications.iOS
         public bool locationTriggerNotifyOnExit;
         
         //Calendar trigger
-        public int calendarTriggerYear;
-        public int calendarTriggerMonth;
-        public int calendarTriggerDay;
-        public int calendarTriggerHour;
-        public int calendarTriggerMinute;
-        public int calendarTriggerSecond;
+        public Int32 calendarTriggerYear;
+        public Int32 calendarTriggerMonth;
+        public Int32 calendarTriggerDay;
+        public Int32 calendarTriggerHour;
+        public Int32 calendarTriggerMinute;
+        public Int32 calendarTriggerSecond;
 
         public bool IsValid()
         {
@@ -166,7 +171,7 @@ namespace Unity.Notifications.iOS
         internal int alertSetting;
         internal int badgeSetting;
         internal int soundSetting;
-        
+
         /// <summary>
         /// When the value is set to AuthorizationStatusAuthorized your app is allowed to schedule and receive local and remote notifications.
         /// </summary>
@@ -174,37 +179,58 @@ namespace Unity.Notifications.iOS
         /// When authorized, use the alertSetting, badgeSetting, and soundSetting properties to specify which types of interactions are allowed.
         /// When the value is AuthorizationStatusDenied, the system doesn't deliver notifications to your app, and the system ignores any attempts to schedule local notifications.
         /// </remarks>
-        public AuthorizationStatus AuthorizationStatus => (AuthorizationStatus)authorizationStatus;
-        
+        public AuthorizationStatus AuthorizationStatus
+        {
+            get { return (AuthorizationStatus) authorizationStatus; }
+        }
+
         /// <summary>
         /// The setting that indicates whether your app’s notifications are displayed in Notification Center.
         /// </summary>
-        public NotificationSetting NotificationCenterSetting => (NotificationSetting)notificationCenterSetting;
-        
-        /// <summary>
+        public NotificationSetting NotificationCenterSetting
+        {
+            get { return (NotificationSetting) notificationCenterSetting; }
+        }
+
+    /// <summary>
         /// The setting that indicates whether your app’s notifications appear onscreen when the device is locked.
         /// </summary>
-        public NotificationSetting LockScreenSetting => (NotificationSetting)lockScreenSetting;
-        
+        public NotificationSetting LockScreenSetting
+        {
+            get { return (NotificationSetting) lockScreenSetting;}
+        }
+
         /// <summary>
         /// The setting that indicates whether your app’s notifications may be displayed in a CarPlay environment.
         /// </summary>
-        public NotificationSetting CarPlaySetting => (NotificationSetting)carPlaySetting;
-        
+        public NotificationSetting CarPlaySetting
+        {
+            get { return (NotificationSetting)carPlaySetting;}
+        }
+
         /// <summary>
         /// The authorization status for displaying alerts.
         /// </summary>
-        public NotificationSetting AlertSetting => (NotificationSetting)alertSetting;
+        public NotificationSetting AlertSetting
+        {
+            get { return  (NotificationSetting)alertSetting;}
+        }
         
         /// <summary>
         /// The authorization status for badging your app’s icon.
         /// </summary>
-        public NotificationSetting BadgeSetting => (NotificationSetting)badgeSetting;
-        
+        public NotificationSetting BadgeSetting
+        {
+            get { return (NotificationSetting)badgeSetting;}
+        }
+
         /// <summary>
         /// The authorization status for playing sounds for incoming notifications.
         /// </summary>
-        public NotificationSetting SoundSetting => (NotificationSetting)soundSetting;
+        public NotificationSetting SoundSetting
+        {
+            get { return (NotificationSetting)soundSetting;}
+        }
     }
 
     /// <summary>
@@ -436,7 +462,7 @@ namespace Unity.Notifications.iOS
             data.identifier = identifier;
             data.title = "";
             data.body = "";
-            data.badge = 0;
+            data.badge = -1;
             data.subtitle = "";
             data.categoryIdentifier = "";
             data.threadIdentifier = "";
@@ -493,7 +519,7 @@ namespace Unity.Notifications.iOS
     ///</remarks>
     public struct iOSNotificationLocationTrigger : iOSNotificationTrigger
     {
-        public static int Type { get { return 2; }}
+        public static int Type { get { return (int)NotificationTriggerType.LocationTrigger; }}
 
         /// <summary>
         /// The center point of the geographic area.
@@ -529,7 +555,7 @@ namespace Unity.Notifications.iOS
 
     public struct iOSNotificationPushTrigger : iOSNotificationTrigger
     {
-        public static  int Type { get { return 3; }}
+        public static  int Type { get { return (int)NotificationTriggerType.PushTrigger; }}
     }
 
     /// <summary>
@@ -540,7 +566,7 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationTimeIntervalTrigger : iOSNotificationTrigger
     {
-        public static int Type { get { return 0; }}
+        public static int Type { get { return (int)NotificationTriggerType.TimeTrigger; }}
         
         internal int timeInterval;
         
@@ -564,7 +590,7 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationCalendarTrigger : iOSNotificationTrigger
     {
-        public static int Type { get { return 1; }}
+        public static int Type { get { return (int)NotificationTriggerType.CalendarTrigger; }}
         
         public int? Year { get; set; }
         public int? Month { get; set; }
@@ -710,13 +736,23 @@ namespace Unity.Notifications.iOS
         {
             #if UNITY_EDITOR || !PLATFORM_IOS
                         return false;
-            #endif
+            #elif PLATFORM_IOS
 
             if (initialized)
                 return true;
             
             iOSNotificationsWrapper.RegisterOnReceivedCallback();
             return initialized = true;
+            #endif
+        }
+
+        /// <summary>
+        /// The number currently set as the badge of the app icon.
+        /// </summary>
+        public static int ApplicationBadge
+        {
+            get { return iOSNotificationsWrapper.GetApplicationBadge(); }
+            set { iOSNotificationsWrapper.SetApplicationBadge(value); }
         }
 
         /// <summary>

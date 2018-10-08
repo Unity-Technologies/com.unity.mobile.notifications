@@ -8,6 +8,11 @@
 
 #import "UnityNotificationManager.h"
 
+#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+    #import <CoreLocation/CoreLocation.h>
+#endif
+
+
 @implementation UnityNotificationManager
 
 + (instancetype)sharedInstance
@@ -166,55 +171,72 @@
 
     UNNotificationContent* content = request.content;
     
-    notificationData -> identifier = [request.identifier UTF8String];
+    notificationData -> identifier = (char*) [request.identifier UTF8String];
     
     if (content.title != nil && content.title.length > 0)
-        notificationData -> title = [content.title  UTF8String];
+        notificationData -> title = (char*) [content.title  UTF8String];
     else
         notificationData -> title = " ";
     
-    if (content.body.length != nil && content.body.length > 0)
-        notificationData -> body = [content.body UTF8String];
+    if (content.body != nil && content.body.length > 0)
+        notificationData -> body = (char*) [content.body UTF8String];
     else
         notificationData -> body = " ";
     
-    notificationData -> badge = content.badge;
+    notificationData -> badge = [content.badge intValue];
     
     if (content.subtitle != nil && content.subtitle.length > 0)
-        notificationData -> subtitle = [content.subtitle  UTF8String];
+        notificationData -> subtitle = (char*) [content.subtitle  UTF8String];
     else
         notificationData -> subtitle = " ";
     
     if (content.categoryIdentifier != nil && content.categoryIdentifier.length > 0)
-        notificationData -> categoryIdentifier = [content.categoryIdentifier  UTF8String];
+        notificationData -> categoryIdentifier = (char*) [content.categoryIdentifier  UTF8String];
     else
         notificationData -> categoryIdentifier = " ";
 
     if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
-        notificationData -> threadIdentifier = [content.threadIdentifier  UTF8String];
+        notificationData -> threadIdentifier = (char*) [content.threadIdentifier  UTF8String];
     else
         notificationData -> threadIdentifier = " ";
     
-     //0 - time, 1 - calendar, 2 - location, 3 - push.
     if ([ request.trigger isKindOfClass:[UNTimeIntervalNotificationTrigger class]])
     {
         notificationData -> triggerType = TIME_TRIGGER;
-        notificationData -> timeTriggerInterval = 0;
-        notificationData -> repeats = request.trigger.repeats;
+        
+        UNTimeIntervalNotificationTrigger* timeTrigger = (UNTimeIntervalNotificationTrigger*) request.trigger;
+        notificationData -> timeTriggerInterval = timeTrigger.timeInterval;
+        notificationData -> repeats = timeTrigger.repeats;
     }
     else if ([ request.trigger isKindOfClass:[UNCalendarNotificationTrigger class]])
     {
-        UNLocationNotificationTrigger* locTrigger = (UNLocationNotificationTrigger*) request.trigger;
         notificationData -> triggerType = CALENDAR_TRIGGER;
-        notificationData -> locationTriggerCenterX = 0;
-        notificationData -> locationTriggerCenterY = 0;
-        notificationData -> locationTriggerRadius = 0;
-        notificationData -> locationTriggerNotifyOnExit = 0;
-        notificationData -> locationTriggerNotifyOnEntry = 0;
+        
+        UNCalendarNotificationTrigger* calendarTrigger = (UNCalendarNotificationTrigger*) request.trigger;
+        NSDateComponents* date = calendarTrigger.dateComponents;
+        
+        notificationData->calendarTriggerYear = (int)date.year;
+        notificationData->calendarTriggerMonth = (int)date.month;
+        notificationData->calendarTriggerDay = (int)date.day;
+        notificationData->calendarTriggerHour = (int)date.hour;
+        notificationData->calendarTriggerMinute = (int)date.minute;
+        notificationData->calendarTriggerSecond = (int)date.second;
+        
     }
     else if ([ request.trigger isKindOfClass:[UNLocationNotificationTrigger class]])
     {
+#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
         notificationData -> triggerType = LOCATION_TRIGGER;
+
+        UNLocationNotificationTrigger* locationTrigger = (UNLocationNotificationTrigger*) request.trigger;
+        CLCircularRegion *region = (CLCircularRegion*)locationTrigger.region;
+
+        notificationData -> locationTriggerCenterX = region.center.latitude ;
+        notificationData -> locationTriggerCenterY = region.center.longitude;
+        notificationData -> locationTriggerRadius = region.radius;
+        notificationData -> locationTriggerNotifyOnExit = region.notifyOnEntry;
+        notificationData -> locationTriggerNotifyOnEntry = region.notifyOnExit;
+#endif
     }
     else if ([ request.trigger isKindOfClass:[UNPushNotificationTrigger class]])
     {
@@ -227,7 +249,6 @@
 + (struct iOSNotificationData*)UNNotificationToiOSNotificationData : (UNNotification*) notification
 {
     UNNotificationRequest* request = notification.request;
-    
     return [UnityNotificationManager UNNotificationRequestToiOSNotificationData : request];
 }
 @end

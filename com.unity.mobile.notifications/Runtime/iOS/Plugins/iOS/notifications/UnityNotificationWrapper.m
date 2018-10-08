@@ -7,7 +7,7 @@
 //
 #import <Foundation/Foundation.h>
 
-#ifdef defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
     #import <CoreLocation/CoreLocation.h>
 #endif
 
@@ -87,7 +87,11 @@ void _RequestAuthorization(int options, BOOL registerRemote)
 void _ScheduleLocalNotification(struct iOSNotificationData* data)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    [manager requestAuthorization:(UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge) : YES];
+    
+    if (!manager.authorized)
+    {
+        [manager requestAuthorization:(UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge) : YES];
+    }
     
     assert(manager.onNotificationReceivedCallback != NULL);
     
@@ -99,8 +103,13 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
     content.title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments:nil];
     content.body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments:nil];
-    content.badge = [NSNumber numberWithInt:data->badge];
+    
     content.userInfo = userInfo;
+    
+    if (data->badge >= 0)
+    {
+        content.badge = [NSNumber numberWithInt:data->badge];
+    }
     
     if (data->subtitle != NULL)
         content.subtitle = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->subtitle] arguments:nil];
@@ -116,11 +125,11 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     
     UNNotificationTrigger* trigger;
     
-    if ( data->triggerType == 0)
+    if ( data->triggerType == TIME_TRIGGER)
     {
         trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:data->timeTriggerInterval repeats: data -> repeats];
     }
-    else if ( data->triggerType == 1)
+    else if ( data->triggerType == CALENDAR_TRIGGER)
     {
         NSDateComponents* date = [[NSDateComponents alloc] init];
         if ( data->calendarTriggerYear >= 0)
@@ -133,12 +142,12 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
             date.hour = data->calendarTriggerHour;
         if (data->calendarTriggerMinute >= 0)
             date.minute = data->calendarTriggerMinute;
-        if (data->calendarTriggerSecond >= 0)
+        if (data->calendarTriggerSecond >= 0) 
             date.second = data->calendarTriggerSecond;
         
         trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:date repeats:data->repeats];
     }
-    else if ( data->triggerType == 2)
+    else if ( data->triggerType == LOCATION_TRIGGER)
     {
 #if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
         CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
@@ -149,11 +158,12 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
         region.notifyOnExit = data->locationTriggerNotifyOnExit;
             
         trigger = [UNLocationNotificationTrigger triggerWithRegion:region repeats:NO];
+#else
+        return;
 #endif
     }
     else
     {
-        //Should throw an error TODO to managed.
         return;
     }
 
@@ -242,3 +252,14 @@ void _RemoveAllDeliveredNotifications()
     [center removeAllDeliveredNotifications];
     [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
 }
+
+void _SetApplicationBadge(long badge)
+{
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badge];
+}
+
+long _GetApplicationBadge()
+{
+    return[UIApplication sharedApplication].applicationIconBadgeNumber;
+}
+
