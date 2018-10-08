@@ -14,7 +14,6 @@
   - Modify remote notification content if they are received while the app is running.
   - Group notification into threads (only  supported on iOS 12+)
 
-
 **Requirements:**
 
 - Supports Android 4.1 (API 16)/iOS 10 and newer.
@@ -273,6 +272,12 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 
 ## FAQ
 
-{{Nobody asked any questions | Please ask some questions }}
+**Notifications with a location trigger do not work.**
 
-## 
+Make sure the CoreLocation framework is added to your project. You can do this in the `Mobile Notification Settings` menu in the Unity Editor. Or by adding it manually to the Xcode project (or using the Unity Xcode API).
+
+
+
+
+
+ 
