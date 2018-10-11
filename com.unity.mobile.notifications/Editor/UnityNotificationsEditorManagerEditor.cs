@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEditorInternal;
 
-namespace Unity.Notifications.Android
+namespace Unity.Notifications
 {
 	[CustomEditor(typeof(UnityNotificationEditorManager))]
 	public class UnityNotificationsEditorManagerEditor : Editor
@@ -35,9 +35,9 @@ namespace Unity.Notifications.Android
 		private GUIContent typeLabelText = new GUIContent("Type");
 
 		private Vector2 m_ScrollViewStart;
+
+		private UnityNotificationEditorManager manager;
 		
-		
-		public int toolbarInt = 0;
 		public string[] toolbarStrings = new string[] {"Android", "iOS"};
 		
 		private string infoStringAndroid =
@@ -58,22 +58,16 @@ namespace Unity.Notifications.Android
 		}
 #endif
 		
-		[Flags]
-		private enum PresentationOptionEditor
-		{
-			None  = 0,
-			Badge = 1 << 0,
-			Sound = 1 << 1,
-			Alert = 1 << 2,
-			All = ~0,
-		}
-
-		
 		void OnEnable()
 		{
-			UnityNotificationEditorManager.Initialize().CustomEditor = this;
+			manager = UnityNotificationEditorManager.Initialize();
+			manager.CustomEditor = this;
+			
+			if (target == null)
+				return;
 			
 			m_Target = new SerializedObject(target);
+			
 			m_ResourceAssets = serializedObject.FindProperty("TrackedResourceAssets");
 
 			
@@ -279,7 +273,7 @@ namespace Unity.Notifications.Android
 						helpBoxMessageTextStyle.fontSize = 8;
 						helpBoxMessageTextStyle.wordWrap = true;
 						helpBoxMessageTextStyle.alignment = TextAnchor.MiddleCenter;
-						GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", helpBoxMessageTextStyle);
+						GUI.Box(previewTextureRect, "Preview not available. \n Make sure fthe texture is readable!", helpBoxMessageTextStyle);
 					}
 				}
 								
@@ -338,13 +332,13 @@ namespace Unity.Notifications.Android
 			serializedObject.UpdateIfRequiredOrScript();
 		
 			var headerRect = GetContentRect(
-				new Rect(kPadding, kToolbarHeight + kPadding, rect.width - kPadding, toolbarInt == 0 ? kHeaderHeight : 0),
+				new Rect(kPadding, kToolbarHeight + kPadding, rect.width - kPadding, manager.toolbarInt == 0 ? kHeaderHeight : 0),
 				kPadding,
 				kPadding
 			);
 
 			var bodyRect = GetContentRect(
-				new Rect(kPadding, headerRect.bottom, rect.width - kPadding, rect.height - headerRect.height),
+				new Rect(kPadding, headerRect.yMax, rect.width - kPadding, rect.height - headerRect.height),
 				kPadding,
 				kPadding
 			);
@@ -360,7 +354,7 @@ namespace Unity.Notifications.Android
 				m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
 
 			var toolBaRect = new Rect(rect.x, rect.y, rect.width, kToolbarHeight);
-			toolbarInt = GUI.Toolbar(toolBaRect,toolbarInt, toolbarStrings);
+			manager.toolbarInt = GUI.Toolbar(toolBaRect,manager.toolbarInt, toolbarStrings);
 
 			var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
 			headerMsgStyle.alignment = TextAnchor.UpperCenter;
@@ -368,7 +362,7 @@ namespace Unity.Notifications.Android
 			headerMsgStyle.wordWrap = true;
 
 			
-			if (toolbarInt == 0)
+			if (manager.toolbarInt == 0)
 			{
 				DrawHeader(headerRect, infoStringAndroid, headerMsgStyle);
 
@@ -380,7 +374,7 @@ namespace Unity.Notifications.Android
 			{
 				var settingsPanelRect = bodyRect;//GetContentRect(rect, kPadding, kPadding);
 
-				var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettings;
+				var settings = manager.iOSNotificationEditorSettings;
 				if (settings == null)
 					return;
 
@@ -440,6 +434,7 @@ namespace Unity.Notifications.Android
 					layer++;
 					DrawSettingsElementList(setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
 				}
+				manager.SaveSetting(setting);
 			}
 		}
 

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using AOT;
 using UnityEngine;
 
-#pragma warning disable 649
+#pragma warning disable 649 162
 namespace Unity.Notifications.iOS
 {
 	[StructLayout(LayoutKind.Sequential)]
@@ -237,4 +237,4 @@ namespace Unity.Notifications.iOS
 
 	}
 }
-#pragma warning restore 649
+#pragma warning restore 649, 162
