@@ -1,9 +1,9 @@
 {
 	"name": "com.unity.mobile.notifications",
 	"displayName":"Mobile Notifications",
-	"version": "0.9.10-preview",
+	"version": "0.9.11-preview",
 	"unity": "2018.2",
-	"description": "Mobile Notifications package ads support for sending local notifications on iOS & Android. \n\nIt allows scheduling local repeatable or one-time and location based notifications (only on iOS).\n\nRequires iOS 10 and Android 4.1 or above.",
+	"description": "Mobile Notifications package adds support for sending local notifications on iOS & Android. \n\nIt allows scheduling local repeatable or one-time and location based notifications (only on iOS).\n\nRequires iOS 10 and Android 4.1 or above.",
 	"keywords": ["Android", "iOS", "Notifications", "Mobile"],
 	"dependencies": {
 	}

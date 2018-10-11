@@ -237,4 +237,4 @@ namespace Unity.Notifications.iOS
 
 	}
 }
-#pragma warning restore 649
+#pragma warning restore 649, 162
