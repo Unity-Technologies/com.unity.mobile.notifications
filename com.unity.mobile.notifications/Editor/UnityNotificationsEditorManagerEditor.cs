@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEditorInternal;
 
-namespace Unity.Notifications.Android
+namespace Unity.Notifications
 {
 	[CustomEditor(typeof(UnityNotificationEditorManager))]
 	public class UnityNotificationsEditorManagerEditor : Editor
@@ -35,7 +35,8 @@ namespace Unity.Notifications.Android
 		private GUIContent typeLabelText = new GUIContent("Type");
 
 		private Vector2 m_ScrollViewStart;
-		
+
+		private UnityNotificationEditorManager manager;
 		
 		public int toolbarInt = 0;
 		public string[] toolbarStrings = new string[] {"Android", "iOS"};
@@ -58,20 +59,10 @@ namespace Unity.Notifications.Android
 		}
 #endif
 		
-		[Flags]
-		private enum PresentationOptionEditor
-		{
-			None  = 0,
-			Badge = 1 << 0,
-			Sound = 1 << 1,
-			Alert = 1 << 2,
-			All = ~0,
-		}
-
-		
 		void OnEnable()
 		{
-			UnityNotificationEditorManager.Initialize().CustomEditor = this;
+			manager = UnityNotificationEditorManager.Initialize();
+			manager.CustomEditor = this;
 			
 			m_Target = new SerializedObject(target);
 			m_ResourceAssets = serializedObject.FindProperty("TrackedResourceAssets");
@@ -344,7 +335,7 @@ namespace Unity.Notifications.Android
 			);
 
 			var bodyRect = GetContentRect(
-				new Rect(kPadding, headerRect.bottom, rect.width - kPadding, rect.height - headerRect.height),
+				new Rect(kPadding, headerRect.yMax, rect.width - kPadding, rect.height - headerRect.height),
 				kPadding,
 				kPadding
 			);
@@ -380,7 +371,7 @@ namespace Unity.Notifications.Android
 			{
 				var settingsPanelRect = bodyRect;//GetContentRect(rect, kPadding, kPadding);
 
-				var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettings;
+				var settings = manager.iOSNotificationEditorSettings;
 				if (settings == null)
 					return;
 
@@ -440,6 +431,7 @@ namespace Unity.Notifications.Android
 					layer++;
 					DrawSettingsElementList(setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
 				}
+				manager.SaveSetting(setting);
 			}
 		}
 
