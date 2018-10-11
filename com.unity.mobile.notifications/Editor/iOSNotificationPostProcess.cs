@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Notifications;
 using Unity.Notifications.Android;
 using Unity.Notifications.iOS;
 using UnityEditor;
@@ -36,19 +37,27 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			if (useReleaseAPSEnvSetting != null)
 				useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.val;
 
-			var needLocationFramework = settings
-				.Find(i => i.key == "UnityUseLocationNotificationTrigger") != null;;
+			var needLocationFramework = (bool)settings
+				.Find(i => i.key == "UnityUseLocationNotificationTrigger").val == true;;
 			
-			proj.AddFrameworkToProject(target, "UserNotifications.framework", useReleaseAPSEnv);
+			proj.AddFrameworkToProject(target, "UserNotifications.framework", true);
 			
 			if (needLocationFramework)
 				proj.AddFrameworkToProject(target, "CoreLocation.framework", false);
 			
 			File.WriteAllText (projPath, proj.WriteToString ());
-			
+						
+			var entitlementsFileName = proj.GetBuildPropertyForConfig(target, "CODE_SIGN_ENTITLEMENTS");
+
+			if (entitlementsFileName == null)
+			{
+				var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
+				entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+			}
+		
 			var pbxPath = PBXProject.GetPBXProjectPath(path);
-			var capManager = new ProjectCapabilityManager(pbxPath, string.Format("{0}.entitlements", PlayerSettings.productName), "Unity-iPhone");
-			capManager.AddPushNotifications(true);
+			var capManager = new ProjectCapabilityManager(pbxPath, entitlementsFileName, "Unity-iPhone");
+			capManager.AddPushNotifications(!useReleaseAPSEnv);
 			capManager.WriteToFile();
 			
 			// Get plist
@@ -91,9 +100,11 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			var preprocessor = File.ReadAllText(preprocessorPath);
 
 			if (needLocationFramework)
+			{
 				if (preprocessor.Contains("UNITY_USES_LOCATION"))
 					preprocessor = preprocessor.Replace("UNITY_USES_LOCATION 0", "UNITY_USES_LOCATION 1");
-						
+			}
+
 			preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
 			File.WriteAllText(preprocessorPath, preprocessor);
 		}
