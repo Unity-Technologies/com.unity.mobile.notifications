@@ -82,7 +82,7 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			}
 			
 			if (!hasMinOSVersion)
-				Debug.Log("UserNotifications is only available on iOS 10 and above, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
+				Debug.Log("UserNotifications are only available on iOS 10 and above, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
 
 			foreach (var setting in settings)
 			{				

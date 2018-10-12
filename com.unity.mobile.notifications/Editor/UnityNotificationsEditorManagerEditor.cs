@@ -38,7 +38,6 @@ namespace Unity.Notifications
 
 		private UnityNotificationEditorManager manager;
 		
-		public int toolbarInt = 0;
 		public string[] toolbarStrings = new string[] {"Android", "iOS"};
 		
 		private string infoStringAndroid =
@@ -64,7 +63,11 @@ namespace Unity.Notifications
 			manager = UnityNotificationEditorManager.Initialize();
 			manager.CustomEditor = this;
 			
+			if (target == null)
+				return;
+			
 			m_Target = new SerializedObject(target);
+			
 			m_ResourceAssets = serializedObject.FindProperty("TrackedResourceAssets");
 
 			
@@ -270,7 +273,7 @@ namespace Unity.Notifications
 						helpBoxMessageTextStyle.fontSize = 8;
 						helpBoxMessageTextStyle.wordWrap = true;
 						helpBoxMessageTextStyle.alignment = TextAnchor.MiddleCenter;
-						GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", helpBoxMessageTextStyle);
+						GUI.Box(previewTextureRect, "Preview not available. \n Make sure fthe texture is readable!", helpBoxMessageTextStyle);
 					}
 				}
 								
@@ -329,7 +332,7 @@ namespace Unity.Notifications
 			serializedObject.UpdateIfRequiredOrScript();
 		
 			var headerRect = GetContentRect(
-				new Rect(kPadding, kToolbarHeight + kPadding, rect.width - kPadding, toolbarInt == 0 ? kHeaderHeight : 0),
+				new Rect(kPadding, kToolbarHeight + kPadding, rect.width - kPadding, manager.toolbarInt == 0 ? kHeaderHeight : 0),
 				kPadding,
 				kPadding
 			);
@@ -351,7 +354,7 @@ namespace Unity.Notifications
 				m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
 
 			var toolBaRect = new Rect(rect.x, rect.y, rect.width, kToolbarHeight);
-			toolbarInt = GUI.Toolbar(toolBaRect,toolbarInt, toolbarStrings);
+			manager.toolbarInt = GUI.Toolbar(toolBaRect,manager.toolbarInt, toolbarStrings);
 
 			var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
 			headerMsgStyle.alignment = TextAnchor.UpperCenter;
@@ -359,7 +362,7 @@ namespace Unity.Notifications
 			headerMsgStyle.wordWrap = true;
 
 			
-			if (toolbarInt == 0)
+			if (manager.toolbarInt == 0)
 			{
 				DrawHeader(headerRect, infoStringAndroid, headerMsgStyle);
 
