@@ -3,9 +3,13 @@
     "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [
-        "iOS",
-        "Editor"
+        "Editor",
+        "iOS"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
 }
