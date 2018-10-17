@@ -13,13 +13,13 @@ else
     exit 1
 fi
 
-if [ -f Documentation\~/html/index.html ];
-then
-    echo "Generated html documentation found."
-else
-	echo "Generated html documentation not found!"
-    exit 1
-fi
+#if [ -f Documentation\~/html/index.html ];
+#then
+#    echo "Generated html documentation found."
+#else
+#    echo "Generated html documentation not found!"
+#    exit 1
+#fi
 
 ls Documentation\~/html
 
