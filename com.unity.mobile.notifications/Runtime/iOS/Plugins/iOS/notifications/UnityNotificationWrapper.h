@@ -15,7 +15,7 @@ typedef void (*DATA_CALLBACK)(struct iOSNotificationData* data);
 void _SetNotificationReceivedDelegate(DATA_CALLBACK callback);
 
 void _ScheduleLocalNotification(struct iOSNotificationData* data);
-void _RequestAuthorizatio(int options, BOOL registerRemote);
+void _RequestAuthorization(int options, BOOL registerRemote);
 
 int _GetScheduledNotificationDataCount();
 iOSNotificationData* _GetScheduledNotificationDataAt(int index);

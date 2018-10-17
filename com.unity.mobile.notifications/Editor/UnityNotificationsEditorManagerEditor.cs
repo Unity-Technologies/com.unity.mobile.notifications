@@ -12,10 +12,10 @@ using UnityEditorInternal;
 namespace Unity.Notifications
 {
 	[CustomEditor(typeof(UnityNotificationEditorManager))]
-	public class UnityNotificationsEditorManagerEditor : Editor
+	class UnityNotificationsEditorManagerEditor : Editor
 	{
-		public delegate void ChangedCallbackDelegate(ReorderableList list);
-		public ChangedCallbackDelegate onChangedCallback = null;
+		internal delegate void ChangedCallbackDelegate(ReorderableList list);
+		internal ChangedCallbackDelegate onChangedCallback = null;
 		
 		SerializedProperty m_ResourceAssets;
 		SerializedProperty m_iOSNotificationEditorSettings;
@@ -147,9 +147,14 @@ namespace Unity.Notifications
 			Repaint();
 		}
 
-		internal float GetMinimumEditorWidth()
+		internal float GetMinimumEditorWidth(float requiredWidth)
 		{
-			return kMaxPreviewSize * 4 + kIconSpacing * 6 + kPadding * 3;
+			
+			var minWidth = kSlotSize * 6;
+			if (requiredWidth < minWidth)
+				return minWidth;
+			
+			return requiredWidth;
 		}
 
 		DrawableResourceData GetElementData(int index)
@@ -320,7 +325,8 @@ namespace Unity.Notifications
 			if (m_Target == null)
 				return;
 
-			var rect = new Rect(10f, 0f, EditorGUIUtility.currentViewWidth - 300f, 400f);
+			var width = GetMinimumEditorWidth(EditorGUIUtility.currentViewWidth - 300f);
+			var rect = new Rect(10f, 0f, width, 400f);
 			OnInspectorGUI(rect);
 		}
 		
@@ -329,20 +335,34 @@ namespace Unity.Notifications
 			if (m_Target == null)
 				return;
 			
+#if UNITY_2018_3
+			rect = new Rect(rect.x, rect.y + 25, rect.width, rect.height);
+#endif
+			
 			serializedObject.UpdateIfRequiredOrScript();
-		
+
+			bool userHeader = manager.toolbarInt == 0;
 			var headerRect = GetContentRect(
-				new Rect(kPadding, kToolbarHeight + kPadding, rect.width - kPadding, manager.toolbarInt == 0 ? kHeaderHeight : 0),
-				kPadding,
-				kPadding
+				new Rect(kPadding, rect.y, rect.width - kPadding, kPadding),
+				0f,
+				0f
 			);
+
+			if (userHeader)
+			{
+				headerRect = GetContentRect(
+					new Rect(kPadding, rect.y + kToolbarHeight + kPadding, rect.width - kPadding, kHeaderHeight),
+					kPadding,
+					kPadding
+				);
+			}
 
 			var bodyRect = GetContentRect(
 				new Rect(kPadding, headerRect.yMax, rect.width - kPadding, rect.height - headerRect.height),
 				kPadding,
 				kPadding
 			);
-
+			
 			var viewRect = GetContentRect(
 				new Rect(rect.x, rect.y, rect.width,
 					headerRect.height + m_ReorderableList.GetHeight() + kSlotSize),

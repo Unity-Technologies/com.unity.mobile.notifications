@@ -52,12 +52,6 @@ void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
     manager.onAuthorizationCompletionCallback = req_callback;
 }
 
-//void onAuthorizationRequestCompletion(BOOL granted)
-//{
-//    req_callback(granted);
-//}
-
-
 void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
 {
     g_notificationReceivedCallback = callback;
@@ -76,9 +70,8 @@ void _SetRemoteNotificationReceivedDelegate(DATA_CALLBACK callback)
 
 
 void _RequestAuthorization(int options, BOOL registerRemote)
-{//UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge
-    
-    [[UnityNotificationManager sharedInstance] requestAuthorization:(UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge) : YES];
+{
+    [[UnityNotificationManager sharedInstance] requestAuthorization:(options) : registerRemote];
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = [UnityNotificationManager sharedInstance];

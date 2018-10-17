@@ -234,21 +234,19 @@ namespace Unity.Notifications.iOS
     }
 
     /// <summary>
-    /// The iOSNotification is used schedule a local notification, which includes the content of the notification and the trigger conditions for delivery.
-    /// An instance of this class is also returned when receiving remote or notifications after they had already be triggered.
+    /// The iOSNotification class is used schedule local notifications. It includes the content of the notification and the trigger conditions for delivery.
+    /// An instance of this class is also returned when receiving remote notifications..
     /// </summary>
     /// <remarks>
     /// Create an instance of this class when you want to schedule the delivery of a local notification. It contains the entire notification  payload to be delivered
     /// (which corresponds to UNNotificationContent) and  also the NotificationTrigger object with the conditions that trigger the delivery of the notification.
-    /// To schedule the delivery of your notification, pass an instance of this class to the iOSNotificationCenter.ScheduleNotification method.
+    /// To schedule the delivery of your notification, pass an instance of this class to the <see cref="iOSNotificationCenter.ScheduleNotification"/>  method.
     /// </remarks>
     public class iOSNotification
     {
         /// <summary>
         /// The unique identifier for this notification request.
-        /// </summary>
-        /// <remarks>
-        /// If not set the identifier an unique string will be automatically generated when creating the object.
+        /// If not explicitly specified the identifier  will be automatically generated when creating the notification.
         /// </remarks>
         public string Identifier
         {
@@ -266,10 +264,8 @@ namespace Unity.Notifications.iOS
         }
         
         /// <summary>
-        /// An identifier that you use to group related notifications together.
-        /// </summary>
-        /// <remarks>
-        /// Automatic notification grouping according to the thread identifier is only supported on iOS 12+.
+        /// An identifier that used to group related notifications together.
+        /// Automatic notification grouping according to the thread identifier is only supported on iOS 12 and above.
         /// </remarks>
         public string ThreadIdentifier
         {
@@ -305,10 +301,10 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Whether the notification alert should be shown when the app is open.
+        /// Indicates whether the notification alert should be shown when the app is open.
         /// </summary>
         /// <remarks>
-        /// Subscribe to the iOSNotificationCenter.OnNotificationReceived even to receive a callback when the notification is triggered.
+        /// Subscribe to the <see cref="iOSNotificationCenter.OnNotificationReceived"/> event to receive a callback when the notification is triggered.
         /// </remarks>
         public bool ShowInForeground
         {
@@ -318,7 +314,7 @@ namespace Unity.Notifications.iOS
 
         
         /// <summary>
-        /// Only works if ShowInForeground is enabled and user has allowed enabled the requested options for your app. 
+        /// Presentation options for displaying the local of notification when the app is running. Only works if  <see cref="iOSNotification.ShowInForeground"/> is enabled and user has allowed enabled the requested options for your app. 
         /// </summary>
         public PresentationOption ForegroundPresentationOption
         {
@@ -330,7 +326,7 @@ namespace Unity.Notifications.iOS
             
 
         /// <summary>
-        /// The number to display as the app’s icon badge.
+        /// The number to display as a badge on the app’s icon.
         /// </summary>
         public int Badge
         {
@@ -341,14 +337,14 @@ namespace Unity.Notifications.iOS
         
         /// <summary>
         /// The conditions that trigger the delivery of the notification.
+        /// For notification that were already delivered and whose instance was returned by <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/> or <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/>
+        /// use this property to determine what caused the delivery to occur. You can do this by comparing <see cref="iOSNotification.Trigger"/>  to any of the notification trigger types that implement it, such as
+        /// <see cref="iOSNotificationLocationTrigger"/>, <see cref="iOSNotificationPushTrigger"/>, <see cref="iOSNotificationTimeIntervalTrigger"/>, <see cref="iOSNotificationCalendarTrigger"/>.
         /// </summary>
-        /// <remarks>
-        /// For notification that were already delivered and whose instance was returned by [[iOSNotificationCenter.OnRemoteNotificationReceived]] or [[iOSNotificationCenter.OnRemoteNotificationReceived]]
-        /// use this property to determine what caused the delivery to occur. You can do this by comparing the trigger object type to any of the notification trigger types that implement it, such as
-        /// [[iOSNotificationLocationTrigger]], [[iOSNotificationPushTrigger]], [[iOSNotificationTimeIntervalTrigger]], [[iOSNotificationCalendarTrigger]]
-        /// </remarks>
         /// <example>
+        /// <code>
         /// notification.Trigger is iOSNotificationPushTrigger
+        /// </code>
         /// </example>
         public iOSNotificationTrigger Trigger
         {
@@ -445,7 +441,7 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Create a new instance of iOSNotification and automatically generate an unique string for iOSNotification.identifier and with all optional fields set to default values.
+        /// Create a new instance of <see cref="iOSNotificationCenter.iOSNotification"/> and automatically generate an unique string for <see cref="iOSNotificationCenter.iOSNotification.identifier"/>  with all optional fields set to default values.
         /// </summary>
         public iOSNotification() : this(
             Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()).ToString())
@@ -454,8 +450,9 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Create a notification struct with all optional fields set to default values.
+        /// Specify a <see cref="iOSNotification.Identifier"/> and create a notification object with all optional fields set to default values.
         /// </summary>
+        /// <param name="identifier">  Unique identifier for the local notification tha can later be used to track or change it's status.</param>
         public iOSNotification(string identifier)
         {          
             data = new iOSNotificationData();
@@ -521,7 +518,7 @@ namespace Unity.Notifications.iOS
     {
         public static int Type { get { return (int)NotificationTriggerType.LocationTrigger; }}
 
-        /// <summary>
+        /// <summary>iOSNotificationLocationTrigger
         /// The center point of the geographic area.
         /// </summary>
         public Vector2 Center { get; set; }
@@ -585,31 +582,53 @@ namespace Unity.Notifications.iOS
     /// A trigger condition that causes a notification to be delivered at a specific date and time.
     /// </summary>
     /// <remarks>
-    /// Create an instance of iOSNotificationCalendarTrigger  when you want to schedule the delivery of a local notification at the specified date and time.
+    /// Create an instance of <see cref="iOSNotificationCalendarTrigger"/>  when you want to schedule the delivery of a local notification at the specified date and time.
     /// You are not required to set all of the fields because the system uses the provided information to determine the next date and time that matches the specified information automatically.
     /// </remarks>
     public struct iOSNotificationCalendarTrigger : iOSNotificationTrigger
     {
         public static int Type { get { return (int)NotificationTriggerType.CalendarTrigger; }}
         
+        /// <summary>
+        /// Year
+        /// </summary>
         public int? Year { get; set; }
+        /// <summary>
+        /// Month
+        /// </summary>
         public int? Month { get; set; }
+        /// <summary>
+        /// Day
+        /// </summary>
         public int? Day { get; set; }
+        /// <summary>
+        /// Hour
+        /// </summary>
         public int? Hour { get; set; }
+        /// <summary>
+        /// Minute
+        /// </summary>
         public int? Minute { get; set; }
+        /// <summary>
+        /// Second
+        /// </summary>
         public int? Second { get; set; }
+        /// <summary>
+        /// Indicate whether the notification is repeated every defined time period. For instance if hour and minute fields are set the notification will be triggered every day at the specified hour and minute.
+        /// </summary>
         public bool Repeats { get; set; }
     }
     
     /// <summary>
-    /// Use this to request authorization to interact with the user when local and remote notifications are delivered to the user's device.
+    /// Use this to request authorization to interact with the user when you with to deliver local and remote notifications are delivered to the user's device.
     /// </summary>
     /// <remarks>
-    /// This method must be called before you attempt to schedule any local notifications. If \"Request Authorization on App Launch\" is enabled in
-    /// \"Edit -> Project Settings -> Mobile Notification Settings\" this method will be caled automatically when the app launches. You might call this method again to determine the current
-    /// authorizations status or the DeviceToken for Push Notifications, but the UI system prompt will not be shown if the user has already granted or denied authorization for this app.
+    /// This method must be called before you attempt to schedule any local notifications. If "Request Authorization on App Launch" is enabled in
+    /// "Edit -> Project Settings -> Mobile Notification Settings" this method will be called automatically when the app launches. You might call this method again to determine the current
+    /// authorizations status or retrieve the DeviceToken for Push Notifications. However the UI system prompt will not be shown if the user has already granted or denied authorization for this app.
     /// </remarks>
     /// <example>
+    /// <code>
     /// using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
     /// {
     ///     while (!req.IsFinished)
@@ -617,23 +636,24 @@ namespace Unity.Notifications.iOS
     ///         yield return null;
     ///     };
     /// 
-    ///     string ressult = "\n RequestAuthorization: \n";
-    ///     ressult += "\n finished: " + req.IsFinished;
-    ///     ressult += "\n granted :  " + req.Granted;
-    ///     ressult += "\n error:  " + req.Error;
-    ///     ressult += "\n deviceToken:  " + req.DeviceToken;
+    ///     string result = "\n RequestAuthorization: \n";
+    ///     result += "\n finished: " + req.IsFinished;
+    ///     result += "\n granted :  " + req.Granted;
+    ///     result += "\n error:  " + req.Error;
+    ///     result += "\n deviceToken:  " + req.DeviceToken;
     ///     Debug.Log(res);
     /// }
+    /// </code>
     /// </example>
     public class AuthorizationRequest : IDisposable
     {
         /// <summary>
-        /// 
+        /// Indicates whether the authorization request has completed.
         /// </summary>
         public bool IsFinished { get; private set; }
         
         /// <summary>
-        /// A property indicating whether authorization was granted. The value of this parameter is set tot true when authorization was granted for one or more options. The value is setr false when authorization is denied for all options.
+        /// A property indicating whether authorization was granted. The value of this parameter is set to true when authorization was granted for one or more options. The value is set to false when authorization is denied for all options.
         /// </summary>
         public bool Granted { get; private set; }
         
@@ -644,7 +664,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// A globally unique token that identifies this device to Apple Push Notification Network. Send this token to the server that you use to generate remote notifications.
         /// Your server must pass this token unmodified back to APNs when sending those remote notifications.
-        /// This property will be empty if you set the [[registerForRemoteNotifications]] to false when creating the Authorization requests or if the app fails registering with the APN.
+        /// This property will be empty if you set the registerForRemoteNotifications parameter to false when creating the Authorization request or if the app fails registration with the APN.
         /// </summary>
         public string DeviceToken { get; private set; }
 
@@ -654,9 +674,9 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Initiate an authorization request.
         /// </summary>
-        /// <param name="authorizationOption"> The authorization options your app is requesting. You may multiple options to request authorization for multiple items. Request only the authorization options that you plan to use.</param>
+        /// <param name="authorizationOption"> The authorization options your app is requesting. You may specify multiple options to request authorization for. Request only the authorization options that you plan to use.</param>
         /// <param name="registerForRemoteNotifications"> Set this to true to initiate the registration process with Apple Push Notification service after the user has granted authorization
-        /// If registration succeeds the DeviceToken property will be set. You should pass this token along to the server you use to generate remote notifications for the device. </param>
+        /// If registration succeeds the DeviceToken will be returned. You should pass this token along to the server you use to generate remote notifications for the device. </param>
         public AuthorizationRequest(AuthorizationOption authorizationOption, bool registerForRemoteNotifications)
         {
             

@@ -1,11 +1,13 @@
-﻿using System;
+﻿#if !UNITY_2018_3_OR_NEWER
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Notifications;
 using UnityEditor;
 using UnityEngine;
 using Unity.Notifications.Android;
 
-#if !UNITY_2018_3_OR_NEWER
+
 public class UnityNotificationsEditorWindow : EditorWindow
 {
 
@@ -29,7 +31,7 @@ public class UnityNotificationsEditorWindow : EditorWindow
 					return;
 		}
 
-		this.minSize = new Vector2(_editor.GetMinimumEditorWidth(), 0f);
+		this.minSize = new Vector2(_editor.GetMinimumEditorWidth(150f), 0f);
 
 		var rect = new Rect(0f, 0f, this.position.width, this.position.height);
 		_editor.OnInspectorGUI(rect, true);

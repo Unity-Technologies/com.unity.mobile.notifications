@@ -100,6 +100,8 @@
         {
             showInForeground = YES;
             presentationOptions = self.remoteNotificationForegroundPresentationOptions;
+            if (presentationOptions == 0)
+                presentationOptions = kDefaultPresentationOptions;
         }
     }
     else
@@ -251,4 +253,5 @@
     UNNotificationRequest* request = notification.request;
     return [UnityNotificationManager UNNotificationRequestToiOSNotificationData : request];
 }
+
 @end
