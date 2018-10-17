@@ -10,6 +10,8 @@
 #import "UnityNotificationManager.h"
 #import "UnityAppController+Notifications.h"
 
+#import "UnityNotificationWrapper.h"
+
 @implementation UnityNotificationLifeCycleManager
 
 
@@ -24,6 +26,7 @@
 {
     static UnityNotificationLifeCycleManager *sharedInstance = nil;
     static dispatch_once_t onceToken;
+    
     dispatch_once(&onceToken, ^{
         sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -45,12 +48,14 @@
                     usingBlock:^(NSNotification *notification) {
                         
                         BOOL authorizeOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationRequestAuthorizationOnAppLaunch"] boolValue] ;
-                        
                         BOOL registerRemoteOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch"] boolValue] ;
                         
                         NSInteger remoteForegroundPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityRemoteNotificationForegroundPresentationOptions"] integerValue] ;
                         
                         NSInteger defaultAuthorizationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationDefaultAuthorizationOptions"] integerValue] ;
+                        
+                        if (defaultAuthorizationOptions <= 0)
+                            defaultAuthorizationOptions = (UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge);
                         
                         if (authorizeOnLaunch)
                         {
