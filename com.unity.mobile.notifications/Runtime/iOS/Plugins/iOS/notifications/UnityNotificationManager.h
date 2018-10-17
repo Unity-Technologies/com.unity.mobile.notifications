@@ -90,6 +90,7 @@ typedef struct NotificationSettingsData {
     
 } NotificationSettingsData;
 
+const int kDefaultPresentationOptions = -1;
 
 @interface UnityNotificationManager : NSObject <UNUserNotificationCenterDelegate>
 
@@ -110,7 +111,6 @@ typedef struct NotificationSettingsData {
 
 @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 
-
 + (instancetype)sharedInstance;
 
 + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData : (UNNotificationRequest*) request;
@@ -129,6 +129,4 @@ typedef struct NotificationSettingsData {
 // UNAuthorizationOptionAlert   = 2
 // UNAuthorizationOptionCarPlay = 3
 //- (BOOL)hasAuthorizationForNotificationType: (int) type;
-
-
 @end

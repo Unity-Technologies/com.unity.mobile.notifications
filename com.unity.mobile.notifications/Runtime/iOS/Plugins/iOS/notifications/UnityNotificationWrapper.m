@@ -76,9 +76,8 @@ void _SetRemoteNotificationReceivedDelegate(DATA_CALLBACK callback)
 
 
 void _RequestAuthorization(int options, BOOL registerRemote)
-{//UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge
-    
-    [[UnityNotificationManager sharedInstance] requestAuthorization:(UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge) : YES];
+{
+    [[UnityNotificationManager sharedInstance] requestAuthorization:(options) : registerRemote];
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = [UnityNotificationManager sharedInstance];
