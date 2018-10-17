@@ -25,20 +25,20 @@ build:
   after_script:
   - /opt/post_build_script.sh    
 
-build_docs:
-  stage: build
-  tags:
-  - darwin
-  only:
-  - master
-  - tags
-  script:
-  - ./project/build_docs.sh
-  artifacts:
-    paths:
-    - com.unity.mobile.notifications/Documentation~
-  after_script:
-   - /opt/post_build_script.sh    
+# build_docs:
+#   stage: build
+#   tags:
+#   - darwin
+#   only:
+#   - master
+#   - tags
+#   script:
+#   - ./project/build_docs.sh
+#   artifacts:
+#     paths:
+#     - com.unity.mobile.notifications/Documentation~
+#   after_script:
+#    - /opt/post_build_script.sh    
 
 publish:
   stage: publish
