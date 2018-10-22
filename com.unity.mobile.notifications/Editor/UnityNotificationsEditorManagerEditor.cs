@@ -421,11 +421,11 @@ namespace Unity.Notifications
 			{
 				EditorGUI.BeginDisabledGroup(disabled);
 				Rect r = EditorGUILayout.BeginHorizontal();
-				GUILayout.Space(layer * 10);
+				GUILayout.Space(layer * 13);
 				
 				var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
 				
-				var width = rect.width - kSlotSize * 3 - layer * 10;
+				var width = rect.width - kSlotSize * 3 - layer * 13;
 
 				styleLabel.fixedWidth = width;
 				styleLabel.wordWrap = true;

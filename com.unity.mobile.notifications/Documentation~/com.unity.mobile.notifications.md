@@ -9,17 +9,17 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 - Schedule local repeatable or one-time notifications.
 - Cancel scheduled or already displayed notifications.
 - Android: 
-  - Create and modify notification channels/categories on Android Oreo and above
+  - Create and modify notification channels (categories) on Android Oreo and above.
   - Set custom notification icons.
 - iOS:
-  - Use the Apple Push Notification Service  (APNs) to send receive notifications.
-  - Modify remote notification content if they are received while the app is running.
-  - Group notification into threads (only  supported on iOS 12+)
+  - Use the Apple Push Notification Service  (APNs) to receive remote notifications.
+  - Modify remote notification content if notifications are received while the app is running.
+  - Group notifications into threads (only  supported on iOS 12+)
 
 **Requirements:**
 
-- Supports Android 4.1 (API 16)/iOS 10 and newer.
-- Compatible with Unity 2018.2 and newer.
+- Supports Android 4.1 (API 16)/iOS 10 or above.
+- Compatible with Unity 2018.2 or above.
 &nbsp;
 
 ## Android
@@ -28,7 +28,7 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 
 **Create a notification channel:**
 
-Every local notification must belong to a notification channel, notification channels are only supported by the system on Android Oreo (8.0) and above. On previous versions the channel behavior is emulated by the this package. Therefore settings which were set individually for each notification before 8.0 (such as priority  (`Importance`)) should be still set on the channel even when using the API older Android versions.
+Every local notification must belong to a notification channel, notification channels are only supported by the system on Android Oreo (8.0) and above. On previous versions the channel behavior is emulated by the this package. Therefore settings which were set individually for each notification before 8.0 (such as priority  (`Importance`)) should be still set on the channel even when using the package on older Android versions.
 
 ```
 var c = new AndroidNotificationChannel()
@@ -55,23 +55,23 @@ notificationTitle = "SomeTitle";
 notification.Text = "SomeText";
 notification.FireTime = System.DateTime.Now.AddMinutes(5);
 ```
-You should specify a custom icon for each notification otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in "Edit -> Project Settings -> Mobile Notification Settings".
+You should specify a custom icon for each notification, otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in "Edit -> Project Settings -> Mobile Notification Settings" (if using Unity 2018.2) or in "Edit -> Settings -> Mobile Notification Settings" (on 2018.3 and above).
 ```
 notification.Icon = "my_custom_icon_id";
 ```
-Optionally you can also set a large icon which will be shown in notification view in place of the small icon (which will be placed in a small badge atop the large icon).
+Optionally you can also set a large icon which will be shown in notification view in place of the small icon (which will be placed in a small badge atop the large icon). 
 ```
 notification.LargeIcon = "my_custom_large_icon_id"
 ```
-When scheduling each notification is assigned an unique identifier number which can later be used to track notification status or cancel it.
+After it's scheduled each notification is assigned an unique identifier number which can later be used to track the notification's status or to cancel it.
 ```
 var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
 ```
-You can check if the notification was already delivered and perform any actions depending on the result. However notification status can only be tracked on Android Marshmallow (6.0) and above.
+You can check if the notification has already been delivered and perform any actions depending on the result. However notification status can only be tracked on Android Marshmallow (6.0) and above.
 ```
 if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Scheduled)
 {
-	// Replace the currently sheduled notification with a new notification.
+	// Replace the currently scheduled notification with a new notification.
 	UpdateScheduledNotifcation(identifier, newNotification);
 }
 else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Delivered)
@@ -91,7 +91,7 @@ else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unk
 
 **Handling received notifications while the app is running:**
 
-You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* event to receive callbacks whenever a notification is delivered while the app is running.
+You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* event to receive a callback whenever a notification is delivered while the app is running.
 
 ```
 AndroidNotificationCenter.OnNotificationReceived +=(int identifier, AndroidNotification notification, string channel)

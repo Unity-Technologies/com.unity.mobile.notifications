@@ -180,7 +180,7 @@ namespace Unity.Notifications
     internal class UnityNotificationEditorManager : ScriptableObject
     {
         
-        internal const string ASSET_PATH = "Editor/com.unity.mobile.notifications/notificationIcons.asset";
+        internal const string ASSET_PATH = "Editor/com.unity.mobile.notifications/NotificationSettings.asset";
         
         [SerializeField]
         public int toolbarInt = 0;
