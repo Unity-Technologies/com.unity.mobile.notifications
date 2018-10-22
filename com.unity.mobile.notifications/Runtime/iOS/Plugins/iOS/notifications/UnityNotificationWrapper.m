@@ -52,12 +52,6 @@ void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
     manager.onAuthorizationCompletionCallback = req_callback;
 }
 
-//void onAuthorizationRequestCompletion(BOOL granted)
-//{
-//    req_callback(granted);
-//}
-
-
 void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
 {
     g_notificationReceivedCallback = callback;

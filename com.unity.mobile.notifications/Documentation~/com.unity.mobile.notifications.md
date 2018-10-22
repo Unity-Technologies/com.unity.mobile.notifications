@@ -17,7 +17,7 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
   - Group notification into threads (only  supported on iOS 12+)
 
 **Requirements:**
- 
+
 - Supports Android 4.1 (API 16)/iOS 10 and newer.
 - Compatible with Unity 2018.2 and newer.
 &nbsp;
@@ -148,10 +148,10 @@ var timeTrigger = new iOSNotificationTimeIntervalTrigger()
 				
 var notification = new iOSNotification()
 {
-	// You can optional specify a custom Identifier which can later be 
-	// used to cancel the notification, if you don't an unique string 
-	// will be generated automtically.
-	//Identifier = "_notification_01" 
+	// You can optionally specify a custom Identifier which can later be 
+	// used to cancel the notification, if you don't set one, an unique 
+	// string will be generated automatically.
+	Identifier = "_notification_01" 
 	Title = title,
 	Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
 	Subtitle = "This is a subtitle, something, something important...",
@@ -198,10 +198,10 @@ You can also create location triggers when you want to schedule the delivery of 
 In this exampe the center coordinate is defined using the WGS 84 system. In this case the notification would be triggered if the user entered an area within a 250 meter radius around Eiffel Tower in Paris.
 
 ```
-var locationTrigger = iOSNotificationLocationTrigger()
+var locationTrigger = new iOSNotificationLocationTrigger()
 {
-    Vector2 Center = new Vector2(2.294498, 48.858263),
-    Radius = 250,
+    Vector2 Center = new Vector2(2.294498f, 48.858263f),
+    Radius = 250f,
     NotifyOnEntry = true,
     NotifyOnExit = false,
 }
@@ -284,4 +284,3 @@ Make sure the CoreLocation framework is added to your project. You can do this i
 
 
 
- 
