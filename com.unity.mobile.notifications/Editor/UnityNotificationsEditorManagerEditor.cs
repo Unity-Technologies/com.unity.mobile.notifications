@@ -441,6 +441,8 @@ namespace Unity.Notifications
 				{
 					setting.val =
 						(PresentationOption) EditorGUILayout.EnumFlagsField((PresentationOptionEditor) setting.val, styleDropwDown);
+					if ((int)(PresentationOptionEditor)setting.val == 0)
+						setting.val = (PresentationOption)PresentationOptionEditor.All;
 				}
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.EndDisabledGroup();

@@ -12,6 +12,7 @@
         "LinuxStandalone32",
         "LinuxStandalone64",
         "LinuxStandaloneUniversal",
+        "Lumin",
         "macOSStandalone",
         "PS4",
         "Switch",
@@ -22,5 +23,9 @@
         "WindowsStandalone64",
         "XboxOne"
     ],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
 }
