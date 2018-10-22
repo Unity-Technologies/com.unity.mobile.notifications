@@ -126,13 +126,6 @@ namespace Unity.Notifications.iOS
         
         //Time trigger
         public Int32 timeTriggerInterval;
-
-        //Location trigger
-        public float locationTriggerCenterX;
-        public float locationTriggerCenterY;
-        public float locationTriggerRadius;
-        public bool locationTriggerNotifyOnEntry;
-        public bool locationTriggerNotifyOnExit;
         
         //Calendar trigger
         public Int32 calendarTriggerYear;
@@ -141,17 +134,13 @@ namespace Unity.Notifications.iOS
         public Int32 calendarTriggerHour;
         public Int32 calendarTriggerMinute;
         public Int32 calendarTriggerSecond;
-
-        public bool IsValid()
-        {
-            return
-                !string.IsNullOrEmpty(identifier) &&
-                !string.IsNullOrEmpty(title) &&
-                !string.IsNullOrEmpty(body) &&
-                !string.IsNullOrEmpty(subtitle) &&
-                !string.IsNullOrEmpty(threadIdentifier) &&
-                !string.IsNullOrEmpty(categoryIdentifier);
-        }
+        
+        //Location trigger
+        public float locationTriggerCenterX;
+        public float locationTriggerCenterY;
+        public float locationTriggerRadius;
+        public bool locationTriggerNotifyOnEntry;
+        public bool locationTriggerNotifyOnExit;
     }
 
     /// <summary>
@@ -470,12 +459,6 @@ namespace Unity.Notifications.iOS
 
             data.triggerType = -1;
             data.repeats = false;
-            //Location trigger
-            data.locationTriggerCenterX = 0f;
-            data.locationTriggerCenterY = 0f;
-            data.locationTriggerRadius = 2f;
-            data.locationTriggerNotifyOnEntry = true;
-            data.locationTriggerNotifyOnExit = false;
     
             //Time trigger
             data.timeTriggerInterval = -1;
@@ -487,6 +470,14 @@ namespace Unity.Notifications.iOS
             data.calendarTriggerHour = -1;
             data.calendarTriggerMinute = -1;
             data.calendarTriggerSecond = -1;
+            
+            //Location trigger
+            data.locationTriggerCenterX = 0f;
+            data.locationTriggerCenterY = 0f;
+            data.locationTriggerRadius = 2f;
+            data.locationTriggerNotifyOnEntry = true;
+            data.locationTriggerNotifyOnExit = false;
+
         }
 
         internal iOSNotification(iOSNotificationData data)
@@ -864,9 +855,6 @@ namespace Unity.Notifications.iOS
         {
             if (!Initialize())
                 return;
-                        
-            if (!notification.data.IsValid())
-                throw new Exception("Attempting to schedule an invalid notification!");
             
             iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
         }

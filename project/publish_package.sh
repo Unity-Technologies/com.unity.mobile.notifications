@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
+brew install jq
+
 cd com.unity.mobile.notifications
 ls
 ls Runtime/Android/Plugins/Android/
@@ -13,15 +15,11 @@ else
     exit 1
 fi
 
-#if [ -f Documentation\~/html/index.html ];
-#then
-#    echo "Generated html documentation found."
-#else
-#    echo "Generated html documentation not found!"
-#    exit 1
-#fi
 
-#ls Documentation\~/html
+REPO_REV=$(git rev-parse HEAD)
+REPO_URL=$(git config --get remote.origin-cd.url)
+
+jq '.repository += {"url": "$REPO_URL", "revision": "$REPO_REV"}' package.json
 
 curl -u $BIN_USERNAME@unity:$BIN_API_KEY https://packages.unity.com/auth > .npmrc
 sed -i -e 's/npm\/unity\/unity/npm\/unity\/unity-staging/g' .npmrc

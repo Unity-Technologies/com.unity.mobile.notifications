@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+#pragma warning disable 162
+
 namespace Unity.Notifications.Android
 {
     /// <summary>
@@ -795,3 +797,5 @@ namespace Unity.Notifications.Android
         }
     }
 }
+
+#pragma warning restore 162

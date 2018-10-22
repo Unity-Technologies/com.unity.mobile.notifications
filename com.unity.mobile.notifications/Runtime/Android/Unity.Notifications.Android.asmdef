@@ -2,9 +2,21 @@
     "name": "Unity.Notifications.Android",
     "references": [],
     "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Android",
-        "Editor"
+    "excludePlatforms": [
+        "iOS",
+        "LinuxStandalone32",
+        "LinuxStandalone64",
+        "LinuxStandaloneUniversal",
+        "Lumin",
+        "macOSStandalone",
+        "PS4",
+        "Switch",
+        "tvOS",
+        "WSA",
+        "WebGL",
+        "WindowsStandalone32",
+        "WindowsStandalone64",
+        "XboxOne"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

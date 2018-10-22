@@ -50,10 +50,16 @@ namespace Unity.Notifications
 		[SettingsProvider]
 		static SettingsProvider CreateMobileNotificationsSettingsProvider()
 		{
+#if UNITY_2019_1_OR_NEWER
+			var provider = AssetSettingsProvider.CreateProviderFromObject("Project/Mobile Notification Settings",
+				UnityNotificationEditorManager.Initialize());
+			provider.label = "Mobile Notification Settings";
+#else
 			var provider = new AssetSettingsProvider("Project/Mobile Notification Settings", UnityNotificationEditorManager.Initialize())
 			{
 				label = "Mobile Notification Settings",
 			};
+#endif
 			return provider;
 		}
 #endif
@@ -421,11 +427,11 @@ namespace Unity.Notifications
 			{
 				EditorGUI.BeginDisabledGroup(disabled);
 				Rect r = EditorGUILayout.BeginHorizontal();
-				GUILayout.Space(layer * 10);
+				GUILayout.Space(layer * 13);
 				
 				var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
 				
-				var width = rect.width - kSlotSize * 3 - layer * 10;
+				var width = rect.width - kSlotSize * 3 - layer * 13;
 
 				styleLabel.fixedWidth = width;
 				styleLabel.wordWrap = true;
@@ -441,6 +447,8 @@ namespace Unity.Notifications
 				{
 					setting.val =
 						(PresentationOption) EditorGUILayout.EnumFlagsField((PresentationOptionEditor) setting.val, styleDropwDown);
+					if ((int)(PresentationOptionEditor)setting.val == 0)
+						setting.val = (PresentationOption)PresentationOptionEditor.All;
 				}
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.EndDisabledGroup();

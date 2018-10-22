@@ -2,7 +2,7 @@
 //  UnityAppController+Notifications.m
 //  Unity-iPhone
 //
-//  Created by Paulius on 07/08/2018.
+//  Copyright © 2018 Unity Technologies. All rights reserved.
 //
 
 #import <objc/runtime.h>
@@ -30,7 +30,6 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        
         [nc addObserverForName:UIApplicationDidBecomeActiveNotification
                         object:nil
                          queue:[NSOperationQueue mainQueue]

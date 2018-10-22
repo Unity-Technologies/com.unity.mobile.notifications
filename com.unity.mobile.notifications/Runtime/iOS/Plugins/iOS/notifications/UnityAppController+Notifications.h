@@ -2,7 +2,7 @@
 //  UnityAppController+Notifications.h
 //  Unity-iPhone
 //
-//  Created by Paulius on 07/08/2018.
+//  Copyright © 2018 Unity Technologies. All rights reserved.
 //
 
 #import "UnityAppController.h"
@@ -15,7 +15,7 @@
 
 @end
 
-@interface UnityNotificationLifeCycleManager  : NSObject//<LifeCycleListener, AppDelegateListener>
+@interface UnityNotificationLifeCycleManager  : NSObject
 
 + (instancetype)sharedInstance;
 

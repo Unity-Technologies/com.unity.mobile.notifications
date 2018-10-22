@@ -55,8 +55,8 @@
     center.delegate = self;
     
     self.needRemoteNotifications = registerRemote;
-    
-    [center requestAuthorizationWithOptions: authorizationOptions                                                                                                                   completionHandler:^(BOOL granted, NSError * _Nullable error) {                                                                                                                        // Enable or disable features based on authorization.
+    [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
+    {
         struct iOSNotificationAuthorizationData* authData = (struct iOSNotificationAuthorizationData*)malloc(sizeof(*authData));
         authData -> finished = YES;
         authData -> granted = granted;
@@ -151,8 +151,6 @@
         self.cachedNotificationSettings = settings;
     }];
 }
-
-//  Helper stuff
 
 + (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData : (UNNotificationSettings*) settings
 {

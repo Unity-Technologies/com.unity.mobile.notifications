@@ -23,7 +23,6 @@ namespace Unity.Notifications
     [Flags]
     internal enum PresentationOptionEditor
     {
-        None  = 0,
         Badge = 1 << 0,
         Sound = 1 << 1,
         Alert = 1 << 2,
@@ -181,7 +180,7 @@ namespace Unity.Notifications
     internal class UnityNotificationEditorManager : ScriptableObject
     {
         
-        internal const string ASSET_PATH = "Editor/com.unity.mobile.notifications/notificationIcons.asset";
+        internal const string ASSET_PATH = "Editor/com.unity.mobile.notifications/NotificationSettings.asset";
         
         [SerializeField]
         public int toolbarInt = 0;
@@ -203,16 +202,20 @@ namespace Unity.Notifications
         {
 
             if (iOSNotificationEditorSettingsValues == null)
+                iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
+
+            try
             {
-                Debug.Log("iOSNotificationEditorSettingsValues = null");
+                var val = iOSNotificationEditorSettingsValues[key];
+                if (val != null)
+                    return (T) val;
+            }
+            catch (InvalidCastException ex)
+            {
+                Debug.LogWarning(ex.ToString());
                 iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
             }
 
-
-            var val = iOSNotificationEditorSettingsValues[key];
-            if (val != null)
-                return (T)val;
-            
             iOSNotificationEditorSettingsValues[key] = defaultValue;
             return defaultValue;
         }
