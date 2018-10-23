@@ -38,13 +38,6 @@ typedef struct iOSNotificationData
     
     //Time trigger
     int timeTriggerInterval;
-
-    //Location trigger
-    float locationTriggerCenterX;
-    float locationTriggerCenterY;
-    float locationTriggerRadius;
-    bool locationTriggerNotifyOnEntry;
-    bool locationTriggerNotifyOnExit;
     
     //Calendar trigger
     int calendarTriggerYear;
@@ -53,6 +46,14 @@ typedef struct iOSNotificationData
     int calendarTriggerHour;
     int calendarTriggerMinute;
     int calendarTriggerSecond;
+    
+    //Location trigger
+    float locationTriggerCenterX;
+    float locationTriggerCenterY;
+    float locationTriggerRadius;
+    bool locationTriggerNotifyOnEntry;
+    bool locationTriggerNotifyOnExit;
+
 
 } iOSNotificationData;
 
