@@ -81,9 +81,10 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     
-    if (!manager.authorized)
+    UNAuthorizationStatus authorizationStatus = manager.cachedNotificationSettings.authorizationStatus;
+    if (authorizationStatus != UNAuthorizationStatusAuthorized && authorizationStatus != UNAuthorizationStatusProvisional)
     {
-        [manager requestAuthorization:(UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge) : YES];
+        return;
     }
     
     assert(manager.onNotificationReceivedCallback != NULL);
