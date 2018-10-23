@@ -152,8 +152,6 @@
     }];
 }
 
-//  Helper stuff
-
 + (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData : (UNNotificationSettings*) settings
 {
     struct NotificationSettingsData* settingsData = (struct NotificationSettingsData*)malloc(sizeof(*settingsData));
