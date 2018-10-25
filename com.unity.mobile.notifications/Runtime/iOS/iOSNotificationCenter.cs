@@ -141,35 +141,6 @@ namespace Unity.Notifications.iOS
         public float locationTriggerRadius;
         public bool locationTriggerNotifyOnEntry;
         public bool locationTriggerNotifyOnExit;
-
-        public string IsValid()
-        {
-            var missingFields = new List<string>();
-
-            if (string.IsNullOrEmpty(identifier))
-                missingFields.Add("identifier");
-            
-            if (string.IsNullOrEmpty(title))
-                missingFields.Add("title");
-
-            if (string.IsNullOrEmpty(body))
-                missingFields.Add("body");
-
-            if (string.IsNullOrEmpty(subtitle))
-                missingFields.Add("subtitle");
-
-            if (string.IsNullOrEmpty(threadIdentifier))
-                missingFields.Add("threadIdentifier");
-
-            if (string.IsNullOrEmpty(categoryIdentifier))
-                missingFields.Add("categoryIdentifier");
-
-            if (missingFields.Count == 0)
-                return null;
-            
-            return missingFields.Aggregate((i, j) => i + ","  + j);
-
-        }
     }
 
     /// <summary>
@@ -884,10 +855,6 @@ namespace Unity.Notifications.iOS
         {
             if (!Initialize())
                 return;
-
-            string missingFields = notification.data.IsValid();
-            if (!string.IsNullOrEmpty(missingFields))
-                throw new Exception("Attempting to schedule an invalid notification! : \n " + missingFields);
             
             iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
         }
