@@ -63,7 +63,7 @@ typedef struct iOSNotificationAuthorizationData
     bool granted;
     char* error;
     bool finished;
-    char* deviceToken;
+    const char* deviceToken;
 } iOSNotificationAuthorizationData;
 
 
@@ -71,23 +71,13 @@ typedef void (*NotificationDataReceivedResponse)(struct iOSNotificationData* dat
 typedef void (*AuthorizationRequestResponse) (struct iOSNotificationAuthorizationData* data);
 
 typedef struct NotificationSettingsData {
-    //    UNAuthorizationStatusNotDetermined
-    //    UNAuthorizationStatusDenied
-    //    UNAuthorizationStatusAuthorized
-    //    UNAuthorizationStatusProvisional
     int authorizationStatus;
-    
-    // Applies to all :
-    //    UNNotificationSettingNotSupported
-    //    UNNotificationSettingDisabled
-    //    UNNotificationSettingEnabled
     int notificationCenterSetting;
     int lockScreenSetting;
     int carPlaySetting;
     int alertSetting;
     int badgeSetting;
     int soundSetting;
-    
 } NotificationSettingsData;
 
 const int kDefaultPresentationOptions = -1;
@@ -122,11 +112,4 @@ const int kDefaultPresentationOptions = -1;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;
 - (void)requestAuthorization: (NSInteger)authorizationOptions : (BOOL) registerRemote;
-//- (void)scheduleLocalNotification: (UNMutableNotificationContent*) content;
-
-// UNAuthorizationOptionBadge   = 0
-// UNAuthorizationOptionSound   = 1
-// UNAuthorizationOptionAlert   = 2
-// UNAuthorizationOptionCarPlay = 3
-//- (BOOL)hasAuthorizationForNotificationType: (int) type;
 @end

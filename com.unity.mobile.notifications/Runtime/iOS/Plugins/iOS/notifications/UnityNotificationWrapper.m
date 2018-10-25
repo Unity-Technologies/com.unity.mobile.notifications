@@ -71,10 +71,10 @@ void _SetRemoteNotificationReceivedDelegate(DATA_CALLBACK callback)
 
 void _RequestAuthorization(int options, BOOL registerRemote)
 {
-    [[UnityNotificationManager sharedInstance] requestAuthorization:(options) : registerRemote];
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+    [manager requestAuthorization:(options) : registerRemote];
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-    center.delegate = [UnityNotificationManager sharedInstance];
+    center.delegate = manager;
 }
 
 void _ScheduleLocalNotification(struct iOSNotificationData* data)
@@ -82,12 +82,18 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     
     UNAuthorizationStatus authorizationStatus = manager.cachedNotificationSettings.authorizationStatus;
-    if (authorizationStatus != UNAuthorizationStatusAuthorized && authorizationStatus != UNAuthorizationStatusProvisional)
+    
+    bool canSendNotifications = authorizationStatus != UNAuthorizationStatusAuthorized;
+    if (@available(iOS 12.0, *)) {
+        if (!canSendNotifications)
+            canSendNotifications = authorizationStatus == UNAuthorizationStatusProvisional;
+    }
+    if (canSendNotifications)
     {
+        NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization before attempting to schedule any notifications");
         return;
     }
-    
-    assert(manager.onNotificationReceivedCallback != NULL);
+        assert(manager.onNotificationReceivedCallback != NULL);
     
     NSDictionary *userInfo = @{
                                  @"showInForeground" : @(data->showInForeground),
@@ -185,7 +191,7 @@ NotificationSettingsData* _GetNotificationSettings()
 int _GetScheduledNotificationDataCount()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return [manager.cachedPendingNotificationRequests count];
+    return (int)[manager.cachedPendingNotificationRequests count];
 }
 iOSNotificationData* _GetScheduledNotificationDataAt(int index)
 {
