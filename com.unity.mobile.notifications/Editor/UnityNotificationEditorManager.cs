@@ -202,16 +202,20 @@ namespace Unity.Notifications
         {
 
             if (iOSNotificationEditorSettingsValues == null)
+                iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
+
+            try
             {
-                Debug.Log("iOSNotificationEditorSettingsValues = null");
+                var val = iOSNotificationEditorSettingsValues[key];
+                if (val != null)
+                    return (T) val;
+            }
+            catch (InvalidCastException ex)
+            {
+                Debug.LogWarning(ex.ToString());
                 iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
             }
 
-
-            var val = iOSNotificationEditorSettingsValues[key];
-            if (val != null)
-                return (T)val;
-            
             iOSNotificationEditorSettingsValues[key] = defaultValue;
             return defaultValue;
         }
