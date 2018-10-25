@@ -55,11 +55,11 @@ notificationTitle = "SomeTitle";
 notification.Text = "SomeText";
 notification.FireTime = System.DateTime.Now.AddMinutes(5);
 ```
-You should specify a custom icon for each notification, otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in "Edit -> Project Settings -> Mobile Notification Settings" (if using Unity 2018.2) or in "Edit -> Settings -> Mobile Notification Settings" (on 2018.3 and above).
+You should specify a custom icon for each notification, otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in "Edit -> Project Settings -> Mobile Notification Settings -> Android" (if using Unity 2018.2) or in "Edit -> Settings -> Mobile Notification Settings -> Android" (on 2018.3 and above).
 ```
 notification.Icon = "my_custom_icon_id";
 ```
-Optionally you can also set a large icon which will be shown in notification view in place of the small icon (which will be placed in a small badge atop the large icon). 
+Optionally you can also set a large icon which will be shown in the notification view in place of the small icon (which will be placed in a small badge atop of the large icon). 
 ```
 notification.LargeIcon = "my_custom_large_icon_id"
 ```
