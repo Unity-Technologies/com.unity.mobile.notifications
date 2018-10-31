@@ -90,7 +90,7 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     }
     if (canSendNotifications)
     {
-        NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization before attempting to schedule any notifications");
+        NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization before attempting to schedule any notifications.");
         return;
     }
         assert(manager.onNotificationReceivedCallback != NULL);

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.0-preview.4] - 2018-10-23
 
+### Fixes:
+
+- Fixed Editor Settings not working on Unity 2019.1.
+
+## [1.0.0-preview.4] - 2018-10-23
+
 ### Minor fixes & improvements:
 
 - Allow sending notifications without title or body. Allows scheduling sounds only notifications that do not have an alert or are shown in the notification center.

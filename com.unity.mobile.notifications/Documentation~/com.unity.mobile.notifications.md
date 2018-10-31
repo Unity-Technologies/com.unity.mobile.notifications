@@ -37,8 +37,8 @@ var c = new AndroidNotificationChannel()
     Name = "Default Channel",
     Importance = Importance.High,
     Description = "Generic notifications",
-}
-AndroidNotificationCenter.RegisterNotficationChannel(c);
+};
+AndroidNotificationCenter.RegisterNotificationChannel(c);
 ```
 &nbsp;
 
