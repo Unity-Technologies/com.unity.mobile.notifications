@@ -30,7 +30,6 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-        
         [nc addObserverForName:UIApplicationDidBecomeActiveNotification
                         object:nil
                          queue:[NSOperationQueue mainQueue]
