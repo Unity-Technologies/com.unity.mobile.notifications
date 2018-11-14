@@ -22,8 +22,6 @@ REPO_URL=$(git remote get-url origin)
 MANIFEST=$(jq -r ".repository += {\"url\": \"$REPO_URL\", \"revision\": \"$REPO_REV\"}" package.json)
 echo "$MANIFEST" > package.json
 
-echo "$(cat package.json | jq '.repository += {"url": "$REPO_URL", "revision": "$REPO_REV"}')" > package.json
-
 curl -u $BIN_USERNAME@unity:$BIN_API_KEY https://packages.unity.com/auth > .npmrc
 sed -i -e 's/npm\/unity\/unity/npm\/unity\/unity-staging/g' .npmrc
 npm publish
