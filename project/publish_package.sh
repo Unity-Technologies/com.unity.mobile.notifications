@@ -17,9 +17,10 @@ fi
 
 
 REPO_REV=$(git rev-parse HEAD)
-REPO_URL=$(git config --get remote.origin-cd.url)
+REPO_URL="gitlab.cds.internal.unity3d.com/upm-packages/mobile/mobile-notifications.git"
 
-jq '.repository += {"url": "$REPO_URL", "revision": "$REPO_REV"}' package.json
+MANIFEST=$(jq -r ".repository += {\"url\": \"$REPO_URL\", \"revision\": \"$REPO_REV\"}" package.json)
+echo "$MANIFEST" > package.json
 
 curl -u $BIN_USERNAME@unity:$BIN_API_KEY https://packages.unity.com/auth > .npmrc
 sed -i -e 's/npm\/unity\/unity/npm\/unity\/unity-staging/g' .npmrc

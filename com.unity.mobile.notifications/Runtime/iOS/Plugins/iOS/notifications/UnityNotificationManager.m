@@ -54,6 +54,9 @@
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
     
+    BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityAddRemoteNotificationCapability"] boolValue] ;
+    registerRemote = supportsPushNotification == YES ? registerRemote : NO ;
+    
     self.needRemoteNotifications = registerRemote;
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
@@ -75,6 +78,11 @@
                 });
             }
         }
+        else
+        {
+            NSLog(@"Requesting notification authorization failed with: %@", error);
+        }
+        
         [self checkAuthorizationFinished];
         [self updateNotificationSettings];
     }];
