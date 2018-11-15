@@ -17,7 +17,7 @@ fi
 
 
 REPO_REV=$(git rev-parse HEAD)
-REPO_URL=$(git remote get-url origin)
+REPO_URL=$(git config --get remote.origin.url)
 
 MANIFEST=$(jq -r ".repository += {\"url\": \"$REPO_URL\", \"revision\": \"$REPO_REV\"}" package.json)
 echo "$MANIFEST" > package.json
