@@ -47,7 +47,9 @@
                     usingBlock:^(NSNotification *notification) {
                         
                         BOOL authorizeOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationRequestAuthorizationOnAppLaunch"] boolValue] ;
-                        BOOL registerRemoteOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch"] boolValue] ;
+                        BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityAddRemoteNotificationCapability"] boolValue] ;
+                        BOOL registerRemoteOnLaunch = supportsPushNotification == YES ?
+                            [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch"] boolValue] : NO ;
                         
                         NSInteger remoteForegroundPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityRemoteNotificationForegroundPresentationOptions"] integerValue] ;
                         

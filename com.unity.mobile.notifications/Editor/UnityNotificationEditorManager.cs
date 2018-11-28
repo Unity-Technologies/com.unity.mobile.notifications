@@ -296,9 +296,26 @@ namespace Unity.Notifications
                                     "UnityNotificationDefaultAuthorizationOptions",
                                     (PresentationOption) PresentationOptionEditor.All)),
 
+                        }),
+
+                    new NotificationEditorSetting("UnityUseLocationNotificationTrigger",
+                        "Include CoreLocation framework",
+                        "If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.",
+                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                            "UnityUseLocationNotificationTrigger", false),
+                        false),
+                    
+                    new NotificationEditorSetting("UnityAddRemoteNotificationCapability",
+                        "Enable Push Notifications",
+                        "Enable this to add the push notification capability to you Xcode project.",
+                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                            "UnityAPSReleaseEnvironment", true),
+                        false,
+                        dependentSettings: new List<NotificationEditorSetting>()
+                        {     
                             new NotificationEditorSetting(
                                 "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                                "Register for Remote Notifications on App Launch",
+                                "Register for Push Notifications on App Launch",
                                 "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
                                 notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
                                     "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false),
@@ -314,23 +331,14 @@ namespace Unity.Notifications
                                                 "UnityRemoteNotificationForegroundPresentationOptions",
                                                 (PresentationOption) PresentationOptionEditor.All)),
                                 }),
-
-                        }),
-
-                    new NotificationEditorSetting("UnityUseLocationNotificationTrigger",
-                        "Include CoreLocation framework",
-                        "If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.",
-                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                            "UnityUseLocationNotificationTrigger", false),
-                        false),
-
-                    new NotificationEditorSetting("UnityAPSReleaseEnvironment",
-                        "Enable release environment for APS",
-                        "Enable this when signing the app with a production certificate.",
-                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                            "UnityAPSReleaseEnvironment", false),
-                        false),
-                };
+                            new NotificationEditorSetting("UnityAPSReleaseEnvironment",
+                                "Enable release environment for APS",
+                                "Enable this when signing the app with a production certificate.",
+                                notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                                    "UnityAPSReleaseEnvironment", false),
+                                false),
+                        })
+                    };
             }
 
             EditorUtility.SetDirty(notificationEditorManager);

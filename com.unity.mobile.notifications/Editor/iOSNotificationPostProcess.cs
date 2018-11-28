@@ -29,37 +29,45 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			var target = proj.TargetGuidByName ("Unity-iPhone");
 			
 			var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettingsFlat;
-
-			var useReleaseAPSEnvSetting = settings
-				.Find(i => i.key == "UnityAPSReleaseEnvironment");
-			var useReleaseAPSEnv = false;
 			
-			if (useReleaseAPSEnvSetting != null)
-				useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.val;
-
+			var addPushNotificationCapability = (bool)settings
+				                            .Find(i => i.key == "UnityAddRemoteNotificationCapability").val == true;;
+			
 			var needLocationFramework = (bool)settings
-				.Find(i => i.key == "UnityUseLocationNotificationTrigger").val == true;;
-			
+				                            .Find(i => i.key == "UnityUseLocationNotificationTrigger").val == true;;
+
 			proj.AddFrameworkToProject(target, "UserNotifications.framework", true);
-			
+
 			if (needLocationFramework)
 				proj.AddFrameworkToProject(target, "CoreLocation.framework", false);
 			
 			File.WriteAllText (projPath, proj.WriteToString ());
-						
-			var entitlementsFileName = proj.GetBuildPropertyForConfig(target, "CODE_SIGN_ENTITLEMENTS");
 
-			if (entitlementsFileName == null)
+
+			if (addPushNotificationCapability)
 			{
-				var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
-				entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+				var useReleaseAPSEnvSetting = settings
+					.Find(i => i.key == "UnityAPSReleaseEnvironment");
+				var useReleaseAPSEnv = false;
+
+				if (useReleaseAPSEnvSetting != null)
+					useReleaseAPSEnv = (bool) useReleaseAPSEnvSetting.val;
+
+				var entitlementsFileName = proj.GetBuildPropertyForConfig(target, "CODE_SIGN_ENTITLEMENTS");
+
+				if (entitlementsFileName == null)
+				{
+					var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
+					entitlementsFileName = string.Format("{0}.entitlements",
+						bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+				}
+
+				var pbxPath = PBXProject.GetPBXProjectPath(path);
+				var capManager = new ProjectCapabilityManager(pbxPath, entitlementsFileName, "Unity-iPhone");
+				capManager.AddPushNotifications(!useReleaseAPSEnv);
+				capManager.WriteToFile();
 			}
-		
-			var pbxPath = PBXProject.GetPBXProjectPath(path);
-			var capManager = new ProjectCapabilityManager(pbxPath, entitlementsFileName, "Unity-iPhone");
-			capManager.AddPushNotifications(!useReleaseAPSEnv);
-			capManager.WriteToFile();
-			
+
 			// Get plist
 			var plistPath = path + "/Info.plist";
 			var plist = new PlistDocument();
