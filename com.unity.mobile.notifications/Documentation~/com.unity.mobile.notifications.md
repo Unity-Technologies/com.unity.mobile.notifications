@@ -279,7 +279,7 @@ iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
 
 **Notifications with a location trigger do not work.**
 
-Make sure the CoreLocation framework is added to your project. You can do this in the `Mobile Notification Settings` menu in the Unity Editor. Or by adding it manually to the Xcode project (or using the Unity Xcode API). Also you need to request permission to use locaiton in your app, you can do this using the [Location Service API](https://docs.unity3d.com/ScriptReference/LocationService.html).
+Make sure the CoreLocation framework is added to your project. You can do this in the `Mobile Notification Settings` menu in the Unity Editor. Or by adding it manually to the Xcode project (or using the Unity Xcode API). Also you need to request permission to use location in your app, you can do this using the [Location Service API](https://docs.unity3d.com/ScriptReference/LocationService.html).
 
 
 
