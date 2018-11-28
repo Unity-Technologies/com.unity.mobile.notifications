@@ -670,7 +670,7 @@ namespace Unity.Notifications.Android
         /// Update an already scheduled notification.
         /// If a notification with the specified id was already scheduled it will be overridden with the information from the passed notification struct.
         /// </summary>
-        public static void UpdateScheduledNotifcation(int id, AndroidNotification notification, string channel)
+        public static void UpdateScheduledNotification(int id, AndroidNotification notification, string channel)
         {
             if (!Initialize())
                 return;
@@ -678,7 +678,19 @@ namespace Unity.Notifications.Android
             if (notificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
                 SendNotification(id, notification, channel);
         }
+        
+        /// <summary>
+        /// Schedule a notification which will be shown at the time specified in the notification struct.
+        /// The specified id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
+        /// </summary>
+        public static void SendNotificationWithExplicitID(AndroidNotification notification, string channel, int id)
+        {
+            if (!Initialize())
+                return;
 
+            SendNotification(id, notification, channel);
+        }
+        
         /// <summary>
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The returned id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
@@ -751,9 +763,6 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);
-
-            Debug.Log(" --- notificationManager.Call(scheduleNotificationIntent, notificationIntent);");
-
 
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
