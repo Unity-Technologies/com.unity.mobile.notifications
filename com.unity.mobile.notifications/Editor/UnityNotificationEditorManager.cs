@@ -309,7 +309,7 @@ namespace Unity.Notifications
                         "Enable Push Notifications",
                         "Enable this to add the push notification capability to you Xcode project.",
                         notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                            "UnityAPSReleaseEnvironment", true),
+                            "UnityAPSReleaseEnvironment", false),
                         false,
                         dependentSettings: new List<NotificationEditorSetting>()
                         {     

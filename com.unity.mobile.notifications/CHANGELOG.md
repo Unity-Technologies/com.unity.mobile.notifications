@@ -4,7 +4,19 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.0.0-preview.6] - 2018-11-14
+
+
+## [1.0.0-preview.7] - 2018-11-14
+
+### Minor fixes & improvements:
+
+- Made CancelDisplayedNotification public.
+- Fix an editor script issue on 2018.3.
+- Added an option to not add Remote Notifications capability to the Xcode project. 
+
+## Fixes: 
+
+[1.0.0-preview.6] - 2018-11-14
 
 ### Minor fixes & improvements.
 

@@ -547,7 +547,7 @@ namespace Unity.Notifications.Android
                 channel.canBypassDnd,
                 channel.canShowBadge,
                 channel.vibrationPattern,
-                Enum.IsDefined(typeof(LocCancelDisplayedNotificationkScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
+                Enum.IsDefined(typeof(LockScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
             );
         }
 
