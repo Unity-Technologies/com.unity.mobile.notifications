@@ -1,10 +1,11 @@
 {
-    "name": "Unity.Notifications",
+    "name": "Tests",
     "references": [
-        "Unity.Notifications.iOS",
-        "Unity.Notifications.Android"
+        "Unity.Notifications"
     ],
-    "optionalUnityReferences": [],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
     "includePlatforms": [
         "Editor"
     ],

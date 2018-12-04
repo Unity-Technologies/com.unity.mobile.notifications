@@ -3,14 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 using UnityEditor;
-#if PLATFORM_ANDROID
-using UnityEditor.Android;
-#endif
-
-using Unity.Notifications.iOS;
 using UnityEngine;
 
+using UnityEditor.Android;
+using Unity.Notifications.iOS;
+using Unity.Notifications;
+
+#pragma warning disable 219
 
 namespace Unity.Notifications
 {
@@ -130,15 +132,20 @@ namespace Unity.Notifications
     }
     
     [System.Serializable]
-    internal class iOSNotificationEditorSettingsCollection
+    internal class NotificationEditorSettingsCollection
     {
         [SerializeField] List<string> keys;
         [SerializeField] List<string> values;
 
-        public iOSNotificationEditorSettingsCollection()
+        public NotificationEditorSettingsCollection()
         {
             keys = new List<string>();
             values = new List<string>();
+        }
+
+        public bool Contains(string key)
+        {
+            return keys.Contains(key);
         }
         
         public object this[string key]
@@ -186,23 +193,67 @@ namespace Unity.Notifications
         public int toolbarInt = 0;
         
         public List<NotificationEditorSetting> iOSNotificationEditorSettings;
+        public List<NotificationEditorSetting> AndroidNotificationEditorSettings;
 
         [SerializeField] 
-        internal iOSNotificationEditorSettingsCollection iOSNotificationEditorSettingsValues;
+        internal NotificationEditorSettingsCollection iOSNotificationEditorSettingsValues;
 
-        public void SaveSetting(NotificationEditorSetting setting)
+        [SerializeField] 
+        internal NotificationEditorSettingsCollection AndroidNotificationEditorSettingsValues;
+
+        private void SaveSetting(NotificationEditorSetting setting, NotificationEditorSettingsCollection values)
         {
-            if (iOSNotificationEditorSettingsValues == null)
-                iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
+            if (values == null)
+                values = new NotificationEditorSettingsCollection();
 
-            iOSNotificationEditorSettingsValues[setting.key] = setting.val;
+            if (values[setting.key].ToString() != setting.val.ToString())
+            {
+                values[setting.key] = setting.val;
+                
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssets();
+            }
+        }
+        
+        public void SaveSetting(NotificationEditorSetting setting, BuildTargetGroup target)
+        {
+            if (target == BuildTargetGroup.Android)
+            {
+                this.SaveSetting(setting, AndroidNotificationEditorSettingsValues);
+            }
+            else
+            {
+                this.SaveSetting(setting, iOSNotificationEditorSettingsValues);
+            }
+        }
+        
+        public T GetAndroidNotificationEditorSettingsValue<T>(string key, T defaultValue)
+        {
+            if (AndroidNotificationEditorSettingsValues == null)
+                AndroidNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
+
+            try
+            {
+                var val = AndroidNotificationEditorSettingsValues[key];
+                if (val != null)
+                    return (T) val;
+            }
+            catch (InvalidCastException ex)
+            {
+                Debug.LogWarning(ex.ToString());
+                AndroidNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
+            }
+
+            AndroidNotificationEditorSettingsValues[key] = defaultValue;
+            return defaultValue;
+
         }
 
         public T GetiOSNotificationEditorSettingsValue<T>(string key, T defaultValue)
         {
 
             if (iOSNotificationEditorSettingsValues == null)
-                iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
+                iOSNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
 
             try
             {
@@ -213,7 +264,7 @@ namespace Unity.Notifications
             catch (InvalidCastException ex)
             {
                 Debug.LogWarning(ex.ToString());
-                iOSNotificationEditorSettingsValues = new iOSNotificationEditorSettingsCollection();
+                iOSNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
             }
 
             iOSNotificationEditorSettingsValues[key] = defaultValue;
@@ -240,6 +291,16 @@ namespace Unity.Notifications
             {
                 var target = new List<NotificationEditorSetting>();
                 FlattenList(iOSNotificationEditorSettings, target);
+                return target;
+            }
+        }
+        
+        public List<NotificationEditorSetting> AndroidNotificationEditorSettingsFlat
+        {
+            get
+            {
+                var target = new List<NotificationEditorSetting>();
+                FlattenList(AndroidNotificationEditorSettings, target);
                 return target;
             }
         }
@@ -309,7 +370,7 @@ namespace Unity.Notifications
                         "Enable Push Notifications",
                         "Enable this to add the push notification capability to you Xcode project.",
                         notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                            "UnityAPSReleaseEnvironment", true),
+                            "UnityAPSReleaseEnvironment", false),
                         false,
                         dependentSettings: new List<NotificationEditorSetting>()
                         {     
@@ -341,10 +402,23 @@ namespace Unity.Notifications
                     };
             }
 
+            if (notificationEditorManager.AndroidNotificationEditorSettings == null)
+            {
+                notificationEditorManager.AndroidNotificationEditorSettings = new List<NotificationEditorSetting>()
+                {
+
+                    new NotificationEditorSetting(
+                        "UnityNotificationAndroidRescheduleOnDeviceRestart",
+                        "Reschedule Notifications on Device Restart",
+                        "By default Android removes all scheduled notifications when the device is restarted. Enable this to automatically reschedule all non expired notifications when the device is turned back on.",
+                        notificationEditorManager.GetAndroidNotificationEditorSettingsValue<bool>(
+                            "UnityNotificationAndroidRescheduleOnDeviceRestart", false),
+                        dependentSettings: null),
+                };
+            }
             EditorUtility.SetDirty(notificationEditorManager);
-           
-            
             return notificationEditorManager;
+            
         }
         
         internal void RegisterDrawableResource(string id, Texture2D image, NotificationIconType type)
@@ -533,9 +607,79 @@ namespace Unity.Notifications
 
     }
 
-#if UNITY_EDITOR && PLATFORM_ANDROID
-    class AndroidNotificationResourcesPostProcessor : IPostGenerateGradleAndroidProject
+#if UNITY_EDITOR  && PLATFORM_ANDROID
+    public class AndroidNotificationResourcesPostProcessor : IPostGenerateGradleAndroidProject
     {
+
+        public static XmlDocument AppendAndroidPermissionField(XmlDocument xmlDoc, string key)
+        {
+            // <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+            string xpath = "manifest";
+            var parentNode = xmlDoc.SelectSingleNode(xpath);
+            XmlElement metaDataNode = xmlDoc.CreateElement("uses-permission");
+
+            foreach (XmlNode node in parentNode.ChildNodes)
+            {
+                if (node.Name == "uses-permission")
+                    foreach (XmlAttribute attr in node.Attributes)
+                    {
+                        if (attr.Value == key)
+                            return xmlDoc;
+                    }
+            }
+            
+            metaDataNode.SetAttribute("name", "http://schemas.android.com/apk/res/android", key);
+           
+            parentNode.AppendChild(metaDataNode);
+
+            return xmlDoc;
+        }
+
+        public static XmlDocument AppendAndroidMetadataField(XmlDocument xmlDoc, string key, string value)
+        {
+            
+            string xpath = "manifest/application/meta-data";
+            
+            var nodes = xmlDoc.SelectNodes(xpath);
+            var fieldSet = false;
+
+            if (nodes != null)
+            {
+                foreach (XmlNode node in nodes)
+                {
+                    foreach (XmlAttribute attr in node.Attributes)
+                    {
+                        if (attr.Value == key)
+                        {
+                            fieldSet = true;
+                        }
+                    }
+
+                    if (fieldSet)
+                    {
+                        ((XmlElement)node).SetAttribute("value", "http://schemas.android.com/apk/res/android", value);
+                        break;   
+                    }
+                       
+                }
+            }
+            
+            if (!fieldSet)
+            {
+                XmlElement metaDataNode = xmlDoc.CreateElement("meta-data");
+                
+                metaDataNode.SetAttribute("name", "http://schemas.android.com/apk/res/android", key);
+                metaDataNode.SetAttribute("value", "http://schemas.android.com/apk/res/android", value);
+                            
+                var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
+                if (applicationNode != null)
+                {
+                    applicationNode.AppendChild(metaDataNode);
+                }
+            }
+            return xmlDoc;
+        }
+        
         public int callbackOrder
         {
             get { return 0; }
@@ -562,8 +706,30 @@ namespace Unity.Notifications
                     File.WriteAllBytes(fileInfo.FullName, icon.Value);
                 }
             }
+            
+            var settings = UnityNotificationEditorManager.Initialize().AndroidNotificationEditorSettingsFlat;
+            
+            var enableRescheduleOnRestart = (bool)settings
+                                                    .Find(i => i.key == "UnityNotificationAndroidRescheduleOnDeviceRestart").val;
+
+
+            if (enableRescheduleOnRestart)
+            {
+                string manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
+                XmlDocument manifestDoc = new XmlDocument();
+                manifestDoc.Load(manifestPath);
+
+                var doc = AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
+                doc = AndroidNotificationResourcesPostProcessor.AppendAndroidPermissionField(doc, "android.permission.RECEIVE_BOOT_COMPLETED");
+                
+                doc.Save(manifestPath);
+            }
+            
+            // meta-data android:name="reschedule_notifications_on_restart" android:value="true"
         }
     }
     #endif
 }
 #endif
+
+#pragma warning restore 219

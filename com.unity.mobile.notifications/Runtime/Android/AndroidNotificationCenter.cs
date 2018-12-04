@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-#pragma warning disable 162
+#pragma warning disable 162, 67, 414
 
 namespace Unity.Notifications.Android
 {
@@ -260,6 +260,15 @@ namespace Unity.Notifications.Android
             set { usesStopwatch = value; }
         }
 
+        /// <summary>
+        /// TODO.
+        /// </summary>
+        public string IntentData
+        {
+            get { return intentData; }
+            set { intentData = value; }
+        }
+        
         internal string title;
         internal string text;
         
@@ -275,6 +284,8 @@ namespace Unity.Notifications.Android
         internal int number;
         internal bool usesStopwatch;
         internal long repeatInterval;
+
+        internal string intentData;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
@@ -292,6 +303,7 @@ namespace Unity.Notifications.Android
             color = -1;
             number = -1;
             usesStopwatch = false;
+            intentData = "";            
             this.fireTime = -1;
             
             this.FireTime = fireTime;
@@ -508,6 +520,18 @@ namespace Unity.Notifications.Android
 
             return initialized = true;
         }
+        
+        public static string GetLastIntentData()
+        {
+            
+            AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+            AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+ 
+            AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
+                
+            var data = intent.Call<string> ("getStringExtra", "data");
+            return data;
+        }
 
         /// <summary>
         ///  Creates a notification channel that notifications can be posted to.
@@ -580,7 +604,7 @@ namespace Unity.Notifications.Android
         /// Cancel a previously shown notification.
         /// The notification will be removed from the status bar.
         /// </summary>
-        static void CancelDisplayedNotification(int id)
+        public static void CancelDisplayedNotification(int id)
         {
             if (!Initialize())
                 return;
@@ -725,10 +749,11 @@ namespace Unity.Notifications.Android
 
             AndroidJavaClass managerClass =
                 new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+            AndroidJavaObject context = notificationManager.Get<AndroidJavaObject>("mContext");
             AndroidJavaObject activity = notificationManager.Get<AndroidJavaObject>("mActivity");
 
             AndroidJavaObject notificationIntent =
-                new AndroidJavaObject("android.content.Intent", activity, managerClass);
+                new AndroidJavaObject("android.content.Intent", context, managerClass);
 
             AndroidJavaObject androidContext = notificationManager.Get<AndroidJavaObject>("mContext");
 
@@ -763,6 +788,8 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.intentData);
+
 
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
@@ -807,4 +834,4 @@ namespace Unity.Notifications.Android
     }
 }
 
-#pragma warning restore 162
+#pragma warning restore 162, 67, 414

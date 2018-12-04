@@ -1,17 +1,18 @@
 {
-    "name": "Unity.Notifications",
+    "name": "Unity.Android.Notifications.Tests",
     "references": [
-        "Unity.Notifications.iOS",
         "Unity.Notifications.Android"
     ],
-    "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
+    "optionalUnityReferences": [
+        "TestAssemblies"
     ],
-    "excludePlatforms": [],
+    "includePlatforms": [
+        "Android",
+        "Editor"
+        ],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": []
 }

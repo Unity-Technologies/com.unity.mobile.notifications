@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Notifications;
-using Unity.Notifications.Android;
-using Unity.Notifications.iOS;
 using UnityEditor;
 using UnityEditor.Callbacks;
 
 using UnityEngine;
 
-#if UNITY_IOS
+#if PLATFORM_IOS
+using Unity.Notifications.iOS;
 using UnityEditor.iOS.Xcode;
 #endif
 
@@ -19,15 +18,35 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 	[PostProcessBuild]
 	public static void OnPostprocessBuild (BuildTarget buildTarget, string path)
 	{
-		#if UNITY_IOS
+		#if PLATFORM_IOS
 		if (buildTarget == BuildTarget.iOS) {
 			
 			var projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
 				
 			var proj = new PBXProject ();
-			proj.ReadFromString (File.ReadAllText (projPath));			
-			var target = proj.TargetGuidByName ("Unity-iPhone");
+			proj.ReadFromString(File.ReadAllText(projPath));
+
+
+			string mainTarget;
+			string unityFrameworkTarget;
 			
+			var unityMainTargetGuidMethod = proj.GetType().GetMethod("GetUnityMainTargetGuid");
+			var unityFrameworkTargetGuidMethod = proj.GetType().GetMethod("GetUnityFrameworkTargetGuid");
+
+				
+			if (unityMainTargetGuidMethod != null && unityFrameworkTargetGuidMethod != null)
+			{
+				mainTarget = (string)unityMainTargetGuidMethod.Invoke(proj, null);
+				unityFrameworkTarget = (string)unityFrameworkTargetGuidMethod.Invoke(proj, null);
+
+			}
+			else
+			{
+				mainTarget = proj.TargetGuidByName ("Unity-iPhone");
+				unityFrameworkTarget = mainTarget;
+
+			}
+						
 			var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettingsFlat;
 			
 			var addPushNotificationCapability = (bool)settings
@@ -36,10 +55,10 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			var needLocationFramework = (bool)settings
 				                            .Find(i => i.key == "UnityUseLocationNotificationTrigger").val == true;;
 
-			proj.AddFrameworkToProject(target, "UserNotifications.framework", true);
+			proj.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
 
 			if (needLocationFramework)
-				proj.AddFrameworkToProject(target, "CoreLocation.framework", false);
+				proj.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
 			
 			File.WriteAllText (projPath, proj.WriteToString ());
 
@@ -53,7 +72,7 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 				if (useReleaseAPSEnvSetting != null)
 					useReleaseAPSEnv = (bool) useReleaseAPSEnvSetting.val;
 
-				var entitlementsFileName = proj.GetBuildPropertyForConfig(target, "CODE_SIGN_ENTITLEMENTS");
+				var entitlementsFileName = proj.GetBuildPropertyForConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
 
 				if (entitlementsFileName == null)
 				{
