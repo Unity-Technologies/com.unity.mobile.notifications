@@ -547,7 +547,7 @@ namespace Unity.Notifications.Android
                 channel.canBypassDnd,
                 channel.canShowBadge,
                 channel.vibrationPattern,
-                Enum.IsDefined(typeof(LockScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
+                Enum.IsDefined(typeof(LocCancelDisplayedNotificationkScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
             );
         }
 
@@ -580,7 +580,7 @@ namespace Unity.Notifications.Android
         /// Cancel a previously shown notification.
         /// The notification will be removed from the status bar.
         /// </summary>
-        static void CancelDisplayedNotification(int id)
+        public static void CancelDisplayedNotification(int id)
         {
             if (!Initialize())
                 return;
