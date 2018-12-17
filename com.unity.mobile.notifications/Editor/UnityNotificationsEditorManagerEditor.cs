@@ -9,6 +9,8 @@ using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEditorInternal;
 
+#pragma warning disable 219
+
 namespace Unity.Notifications
 {
 	[CustomEditor(typeof(UnityNotificationEditorManager))]
@@ -477,3 +479,5 @@ namespace Unity.Notifications
 		}
 	}
 }
+
+#pragma warning restore 219

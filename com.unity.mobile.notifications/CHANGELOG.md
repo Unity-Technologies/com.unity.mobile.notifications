@@ -4,17 +4,19 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-preview.8] - 2018-12-17
 
+### Fixes:
 
-## [1.0.0-preview.7] - 2018-11-14
+- Fixed issues with editor scripts and .asmdef files on Unity 2018.2.
 
-### Minor fixes & improvements:
+## [1.0.0-preview.7] - 2018-12-10
+
+### Fixes & improvements:
 
 - Made CancelDisplayedNotification public.
 - Fix an editor script issue on 2018.3.
 - Added an option to not add Remote Notifications capability to the Xcode project. 
-
-## Fixes: 
 
 [1.0.0-preview.6] - 2018-11-14
 
