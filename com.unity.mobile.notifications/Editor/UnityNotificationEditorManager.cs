@@ -11,6 +11,7 @@ using UnityEditor.Android;
 using Unity.Notifications.iOS;
 using UnityEngine;
 
+#pragma warning disable 219
 
 namespace Unity.Notifications
 {
@@ -567,3 +568,5 @@ namespace Unity.Notifications
     #endif
 }
 #endif
+
+#pragma warning restore 219

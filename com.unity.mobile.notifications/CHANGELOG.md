@@ -4,6 +4,14 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+
+## [1.0.0-preview.9] - 2019-02-5
+
+### Fixes:
+
+- Fixed warning messages that were being thrown after importing the package on 2018.2.
+- Compatibility fix for Unity 2019.3.
+
 ## [1.0.0-preview.8] - 2018-12-17
 
 ### Fixes:

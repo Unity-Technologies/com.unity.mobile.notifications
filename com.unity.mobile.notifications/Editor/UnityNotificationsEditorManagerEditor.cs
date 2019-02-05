@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.VersionControl;
 using UnityEditorInternal;
 
-#pragma warning disable 219
+#pragma warning disable 219, 414
 
 namespace Unity.Notifications
 {
@@ -480,4 +480,4 @@ namespace Unity.Notifications
 	}
 }
 
-#pragma warning restore 219
+#pragma warning restore 219, 414
