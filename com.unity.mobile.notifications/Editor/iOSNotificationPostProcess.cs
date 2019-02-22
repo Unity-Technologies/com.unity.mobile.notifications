@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Notifications;
-using Unity.Notifications.Android;
-using Unity.Notifications.iOS;
 using UnityEditor;
 using UnityEditor.Callbacks;
 
 using UnityEngine;
 
-#if UNITY_IOS
+#if PLATFORM_IOS
+using Unity.Notifications.iOS;
 using UnityEditor.iOS.Xcode;
 #endif
 
@@ -19,7 +18,7 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 	[PostProcessBuild]
 	public static void OnPostprocessBuild (BuildTarget buildTarget, string path)
 	{
-		#if UNITY_IOS
+		#if PLATFORM_IOS
 		if (buildTarget == BuildTarget.iOS) {
 			
 			var projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
