@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Debug;
 import android.service.notification.StatusBarNotification;
@@ -165,7 +166,11 @@ public class UnityNotificationManager extends BroadcastReceiver
         Intent openAppIntent = new Intent(mActivity, mActivity.getClass());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
+        openAppIntent.setData(Uri.parse("http://www.google.com"));
+        openAppIntent.putExtra("data", intent.getStringExtra("data"));
+
         PendingIntent tapIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
+
         intent.putExtra("tapIntent", tapIntent);
 
         SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);

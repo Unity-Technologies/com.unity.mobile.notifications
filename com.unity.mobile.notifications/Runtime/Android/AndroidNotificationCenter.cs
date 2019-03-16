@@ -260,6 +260,15 @@ namespace Unity.Notifications.Android
             set { usesStopwatch = value; }
         }
 
+        /// <summary>
+        /// TODO.
+        /// </summary>
+        public string IntentData
+        {
+            get { return intentData; }
+            set { intentData = value; }
+        }
+        
         internal string title;
         internal string text;
         
@@ -275,6 +284,8 @@ namespace Unity.Notifications.Android
         internal int number;
         internal bool usesStopwatch;
         internal long repeatInterval;
+
+        internal string intentData;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
@@ -292,6 +303,7 @@ namespace Unity.Notifications.Android
             color = -1;
             number = -1;
             usesStopwatch = false;
+            intentData = "";            
             this.fireTime = -1;
             
             this.FireTime = fireTime;
@@ -507,6 +519,18 @@ namespace Unity.Notifications.Android
             AndroidSDK = buildVersion.GetStatic<int>("SDK_INT");
 
             return initialized = true;
+        }
+        
+        public static string GetLastIntentData()
+        {
+            
+            AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+            AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+ 
+            AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
+                
+            var data = intent.Call<string> ("getStringExtra", "data");
+            return data;
         }
 
         /// <summary>
@@ -763,6 +787,8 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.intentData);
+
 
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
