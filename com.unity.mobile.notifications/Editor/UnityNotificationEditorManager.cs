@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-#if PLATFORM_ANDROID
-using UnityEditor.Android;
-#endif
-
-using Unity.Notifications.iOS;
 using UnityEngine;
+
+using UnityEditor.Android;
+using Unity.Notifications.iOS;
+using Unity.Notifications;
 
 #pragma warning disable 219
 

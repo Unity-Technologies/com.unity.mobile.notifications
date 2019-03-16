@@ -1,13 +1,20 @@
 {
-    "name": "Unity.Notifications.Editor",
+    "name": "Unity.Notifications",
     "references": [
-        "Unity.Notifications.Android",
-        "Unity.Notifications.iOS"
+        "GUID:1e8e55397bd004beaba78a667566665f",
+        "GUID:ac145e6b8c6034cdbadc8c6e26aedbcf"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        ""
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": []
 }
