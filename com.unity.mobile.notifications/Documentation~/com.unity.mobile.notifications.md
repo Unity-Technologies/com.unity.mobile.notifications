@@ -51,9 +51,12 @@ This example shows how to schedule a simple notification with some text in it.
 ```
 
 var notification = new AndroidNotification();
-notificationTitle = "SomeTitle";
+notification.Title = "SomeTitle";
 notification.Text = "SomeText";
 notification.FireTime = System.DateTime.Now.AddMinutes(5);
+
+AndroidNotificationCenter.SendNotification(notification, "Channel_ID");
+
 ```
 You should specify a custom icon for each notification, otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in "Edit -> Project Settings -> Mobile Notification Settings -> Android" (if using Unity 2018.2) or in "Edit -> Settings -> Mobile Notification Settings -> Android" (on 2018.3 and above).
 ```
@@ -87,6 +90,21 @@ else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unk
 
 &nbsp;
 
+**Saving custom data and retrieving it when the notification is used to open the app**
+
+You can store arbitrary string data in a notification object by setting the `IntentData` property. 
+```
+            var notification = new AndroidNotification();
+            notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\" }";
+            AndroidNotificationCenter.SendNotification(notification, "channel_id");
+
+```
+
+If that notification used to open the app, you can retrieve the date like this:
+```
+var jsonData = AndroidNotificationCenter.GetLastIntentData();
+```
+
 &nbsp;
 
 **Handling received notifications while the app is running:**
@@ -94,15 +112,19 @@ else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unk
 You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* event to receive a callback whenever a notification is delivered while the app is running.
 
 ```
-AndroidNotificationCenter.OnNotificationReceived +=(int identifier, AndroidNotification notification, string channel)
-{
-	var msg = "Notification received : " + identifier + "\n";
-	msg += "\n Notification received: ";
-	msg += "\n .Title: " + notification.Title;
-	msg += "\n .Body: " + notification.Text;
-	msg += "\n .Channel: " + channel.Name;
-	Debug.Log(msg);
-};
+AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
+	delegate(int identifier, AndroidNotification notification, string channel)
+    {
+    	var msg = "Notification received : " + identifier + "\n";
+        msg += "\n Notification received: ";
+        msg += "\n .Title: " + notification.Title;
+        msg += "\n .Body: " + notification.Text;
+        msg += "\n .Channel: " + channel;
+        Debug.Log(msg);
+    };
+        
+AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
+
 ```
 
 ## iOS
