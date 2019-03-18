@@ -107,6 +107,12 @@ var jsonData = AndroidNotificationCenter.GetLastIntentData();
 
 &nbsp;
 
+**Preserving scheduled notifications after device restart**
+
+By default scheduled notification are removed when the device is restarted. To automatically reschedule all notifications when the device is turned back on enable the `Reschedule Notifications on Device Restart` option in `Edit->Project Settings->Mobile Notification Settings`. This will add the `RECEIVE_BOOT_COMPLETED` permissions to your apps manifest.
+
+&nbsp;
+
 **Handling received notifications while the app is running:**
 
 You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* event to receive a callback whenever a notification is delivered while the app is running.
@@ -173,20 +179,20 @@ var notification = new iOSNotification()
 	// You can optionally specify a custom Identifier which can later be 
 	// used to cancel the notification, if you don't set one, an unique 
 	// string will be generated automatically.
-	Identifier = "_notification_01" 
+	Identifier = "_notification_01",
 	Title = title,
 	Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
 	Subtitle = "This is a subtitle, something, something important...",
 	ShowInForeground = true,
-	ForegroundPresentationOption = foregoungOption,
+	ForegroundPresentationOption = (PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
 	CategoryIdentifier = "category_a",
-	ThreadIdentifier = thread,
+	ThreadIdentifier = "thread1",
 	Trigger = timeTrigger,
 };
 		
 iOSNotificationCenter.ScheduleNotification(notification);
 ```
-You can cancel the notification if wasn't yet triggered:
+You can cancel the notification if it wasn't yet triggered, like this:
 ```
 iOSNotificationCenter.RemoveScheduledNotification(notification.Identifier);
 ```
@@ -217,7 +223,7 @@ var calendarTrigger = new iOSNotificationCalendarTrigger()
 
 You can also create location triggers when you want to schedule the delivery of a notification when the device enters or leaves a specific geographic region. Before scheduling any notifications using this trigger, your app must have authorization to use Core Location and must have when-in-use permissions. Use the Unity LocationService API to request for this authorization. See https://developer.apple.com/documentation/corelocation/clregion?language=objc for additional information.
 
-In this exampe the center coordinate is defined using the WGS 84 system. In this case the notification would be triggered if the user entered an area within a 250 meter radius around Eiffel Tower in Paris.
+In this example the center coordinate is defined using the WGS 84 system. In this case the notification would be triggered if the user entered an area within a 250 meter radius around Eiffel Tower in Paris.
 
 ```
 var locationTrigger = new iOSNotificationLocationTrigger()
@@ -247,22 +253,7 @@ notification.ForegroundPresentationOption = (PresentationOption.NotificationPres
 
 Alternatively you might wish to perform some other action, like displaying the notification content using the in-game UI, when the notification is triggered. In this case you need to subscribe to the `OnNotificationReceived` event which will be called whenever a local or a remote notification is received (irregardless if it's shown in the foregound).
 
-```
-
-iOSNotificationCenter.OnNotificationReceived += notification =>
-{
-	var msg = "Notification received : " + notification.Identifier + "\n";
-	msg += "\n Notification received: ";
-	msg += "\n .Title: " + notification.Title;
-	msg += "\n .Badge: " + notification.Badge;
-	msg += "\n .Body: " + notification.Body;
-	msg += "\n .CategoryIdentifier: " + notification.CategoryIdentifier;
-	msg += "\n .Subtitle: " + notification.Subtitle;
-	Debug.Log(msg);
-};
-```
-
-When receiving remote notification while the app is running you might wish modify the remote notification content or not show it at all. You can do this by subscribing  to the `OnRemoteNotificationReceived` event. Please note that if you do this remotecnotifications will never be displayed when the app is running. If you still wish to show an alert for it you'll have to schedule a local notification using the remote notifications content:
+When receiving remote notifications while the app is running you might wish modify the remote notification content or not show it at all. You can do this by subscribing to the `OnRemoteNotificationReceived` event. Please note that if you do this the remote notification will not be displayed when the app is running. If you still wish to show an alert for it you'll have to schedule a local notification using the remote notifications content, like this:
 
 ```
 

@@ -340,14 +340,14 @@ namespace Unity.Notifications
 				return;
 			
 #if UNITY_2018_3
-			rect = new Rect(rect.x, rect.y + 25, rect.width, rect.height);
+			rect = new Rect(rect.x, rect.y + 10f, rect.width, rect.height);
 #endif
 			
 			serializedObject.UpdateIfRequiredOrScript();
 
-			bool userHeader = manager.toolbarInt == 0;
+			bool userHeader = false;//manager.toolbarInt == 0;
 			var headerRect = GetContentRect(
-				new Rect(kPadding, rect.y, rect.width - kPadding, kPadding),
+				new Rect(kPadding, rect.y, rect.width - kPadding, kPadding * 2),
 				0f,
 				0f
 			);
@@ -388,11 +388,33 @@ namespace Unity.Notifications
 			
 			if (manager.toolbarInt == 0)
 			{
-				DrawHeader(headerRect, infoStringAndroid, headerMsgStyle);
+				
+				var settingsPanelRect = bodyRect;
+				var settings = manager.AndroidNotificationEditorSettings;
+				if (settings == null)
+					return;
+				
+				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
+				
+				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
+				styleToggle.alignment = TextAnchor.MiddleRight;
+			
+				var styleDropwDown = new GUIStyle(GUI.skin.GetStyle("Button"));
+				styleDropwDown.fixedWidth = kSlotSize * 2.5f;
+				
+				GUI.BeginGroup(settingsPanelRect);
+				DrawSettingsElementList(settings, false, styleToggle, styleDropwDown, settingsPanelRect);
+				GUI.EndGroup();
+				
+				
+				var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 55f, bodyRect.width, 55f);
+				DrawHeader(iconListRectHeader, infoStringAndroid, headerMsgStyle);
+				
+				var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 65f, iconListRectHeader.width, iconListRectHeader.height-55f);
 
-				m_ReorderableList.DoList(bodyRect);
+				m_ReorderableList.DoList(iconListRectBody);
 				if (!drawInInspector)
-					EditorGUILayout.GetControlRect(true, headerRect.height + m_ReorderableList.GetHeight() + kSlotSize);
+					EditorGUILayout.GetControlRect(true, iconListRectHeader.height + m_ReorderableList.GetHeight() + kSlotSize);
 			}
 			else
 			{
@@ -421,6 +443,7 @@ namespace Unity.Notifications
 
 		private void DrawSettingsElementList(List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
 		{
+			int totalHeight = 0;
 			foreach (var setting in settings)
 			{
 				EditorGUI.BeginDisabledGroup(disabled);

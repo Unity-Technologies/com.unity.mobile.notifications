@@ -13,6 +13,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable true
+            jniDebuggable true
+            minifyEnabled false
+        }
     }
     buildToolsVersion '27.0.3'
     compileOptions {
@@ -31,6 +36,15 @@ dependencies {
 }
 
 afterEvaluate {
+    assembleDebug.doLast {
+        copy {
+            from('build/outputs/aar') {
+                include '*-debug.aar'
+            }
+            into '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android'
+        }
+    }
+
     assembleRelease.doLast {
         copy {
             from('build/outputs/aar') {
