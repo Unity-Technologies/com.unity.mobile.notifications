@@ -403,7 +403,7 @@ namespace Unity.Notifications
 				styleDropwDown.fixedWidth = kSlotSize * 2.5f;
 				
 				GUI.BeginGroup(settingsPanelRect);
-				DrawSettingsElementList(settings, false, styleToggle, styleDropwDown, settingsPanelRect);
+				DrawSettingsElementList(BuildTargetGroup.Android, settings, false, styleToggle, styleDropwDown, settingsPanelRect);
 				GUI.EndGroup();
 				
 				
@@ -433,7 +433,7 @@ namespace Unity.Notifications
 				styleDropwDown.fixedWidth = kSlotSize * 2.5f;
 				
 				GUI.BeginGroup(settingsPanelRect);
-				DrawSettingsElementList(settings, false, styleToggle, styleDropwDown, settingsPanelRect);
+				DrawSettingsElementList(BuildTargetGroup.iOS, settings, false, styleToggle, styleDropwDown, settingsPanelRect);
 				GUI.EndGroup();
 			}
 			if (drawInInspector)
@@ -441,7 +441,7 @@ namespace Unity.Notifications
 
 		}
 
-		private void DrawSettingsElementList(List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
+		private void DrawSettingsElementList(BuildTargetGroup target, List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
 		{
 			int totalHeight = 0;
 			foreach (var setting in settings)
@@ -481,9 +481,9 @@ namespace Unity.Notifications
 				if (setting.dependentSettings != null)
 				{
 					layer++;
-					DrawSettingsElementList(setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
+					DrawSettingsElementList(target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
 				}
-				manager.SaveSetting(setting);
+				manager.SaveSetting(setting, target);
 			}
 		}
 

@@ -142,6 +142,11 @@ namespace Unity.Notifications
             keys = new List<string>();
             values = new List<string>();
         }
+
+        public bool Contains(string key)
+        {
+            return keys.Contains(key);
+        }
         
         public object this[string key]
         {
@@ -196,14 +201,32 @@ namespace Unity.Notifications
         [SerializeField] 
         internal NotificationEditorSettingsCollection AndroidNotificationEditorSettingsValues;
 
-        public void SaveSetting(NotificationEditorSetting setting)
+        private void SaveSetting(NotificationEditorSetting setting, NotificationEditorSettingsCollection values)
         {
-            if (iOSNotificationEditorSettingsValues == null)
-                iOSNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
+            if (values == null)
+                values = new NotificationEditorSettingsCollection();
 
-            iOSNotificationEditorSettingsValues[setting.key] = setting.val;
+            if (values[setting.key].ToString() != setting.val.ToString())
+            {
+                values[setting.key] = setting.val;
+                
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssets();
+            }
         }
-
+        
+        public void SaveSetting(NotificationEditorSetting setting, BuildTargetGroup target)
+        {
+            if (target == BuildTargetGroup.Android)
+            {
+                this.SaveSetting(setting, AndroidNotificationEditorSettingsValues);
+            }
+            else
+            {
+                this.SaveSetting(setting, iOSNotificationEditorSettingsValues);
+            }
+        }
+        
         public T GetAndroidNotificationEditorSettingsValue<T>(string key, T defaultValue)
         {
             if (AndroidNotificationEditorSettingsValues == null)
