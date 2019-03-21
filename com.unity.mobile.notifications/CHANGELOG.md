@@ -1,8 +1,18 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+## [1.0.0-preview.11] - 2019-02-22
+
+### Improvements & changes:
+
+- [Android] Added an option to reshedule all non expired notification on device restart.
+- [Android] Added a `data` field to notification object and a method to retrieve the `data` assigned to a notification that was used to open the app or bring it back from background.
+
+- Changed the minimum Unity version supported by the package to 2018.3.
+
+### Fixes:
+
+- Notification settings should no longer dissapear if Unity is closed while settings editor screen is not opened.
 
 ## [1.0.0-preview.10] - 2019-02-22
 
