@@ -9,5 +9,10 @@ QAReport.md.meta
 .gitlab-ci.yml
 Doxyfile
 Doxyfile.meta
-Tests/**
 DoxygenLayout~.xml
+upm-ci~/**
+.Editor/**
+.yamato/**
+*.zip*
+Tests/*
+Tests.meta

@@ -2,7 +2,7 @@
 
 # Unity Mobile Notifications Package
 
-The runtime API is split into two classes AndroidNotificationCenter and iOSNotificationCenter which can be used to schedule and manage notifications for Android and iOS respectively (see appropriate sections for code samples).
+The runtime API is split into two parts `AndroidNotificationCenter` and `iOSNotificationCenter` which can be used to schedule and manage notifications for their respective platforms(see appropriate sections for code samples).  A sample Project which implements a high level wrapper that allows sending notifications to both Android and iOS with the same API is available on our [GitHub page](https://github.com/Unity-Technologies/NotificationsSamples).
 
 **Supported features:**
 
@@ -10,6 +10,7 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 - Cancel scheduled or already displayed notifications.
 - Android: 
   - Create and modify notification channels (categories) on Android Oreo and above.
+  - Notifications can be preserved on device restart
   - Set custom notification icons.
 - iOS:
   - Use the Apple Push Notification Service  (APNs) to receive remote notifications.
@@ -19,7 +20,7 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 **Requirements:**
 
 - Supports Android 4.1 (API 16)/iOS 10 or above.
-- Compatible with Unity 2018.2 or above.
+- Compatible with Unity 2018.3 or above.
 &nbsp;
 
 ## Android
@@ -28,7 +29,7 @@ The runtime API is split into two classes AndroidNotificationCenter and iOSNotif
 
 **Create a notification channel:**
 
-Every local notification must belong to a notification channel, notification channels are only supported by the system on Android Oreo (8.0) and above. On previous versions the channel behavior is emulated by the this package. Therefore settings which were set individually for each notification before 8.0 (such as priority  (`Importance`)) should be still set on the channel even when using the package on older Android versions.
+Every local notification must belong to a notification channel, notification channels are only supported by the Android on Oreo (8.0) and above. When using the packages on older versions the channel behavior is emulated. Therefore settings which were set individually for each notification before 8.0 (such as priority  (`Importance`)) should be still set on the channel even for version prior to 8.0.
 
 ```
 var c = new AndroidNotificationChannel()
@@ -42,11 +43,9 @@ AndroidNotificationCenter.RegisterNotificationChannel(c);
 ```
 &nbsp;
 
-&nbsp;
+**Sending a simple notification:**
 
-**Send a simple notification:**
-
-This example shows how to schedule a simple notification with some text in it.
+This example shows how to schedule a simple notification with some text in it and send it to the notification channel created in the previous step.
 
 ```
 
@@ -55,10 +54,10 @@ notification.Title = "SomeTitle";
 notification.Text = "SomeText";
 notification.FireTime = System.DateTime.Now.AddMinutes(5);
 
-AndroidNotificationCenter.SendNotification(notification, "Channel_ID");
+AndroidNotificationCenter.SendNotification(notification, "channel_id");
 
 ```
-You should specify a custom icon for each notification, otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in "Edit -> Project Settings -> Mobile Notification Settings -> Android" (if using Unity 2018.2) or in "Edit -> Settings -> Mobile Notification Settings -> Android" (on 2018.3 and above).
+You should specify a custom icon for each notification, otherwise a default Unity icon will be shown in the status bar instead. You can configure notification icons in `Edit->Project Settings->Mobile Notification Settings`. When scheduling a notification in your script just use the ID you've defined in the settings window.
 ```
 notification.Icon = "my_custom_icon_id";
 ```
@@ -66,7 +65,7 @@ Optionally you can also set a large icon which will be shown in the notification
 ```
 notification.LargeIcon = "my_custom_large_icon_id"
 ```
-After it's scheduled each notification is assigned an unique identifier number which can later be used to track the notification's status or to cancel it.
+After it's scheduled each notification is assigned an unique identifier which can later be used to track the notification's status or to cancel it.
 ```
 var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
 ```
@@ -100,7 +99,7 @@ You can store arbitrary string data in a notification object by setting the `Int
 
 ```
 
-If that notification used to open the app, you can retrieve the date like this:
+If a notification used to open the app, you can retrieve the date like this, if the app was opened in any other way an empty string will be returned.
 ```
 var jsonData = AndroidNotificationCenter.GetLastIntentData();
 ```
@@ -109,13 +108,13 @@ var jsonData = AndroidNotificationCenter.GetLastIntentData();
 
 **Preserving scheduled notifications after device restart**
 
-By default scheduled notification are removed when the device is restarted. To automatically reschedule all notifications when the device is turned back on enable the `Reschedule Notifications on Device Restart` option in `Edit->Project Settings->Mobile Notification Settings`. This will add the `RECEIVE_BOOT_COMPLETED` permissions to your apps manifest.
+By default scheduled notifications are removed when the device is restarted. To automatically reschedule all notifications when the device is turned back on enable the `Reschedule Notifications on Device Restart` option in `Edit->Project Settings->Mobile Notification Settings`. This will add the `RECEIVE_BOOT_COMPLETED` permissions to your app's manifest.
 
 &nbsp;
 
 **Handling received notifications while the app is running:**
 
-You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* event to receive a callback whenever a notification is delivered while the app is running.
+You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* event in order to receive a callback whenever a notification is delivered while the app is running.
 
 ```
 AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
@@ -137,13 +136,13 @@ AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
 
 &nbsp;
 
-**Request authorization:**
+**Requesting authorization:**
 
-Request the system for permission to post local and receive remote notifications. After completion you can retrieve the *DeviceToken* if you created the request with *registerForRemoteNotifications* set to true and the app successfully registered on the APN. See [Apple Developer Site](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1) on how to use push notification to a device and on how to add push notification support to your app. 
+You need to request the system for a permission to post local and receive remote notifications. If you intend to user remote notificaitons after the user confirms the authorization request  you can retrieve the *DeviceToken*  (the request must be created with *registerForRemoteNotifications* set to true) . See [Apple Developer Site](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1) on how to use push notification to a device and on how to add push notification support to your app. 
 
-You can only request the user to grant permission for certain notification features (in example below we requested the permission to show UI Alert dialogs and to show a badge on the app icon). However the user might change the authorization status for each notification type at any point in the settings app, you can check the actual authorization status by calling *iOSNotificationCenter.GetNotificationSettings*. 
+Optionally you can only request the user for a permission to send certain notification types (see the example below which shows how to request for  the permission to show UI Alert dialogs and a badge on the app icon). However the user might change the authorization status for each notification type at any point in the settings app, you can check the actual authorization status by calling *iOSNotificationCenter.GetNotificationSettings*. 
 
-Alternatively you can enable *Request Authorization on App Launch* in *Edit -> Project Settings -> Mobile Notification Settings* then the app will automatically request authorization when it's launched. Afterwards you might call this method again to determine the current authorization status but the UI system prompt will not be shown again if the user has already granted or denied authorization for this app.
+Alternatively you can enable *Request Authorization on App Launch* in `Edit -> Project Settings -> Mobile Notification Settings` in this case the app will automatically show the permissions dialog when it's launched. Afterwards you might call this method again to determine the current authorization status but the UI system prompt will not be shown again if the user has already granted or denied authorization.
 ```
 using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
 {
@@ -165,7 +164,7 @@ using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptio
 
 &nbsp;
 
-**To Send a Simple and Cancel Notification in X seconds:**
+**Sending a simple notification:**
 
 ```
 var timeTrigger = new iOSNotificationTimeIntervalTrigger()
@@ -192,7 +191,7 @@ var notification = new iOSNotification()
 		
 iOSNotificationCenter.ScheduleNotification(notification);
 ```
-You can cancel the notification if it wasn't yet triggered, like this:
+If the notification was not triggered it can be canceled like this:
 ```
 iOSNotificationCenter.RemoveScheduledNotification(notification.Identifier);
 ```
@@ -206,7 +205,7 @@ iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier)
 
 **Other triggers:**
 
-Besides the time interval trigger you can also use calendar and location triggers. All the fields in iOSNotificationCalendarTrigger are optional but you need to set atleast one for it work. For example if you only set the hour and minute fields the system will automatically trigger the notification on the next specified hour and minute.
+Besides the time interval trigger you can also use calendar and location triggers. All the fields in iOSNotificationCalendarTrigger are optional but you need to atleast set one field for the trigger to work. For example if you only set the hour and minute fields the system will automatically trigger the notification on the next specified hour and minute.
 
 ```
 var calendarTrigger = new iOSNotificationCalendarTrigger()
