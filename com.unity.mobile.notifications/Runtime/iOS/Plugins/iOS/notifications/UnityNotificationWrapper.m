@@ -97,7 +97,8 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     
     NSDictionary *userInfo = @{
                                  @"showInForeground" : @(data->showInForeground),
-                                 @"showInForegroundPresentationOptions" : [NSNumber numberWithInteger:data->showInForegroundPresentationOptions]
+                                 @"showInForegroundPresentationOptions" : [NSNumber numberWithInteger:data->showInForegroundPresentationOptions],
+                                 @"data" : @(data->data),
                                  };
 
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
@@ -261,5 +262,21 @@ void _SetApplicationBadge(long badge)
 long _GetApplicationBadge()
 {
     return[UIApplication sharedApplication].applicationIconBadgeNumber;
+}
+// - -
+
+bool _GetAppOpenedUsingNotification()
+{
+    UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+    return manager.lastReceivedNotification != NULL;
+}
+
+
+iOSNotificationData* _GetLastNotificationData()
+{
+    UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+    iOSNotificationData* data = [UnityNotificationManager UNNotificationRequestToiOSNotificationData : manager.lastReceivedNotification.request];
+    return data;
+    
 }
 

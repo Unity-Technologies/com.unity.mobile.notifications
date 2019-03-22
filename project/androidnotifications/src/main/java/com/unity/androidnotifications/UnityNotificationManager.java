@@ -77,14 +77,19 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public static UnityNotificationManager getNotificationManagerImpl(Context context) {
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-        {
-            return new UnityNotificationManager(context, (Activity) context);
-        }
-        else
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             return new UnityNotificationManagerOreo(context, (Activity) context);
+
         }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        {
+            return new UnityNotificationManagerNougat(context, (Activity) context);
+
+        }
+
+        return new UnityNotificationManager(context, (Activity) context);
+
     }
 
     public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
@@ -132,6 +137,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         SharedPreferences prefs = context.getSharedPreferences(String.format("u_notification_data_%s", notification_id), Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
 
         String data = UnityNotificationManager.SerializeNotificationIntent(intent);
         editor.putString("data", data);
@@ -194,8 +200,11 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         List<Intent> intent_data_list = new ArrayList<Intent> ();
 
+         //
+//         Log.w("UnityNotifications", String.format(" \n LoadNotificationIntents -- - Total Intents : %d \n", idsSet.size()));
+        //
 
-//        Log.w("UnityNotifications", String.format(" \n -- - Total Intents : %d \n", idsSet.size()));
+
 
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
@@ -363,8 +372,9 @@ public class UnityNotificationManager extends BroadcastReceiver
         Intent openAppIntent = new Intent(context, c);
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        openAppIntent.setData(Uri.parse("http://www.google.com"));
-        openAppIntent.putExtra("data", data_intent.getStringExtra("data"));
+//        openAppIntent.putExtra("data", data_intent.getStringExtra("data"));
+
+        openAppIntent.putExtras(data_intent);
 
         return openAppIntent;
     }
@@ -407,7 +417,6 @@ public class UnityNotificationManager extends BroadcastReceiver
     {
         int id = intent.getIntExtra("id", 0);
 
-
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         intent.putExtra("tapIntent", pendingIntent);
@@ -415,18 +424,21 @@ public class UnityNotificationManager extends BroadcastReceiver
         SharedPreferences prefs = context.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
         Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
+        //
+//        Log.w("UnityNotifications", String.format(" \n prepareNotificationIntent -- - Total Intents :\n"));
+        //
         idsSet.add(Integer.toString(id));
 
         SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
         editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSet);
         editor.commit();
 
         return intent;
     }
 
-    public static void sendNotification(Intent intent, Context context)
+    protected static Notification.Builder buildNotification(Intent intent, Context context)
     {
-        int id = intent.getIntExtra("id", -1);
         String channelID = intent.getStringExtra("channelID");
         String textTitle = intent.getStringExtra("textTitle");
         String textContent = intent.getStringExtra("textContent");
@@ -538,6 +550,19 @@ public class UnityNotificationManager extends BroadcastReceiver
             notificationBuilder.setPriority(priority);
         }
 
+        return notificationBuilder;
+    }
+
+    public static void sendNotification(Intent intent, Context context) {
+
+        Notification.Builder notificationBuilder = UnityNotificationManager.buildNotification(intent, context);
+        int id = intent.getIntExtra("id", -1);
+
+        UnityNotificationManager.notify(context, id, notificationBuilder, intent);
+    }
+
+    protected static void notify(Context context, int id, Notification.Builder notificationBuilder, Intent intent)
+    {
         getNotificationManager(context).notify(id, notificationBuilder.build());
 
         try {
@@ -568,6 +593,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         channelIdsSet.add(id);
 
         SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
         editor.putStringSet("ChannelIDs", channelIdsSet);
         editor.commit();
 
@@ -611,6 +637,7 @@ public class UnityNotificationManager extends BroadcastReceiver
                 channelIdsSet.remove(id);
 
                 SharedPreferences.Editor editor = prefs.edit();
+                editor.clear();
                 editor.putStringSet("ChannelIDs", channelIdsSet);
                 editor.commit();
 
@@ -630,6 +657,8 @@ public class UnityNotificationManager extends BroadcastReceiver
     {
         SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
         Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+
+//        Log.w("UnityNotifications", String.format(" \n getScheduledNotificationIDs -- - getScheduledNotificationIDs :\n"));
 
         String[] idsArrStr = idsSet.toArray(new String[idsSet.size()]);
         int[] idsArrInt = new int[idsSet.size()];
@@ -707,16 +736,21 @@ public class UnityNotificationManager extends BroadcastReceiver
         Intent intent = CreateNotificationIntent();
         PendingIntent broadcast = PendingIntent.getBroadcast(mContext, requestCode,
                 intent, PendingIntent.FLAG_NO_CREATE);
-        if (broadcast != null)
-        {
+        if (broadcast != null) {
             broadcast.cancel();
+        }
 
-            SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
-            Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
+        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
+//        Log.w("UnityNotifications", String.format(" \n cancelPendingNotificationIntent -- - cancelPendingNotificationIntent :\n"));
+
+        String requestCodeStr = Integer.toString(requestCode);
+        if (idsSet.contains(requestCodeStr)) {
             idsSet.remove(Integer.toString(requestCode));
 
             SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
             editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSet);
             editor.commit();
         }
@@ -730,7 +764,13 @@ public class UnityNotificationManager extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        UnityNotificationManager.sendNotification(intent, context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        {
+            UnityNotificationManagerNougat.sendNotificationNougat(intent, context);
+        }
+        else {
+            UnityNotificationManager.sendNotification(intent, context);
+        }
     }
 
 }

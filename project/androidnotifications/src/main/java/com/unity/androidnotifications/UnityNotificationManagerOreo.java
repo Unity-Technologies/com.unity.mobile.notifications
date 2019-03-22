@@ -14,7 +14,7 @@ import static android.app.Notification.PRIORITY_DEFAULT;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.app.NotificationManager.IMPORTANCE_NONE;
 
-public class UnityNotificationManagerOreo extends UnityNotificationManager {
+public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat {
 
     public static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel)
     {

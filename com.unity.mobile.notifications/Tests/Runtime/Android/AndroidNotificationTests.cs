@@ -61,7 +61,8 @@ class AndroidNotificationTests
         var n = new AndroidNotification();
         n.Title = "SendNotificationExplicitID_NotificationIsReceived : " + originalId.ToString();
         n.Text = "SendNotificationExplicitID_NotificationIsReceived Text";
-        n.FireTime = System.DateTime.Now.AddSeconds(2.0f);    
+        n.FireTime = System.DateTime.Now.AddSeconds(2.0f);
+        n.Group = "test.dummy.group";
         
         
         var current_time = DateTime.Now;
@@ -80,10 +81,11 @@ class AndroidNotificationTests
 
         
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
+                Assert.AreEqual(n.Group, data.Notification.Group);
             };
         
         
@@ -132,10 +134,10 @@ class AndroidNotificationTests
 
         
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
             };
         
         
@@ -184,10 +186,10 @@ class AndroidNotificationTests
         AndroidNotificationCenter.CancelAllNotifications();
         
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
             };
         
         AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
@@ -228,10 +230,10 @@ class AndroidNotificationTests
         int originalId = AndroidNotificationCenter.SendNotification(n, "default_test_channel_2");
     
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
             };
 
         AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;

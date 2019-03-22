@@ -29,6 +29,7 @@ typedef struct iOSNotificationData
     char* threadIdentifier;
     
     //Custom data
+    char* data;
     BOOL showInForeground;
     int showInForegroundPresentationOptions;
     
@@ -78,38 +79,45 @@ typedef struct NotificationSettingsData {
     int alertSetting;
     int badgeSetting;
     int soundSetting;
+    int alertStyle;
+    int showPreviewsSetting;
 } NotificationSettingsData;
 
 const int kDefaultPresentationOptions = -1;
 
 @interface UnityNotificationManager : NSObject <UNUserNotificationCenterDelegate>
 
-@property UNNotificationSettings* cachedNotificationSettings;
-@property struct iOSNotificationAuthorizationData* authData;
+    @property UNNotificationSettings* cachedNotificationSettings;
+    @property struct iOSNotificationAuthorizationData* authData;
 
-@property NotificationDataReceivedResponse onNotificationReceivedCallback;
-@property NotificationDataReceivedResponse onCatchReceivedRemoteNotificationCallback;
-@property AuthorizationRequestResponse onAuthorizationCompletionCallback;
+    @property NotificationDataReceivedResponse onNotificationReceivedCallback;
+    @property NotificationDataReceivedResponse onCatchReceivedRemoteNotificationCallback;
+    @property AuthorizationRequestResponse onAuthorizationCompletionCallback;
 
-@property NSArray<UNNotificationRequest *> * cachedPendingNotificationRequests;
-@property NSArray<UNNotification *> * cachedDeliveredNotifications;
+    @property NSArray<UNNotificationRequest *> * cachedPendingNotificationRequests;
+    @property NSArray<UNNotification *> * cachedDeliveredNotifications;
 
-@property BOOL authorized;
-@property BOOL needRemoteNotifications;
-@property NSString* deviceToken;
-@property UNAuthorizationStatus remoteNotificationsRegistered;
+    @property (nonatomic) UNNotification* lastReceivedNotification;
 
-@property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
+    @property BOOL authorized;
+    @property BOOL needRemoteNotifications;
+    @property NSString* deviceToken;
+    @property UNAuthorizationStatus remoteNotificationsRegistered;
 
-+ (instancetype)sharedInstance;
+    @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 
-+ (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData : (UNNotificationRequest*) request;
-+ (struct iOSNotificationData*)UNNotificationToiOSNotificationData : (UNNotification*) notification;
-+ (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData : (UNNotificationSettings*) settings;
+    + (instancetype)sharedInstance;
 
-- (void)checkAuthorizationFinished;
-- (void)updateScheduledNotificationList;
-- (void)updateDeliveredNotificationList;
-- (void)updateNotificationSettings;
-- (void)requestAuthorization: (NSInteger)authorizationOptions : (BOOL) registerRemote;
+    + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData : (UNNotificationRequest*) request;
+    + (struct iOSNotificationData*)UNNotificationToiOSNotificationData : (UNNotification*) notification;
+    + (struct iOSNotificationData*)NSDictionaryToiOSNotificationData : (NSDictionary*) notification;
+    + (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData : (UNNotificationSettings*) settings;
+
+    + (void)InitiOSNotificationData : (iOSNotificationData*) notificationData;
+
+    - (void)checkAuthorizationFinished;
+    - (void)updateScheduledNotificationList;
+    - (void)updateDeliveredNotificationList;
+    - (void)updateNotificationSettings;
+    - (void)requestAuthorization: (NSInteger)authorizationOptions : (BOOL) registerRemote;
 @end

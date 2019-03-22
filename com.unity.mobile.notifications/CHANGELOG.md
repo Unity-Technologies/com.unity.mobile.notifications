@@ -1,7 +1,42 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-## [1.0.0-preview.12] - 2019-02-22
+## [1.0.0-preview.15] - 2019-04-08
+
+### Improvements & changes:
+
+- [Android] Added support for notification groups:
+
+  - Set `Group` property to group multiple notifications in a single thread.
+  - Enable `GroupSummary`on a notification to use it as the summary notification for it's group.
+  - `GroupAlertBehaviour`  can be used to override the alert behaviour for all notifications in a group. 
+
+- [Android] Added a `SortKey` property for Android.
+
+  - Used to lexicographically order this notification among other notifications from the same package or the same notification group.
+
+- [Android] Changed ‘GetLastIntentData’ to ‘GetLastNotificationIntent’, it nows returns a `AndroidNotificationIntentData` object (which encapsulates the received `AndroidNotification` and it's `Channel` and `Id` fields) instead of just a string:
+
+  - `OnNotificationReceived` now returns `AndroidNotificationIntentData`.
+  - Arbitrary data can be stored in the `AndroidNotification.intentData` field.
+
+- [iOS] Added `GetLastNotification()` to `iOSNotificationCenter` :
+
+  - Can be used to retrieve the notification which was used to open the app.
+  - If any new notifications are received while the app is active they will override the original one.
+
+- [iOS] Exposed additional `iOSNotificationSettings` properties:
+
+  - `ShowPreviewsSetting`indicates whether the app can a preview of the notification's contenton the lock screen.
+  - `AlertStyle` indicates the type of alerts the user has authorized (`Banner`, `Alert` or `None`). 
+
+  ### Fixes:
+
+  - [Android] Canceling scheduled notifications now works correctly when the app is restarted.
+
+  - [iOS] Subscribing to OnNotificationReceived on iOS should now work, even if no other notification was called 
+
+## [1.0.0-preview.13] - 2019-03-22
 
 ### Improvements & changes:
 
