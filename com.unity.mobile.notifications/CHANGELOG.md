@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this package will be documented in this file.
 
-## [1.0.0-preview.12] - 2019-02-22
+## [1.0.0-preview.13] - 2019-02-22
 
 ### Improvements & changes:
 
