@@ -109,6 +109,29 @@ namespace Unity.Notifications.Android
     }
 
     /// <summary>
+    /// Allows applying an alert behaviour to grouped notifications.
+    /// </summary>
+    public enum GroupAlertBehaviours
+    {
+        /// <summary>
+        /// All notifications in a group with sound or vibration will make sound or vibrate, so this notification will not be muted when it is in a group.
+        /// </summary>
+        GroupAlertAll = 0,
+        
+        /// <summary>
+        /// The summary notification in a group will be silenced (no sound or vibration) even if they would otherwise make sound or vibrate.
+        /// Use this to mute this notification if this notification is a group summary.
+        /// </summary>
+        GroupAlertSummary = 1,
+        
+        /// <summary>
+        /// All children notification in a group will be silenced (no sound or vibration) even if they would otherwise make sound or vibrate.
+        /// Use this to mute this notification if this notification is a group child. This must be set on all children notifications you want to mute.
+        /// </summary>
+        GroupAlertChildren = 2,
+    }
+
+    /// <summary>
     /// The AndroidNotification is used schedule a local notification, which includes the content of the notification.
     /// </summary>
     public struct AndroidNotification
@@ -261,14 +284,57 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// TODO.
+        ///Set this property for the notification to be made part of a group of notifications sharing the same key.
+        /// Grouped notifications may display in a cluster or stack on devices which support such rendering.
+        /// Only available on Android 7.0 (API level 24) and above.
+        /// </summary>
+        public string Group
+        {
+            get { return group; }
+            set { group = value; }
+        }
+        
+        /// <summary>
+        /// Set this notification to be the group summary for a group of notifications. Requires the 'Group' property to also be set.
+        /// Grouped notifications may display in a cluster or stack on devices which support such rendering. 
+        /// Only available on Android 7.0 (API level 24) and above.
+        /// </summary>
+        public bool GroupSummary
+        {
+            get { return groupSummary; }
+            set { groupSummary = value; }
+        }
+        
+        /// <summary>
+        /// Sets the group alert behavior for this notification. Set this property to mute this notification if alerts for this notification's group should be handled by a different notification.
+        /// This is only applicable for notifications that belong to a group. This must be set on all notifications you want to mute.
+        /// Only available on Android 8.0 (API level 26) and above.
+        /// </summary>
+        public GroupAlertBehaviours GroupAlertBehaviour
+        {
+            get { return (GroupAlertBehaviours)groupAlertBehaviour; }
+            set { groupAlertBehaviour = (int)value; }
+        }
+        
+        /// <summary>
+        /// The sort key will be used to order this notification among other notifications from the same package. 
+        /// Notifications will be sorted lexicographically using this value.
+        /// </summary>
+        public string SortKey
+        {
+            get { return sortKey; }
+            set { sortKey = value; }
+        }
+        
+        /// <summary>
+        /// If a notification was used to open the app, this returns the string 'Data' property value assigned to that notification. 
         /// </summary>
         public string IntentData
         {
             get { return intentData; }
             set { intentData = value; }
         }
-        
+                
         internal string title;
         internal string text;
         
@@ -286,6 +352,13 @@ namespace Unity.Notifications.Android
         internal long repeatInterval;
 
         internal string intentData;
+        
+        internal string group;
+        internal bool groupSummary;
+        
+        internal string sortKey;
+        internal int groupAlertBehaviour;
+
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
@@ -305,6 +378,10 @@ namespace Unity.Notifications.Android
             usesStopwatch = false;
             intentData = "";            
             this.fireTime = -1;
+            this.group = "";
+            this.groupSummary = false;
+            this.sortKey = "";
+            this.groupAlertBehaviour = -1;
             
             this.FireTime = fireTime;
         }
@@ -789,8 +866,11 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.intentData);
-
-
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "group", notification.group);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", notification.groupSummary);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.sortKey);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", notification.groupAlertBehaviour);
+            
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
 
@@ -827,6 +907,11 @@ namespace Unity.Notifications.Android
                 notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
                 notification.color = notificationIntent.Call<int>("getIntExtra", "color", -1);
                 notification.number = notificationIntent.Call<int>("getIntExtra", "number", -1);
+                notification.intentData = notificationIntent.Call<string>("getStringExtra", "data");
+                notification.group = notificationIntent.Call<string>("getStringExtra", "group");
+                notification.groupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
+                notification.sortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
+                notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
 
                 OnNotificationReceived(id, notification, channel);
             }

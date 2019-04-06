@@ -61,7 +61,8 @@ class AndroidNotificationTests
         var n = new AndroidNotification();
         n.Title = "SendNotificationExplicitID_NotificationIsReceived : " + originalId.ToString();
         n.Text = "SendNotificationExplicitID_NotificationIsReceived Text";
-        n.FireTime = System.DateTime.Now.AddSeconds(2.0f);    
+        n.FireTime = System.DateTime.Now.AddSeconds(2.0f);
+        n.Group = "test.dummy.group";
         
         
         var current_time = DateTime.Now;
@@ -84,6 +85,7 @@ class AndroidNotificationTests
             {
                 receivedNotificationCount += 1;
                 Assert.AreEqual(originalId, id);
+                Assert.AreEqual(n.Group, notification.Group);
             };
         
         
