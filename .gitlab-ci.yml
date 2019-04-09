@@ -43,6 +43,7 @@ build:
 publish:
   stage: publish
   tags:
+  - linux
   - darwin
   only:
   - master
