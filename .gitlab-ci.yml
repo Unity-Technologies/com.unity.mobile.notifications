@@ -13,7 +13,6 @@ build:
   stage: build
   tags:
   - linux
-  - darwin
   only:
   - master
   before_script:
@@ -45,7 +44,6 @@ publish:
   stage: publish
   tags:
   - linux
-  - darwin
   only:
   - master
   - tags
