@@ -12,6 +12,7 @@ stages:
 build:
   stage: build
   tags:
+  - linux
   - darwin
   only:
   - master
