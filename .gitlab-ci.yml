@@ -15,8 +15,8 @@ build:
   - linux
   only:
   - master
-  before_script:
-  - ./project/prepare_env.sh
+  # before_script:
+  # - ./project/prepare_env.sh
   script:
   - ./project/build_package.sh
   artifacts:
