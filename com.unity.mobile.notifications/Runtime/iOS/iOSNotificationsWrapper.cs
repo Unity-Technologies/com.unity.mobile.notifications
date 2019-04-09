@@ -64,9 +64,16 @@ namespace Unity.Notifications.iOS
 		
 		[DllImport("__Internal")]
 		internal static extern Int32 _GetApplicationBadge();
+
+		[DllImport("__Internal")]
+		internal static extern bool _GetAppOpenedUsingNotification();
 		
 		[DllImport("__Internal")]
 		internal static extern void _RemoveAllDeliveredNotifications();
+		
+		[DllImport("__Internal")]
+		private static extern IntPtr _GetLastNotificationData();
+
 
 		
 		[DllImport("__Internal")]
@@ -195,7 +202,7 @@ namespace Unity.Notifications.iOS
 #endif
 			return null;
 		}
-
+				
 		public static iOSNotificationData[] GetScheduledNotificationData()
 		{
 #if UNITY_IOS && !UNITY_EDITOR
@@ -235,6 +242,34 @@ namespace Unity.Notifications.iOS
 			return 0;
 		}
 
+		public static bool GetAppOpenedUsingNotification()
+		{
+#if UNITY_IOS && !UNITY_EDITOR
+			return _GetAppOpenedUsingNotification();
+#endif
+			return false;
+
+		}
+		
+
+		public static iOSNotificationData? GetLastNotificationData()
+		{
+#if UNITY_IOS && !UNITY_EDITOR
+			if (_GetAppOpenedUsingNotification())
+			{
+				iOSNotificationData data;
+				IntPtr ptr = _GetLastNotificationData();
+
+				if (ptr != IntPtr.Zero)
+				{
+					data = (iOSNotificationData) Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
+					_FreeUnmanagedStruct(ptr);
+					return data;
+				}
+			}
+#endif
+			return null;
+		}
 	}
 }
 #pragma warning restore 649, 162

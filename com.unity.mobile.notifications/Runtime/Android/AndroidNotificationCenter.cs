@@ -132,6 +132,20 @@ namespace Unity.Notifications.Android
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public class AndroidNotificationIntentData
+    {
+        internal int id;
+        internal string channel;
+        internal AndroidNotification notification;
+
+        public int Id { get { return id; }}
+        public string Channel { get { return channel; }}
+        public AndroidNotification Notification { get { return notification; }}
+    }
+    
+    /// <summary>
     /// The AndroidNotification is used schedule a local notification, which includes the content of the notification.
     /// </summary>
     public struct AndroidNotification
@@ -327,7 +341,7 @@ namespace Unity.Notifications.Android
         }
         
         /// <summary>
-        /// If a notification was used to open the app, this returns the string 'Data' property value assigned to that notification. 
+        /// Use this to save arbitrary string data related to the notification. 
         /// </summary>
         public string IntentData
         {
@@ -554,7 +568,7 @@ namespace Unity.Notifications.Android
     /// </summary>
     public class AndroidNotificationCenter
     {
-        public delegate void NotificationReceivedCallback(int id, AndroidNotification notification, string channel);
+        public delegate void NotificationReceivedCallback(AndroidNotificationIntentData data);
 
         /// <summary>
         /// Subscribe to this event to receive callbacks whenever a scheduled notification is shown to the user.
@@ -598,16 +612,21 @@ namespace Unity.Notifications.Android
             return initialized = true;
         }
         
-        public static string GetLastIntentData()
+        /// <summary>
+        /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
+        /// </summary>
+        /// <returns>
+        /// Returns the AndroidNotification used to open the app, returns ‘null ‘ if the app was not opened with a notification.
+        /// </returns>
+        public static AndroidNotificationIntentData GetLastNotificationIntent()
         {
             
             AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
             AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
  
             AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
-                
-            var data = intent.Call<string> ("getStringExtra", "data");
-            return data;
+                            
+            return ParseNotificationIntentData(intent);
         }
 
         /// <summary>
@@ -885,6 +904,41 @@ namespace Unity.Notifications.Android
             notificationManager.Call("deleteNotificationChannel", id);
         }
 
+        internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
+        {
+
+            var id = notificationIntent.Call<int>("getIntExtra", "id", -1);
+            var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
+
+            if (id == -1)
+                return null;
+
+            var notification = new AndroidNotification();
+
+            notification.title = notificationIntent.Call<string>("getStringExtra", "textTitle");
+            notification.text = notificationIntent.Call<string>("getStringExtra", "textContent");
+            notification.shouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
+            notification.usesStopwatch =
+                notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
+            notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
+            notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
+            notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
+            notification.color = notificationIntent.Call<int>("getIntExtra", "color", -1);
+            notification.number = notificationIntent.Call<int>("getIntExtra", "number", -1);
+            notification.intentData = notificationIntent.Call<string>("getStringExtra", "data");
+            notification.group = notificationIntent.Call<string>("getStringExtra", "group");
+            notification.groupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
+            notification.sortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
+            notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
+          
+            return new AndroidNotificationIntentData
+            {
+                id = id,
+                channel = channel,
+                notification = notification,
+            };
+        }
+
         class NotificationCallback : AndroidJavaProxy
         {
             public NotificationCallback() : base("com.unity.androidnotifications.NotificationCallback")
@@ -892,28 +946,9 @@ namespace Unity.Notifications.Android
             }
 
             public void onSentNotification(AndroidJavaObject notificationIntent)
-            {                
-                var notification = new AndroidNotification();
-
-                var id = notificationIntent.Call<int>("getIntExtra", "id", -1);
-                var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
-                notification.title = notificationIntent.Call<string>("getStringExtra", "textTitle");
-                notification.text = notificationIntent.Call<string>("getStringExtra", "textContent");
-                notification.shouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
-                notification.usesStopwatch =
-                    notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
-                notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
-                notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
-                notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
-                notification.color = notificationIntent.Call<int>("getIntExtra", "color", -1);
-                notification.number = notificationIntent.Call<int>("getIntExtra", "number", -1);
-                notification.intentData = notificationIntent.Call<string>("getStringExtra", "data");
-                notification.group = notificationIntent.Call<string>("getStringExtra", "group");
-                notification.groupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
-                notification.sortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
-                notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
-
-                OnNotificationReceived(id, notification, channel);
+            {
+                var data = ParseNotificationIntentData(notificationIntent);
+                OnNotificationReceived(data);
             }
         }
     }

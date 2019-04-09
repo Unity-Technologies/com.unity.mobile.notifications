@@ -87,24 +87,7 @@ else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unk
 }
 ```
 
-&nbsp;
-
-**Saving custom data and retrieving it when the notification is used to open the app**
-
-You can store arbitrary string data in a notification object by setting the `IntentData` property. 
-```
-            var notification = new AndroidNotification();
-            notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\" }";
-            AndroidNotificationCenter.SendNotification(notification, "channel_id");
-
-```
-
-If a notification used to open the app, you can retrieve the date like this, if the app was opened in any other way an empty string will be returned.
-```
-var jsonData = AndroidNotificationCenter.GetLastIntentData();
-```
-
-&nbsp;
+&nbsp
 
 **Preserving scheduled notifications after device restart**
 
@@ -118,19 +101,49 @@ You can subscribe to the *AndroidNotificationCenter.OnNotificationReceived* even
 
 ```
 AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-	delegate(int identifier, AndroidNotification notification, string channel)
+	delegate(AndroidNotificationIntentData data)
     {
-    	var msg = "Notification received : " + identifier + "\n";
+        var msg = "Notification received : " + data.Id + "\n";
         msg += "\n Notification received: ";
-        msg += "\n .Title: " + notification.Title;
-        msg += "\n .Body: " + notification.Text;
-        msg += "\n .Channel: " + channel;
-        Debug.Log(msg);
+        msg += "\n .Title: " + data.Notification.Title;
+        msg += "\n .Body: " + data.Notification.Text;
+        msg += "\n .Channel: " + data.Channel;
+    	Debug.Log(msg);
     };
         
 AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
 
 ```
+
+**Saving custom data and retrieving it when the notification is used to open the app**
+
+You can store arbitrary string data in a notification object by setting the `IntentData` property. 
+
+```
+            var notification = new AndroidNotification();
+            notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
+            AndroidNotificationCenter.SendNotification(notification, "channel_id");
+
+```
+
+If the notification is used to open the app, you can retrieve the retrieve it any and any data assigned to it like this:
+
+```
+var notificationIntentData = AndroidNotificationCenter.GetLastNotificationIntent();
+
+if (notificationIntentData != null)
+{
+    var id = notificationIntentData.Id;
+    var channel = notificationIntentData.Channel;
+    var notification = notificationIntentData.Notification;
+    
+    return notification.IntentData;
+}
+```
+
+If the app was opened in any other way `GetLastNotificationIntent` will return null.&nbsp;
+
+
 
 ## iOS
 
@@ -283,6 +296,44 @@ iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
 
 };
 ```
+
+
+
+**Saving custom data and retrieving it when the notification is used to open the app**
+
+You can store arbitrary string data in a notification object by setting the `Data` property. 
+
+```
+var notification = new iOSNotification()();
+notification.Data = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
+//..assign other fields..
+iOSNotificationCenter.ScheduleNotification(notification);
+
+```
+
+The last notification received by the app can be retrieved like this:
+
+```
+var n = iOSNotificationCenter.GetLastNotification();
+if (n != null)
+{
+	var msg = "Last Received Notification : " + n.Identifier + "\n";
+	msg += "\n - Notification received: ";
+	msg += "\n - .Title: " + n.Title;
+	msg += "\n - .Badge: " + n.Badge;
+	msg += "\n - .Body: " + n.Body;
+	msg += "\n - .CategoryIdentifier: " + n.CategoryIdentifier;
+	msg += "\n - .Subtitle: " + n.Subtitle;
+	msg += "\n - .Data: " + n.Data;
+	Debug.Log(msg);
+}
+else
+{
+	Debug.Log("No notifications received.");
+}
+```
+
+If the app was opened using a notification that notification will also be returned. If the app was opened in any other way `GetLastNotification` will return null.&nbsp;
 
 
 

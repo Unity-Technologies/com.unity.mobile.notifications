@@ -27,6 +27,43 @@ namespace Unity.Notifications.iOS
         AuthorizationStatusAuthorized
     }
     
+    /// <summary>
+    /// Presentation styles for alerts.
+    /// </summary>
+    public enum AlertStyle
+    {
+        /// <summary>
+        /// No alert.
+        /// </summary>
+        AlertStyleNone = 0,
+        /// <summary>
+        /// Banner alerts.
+        /// </summary>
+        AlertStyleBanner = 1,
+        /// <summary>
+        /// Modal alerts.
+        /// </summary>
+        AlertStyleAlert = 2,
+    }
+
+    /// <summary>
+    /// The style for previewing a notification's content.
+    /// </summary>
+    public enum ShowPreviewsSetting
+    {
+        /// <summary>
+        /// The notification's content is always shown, even when the device is locked.
+        /// </summary>
+        ShowPreviewsSettingAlways = 0,
+        /// <summary>
+        /// The notification's content is shown only when the device is unlocked.
+        /// </summary>
+        ShowPreviewsSettingWhenAuthenticated = 1,
+        /// <summary>
+        /// The notification's content is never shown, even when the device is unlocked
+        /// </summary>
+        ShowPreviewsSettingNever = 2,
+    }
 
     /// <summary>
     /// Enum indicating the current status of a notification setting. 
@@ -119,6 +156,7 @@ namespace Unity.Notifications.iOS
         public string threadIdentifier;
 
         //Custom information
+        public string data;
         public bool showInForeground;
         public Int32 showInForegroundPresentationOptions;
         
@@ -162,7 +200,11 @@ namespace Unity.Notifications.iOS
         internal int alertSetting;
         internal int badgeSetting;
         internal int soundSetting;
-
+        
+        internal int alertStyle;
+        internal int showPreviewsSetting;
+            
+        
         /// <summary>
         /// When the value is set to AuthorizationStatusAuthorized your app is allowed to schedule and receive local and remote notifications.
         /// </summary>
@@ -221,6 +263,26 @@ namespace Unity.Notifications.iOS
         public NotificationSetting SoundSetting
         {
             get { return (NotificationSetting)soundSetting;}
+        }
+                            
+        /// <summary>
+        /// The type of alert that the app may display when the device is unlocked.
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the presentation style for alerts when the device is unlocked.
+        /// The user may choose to display alerts as automatically disappearing banners or as modal windows that require explicit dismissal (the user may also choose not to display alerts at all.
+        /// </remarks>
+        public AlertStyle AlertStyle
+        {
+            get { return  (AlertStyle)alertStyle; }
+        }
+        
+        /// <summary>
+        /// The setting that indicates whether the app shows a preview of the notification's content.
+        /// </summary>
+        public ShowPreviewsSetting ShowPreviewsSetting
+        {
+            get { return  (ShowPreviewsSetting)showPreviewsSetting;}
         }
     }
 
@@ -325,7 +387,15 @@ namespace Unity.Notifications.iOS
             set {  data.badge = value; }
         }
         
-        
+        /// <summary>
+        /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
+        /// </summary>
+        public string Data
+        {
+            get { return data.data; }
+            set { data.data = value; }
+        }
+
         /// <summary>
         /// The conditions that trigger the delivery of the notification.
         /// For notification that were already delivered and whose instance was returned by <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/> or <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/>
@@ -454,7 +524,8 @@ namespace Unity.Notifications.iOS
             data.subtitle = "";
             data.categoryIdentifier = "";
             data.threadIdentifier = "";
-
+            
+            data.data = "";
             data.showInForeground = false;
             data.showInForegroundPresentationOptions = (int) (PresentationOption.NotificationPresentationOptionAlert |
                                                          PresentationOption.NotificationPresentationOptionSound);
@@ -713,7 +784,25 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a local notification or a remote is shown to the user.
         /// </summary>
-        public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
+        public static event NotificationReceivedCallback OnNotificationReceived{
+            add
+            {
+            if (!onNotificationReceivedCallbackSet)
+            {
+                iOSNotificationsWrapper.RegisterOnReceivedCallback();
+                onNotificationReceivedCallbackSet = true;
+            }
+
+                onNotificationReceived += value;
+            }
+            remove
+            {
+                onNotificationReceived -= value;
+            }
+        }
+
+        private static bool onNotificationReceivedCallbackSet;
+        private static event NotificationReceivedCallback onNotificationReceived = delegate(iOSNotification notification) {  };
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
@@ -734,7 +823,10 @@ namespace Unity.Notifications.iOS
 
                 onRemoteNotificationReceived += value;
             }
-            remove { onRemoteNotificationReceived -= value; }
+            remove
+            {
+                onRemoteNotificationReceived -= value;
+            }
         }
 
         private static bool onRemoteNotificationReceivedCallbackSet;
@@ -758,6 +850,25 @@ namespace Unity.Notifications.iOS
             return initialized = true;
             #endif
         }
+        
+        /// <summary>
+        /// Use this to retrieve the last local or remote notification received by the app. 
+        /// </summary>
+        /// <returns>
+        /// Returns the local or remote notification last received by the app or uswed to open it. If not notification is available it returns null.
+        /// </returns>
+        public static iOSNotification GetLastNotification()
+        {
+            var data = iOSNotificationsWrapper.GetLastNotificationData();
+
+            if (data == null)
+                return null;
+            
+            var notification = new iOSNotification(data.Value.identifier);
+            notification.data = data.Value;
+
+            return notification;
+        }
 
         /// <summary>
         /// The number currently set as the badge of the app icon.
@@ -769,7 +880,7 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Unschedule the specified notification.
+        /// Un-schedule the specified notification.
         /// </summary>
         public static void RemoveScheduledNotification(string identifier)
         {
@@ -872,7 +983,7 @@ namespace Unity.Notifications.iOS
         {                
             var notification = new iOSNotification(data.identifier);
             notification.data = data;
-            OnNotificationReceived(notification);
+            onNotificationReceived(notification);
         }
 
         internal static void onFinishedAuthorizationRequest(iOSAuthorizationRequestData data)

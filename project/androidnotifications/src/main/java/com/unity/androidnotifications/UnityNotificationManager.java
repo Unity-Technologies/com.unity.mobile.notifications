@@ -372,8 +372,9 @@ public class UnityNotificationManager extends BroadcastReceiver
         Intent openAppIntent = new Intent(context, c);
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        openAppIntent.setData(Uri.parse("http://www.google.com"));
-        openAppIntent.putExtra("data", data_intent.getStringExtra("data"));
+//        openAppIntent.putExtra("data", data_intent.getStringExtra("data"));
+
+        openAppIntent.putExtras(data_intent);
 
         return openAppIntent;
     }

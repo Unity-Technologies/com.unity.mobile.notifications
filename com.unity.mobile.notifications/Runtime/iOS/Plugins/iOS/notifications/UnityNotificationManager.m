@@ -83,7 +83,6 @@
             NSLog(@"Requesting notification authorization failed with: %@", error);
         }
         
-        [self checkAuthorizationFinished];
         [self updateNotificationSettings];
     }];
 }
@@ -131,8 +130,9 @@
 //Called to let your app know which action was selected by the user for a given notification.
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)())completionHandler{
     
-    completionHandler();
-    [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
+        self.lastReceivedNotification = response.notification; 
+        completionHandler();
+        [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
     }
 
 -(void)updateScheduledNotificationList
@@ -170,12 +170,15 @@
     settingsData->lockScreenSetting = (int) settings.lockScreenSetting;
     settingsData->notificationCenterSetting = (int) settings.notificationCenterSetting;
     settingsData->soundSetting = (int) settings.soundSetting;
+    settingsData->alertStyle = (int)settings.alertStyle;
+    settingsData->showPreviewsSetting = (int)settings.showPreviewsSetting;
     return settingsData;
 }
 
 + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData : (UNNotificationRequest*) request
 {
     struct iOSNotificationData* notificationData = (struct iOSNotificationData*)malloc(sizeof(*notificationData));
+    [UnityNotificationManager InitiOSNotificationData : notificationData];
 
     UNNotificationContent* content = request.content;
     
@@ -183,30 +186,20 @@
     
     if (content.title != nil && content.title.length > 0)
         notificationData -> title = (char*) [content.title  UTF8String];
-    else
-        notificationData -> title = " ";
     
     if (content.body != nil && content.body.length > 0)
         notificationData -> body = (char*) [content.body UTF8String];
-    else
-        notificationData -> body = " ";
     
     notificationData -> badge = [content.badge intValue];
     
     if (content.subtitle != nil && content.subtitle.length > 0)
         notificationData -> subtitle = (char*) [content.subtitle  UTF8String];
-    else
-        notificationData -> subtitle = " ";
     
     if (content.categoryIdentifier != nil && content.categoryIdentifier.length > 0)
         notificationData -> categoryIdentifier = (char*) [content.categoryIdentifier  UTF8String];
-    else
-        notificationData -> categoryIdentifier = " ";
 
     if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
         notificationData -> threadIdentifier = (char*) [content.threadIdentifier  UTF8String];
-    else
-        notificationData -> threadIdentifier = " ";
     
     if ([ request.trigger isKindOfClass:[UNTimeIntervalNotificationTrigger class]])
     {
@@ -250,6 +243,9 @@
     {
         notificationData -> triggerType = PUSH_TRIGGER;
     }
+    
+    notificationData -> data = (char*) [[request.content.userInfo objectForKey:@"data"] UTF8String];
+
               
     return notificationData;
 }
@@ -258,6 +254,18 @@
 {
     UNNotificationRequest* request = notification.request;
     return [UnityNotificationManager UNNotificationRequestToiOSNotificationData : request];
+}
+
++ (void)InitiOSNotificationData : (iOSNotificationData*) notificationData;
+{
+    notificationData -> title = " ";
+    notificationData -> body = " ";
+    notificationData -> badge = 0;
+    notificationData -> subtitle = " ";
+    notificationData -> categoryIdentifier = " ";
+    notificationData -> threadIdentifier = " ";
+    notificationData -> triggerType = PUSH_TRIGGER;
+    notificationData -> data = " ";
 }
 
 @end

@@ -81,11 +81,11 @@ class AndroidNotificationTests
 
         
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
-                Assert.AreEqual(n.Group, notification.Group);
+                Assert.AreEqual(originalId, data.Id);
+                Assert.AreEqual(n.Group, data.Notification.Group);
             };
         
         
@@ -134,10 +134,10 @@ class AndroidNotificationTests
 
         
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
             };
         
         
@@ -186,10 +186,10 @@ class AndroidNotificationTests
         AndroidNotificationCenter.CancelAllNotifications();
         
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
             };
         
         AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
@@ -230,10 +230,10 @@ class AndroidNotificationTests
         int originalId = AndroidNotificationCenter.SendNotification(n, "default_test_channel_2");
     
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-            delegate(int id, AndroidNotification notification, string channel)
+            delegate(AndroidNotificationIntentData data)
             {
                 receivedNotificationCount += 1;
-                Assert.AreEqual(originalId, id);
+                Assert.AreEqual(originalId, data.Id);
             };
 
         AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
