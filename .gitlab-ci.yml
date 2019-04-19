@@ -65,8 +65,6 @@ publish:
   - tags
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh.sh
-  before_script:
-  - ./com.unity.mobile.notifications/prepare_upm-ci.sh.sh
   script:
   - ./com.unity.mobile.notifications/publish_package.sh
   after_script:
