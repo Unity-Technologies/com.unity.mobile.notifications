@@ -1,1 +1,1 @@
-upm-ci package test -u /workspace/Notifications/Unified/Package/com.unity.mobile.notifications --platform editmode
+upm-ci package test -u 2019.1 --platform editmode
