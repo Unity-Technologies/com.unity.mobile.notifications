@@ -1,17 +1,16 @@
 # Changelog
+
 All notable changes to this package will be documented in this file.
 
 
 
-## [1.0.0-preview.15.1] - 2019-04-19
+## [1.0.0-preview.19] - 2019-04-19
 
 ### Fixes:
 
-- Test.
+- Fixed an issue with settings when opening a project which used a previous version of the package.
 
-
-
-## [1.0.0-preview.15] - 2019-04-08
+## [1.0.0-preview.17] - 2019-04-08
 
 ### Improvements & changes:
 
@@ -43,7 +42,6 @@ All notable changes to this package will be documented in this file.
   ### Fixes:
 
   - [Android] Canceling scheduled notifications now works correctly when the app is restarted.
-
   - [iOS] Subscribing to OnNotificationReceived on iOS should now work, even if no other notification was called 
 
 ## [1.0.0-preview.13] - 2019-03-22
@@ -52,7 +50,6 @@ All notable changes to this package will be documented in this file.
 
 - [Android] Added an option to reshedule all non expired notification on device restart.
 - [Android] Added a `data` field to notification object and a method to retrieve the `data` assigned to a notification that was used to open the app or bring it back from background.
-
 - Changed the minimum Unity version supported by the package to 2018.3.
 
 ### Fixes:
@@ -118,4 +115,5 @@ All notable changes to this package will be documented in this file.
 - Minor documentation improvements.
 
 ## [1.0.0-preview.1] - 2018-10-22
+
 ### This is the initial release of *Mobile Notifications  Package*.

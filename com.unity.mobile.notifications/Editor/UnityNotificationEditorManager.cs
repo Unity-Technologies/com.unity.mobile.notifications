@@ -203,10 +203,10 @@ namespace Unity.Notifications
 
         private void SaveSetting(NotificationEditorSetting setting, NotificationEditorSettingsCollection values)
         {
-            if (values == null)
+            if (values == null )
                 values = new NotificationEditorSettingsCollection();
 
-            if (values[setting.key].ToString() != setting.val.ToString())
+            if (!values.Contains(setting.key) || values[setting.key].ToString() != setting.val.ToString())
             {
                 values[setting.key] = setting.val;
                 
