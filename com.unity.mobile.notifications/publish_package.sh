@@ -25,4 +25,4 @@ brew install jq
 
 curl -u $BIN_USERNAME@unity:$BIN_API_KEY https://packages.unity.com/auth > .npmrc
 sed -i -e 's/npm\/unity\/unity/npm\/unity\/unity-staging/g' .npmrc
-npm publish com.unity.mobile.notifications/upm-ci\~/packages/com.unity.mobile.notifications-1.0.0-preview.15.1.tgz
+npm publish upm-ci\~/packages/com.unity.mobile.notifications-1.0.0-preview.15.1.tgz

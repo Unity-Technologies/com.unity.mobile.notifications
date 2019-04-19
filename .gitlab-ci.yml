@@ -13,7 +13,7 @@ stages:
 
 build:
   stage: build
-  image: mobile/android-linux-build
+  image: 'mobile/android-linux-build:stable'
   tags:
    - bokken-runner
   only:
