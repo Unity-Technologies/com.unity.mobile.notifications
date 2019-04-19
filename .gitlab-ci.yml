@@ -14,10 +14,9 @@ stages:
 build:
   stage: build
   image: mobile/android-linux-build
-  tags:
-  - darwin
   only:
   - master
+  - tags
   # before_script:
   # - ./project/prepare_env.sh
   script:
