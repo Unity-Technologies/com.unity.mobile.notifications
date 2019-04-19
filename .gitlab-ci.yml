@@ -35,7 +35,7 @@ package:
   only:
   - master
   before_script:
-  - ./com.unity.mobile.notifications/prepare_upm-ci.sh.sh
+  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
   - ./com.unity.mobile.notifications/package_package.sh
   artifacts:
@@ -49,7 +49,7 @@ test:
   only:
   - master
   before_script:
-  - ./com.unity.mobile.notifications/prepare_upm-ci.sh.sh
+  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
   - ./com.unity.mobile.notifications/test_package.sh
   artifacts:
@@ -64,7 +64,7 @@ publish:
   - master
   - tags
   before_script:
-  - ./com.unity.mobile.notifications/prepare_upm-ci.sh.sh
+  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
   - ./com.unity.mobile.notifications/publish_package.sh
   after_script:
