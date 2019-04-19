@@ -13,14 +13,14 @@ stages:
 
 build:
   stage: build
-  image: 'mobile/android-linux-build:stable'
+  # image: 'mobile/android-linux-build:stable'
   tags:
-   - bokken-runner
+   - darwin
   only:
   - master
   - tags
-  # before_script:
-  # - ./project/prepare_env.sh
+  before_script:
+  - ./project/prepare_env.sh
   script:
   - ./project/build_package.sh
   artifacts:

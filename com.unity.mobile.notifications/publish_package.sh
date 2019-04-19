@@ -3,24 +3,24 @@ set -xeuo pipefail
 
 brew install jq
 
-# cd com.unity.mobile.notifications
-# ls
-# ls Runtime/Android/Plugins/Android/
+cd com.unity.mobile.notifications
+ls
+ls Runtime/Android/Plugins/Android/
 
-# if [ -f Runtime/Android/Plugins/Android/androidnotifications-release.aar ];
-# then
-#     echo "Built AAR package found in Plugins folder."
-# else
-# 	echo "Built AAR package not found in Plugins folder!"
-#     exit 1
-# fi
+if [ -f Runtime/Android/Plugins/Android/androidnotifications-release.aar ];
+then
+    echo "Built AAR package found in Plugins folder."
+else
+	echo "Built AAR package not found in Plugins folder!"
+    exit 1
+fi
 
 
-# REPO_REV=$(git rev-parse HEAD)
-# REPO_URL="gitlab.cds.internal.unity3d.com/upm-packages/mobile/mobile-notifications.git"
+REPO_REV=$(git rev-parse HEAD)
+REPO_URL="gitlab.cds.internal.unity3d.com/upm-packages/mobile/mobile-notifications.git"
 
-# MANIFEST=$(jq -r ".repository += {\"url\": \"$REPO_URL\", \"revision\": \"$REPO_REV\"}" package.json)
-# echo "$MANIFEST" > package.json
+MANIFEST=$(jq -r ".repository += {\"url\": \"$REPO_URL\", \"revision\": \"$REPO_REV\"}" package.json)
+echo "$MANIFEST" > package.json
 
 
 curl -u $BIN_USERNAME@unity:$BIN_API_KEY https://packages.unity.com/auth > .npmrc
