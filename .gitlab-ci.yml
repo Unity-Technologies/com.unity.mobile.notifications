@@ -37,7 +37,8 @@ package:
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
-  - ./com.unity.mobile.notifications/package_package.sh
+  - cd com.unity.mobile.notifications
+  - ./package_package.sh
   artifacts:
     paths:
     - com.unity.mobile.notifications/upm-ci~/packages/*
@@ -51,7 +52,8 @@ test:
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
-  - ./com.unity.mobile.notifications/test_package.sh
+  - cd com.unity.mobile.notifications
+  - ./test_package.sh
   artifacts:
     paths:
     - com.unity.mobile.notifications/upm-ci~/packages/*
@@ -66,7 +68,8 @@ publish:
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
-  - ./com.unity.mobile.notifications/publish_package.sh
+  - cd com.unity.mobile.notifications
+  - ./publish_package.sh
   after_script:
   - /opt/post_build_script.sh    
 
