@@ -11,21 +11,22 @@ stages:
  - test
  - publish
 
-# build:
-#   stage: build
-#   tags:
-#   - darwin
-#   only:
-#   - master
-#   before_script:
-#   - ./project/prepare_env.sh
-#   script:
-#   - ./project/build_package.sh
-#   artifacts:
-#     paths:
-#     - com.unity.mobile.notifications/Runtime/Android/Plugins/Android
-#   after_script:
-#   - /opt/post_build_script.sh    
+build:
+  stage: build
+  image: mobile/android-linux-build
+  tags:
+  - darwin
+  only:
+  - master
+  # before_script:
+  # - ./project/prepare_env.sh
+  script:
+  - ./project/build_package.sh
+  artifacts:
+    paths:
+    - com.unity.mobile.notifications/Runtime/Android/Plugins/Android
+  after_script:
+  - /opt/post_build_script.sh    
 
 package:
   stage: package
