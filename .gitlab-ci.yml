@@ -27,7 +27,6 @@ stages:
 #   after_script:
 #   - /opt/post_build_script.sh    
 
-
 package:
   stage: package
   tags:
