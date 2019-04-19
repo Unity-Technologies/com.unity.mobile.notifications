@@ -7,7 +7,6 @@
         "TestAssemblies"
     ],
     "includePlatforms": [
-        "Editor",
         "iOS"
     ],
     "excludePlatforms": [],

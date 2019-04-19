@@ -15,3 +15,7 @@ upm-ci~/**
 .yamato/**
 *.zip*
 .npmrc-e
+publish_package.sh
+prepare_upm-ci.sh
+package_package.sh
+test_package.sh
