@@ -1,5 +1,8 @@
 package com.unity.androidnotifications;
 
+import android.support.annotation.Keep;
+
+@Keep
 public class NotificationChannelWrapper {
 
     public String id;

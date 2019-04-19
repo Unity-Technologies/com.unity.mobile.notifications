@@ -7,8 +7,7 @@
         "TestAssemblies"
     ],
     "includePlatforms": [
-        "Android",
-        "Editor"
+        "Android"
         ],
     "allowUnsafeCode": false,
     "overrideReferences": false,

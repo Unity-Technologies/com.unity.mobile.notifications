@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeuo pipefail
+#set -xeuo pipefail
 
 printf "Attempting to build package:"
 

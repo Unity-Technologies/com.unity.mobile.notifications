@@ -7,14 +7,18 @@ variables:
 
 stages:
  - build
+ - package
+ - test
  - publish
 
 build:
   stage: build
+  # image: 'mobile/android-linux-build:stable'
   tags:
-  - darwin
+   - darwin
   only:
   - master
+  - tags
   before_script:
   - ./project/prepare_env.sh
   script:
@@ -25,30 +29,49 @@ build:
   after_script:
   - /opt/post_build_script.sh    
 
-# build_docs:
-#   stage: build
-#   tags:
-#   - darwin
-#   only:
-#   - master
-#   - tags
-#   script:
-#   - ./project/build_docs.sh
-#   artifacts:
-#     paths:
-#     - com.unity.mobile.notifications/Documentation~
-#   after_script:
-#    - /opt/post_build_script.sh    
+package:
+  stage: package
+  tags:
+  - darwin
+  only:
+  - master
+  - tags
+  before_script:
+  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
+  script:
+  - cd com.unity.mobile.notifications
+  - ./package_package.sh
+  artifacts:
+    paths:
+    - com.unity.mobile.notifications/upm-ci~/packages/*
+
+test:
+  stage: test
+  tags:
+  - darwin
+  only:
+  - master
+  - tags
+  before_script:
+  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
+  script:
+  - cd com.unity.mobile.notifications
+  - ./test_package.sh
+  artifacts:
+    paths:
+    - com.unity.mobile.notifications/upm-ci~/packages/*
 
 publish:
   stage: publish
   tags:
   - darwin
   only:
-  - master
   - tags
+  before_script:
+  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
-  - ./project/publish_package.sh
+  - cd com.unity.mobile.notifications
+  - ./publish_package.sh
   after_script:
   - /opt/post_build_script.sh    
 

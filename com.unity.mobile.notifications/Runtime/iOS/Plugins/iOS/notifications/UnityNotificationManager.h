@@ -100,6 +100,7 @@ const int kDefaultPresentationOptions = -1;
     @property (nonatomic) UNNotification* lastReceivedNotification;
 
     @property BOOL authorized;
+    @property BOOL authorizationRequestFinished;
     @property BOOL needRemoteNotifications;
     @property NSString* deviceToken;
     @property UNAuthorizationStatus remoteNotificationsRegistered;

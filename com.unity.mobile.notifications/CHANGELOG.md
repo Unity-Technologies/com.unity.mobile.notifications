@@ -1,7 +1,27 @@
 # Changelog
+
 All notable changes to this package will be documented in this file.
 
-## [1.0.0-preview.15] - 2019-04-08
+
+
+## [1.0.0-preview.22] - 2019-05-20
+
+### Fixes:
+
+- [Android] Notification API Java classes are nog longer stripped when building with Proguard enabled.
+
+## [1.0.0-preview.21] - 2019-04-23
+
+### Fixes:
+
+- [Editor] Editor settings window should not automatically detect changes to Android icon source texture assets.
+
+- [Editor] The settings window should work properly  and no longer throw exceptions when opening a project used with a previous version of the package. 
+
+- [iOS] `AuthorizationRequest` should properly finish even when the user denies the request.
+
+
+## [1.0.0-preview.17] - 2019-04-08
 
 ### Improvements & changes:
 
@@ -33,7 +53,6 @@ All notable changes to this package will be documented in this file.
   ### Fixes:
 
   - [Android] Canceling scheduled notifications now works correctly when the app is restarted.
-
   - [iOS] Subscribing to OnNotificationReceived on iOS should now work, even if no other notification was called 
 
 ## [1.0.0-preview.13] - 2019-03-22
@@ -42,7 +61,6 @@ All notable changes to this package will be documented in this file.
 
 - [Android] Added an option to reshedule all non expired notification on device restart.
 - [Android] Added a `data` field to notification object and a method to retrieve the `data` assigned to a notification that was used to open the app or bring it back from background.
-
 - Changed the minimum Unity version supported by the package to 2018.3.
 
 ### Fixes:
@@ -108,4 +126,5 @@ All notable changes to this package will be documented in this file.
 - Minor documentation improvements.
 
 ## [1.0.0-preview.1] - 2018-10-22
+
 ### This is the initial release of *Mobile Notifications  Package*.

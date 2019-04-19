@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.support.annotation.Keep;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import static android.app.Notification.PRIORITY_DEFAULT;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.app.NotificationManager.IMPORTANCE_NONE;
 
+@Keep
 public class UnityNotificationManagerNougat extends UnityNotificationManager {
 
     public UnityNotificationManagerNougat(Context context, Activity activity)

@@ -178,7 +178,6 @@ namespace Unity.Notifications
 
 			if (drawableResourceDataRef != null)
 			{
-
 				var idProperty = drawableResourceDataRef.FindPropertyRelative("Id");
 				var typeProperty = drawableResourceDataRef.FindPropertyRelative("Type");
 				var assetProperty = drawableResourceDataRef.FindPropertyRelative("Asset");
@@ -249,24 +248,8 @@ namespace Unity.Notifications
 
 				Texture2D previewTexture = data.GetPreviewTexture(updatePreviewTexture);
 
-				if (previewTexture != null)
-				{
-
-					GUIStyle previewLabelTextStyle = new GUIStyle(GUI.skin.label);
-					previewLabelTextStyle.fontSize = 8;
-					previewLabelTextStyle.wordWrap = true;
-					previewLabelTextStyle.alignment = TextAnchor.UpperCenter;
-
-					EditorGUI.LabelField(previewTextureRect, "Preview", previewLabelTextStyle);
-
-					Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
-					previewTextureRectPadded.y += 8;
-
-					previewTexture.alphaIsTransparency = false;
-					GUI.DrawTexture(previewTextureRectPadded, previewTexture);
-				}
 				
-				if (data.Asset != null && !data.IsValid)
+				if (data.Asset != null && !data.Verify())
 				{
 					EditorGUI.HelpBox(
 						errorBoxRect,
@@ -283,6 +266,25 @@ namespace Unity.Notifications
 						helpBoxMessageTextStyle.wordWrap = true;
 						helpBoxMessageTextStyle.alignment = TextAnchor.MiddleCenter;
 						GUI.Box(previewTextureRect, "Preview not available. \n Make sure fthe texture is readable!", helpBoxMessageTextStyle);
+					}
+				}
+				else
+				{
+					if (previewTexture != null)
+					{
+
+						GUIStyle previewLabelTextStyle = new GUIStyle(GUI.skin.label);
+						previewLabelTextStyle.fontSize = 8;
+						previewLabelTextStyle.wordWrap = true;
+						previewLabelTextStyle.alignment = TextAnchor.UpperCenter;
+
+						EditorGUI.LabelField(previewTextureRect, "Preview", previewLabelTextStyle);
+
+						Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
+						previewTextureRectPadded.y += 8;
+
+						previewTexture.alphaIsTransparency = false;
+						GUI.DrawTexture(previewTextureRectPadded, previewTexture);
 					}
 				}
 								
