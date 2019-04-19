@@ -19,4 +19,11 @@ publish_package.sh
 prepare_upm-ci.sh
 package_package.sh
 test_package.sh
+
+publish_package.sh.meta
+prepare_upm-ci.sh.meta
+package_package.sh.meta
+test_package.sh.meta
+test_package_local.sh
+test_package_local.sh.meta
 TestRunnerOptions.json

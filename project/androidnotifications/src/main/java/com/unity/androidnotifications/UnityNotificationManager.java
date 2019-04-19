@@ -54,7 +54,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     /// Static stuff TODO cleanup
 
-    public static final String UNITYlas_NOTIFICATION_SETTINGS = "UNITY_NOTIFICATIONS";
+    public static final String UNITY_NOTIFICATION_SETTINGS = "UNITY_NOTIFICATIONS";
     public static final String SHARED_PREFS_NOTIFICATION_IDS = "UNITY_NOTIFICATION_IDS";
     public static final String DEFAULT_APP_ICON = "app_icon";
 
