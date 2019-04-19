@@ -33,6 +33,7 @@ package:
   - darwin
   only:
   - master
+  - tags
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
@@ -48,6 +49,7 @@ test:
   - darwin
   only:
   - master
+  - tags
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
@@ -62,7 +64,6 @@ publish:
   tags:
   - darwin
   only:
-  - master
   - tags
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
