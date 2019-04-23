@@ -89,11 +89,12 @@ namespace Unity.Notifications
             previewTexture = null;
         }
         
-        public void Verify()
+        public bool Verify()
         {
             List<string> errors;
             isValid = TextureAssetUtils.VerifyTextureByType(Asset, Type, out errors);
             this.errors = errors;
+            return isValid;
         }
 
         public static string GenerateErrorString(string[] errors)
@@ -452,7 +453,7 @@ namespace Unity.Notifications
             var icons = new Dictionary<string, byte[]>();
             foreach (var res in TrackedResourceAssets)
             {
-                if (!res.IsValid)
+                if (!res.Verify())
                 {
                     Debug.LogWarning( string.Format("Failed exporting: '{0}' Android notification icon because:\n {1} ", res.Id,
                         DrawableResourceData.GenerateErrorString(res.Errors))
