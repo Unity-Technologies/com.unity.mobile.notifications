@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 
 
 
+## [1.0.0-preview.20] - 2019-04-23
+
+### Fixes:
+
+- Fixed an issue where Android icons in the editor where not reverified automatically when issues related to them were resolved.
+
 ## [1.0.0-preview.19] - 2019-04-19
 
 ### Fixes:
