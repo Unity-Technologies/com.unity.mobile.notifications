@@ -4,17 +4,16 @@ All notable changes to this package will be documented in this file.
 
 
 
-## [1.0.0-preview.20] - 2019-04-23
+## [1.0.0-preview.21] - 2019-04-23
 
 ### Fixes:
 
-- Fixed an issue where Android icons in the editor where not reverified automatically when issues related to them were resolved.
+- [Editor] Editor settings window should not automatically detect changes to Android icon source texture assets.
 
-## [1.0.0-preview.19] - 2019-04-19
+- [Editor] The settings window should work properly  and no longer throw exceptions when opening a project used with a previous version of the package. 
 
-### Fixes:
+- [iOS] `AuthorizationRequest` should properly finish even when the user denies the request.
 
-- Fixed an issue with settings when opening a project which used a previous version of the package.
 
 ## [1.0.0-preview.17] - 2019-04-08
 

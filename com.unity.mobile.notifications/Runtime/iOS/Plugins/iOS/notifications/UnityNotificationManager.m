@@ -36,7 +36,7 @@
         if (!self.remoteNotificationsRegistered)
             return;
     
-    if (self.authorized && self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
+    if (self.authorizationRequestFinished && self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
     {
         self.authData -> deviceToken = [self.deviceToken UTF8String];
         self.onAuthorizationCompletionCallback(self.authData);
@@ -51,6 +51,7 @@
     if ( !SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
+    self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
     
@@ -70,7 +71,8 @@
 
         if (granted)
         {
-            self.authorized = TRUE;
+            self.authorizationRequestFinished = YES;
+            self.authorized = YES;
             if (registerRemote)
             {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -80,9 +82,11 @@
         }
         else
         {
+            self.authorizationRequestFinished = YES;
             NSLog(@"Requesting notification authorization failed with: %@", error);
         }
         
+        [self checkAuthorizationFinished];
         [self updateNotificationSettings];
     }];
 }
