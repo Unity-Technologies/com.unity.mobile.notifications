@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8f6540f3d50fe42c3b15ce4ae44360d3
+guid: 4badab99f8f33a949a692d6aff06206f
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -7,9 +7,8 @@ PluginImporter:
   executionOrder: {}
   defineConstraints: []
   isPreloaded: 0
-  isOverridable: 0
+  isOverridable: 1
   isExplicitlyReferenced: 0
-  validateReferences: 1
   platformData:
   - first:
       Android: Android

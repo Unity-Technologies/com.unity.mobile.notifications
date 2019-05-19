@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.os.Parcel;
 import android.service.notification.StatusBarNotification;
+import android.support.annotation.Keep;
 import android.util.Base64;
 import android.util.Log;
 import android.content.SharedPreferences;
@@ -42,6 +43,7 @@ import java.util.List;
 
 import java.lang.Integer;
 
+@Keep
 public class UnityNotificationManager extends BroadcastReceiver
 {
 

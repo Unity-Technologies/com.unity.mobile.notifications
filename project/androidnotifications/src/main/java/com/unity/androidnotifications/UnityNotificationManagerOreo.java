@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.support.annotation.Keep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import static android.app.Notification.PRIORITY_DEFAULT;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.app.NotificationManager.IMPORTANCE_NONE;
 
+@Keep
 public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat {
 
     public static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel)
