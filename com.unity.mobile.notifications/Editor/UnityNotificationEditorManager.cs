@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,15 +38,24 @@ namespace Unity.Notifications
         public string Id;
         public NotificationIconType Type;
         public Texture2D Asset;
+        
+        public Texture2D AssetXXHDPI;
+        public Texture2D AssetXHDPI;
+        public Texture2D AssetMDPI;
+        public Texture2D AssetHDPI;
+        public Texture2D AssetLDPI;
+
 
         private bool isValid = false;
         private List<string> errors = null;
-        private Texture2D previewTexture;
+        
+        internal Texture2D previewTexture;
+        internal bool showOtherSizes;
         
         public bool IsValid
         {
             get
-            {
+            {                
                 if (isValid == false && errors == null)
                     Verify();
 
@@ -120,8 +130,9 @@ namespace Unity.Notifications
         public bool writeToPlist;
 
         public List<NotificationEditorSetting> dependentSettings;
+        public List<string> requiredSettings;
         
-        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist  = true, List<NotificationEditorSetting> dependentSettings = null)
+        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist  = true, List<NotificationEditorSetting> dependentSettings = null, List<string> requiredSettings = null)
         {
             this.key = key;
             this.label = label;
@@ -129,6 +140,7 @@ namespace Unity.Notifications
             this.val = val;
             this.writeToPlist = writeToPlist;
             this.dependentSettings = dependentSettings;
+            this.requiredSettings = requiredSettings;
         }
     }
     
@@ -345,7 +357,7 @@ namespace Unity.Notifications
                     new NotificationEditorSetting(
                         "UnityNotificationRequestAuthorizationOnAppLaunch",
                         "Request Authorization on App Launch",
-                        "It's recommended f to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorizatio popup immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
+                        "It's recommended f to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorization pop-up immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
                         notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
                             "UnityNotificationRequestAuthorizationOnAppLaunch", true),
                         dependentSettings: new List<NotificationEditorSetting>()
@@ -353,11 +365,46 @@ namespace Unity.Notifications
                             new NotificationEditorSetting(
                                 "UnityNotificationDefaultAuthorizationOptions",
                                 "Default Notification Authorization Options",
-                                "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Slternatively you can specify them when creating a `AuthorizationRequest` from a script.",
+                                "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Alternatively you can specify them when creating a `AuthorizationRequest` from a script.",
                                 notificationEditorManager.GetiOSNotificationEditorSettingsValue<PresentationOption>(
                                     "UnityNotificationDefaultAuthorizationOptions",
-                                    (PresentationOption) PresentationOptionEditor.All)),
+                                    (PresentationOption) PresentationOptionEditor.All)
+                            ),
 
+
+                            new NotificationEditorSetting(
+                                "UnityAddRemoteNotificationCapability",
+                                "Enable Push Notifications",
+                                "Enable this to add the push notification capability to you Xcode project.",
+                                notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                                    "UnityAPSReleaseEnvironment", false),
+                                false,
+                                dependentSettings: new List<NotificationEditorSetting>()
+                                {     
+                                    new NotificationEditorSetting(
+                                        "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
+                                        "Register for Push Notifications on App Launch",
+                                        "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
+                                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                                            "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false)
+                                    ),
+                                    new NotificationEditorSetting(
+                                        "UnityRemoteNotificationForegroundPresentationOptions",
+                                        "Remote Notification Foreground Presentation Options",
+                                        "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorization to use them (the user might change it at any time). ",
+                                        notificationEditorManager
+                                            .GetiOSNotificationEditorSettingsValue<PresentationOption>(
+                                                "UnityRemoteNotificationForegroundPresentationOptions",
+                                                (PresentationOption) PresentationOptionEditor.All)
+                                    ),
+                                    new NotificationEditorSetting("UnityAPSReleaseEnvironment",
+                                        "Enable release environment for APS",
+                                        "Enable this when signing the app with a production certificate.",
+                                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                                            "UnityAPSReleaseEnvironment", false),
+                                        false),
+                                }
+                            ),
                         }),
 
                     new NotificationEditorSetting("UnityUseLocationNotificationTrigger",
@@ -366,40 +413,6 @@ namespace Unity.Notifications
                         notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
                             "UnityUseLocationNotificationTrigger", false),
                         false),
-                    
-                    new NotificationEditorSetting("UnityAddRemoteNotificationCapability",
-                        "Enable Push Notifications",
-                        "Enable this to add the push notification capability to you Xcode project.",
-                        notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                            "UnityAPSReleaseEnvironment", false),
-                        false,
-                        dependentSettings: new List<NotificationEditorSetting>()
-                        {     
-                            new NotificationEditorSetting(
-                                "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                                "Register for Push Notifications on App Launch",
-                                "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
-                                notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                                    "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false),
-
-                                dependentSettings: new List<NotificationEditorSetting>()
-                                {
-                                    new NotificationEditorSetting(
-                                        "UnityRemoteNotificationForegroundPresentationOptions",
-                                        "Remote Notification Foreground Presentation Options",
-                                        "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorisation to use them (the user might change it at any time). ",
-                                        notificationEditorManager
-                                            .GetiOSNotificationEditorSettingsValue<PresentationOption>(
-                                                "UnityRemoteNotificationForegroundPresentationOptions",
-                                                (PresentationOption) PresentationOptionEditor.All)),
-                                }),
-                            new NotificationEditorSetting("UnityAPSReleaseEnvironment",
-                                "Enable release environment for APS",
-                                "Enable this when signing the app with a production certificate.",
-                                notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                                    "UnityAPSReleaseEnvironment", false),
-                                false),
-                        })
                     };
             }
 
@@ -460,15 +473,11 @@ namespace Unity.Notifications
                     );
                     continue;
                 }
-                
-                var texture = TextureAssetUtils.ProcessTextureForType(res.Asset, res.Type);
-
-                var scale = res.Type == NotificationIconType.SmallIcon ? 0.375f : 1;
                                                
-                var textXhdpi = TextureAssetUtils.ScaleTexture(texture, (int) (128 * scale), (int) (128 * scale));
-                var textHdpi  = TextureAssetUtils.ScaleTexture(texture, (int) (96 * scale), (int) (96 * scale));
-                var textMdpi  = TextureAssetUtils.ScaleTexture(texture, (int) (64 * scale), (int) (64 * scale));
-                var textLdpi  = TextureAssetUtils.ScaleTexture(texture, (int) (48 * scale), (int) (48 * scale));
+                var textXhdpi = TextureAssetUtils.ProcessAndResizeTextureForType(res.Asset, res.Type, ImageSize.XHDPI);
+                var textHdpi  = TextureAssetUtils.ProcessAndResizeTextureForType(res.Asset, res.Type, ImageSize.HDPI);
+                var textMdpi  = TextureAssetUtils.ProcessAndResizeTextureForType(res.Asset, res.Type, ImageSize.MDPI);
+                var textLdpi  = TextureAssetUtils.ProcessAndResizeTextureForType(res.Asset, res.Type, ImageSize.LDPI);
 
                 icons[string.Format("drawable-xhdpi-v11/{0}.png", res.Id)] = textXhdpi.EncodeToPNG();
                 icons[string.Format("drawable-hdpi-v11/{0}.png", res.Id)] = textHdpi.EncodeToPNG();
@@ -477,8 +486,8 @@ namespace Unity.Notifications
 
                 if (res.Type == NotificationIconType.LargeIcon)
                 {
-                    var textXxhdpi = TextureAssetUtils.ScaleTexture(texture, (int) (192 * scale), (int) (192 * scale));
-                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXhdpi.EncodeToPNG();
+                    var textXxhdpi = TextureAssetUtils.ProcessAndResizeTextureForType(res.Asset, res.Type, ImageSize.XXHDPI);
+                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXxhdpi.EncodeToPNG();
                 }
             }
 
@@ -486,8 +495,57 @@ namespace Unity.Notifications
         }
     }
 
+
+
+    public enum ImageSize
+    {
+        XXHDPI,
+        XHDPI,
+        HDPI, 
+        MDPI,
+        LDPI,
+        
+    }
+
     internal static class TextureAssetUtils
     {
+
+        public static Texture2D ProcessAndResizeTextureForType(Texture2D texture, NotificationIconType type, ImageSize size)
+        {
+            var width = 0;
+            var height = 0;
+            var scale = type == NotificationIconType.SmallIcon ? 0.375f : 1;
+
+            if (size == ImageSize.XXHDPI)
+            {
+                width = (int)(192 * scale);
+                height =  (int)(192 * scale);
+            }
+            else if (size == ImageSize.XHDPI)
+            {
+                width = (int)(128 * scale);
+                height =  (int)(128 * scale);
+            }
+            else if (size == ImageSize.HDPI)
+            {
+                width = (int)(96 * scale);
+                height =  (int)(96 * scale);
+            }
+            else if (size == ImageSize.MDPI)
+            {
+                width = (int)(64 * scale);
+                height =  (int)(64 * scale);
+            }
+            else if (size == ImageSize.LDPI)
+            {
+                width = (int)(48 * scale);
+                height =  (int)(48 * scale);
+            }
+            
+            var downscaled = TextureAssetUtils.ScaleTexture(texture, width, height);
+            return TextureAssetUtils.ProcessTextureForType(downscaled, type);
+        }
+        
         public static bool VerifyTextureByType(Texture2D texture, NotificationIconType type, out List<string> errors)
         {            
             errors = new List<string>();
@@ -511,10 +569,7 @@ namespace Unity.Notifications
             var isLargeEnough = texture.width >= minSize;
             var hasAlpha = true;// texture.format == TextureFormat.Alpha8;
 
-            string assetPath = AssetDatabase.GetAssetPath( texture );
-            var importer = AssetImporter.GetAtPath( assetPath ) as TextureImporter;
-
-            var isReadable = importer != null && importer.isReadable;
+            var isReadable = texture.isReadable;
                 
             if (!isReadable)
             {
@@ -549,7 +604,7 @@ namespace Unity.Notifications
             string assetPath = AssetDatabase.GetAssetPath( sourceTexture );
             var importer = AssetImporter.GetAtPath( assetPath ) as TextureImporter;
 
-            if (importer == null || !importer.isReadable)
+            if (importer != null && !importer.isReadable)
                 return null;
 
             var textureFormat = type == NotificationIconType.LargeIcon ? sourceTexture.format : TextureFormat.RGBA32;
@@ -569,6 +624,7 @@ namespace Unity.Notifications
                         
                     }
                     texture.SetPixels(c_1, i);
+                    sourceTexture.filterMode = FilterMode.Point;
                 }
                 texture.Apply();
             }
@@ -579,6 +635,20 @@ namespace Unity.Notifications
                 texture.Apply();
             }
             return texture;
+          }
+        
+        public static Texture2D ScaleTextureNew(Texture2D source,int targetWidth,int targetHeight) {
+            Texture2D result=new Texture2D(targetWidth,targetHeight,source.format,true);
+            Color[] rpixels=result.GetPixels(0);
+            float incX=((float)1/source.width)*((float)source.width/targetWidth);
+            float incY=((float)1/source.height)*((float)source.height/targetHeight);
+            for(int px=0; px<rpixels.Length; px++) {
+                rpixels[px] = source.GetPixelBilinear(incX*((float)px%targetWidth),
+                    incY*((float)Mathf.Floor(px/targetWidth)));
+            }
+            result.SetPixels(rpixels,0);
+            result.Apply();
+            return result;
         }
         
         public static Texture2D ScaleTexture(Texture2D sourceTexture, int width, int height)
@@ -587,9 +657,10 @@ namespace Unity.Notifications
             if (sourceTexture.width == width && sourceTexture.height == sourceTexture.height)
                 return sourceTexture;
             
+            
             Rect rect = new Rect(0,0,width,height);
 
-            sourceTexture.filterMode = FilterMode.Trilinear;
+            sourceTexture.filterMode = FilterMode.Point;
             sourceTexture.Apply(true);       
                                
             RenderTexture rtt = new RenderTexture(width, height, 32);
@@ -603,6 +674,7 @@ namespace Unity.Notifications
             Texture2D result = new Texture2D(width, height, TextureFormat.ARGB32, true);
             result.Resize(width, height);
             result.ReadPixels(rect,0,0,true);
+            result.Apply(true, false);
             return result;                 
         }
 

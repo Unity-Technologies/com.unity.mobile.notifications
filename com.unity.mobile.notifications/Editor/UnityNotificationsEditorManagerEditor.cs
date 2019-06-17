@@ -9,6 +9,7 @@ using UnityEditor.VersionControl;
 using UnityEditorInternal;
 
 using Unity.Notifications.iOS;
+using Object = System.Object;
 
 
 #pragma warning disable 219, 414
@@ -69,7 +70,8 @@ namespace Unity.Notifications
 			
 			if (target == null)
 				return;
-			
+
+
 			m_Target = new SerializedObject(target);
 			
 			m_ResourceAssets = serializedObject.FindProperty("TrackedResourceAssets");
@@ -138,6 +140,8 @@ namespace Unity.Notifications
 				var data = GetElementData(index);
 				if (data == null)
 					return kSlotSize;
+				if (data.showOtherSizes)
+					return m_ReorderableList.elementHeight * 6;				
 				return m_ReorderableList.elementHeight +
 					(data.Asset != null && !data.IsValid ? kSlotSize : 0);
 			};
@@ -168,6 +172,120 @@ namespace Unity.Notifications
 				return res[index];
 			return null;
 		}
+
+		static void DrawIconTextureSlot(Rect elementRect, int row, DrawableResourceData data, ImageSize size, NotificationIconType newType, string newId, UnityEngine.Object target)
+		{
+			Rect elementContentRect = GetContentRect(elementRect, 6f, 12f);
+			float errorMsgWidth = elementRect.width - kSlotSize * 3;
+			                      
+			var textureRect  = new Rect(elementContentRect.width - (kMaxPreviewSize * 2 - kIconSpacing * 5),
+						elementContentRect.y + kIconSpacing * row + kSlotSize * row, kMaxPreviewSize, kSlotSize);
+
+			var errorBoxRect = GetContentRect(
+				new Rect(elementContentRect.x,
+					elementContentRect.y + kIconSpacing * row + kSlotSize * row, errorMsgWidth, kSlotSize),
+				4f, 4f);
+			
+			Rect previewTextureRect = new Rect(elementContentRect.width - (kMaxPreviewSize - kIconSpacing * 5),
+				elementContentRect.y + kIconSpacing * row + kSlotSize * row , kMaxPreviewSize, kSlotSize);
+
+			Texture2D assetTexture = null;
+			
+			if (size == ImageSize.XXHDPI)
+				assetTexture = data.AssetXXHDPI;
+			
+			if (size == ImageSize.XHDPI)
+				assetTexture = data.AssetXHDPI;
+			
+			if (size == ImageSize.HDPI)
+				assetTexture = data.AssetHDPI;
+			
+			if (size == ImageSize.MDPI)
+				assetTexture = data.AssetMDPI;
+			
+			if (size == ImageSize.LDPI)
+				assetTexture = data.AssetLDPI;
+
+			
+			var newAsset = (Texture2D) EditorGUI.ObjectField(
+				textureRect,
+				assetTexture,
+				typeof(Texture2D),
+				false);
+			
+			// ---
+
+			bool updatePreviewTexture = (newId != data.Id || newType != data.Type || newAsset != data.Asset);
+			if (updatePreviewTexture)
+			{
+				Undo.RegisterCompleteObjectUndo(target, "Update icon data.");
+				data.Id = newId;
+				data.Type = newType;
+				data.Asset = newAsset;
+
+				if (size == ImageSize.XXHDPI)
+					data.AssetXXHDPI = newAsset;
+			
+				if (size == ImageSize.XHDPI)
+					data.AssetXHDPI = newAsset;
+			
+				if (size == ImageSize.HDPI)
+					data.AssetHDPI = newAsset;
+			
+				if (size == ImageSize.MDPI)
+					data.AssetMDPI = newAsset;
+			
+				if (size == ImageSize.LDPI)
+					data.AssetLDPI = newAsset;
+				
+				data.previewTexture = data.GetPreviewTexture(updatePreviewTexture);
+
+				data.Clean();
+				data.Verify();
+			}
+			
+			// TODO Allocates a lot of memory for some reason, cache.
+
+			
+			if (data.Asset != null && !data.Verify())
+			{
+				EditorGUI.HelpBox(
+					errorBoxRect,
+					"Specified texture can't be used because: \n" + (errorMsgWidth > 145
+						? DrawableResourceData.GenerateErrorString(data.Errors)
+						: "...expand to see more..."),
+					MessageType.Error
+				);
+
+				if (data.Type == NotificationIconType.SmallIcon)
+				{
+					GUIStyle helpBoxMessageTextStyle = new GUIStyle(GUI.skin.label);
+					helpBoxMessageTextStyle.fontSize = 8;
+					helpBoxMessageTextStyle.wordWrap = true;
+					helpBoxMessageTextStyle.alignment = TextAnchor.MiddleCenter;
+					GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", helpBoxMessageTextStyle);
+				}
+			}
+			else
+			{
+				if (data.previewTexture != null)
+				{
+
+					GUIStyle previewLabelTextStyle = new GUIStyle(GUI.skin.label);
+					previewLabelTextStyle.fontSize = 8;
+					previewLabelTextStyle.wordWrap = true;
+					previewLabelTextStyle.alignment = TextAnchor.UpperCenter;
+
+					EditorGUI.LabelField(previewTextureRect, "Preview", previewLabelTextStyle);
+
+					Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
+					previewTextureRectPadded.y += 8;
+
+					data.previewTexture.alphaIsTransparency = false;
+					GUI.DrawTexture(previewTextureRectPadded, data.previewTexture);
+				}
+			}
+		}
 		
 		void DrawIconDataElement(Rect rect, int index, bool selected, bool focused)
 		{
@@ -195,16 +313,55 @@ namespace Unity.Notifications
 				Rect previewTextureRect = new Rect(elementContentRect.width - (assetPropWidth - kIconSpacing * 5),
 						elementContentRect.y - 6, assetPropWidth, slotHeight);
 				
-				Rect textureRect = 
-					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
-						elementContentRect.y, assetPropWidth, slotHeight);
+							
+				var data = GetElementData(index);
+
+				var showOtherSizes = EditorGUI.Foldout(
+					new Rect(elementContentRect.x - 20, elementContentRect.y, idPropWidth, 20),
+					data.showOtherSizes, " ");
 
 				
-				Rect errorBoxRect =  GetContentRect(
-					new Rect(elementContentRect.x,
-						elementContentRect.y + kSlotSize, errorMsgWidth, slotHeight), 
-					4f, 4f);
+//				Rect textureRect = 
+//					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
+//						elementContentRect.y, assetPropWidth, slotHeight);
+//				
+//				Rect textureRectXXHDPI = 
+//					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
+//						elementContentRect.y + kIconSpacing * 1 + slotHeight * 1, assetPropWidth, slotHeight);
+//				
+//				Rect textureRectXHDPI = 
+//					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
+//						elementContentRect.y + kIconSpacing * 2 + slotHeight * 2, assetPropWidth, slotHeight);
+//				
+//				Rect textureRectHDPI = 
+//					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
+//						elementContentRect.y + kIconSpacing * 3 + slotHeight * 3, assetPropWidth, slotHeight);
+//				
+//				Rect textureRectMDPI = 
+//					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
+//						elementContentRect.y + kIconSpacing * 4 + slotHeight * 4, assetPropWidth, slotHeight);
+//				
+//				Rect textureRectLDPI = 
+//					new Rect(elementContentRect.width - (assetPropWidth * 2 - kIconSpacing * 5),
+//						elementContentRect.y + kIconSpacing * 5 + slotHeight * 5, assetPropWidth, slotHeight);
+
+				Rect errorBoxRect;
 				
+				if (!showOtherSizes)
+				{
+					errorBoxRect = GetContentRect(
+						new Rect(elementContentRect.x,
+							elementContentRect.y + kSlotSize, errorMsgWidth, slotHeight),
+						4f, 4f);
+				}
+				else
+				{
+					errorBoxRect = GetContentRect(
+						new Rect(elementContentRect.x,
+							elementContentRect.y + kSlotSize, errorMsgWidth - (assetPropWidth * 2 + kIconSpacing), slotHeight + assetPropWidth),
+						4f, 4f);
+				}
+
 				EditorGUI.LabelField(
 					new Rect(elementContentRect.x, elementContentRect.y, idPropWidth, 20),
 					"Identifier"
@@ -217,8 +374,6 @@ namespace Unity.Notifications
 								
 				EditorGUI.BeginChangeCheck();
 							
-				var data = GetElementData(index);
-
 				var newId =  EditorGUI.TextField(
 					new Rect(elementContentRect.x + kSlotSize, elementContentRect.y, idPropWidth, 20),
 					data.Id);
@@ -228,65 +383,62 @@ namespace Unity.Notifications
 					(NotificationIconType) (int)data.Type
 				);
 
-				var newAsset = (Texture2D) EditorGUI.ObjectField(
-					textureRect,
-					data.Asset,
-					typeof(Texture2D),
-					false);
 
-				bool updatePreviewTexture = (newId != data.Id || newType != data.Type || newAsset != data.Asset);
-				
-				if (updatePreviewTexture)
+
+				var newAssetXXHDPI = data.AssetXXHDPI;
+				var newAssetXHDPI = data.AssetXHDPI;
+				var newAssetHDPI = data.AssetHDPI;
+				var newAssetMDPI = data.AssetMDPI;
+				var newAssetLDPI = data.AssetLDPI;
+					
+				DrawIconTextureSlot(elementRect, 0, data, ImageSize.XXHDPI, newType, newId, target);
+				if (showOtherSizes)
 				{
-					Undo.RegisterCompleteObjectUndo(target, "Update icon data.");
-					data.Id = newId;
-					data.Type = newType;
-					data.Asset = newAsset;
-					data.Clean();
-					data.Verify();
+					DrawIconTextureSlot(elementRect, 1, data, ImageSize.LDPI, newType, newId, target);
+					DrawIconTextureSlot(elementRect, 2, data, ImageSize.MDPI, newType, newId, target);
+					DrawIconTextureSlot(elementRect, 3, data, ImageSize.HDPI, newType, newId, target);
+					DrawIconTextureSlot(elementRect, 4, data, ImageSize.XHDPI, newType, newId, target);
+					DrawIconTextureSlot(elementRect, 5, data, ImageSize.XXHDPI, newType, newId, target);
 				}
 
-				Texture2D previewTexture = data.GetPreviewTexture(updatePreviewTexture);
 
-				
-				if (data.Asset != null && !data.Verify())
-				{
-					EditorGUI.HelpBox(
-						errorBoxRect,
-						"Specified texture can't be used because: \n" + (errorMsgWidth > 145
-							? DrawableResourceData.GenerateErrorString(data.Errors)
-							: "...expand to see more..."),
-						MessageType.Error
-					);
 
-					if (data.Type == NotificationIconType.SmallIcon)
-					{
-						GUIStyle helpBoxMessageTextStyle = new GUIStyle(GUI.skin.label);
-						helpBoxMessageTextStyle.fontSize = 8;
-						helpBoxMessageTextStyle.wordWrap = true;
-						helpBoxMessageTextStyle.alignment = TextAnchor.MiddleCenter;
-						GUI.Box(previewTextureRect, "Preview not available. \n Make sure fthe texture is readable!", helpBoxMessageTextStyle);
-					}
-				}
-				else
-				{
-					if (previewTexture != null)
-					{
 
-						GUIStyle previewLabelTextStyle = new GUIStyle(GUI.skin.label);
-						previewLabelTextStyle.fontSize = 8;
-						previewLabelTextStyle.wordWrap = true;
-						previewLabelTextStyle.alignment = TextAnchor.UpperCenter;
+//				if (showOtherSizes)
+//				{
+//					newAssetXXHDPI = (Texture2D) EditorGUI.ObjectField(
+//						textureRectXXHDPI,
+//						data.AssetXXHDPI,
+//						typeof(Texture2D),
+//						false);
+//
+//					newAssetXHDPI = (Texture2D) EditorGUI.ObjectField(
+//						textureRectXHDPI,
+//						data.AssetXHDPI,
+//						typeof(Texture2D),
+//						false);
+//
+//					newAssetHDPI = (Texture2D) EditorGUI.ObjectField(
+//						textureRectHDPI,
+//						data.AssetHDPI,
+//						typeof(Texture2D),
+//						false);
+//
+//					newAssetMDPI = (Texture2D) EditorGUI.ObjectField(
+//						textureRectMDPI,
+//						data.AssetMDPI,
+//						typeof(Texture2D),
+//						false);
+//
+//					newAssetLDPI = (Texture2D) EditorGUI.ObjectField(
+//						textureRectLDPI,
+//						data.AssetLDPI,
+//						typeof(Texture2D),
+//						false);
+//				}
 
-						EditorGUI.LabelField(previewTextureRect, "Preview", previewLabelTextStyle);
+				data.showOtherSizes = showOtherSizes;
 
-						Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
-						previewTextureRectPadded.y += 8;
-
-						previewTexture.alphaIsTransparency = false;
-						GUI.DrawTexture(previewTextureRectPadded, previewTexture);
-					}
-				}
 								
 			}
 		}
@@ -395,9 +547,7 @@ namespace Unity.Notifications
 				var settings = manager.AndroidNotificationEditorSettings;
 				if (settings == null)
 					return;
-				
-				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
-				
+								
 				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
 				styleToggle.alignment = TextAnchor.MiddleRight;
 			
@@ -420,13 +570,11 @@ namespace Unity.Notifications
 			}
 			else
 			{
-				var settingsPanelRect = bodyRect;//GetContentRect(rect, kPadding, kPadding);
+				var settingsPanelRect = bodyRect;
 
 				var settings = manager.iOSNotificationEditorSettings;
 				if (settings == null)
 					return;
-
-				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
 
 				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
 				styleToggle.alignment = TextAnchor.MiddleRight;
@@ -482,9 +630,27 @@ namespace Unity.Notifications
 				
 				if (setting.dependentSettings != null)
 				{
-					layer++;
-					DrawSettingsElementList(target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
+					var childLayer = layer;
+					childLayer++;
+					DrawSettingsElementList(target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, childLayer);
 				}
+
+				if (setting.requiredSettings != null && !disabled)
+				{
+					if ((bool)setting.val)
+					{
+						foreach (var requiredSettingKey in setting.requiredSettings)
+						{
+							var requiredSetting = manager.iOSNotificationEditorSettings.Find(s => s.key == requiredSettingKey);
+							if (requiredSetting != null)
+							{
+								requiredSetting.val = setting.val;
+								manager.SaveSetting(requiredSetting, target);
+							}
+						}
+					}
+				}
+				
 				manager.SaveSetting(setting, target);
 			}
 		}

@@ -63,16 +63,17 @@ test:
 
 publish:
   stage: publish
-  tags:
-  - darwin
+  image: package-ci/ubuntu:stable
   only:
+  - master
   - tags
+  tags:
+  - bokken-job
   before_script:
   - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
   - cd com.unity.mobile.notifications
   - ./publish_package.sh
-  after_script:
-  - /opt/post_build_script.sh    
-
-  
+  artifacts:
+    paths:
+    - com.unity.mobile.notifications/upm-ci~/packages/*

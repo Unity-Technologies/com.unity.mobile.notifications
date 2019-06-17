@@ -489,7 +489,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
-            if (color >= 0)
+            if (color != 0)
             {
                 notificationBuilder.setColor(color);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

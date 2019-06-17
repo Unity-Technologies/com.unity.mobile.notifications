@@ -7,13 +7,18 @@ using UnityEngine.TestTools;
 
 using Unity.Notifications;
 
-namespace Tests
+namespace Unity.Notifications.Tests
 {
-#if PLATFORM_ANDROID && UNITY_EDITOR
     public class PostprocessorTests
     {
+        [Test]
+        public void DummmyTest()
+        {
+            Assert.AreEqual(true, true);
+        }
         
-                
+
+#if PLATFORM_ANDROID && UNITY_EDITOR                
         [Test]
         public void AppendMetadataToManifest_WhenSameValue_Works()
         {
@@ -422,11 +427,6 @@ namespace Tests
             Assert.AreEqual(targetXmlDoc.InnerXml, doc.InnerXml);
           
         }
-
-    }
-  
 #endif
+    }
 }
-
-
-//    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>

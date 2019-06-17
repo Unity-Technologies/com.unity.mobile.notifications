@@ -102,8 +102,21 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
                                  };
 
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
-    content.title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments:nil];
-    content.body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments:nil];
+    
+    NSString *title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments:nil];
+    NSString *body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments:nil];
+    
+    // iOS 10 does not show notifications with an empty body or title fields. Since this works fine on iOS 11+ we'll add assign a string
+    // with a space to maintain consistent behaviour.
+    if (!@available(iOS 11.0, *)) {
+        if (title.length == 0)
+            title = @" ";
+        if (body.length == 0)
+            body = @" ";
+    }
+    
+    content.title = title;
+    content.body = body;
     
     content.userInfo = userInfo;
     
