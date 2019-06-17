@@ -16,15 +16,15 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The user has not yet made a choice regarding whether the application may post notifications.
         /// </summary>
-        AuthorizationStatusNotDetermined = 0,
+        NotDetermined = 0,
         /// <summary>
         /// The application is not authorized to post notifications.
         /// </summary>
-        AuthorizationStatusDenied,
+        Denied,
         /// <summary>
         /// The application is authorized to post notifications.
         /// </summary>
-        AuthorizationStatusAuthorized
+        Authorized
     }
     
     /// <summary>
@@ -35,15 +35,15 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// No alert.
         /// </summary>
-        AlertStyleNone = 0,
+        None = 0,
         /// <summary>
         /// Banner alerts.
         /// </summary>
-        AlertStyleBanner = 1,
+        Banner = 1,
         /// <summary>
         /// Modal alerts.
         /// </summary>
-        AlertStyleAlert = 2,
+        Alert = 2,
     }
 
     /// <summary>
@@ -54,15 +54,15 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The notification's content is always shown, even when the device is locked.
         /// </summary>
-        ShowPreviewsSettingAlways = 0,
+        Always = 0,
         /// <summary>
         /// The notification's content is shown only when the device is unlocked.
         /// </summary>
-        ShowPreviewsSettingWhenAuthenticated = 1,
+        WhenAuthenticated = 1,
         /// <summary>
         /// The notification's content is never shown, even when the device is unlocked
         /// </summary>
-        ShowPreviewsSettingNever = 2,
+        Never = 2,
     }
 
     /// <summary>
@@ -73,17 +73,17 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The app does not support this notification setting.
         /// </summary>
-        NotificationSettingNotSupported  = 0,
+        NotSupported  = 0,
         
         /// <summary>
         /// The notification setting is turned off.
         /// </summary>
-        NotificationSettingDisabled,
+        Disabled,
         
         /// <summary>
         /// The notification setting is turned on.
         /// </summary>
-        NotificationSettingEnabled,
+        Enabled,
     }
 
     /// <summary>
@@ -95,22 +95,22 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The ability to update the app’s badge.
         /// </summary>
-        AuthorizationOptionBadge   = (1 << 0),
+        Badge   = (1 << 0),
         
         /// <summary>
         /// The ability to play sounds.
         /// </summary>
-        AuthorizationOptionSound   = (1 << 1),
+        Sound   = (1 << 1),
         
         /// <summary>
         /// The ability to display alerts.
         /// </summary>
-        AuthorizationOptionAlert   = (1 << 2),
+        Alert   = (1 << 2),
         
         /// <summary>
         /// The ability to display notifications in a CarPlay environment.
         /// </summary>
-        AuthorizationOptionCarPlay = (1 << 3),
+        CarPlay = (1 << 3),
     }
     /// <summary>
     /// Constants indicating how to present a notification in a foreground app
@@ -118,22 +118,22 @@ namespace Unity.Notifications.iOS
     [Flags]
     public enum PresentationOption
     {
-        NotificationPresentationOptionNone  = 0,
+        None  = 0,
         
         /// <summary>
         /// Apply the notification's badge value to the app’s icon.
         /// </summary>
-        NotificationPresentationOptionBadge = 1 << 0,
+        Badge = 1 << 0,
         
         /// <summary>
         /// Play the sound associated with the notification.
         /// </summary>
-        NotificationPresentationOptionSound = 1 << 1,
+        Sound = 1 << 1,
         
         /// <summary>
         /// Display the alert using the content provided by the notification.
         /// </summary>
-        NotificationPresentationOptionAlert = 1 << 2,
+        Alert = 1 << 2,
     }
 
     internal enum NotificationTriggerType
@@ -206,11 +206,11 @@ namespace Unity.Notifications.iOS
             
         
         /// <summary>
-        /// When the value is set to AuthorizationStatusAuthorized your app is allowed to schedule and receive local and remote notifications.
+        /// When the value is set to Authorized your app is allowed to schedule and receive local and remote notifications.
         /// </summary>
         /// <remarks>
         /// When authorized, use the alertSetting, badgeSetting, and soundSetting properties to specify which types of interactions are allowed.
-        /// When the value is AuthorizationStatusDenied, the system doesn't deliver notifications to your app, and the system ignores any attempts to schedule local notifications.
+        /// When the value is Denied, the system doesn't deliver notifications to your app, and the system ignores any attempts to schedule local notifications.
         /// </remarks>
         public AuthorizationStatus AuthorizationStatus
         {
@@ -527,8 +527,8 @@ namespace Unity.Notifications.iOS
             
             data.data = "";
             data.showInForeground = false;
-            data.showInForegroundPresentationOptions = (int) (PresentationOption.NotificationPresentationOptionAlert |
-                                                         PresentationOption.NotificationPresentationOptionSound);
+            data.showInForegroundPresentationOptions = (int) (PresentationOption.Alert |
+                                                         PresentationOption.Sound);
 
             data.triggerType = -1;
             data.repeats = false;
@@ -693,7 +693,7 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     /// <example>
     /// <code>
-    /// using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
+    /// using (var req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
     /// {
     ///     while (!req.IsFinished)
     ///     {
