@@ -855,9 +855,9 @@ namespace Unity.Notifications.iOS
         /// Use this to retrieve the last local or remote notification received by the app. 
         /// </summary>
         /// <returns>
-        /// Returns the local or remote notification last received by the app or uswed to open it. If not notification is available it returns null.
+        /// Returns the last local or remote notification used to open the app or clicked on by the user. If no notification is available it returns null.
         /// </returns>
-        public static iOSNotification GetLastNotification()
+        public static iOSNotification GetLastRespondedNotification()
         {
             var data = iOSNotificationsWrapper.GetLastNotificationData();
 
