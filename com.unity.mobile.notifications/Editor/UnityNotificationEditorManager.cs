@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
@@ -120,8 +121,9 @@ namespace Unity.Notifications
         public bool writeToPlist;
 
         public List<NotificationEditorSetting> dependentSettings;
+        public List<string> requiredSettings;
         
-        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist  = true, List<NotificationEditorSetting> dependentSettings = null)
+        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist  = true, List<NotificationEditorSetting> dependentSettings = null, List<string> requiredSettings = null)
         {
             this.key = key;
             this.label = label;
@@ -129,6 +131,7 @@ namespace Unity.Notifications
             this.val = val;
             this.writeToPlist = writeToPlist;
             this.dependentSettings = dependentSettings;
+            this.requiredSettings = requiredSettings;
         }
     }
     
@@ -381,18 +384,17 @@ namespace Unity.Notifications
                                 "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
                                 notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
                                     "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false),
-
-                                dependentSettings: new List<NotificationEditorSetting>()
-                                {
-                                    new NotificationEditorSetting(
+                                requiredSettings: new List<string>(){"UnityNotificationRequestAuthorizationOnAppLaunch"}
+                            ),
+                            new NotificationEditorSetting(
+                                "UnityRemoteNotificationForegroundPresentationOptions",
+                                "Remote Notification Foreground Presentation Options",
+                                "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorisation to use them (the user might change it at any time). ",
+                                notificationEditorManager
+                                    .GetiOSNotificationEditorSettingsValue<PresentationOption>(
                                         "UnityRemoteNotificationForegroundPresentationOptions",
-                                        "Remote Notification Foreground Presentation Options",
-                                        "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorisation to use them (the user might change it at any time). ",
-                                        notificationEditorManager
-                                            .GetiOSNotificationEditorSettingsValue<PresentationOption>(
-                                                "UnityRemoteNotificationForegroundPresentationOptions",
-                                                (PresentationOption) PresentationOptionEditor.All)),
-                                }),
+                                        (PresentationOption) PresentationOptionEditor.All)
+                            ),
                             new NotificationEditorSetting("UnityAPSReleaseEnvironment",
                                 "Enable release environment for APS",
                                 "Enable this when signing the app with a production certificate.",
@@ -579,7 +581,7 @@ namespace Unity.Notifications
                 texture.Apply();
             }
             return texture;
-        }
+          }
         
         public static Texture2D ScaleTexture(Texture2D sourceTexture, int width, int height)
         {

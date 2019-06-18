@@ -395,9 +395,7 @@ namespace Unity.Notifications
 				var settings = manager.AndroidNotificationEditorSettings;
 				if (settings == null)
 					return;
-				
-				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
-				
+								
 				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
 				styleToggle.alignment = TextAnchor.MiddleRight;
 			
@@ -420,13 +418,11 @@ namespace Unity.Notifications
 			}
 			else
 			{
-				var settingsPanelRect = bodyRect;//GetContentRect(rect, kPadding, kPadding);
+				var settingsPanelRect = bodyRect;
 
 				var settings = manager.iOSNotificationEditorSettings;
 				if (settings == null)
 					return;
-
-				var settingsFlat = settings.Where(s => s is NotificationEditorSetting).Cast<NotificationEditorSetting>().ToList();
 
 				var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
 				styleToggle.alignment = TextAnchor.MiddleRight;
@@ -482,9 +478,27 @@ namespace Unity.Notifications
 				
 				if (setting.dependentSettings != null)
 				{
-					layer++;
-					DrawSettingsElementList(target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, layer);
+					var childLayer = layer;
+					childLayer++;
+					DrawSettingsElementList(target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, childLayer);
 				}
+
+				if (setting.requiredSettings != null)
+				{
+					if ((bool)setting.val)
+					{
+						foreach (var requiredSettingKey in setting.requiredSettings)
+						{
+							var requiredSetting = manager.iOSNotificationEditorSettings.Find(s => s.key == requiredSettingKey);
+							if (requiredSetting != null)
+							{
+								requiredSetting.val = setting.val;
+								manager.SaveSetting(requiredSetting, target);
+							}
+						}
+					}
+				}
+				
 				manager.SaveSetting(setting, target);
 			}
 		}

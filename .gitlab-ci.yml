@@ -63,16 +63,11 @@ test:
 
 publish:
   stage: publish
-  tags:
-  - darwin
+  image: package-ci/win10:stable
   only:
+  - master
   - tags
-  before_script:
-  - ./com.unity.mobile.notifications/prepare_upm-ci.sh
   script:
-  - cd com.unity.mobile.notifications
-  - ./publish_package.sh
-  after_script:
-  - /opt/post_build_script.sh    
-
+    - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - upm-ci package publish
   
