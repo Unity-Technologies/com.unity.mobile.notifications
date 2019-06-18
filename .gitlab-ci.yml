@@ -63,7 +63,7 @@ test:
 
 publish:
   stage: publish
-  image: package-ci/win10:stable
+  image: slough-ops/win-bokken-ci:stable
   only:
   - master
   - tags
