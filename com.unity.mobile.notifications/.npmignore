@@ -27,3 +27,6 @@ test_package.sh.meta
 test_package_local.sh
 test_package_local.sh.meta
 TestRunnerOptions.json
+
+publish_package.bat
+publish_package.bat.meta
