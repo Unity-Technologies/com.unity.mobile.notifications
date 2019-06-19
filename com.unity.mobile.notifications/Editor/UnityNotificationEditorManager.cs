@@ -513,10 +513,7 @@ namespace Unity.Notifications
             var isLargeEnough = texture.width >= minSize;
             var hasAlpha = true;// texture.format == TextureFormat.Alpha8;
 
-            string assetPath = AssetDatabase.GetAssetPath( texture );
-            var importer = AssetImporter.GetAtPath( assetPath ) as TextureImporter;
-
-            var isReadable = importer != null && importer.isReadable;
+            var isReadable = texture.isReadable;
                 
             if (!isReadable)
             {
