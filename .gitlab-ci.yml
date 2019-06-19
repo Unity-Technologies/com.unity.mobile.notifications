@@ -69,6 +69,9 @@ publish:
   - tags
   tags:
   - bokken-job
+  before_script:
+  - npm install upm-ci-utils@stable --registry https://api.bintray.com/npm/unity/unity-npm
+  - echo "installed upm-ci"
   script:
   - cd com.unity.mobile.notifications
   - publish_package.bat
