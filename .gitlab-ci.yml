@@ -71,7 +71,7 @@ publish:
   - bokken-job
   script:
   - cd com.unity.mobile.notifications
-  - ./publish_package.sh
+  - publish_package.bat
   artifacts:
     paths:
     - com.unity.mobile.notifications/upm-ci~/packages/*
