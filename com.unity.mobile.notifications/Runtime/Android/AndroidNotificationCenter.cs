@@ -7,6 +7,7 @@ using UnityEngine;
 
 #pragma warning disable 162, 67, 414
 
+
 namespace Unity.Notifications.Android
 {
     /// <summary>
@@ -245,7 +246,7 @@ namespace Unity.Notifications.Android
         {
             get
             {
-                if (color < 0)
+                if (color == 0)
                     return null;
 
                 int a = (color >> 24) & 0xff;
@@ -258,7 +259,7 @@ namespace Unity.Notifications.Android
             set
             {
                 if (value == null)
-                    color = -1;
+                    color = 0;
                 else
                 {
                     var color32 = (Color32) value.Value;
@@ -387,7 +388,7 @@ namespace Unity.Notifications.Android
             shouldAutoCancel = false;
             largeIcon = "";
             style = (int) NotificationStyle.None;
-            color = -1;
+            color = 0;
             number = -1;
             usesStopwatch = false;
             intentData = "";            
@@ -923,7 +924,7 @@ namespace Unity.Notifications.Android
             notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
             notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
             notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
-            notification.color = notificationIntent.Call<int>("getIntExtra", "color", -1);
+            notification.color = notificationIntent.Call<int>("getIntExtra", "color", 0);
             notification.number = notificationIntent.Call<int>("getIntExtra", "number", -1);
             notification.intentData = notificationIntent.Call<string>("getStringExtra", "data");
             notification.group = notificationIntent.Call<string>("getStringExtra", "group");
