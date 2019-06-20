@@ -29,9 +29,9 @@ export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
 ls $ANDROID_HOME
 
 printf "\n Install Android Build Tool and Libraries: \n" && \
-.$ANDROID_HOME/tools/bin/sdkmanager --update --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128 >/dev/null
+sdkmanager --update --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128 >/dev/null
 
-.$ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     "platforms;android-${ANDROID_VERSION}" \
     "platform-tools" \
     --proxy=http \
