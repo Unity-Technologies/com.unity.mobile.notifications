@@ -8,11 +8,11 @@ export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
 
 # printf "\n Download Android SDK: \n"
 
-#mkdir "$ANDROID_HOME"  \
- #   && cd "$ANDROID_HOME" \
-  #  && curl -o sdk.zip $SDK_URL \
-   # && unzip sdk.zip \
-    #&& rm sdk.zip
+mkdir "$ANDROID_HOME"  \
+   && cd "$ANDROID_HOME" \
+   && curl -o sdk.zip $SDK_URL \
+   && unzip sdk.zip \
+    && rm sdk.zip
     
 # printf "\n SDK Manager license: \n"
 
