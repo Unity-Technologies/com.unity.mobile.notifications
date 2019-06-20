@@ -11,8 +11,8 @@ pack:
   name: Pack
   agent:
     type: Unity::VM
-    image: buildfarm/mac:stable
-    flavor: m1.mac
+    image: package-ci/ubuntu:stable
+    flavor: b1.large
   commands:
     - export SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" 
     - export ANDROID_HOME="$CI_PROJECT_DIR/package/android-sdk" 
