@@ -17,7 +17,7 @@ pack:
   variables:
     CI_PROJECT_DIR: "$HOME"
     SDK_URL: "https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" 
-    ANDROID_HOME: "~/android-sdk"
+    ANDROID_HOME: "/usr/lib/android-sdk"
     ANDROID_VERSION: 26 
     ANDROID_BUILD_TOOLS_VERSION: 26.0.2
   commands:
