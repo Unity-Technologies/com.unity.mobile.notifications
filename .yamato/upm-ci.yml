@@ -16,7 +16,7 @@ pack:
 
   variables:
     SDK_URL: "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" 
-    ANDROID_HOME: ~/android-sdk
+    ANDROID_HOME: /home/bokken/android-sdk
     ANDROID_VERSION: 26 
     ANDROID_BUILD_TOOLS_VERSION: 26.0.2
   commands:
