@@ -98,8 +98,7 @@ publish:
   artifacts:
     artifacts:
       paths:
-        - "*/upm-ci~/packages/*.tgz"
-        - "com.unity.mobile.notifications/upm-ci~/packages/*.tgz"
+        - "upm-ci~/packages/*.tgz"
   dependencies:
     - .yamato/upm-ci.yml#pack
     {% for editor in test_editors %}
