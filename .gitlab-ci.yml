@@ -63,7 +63,7 @@ test:
 
 publish:
   stage: publish
-  image: package-ci/win10:stable
+  image: package-ci/ubuntu:stable
   only:
   - master
   - tags
@@ -74,7 +74,7 @@ publish:
   - echo "installed upm-ci"
   script:
   - cd com.unity.mobile.notifications
-  - publish_package.bat
+  - ./publish_package.sh
   artifacts:
     paths:
     - com.unity.mobile.notifications/upm-ci~/packages/*
