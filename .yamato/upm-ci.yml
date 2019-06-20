@@ -28,6 +28,7 @@ pack:
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
     - ls
     - upm-ci package pack --package-path com.unity.mobile.notifications
+    - find .
   artifacts:
     packages:
        paths:
