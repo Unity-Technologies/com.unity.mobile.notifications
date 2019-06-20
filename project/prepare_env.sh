@@ -17,7 +17,7 @@ mkdir "$ANDROID_HOME" .android \
     
 printf "\n SDK Manager license: \n"
 
-/usr/bin/expect -c '
+./usr/bin/expect -c '
 set timeout -1;
 spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128;
   expect {
