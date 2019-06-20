@@ -14,18 +14,16 @@ mkdir "$ANDROID_HOME"  \
    && unzip sdk.zip \
     && rm sdk.zip
     
-# printf "\n SDK Manager license: \n"
+expect -c '
+set timeout -1;
+spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128;
+   expect {
+     "y/N" { exp_send "y\r" ; exp_continue }
+     eof
+   }
+'
 
-# ./usr/bin/expect -c '
-# set timeout -1;
-# spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128;
-#   expect {
-#     "y/N" { exp_send "y\r" ; exp_continue }
-#     eof
-#   }
-# '
-
-echo yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+#echo yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 printf "\n Install Android Build Tool and Libraries: \n" && \
 $ANDROID_HOME/tools/bin/sdkmanager --update >/dev/null
