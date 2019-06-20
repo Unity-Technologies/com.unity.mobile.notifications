@@ -2,7 +2,7 @@
 set -xeuo pipefail
 
 export SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" 
-export ANDROID_HOME=~/android-sdk
+export ANDROID_HOME=/home/bokken/android-sdk
 export ANDROID_VERSION="26" 
 export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
 
