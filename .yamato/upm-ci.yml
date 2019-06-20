@@ -14,6 +14,10 @@ pack:
     image: package-ci/ubuntu:stable
     flavor: b1.large
   commands:
+    - export SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" 
+    - export ANDROID_HOME="$CI_PROJECT_DIR/package/android-sdk" 
+    - export ANDROID_VERSION="26" 
+    - export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
     - ./project/prepare_env.sh
     - ./project/build_package.sh
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
