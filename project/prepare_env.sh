@@ -23,6 +23,15 @@ spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_h
    }
 '
 
+expect -c '
+set timeout -1;
+spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses;
+   expect {
+     "y/N" { exp_send "y\r" ; exp_continue }
+     eof
+   }
+'
+
 #echo yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 printf "\n Install Android Build Tool and Libraries: \n" && \
