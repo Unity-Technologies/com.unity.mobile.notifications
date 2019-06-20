@@ -21,6 +21,7 @@ pack:
     ANDROID_VERSION: 26 
     ANDROID_BUILD_TOOLS_VERSION: 26.0.2
   commands:
+    - sudo apt-get install openjdk-8-jdk
     - ./project/prepare_env.sh
     - ./project/build_package.sh
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
