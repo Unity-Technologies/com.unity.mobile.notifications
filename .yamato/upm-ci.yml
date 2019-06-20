@@ -30,7 +30,8 @@ pack:
     - upm-ci package pack --package-path com.unity.mobile.notifications
   artifacts:
     packages:
-      paths:
+       paths:
+        - "upm-ci~/**/*"
         - com.unity.mobile.notifications/upm-ci~/packages/*
         - "*/upm-ci~/packages/*"
         
