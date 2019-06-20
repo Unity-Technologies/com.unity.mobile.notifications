@@ -17,14 +17,16 @@ export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
     
 # printf "\n SDK Manager license: \n"
 
-./usr/bin/expect -c '
-set timeout -1;
-spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128;
-  expect {
-    "y/N" { exp_send "y\r" ; exp_continue }
-    eof
-  }
-'
+# ./usr/bin/expect -c '
+# set timeout -1;
+# spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128;
+#   expect {
+#     "y/N" { exp_send "y\r" ; exp_continue }
+#     eof
+#   }
+# '
+
+yes | .$ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 ls $ANDROID_HOME
 ls $ANDROID_HOME/tools
