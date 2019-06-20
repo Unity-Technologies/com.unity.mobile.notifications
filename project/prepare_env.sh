@@ -3,6 +3,11 @@ set -xeuo pipefail
 
 mkdir package
 
+export SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" 
+export ANDROID_HOME="$CI_PROJECT_DIR/package/android-sdk" 
+export ANDROID_VERSION="26" 
+export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
+
 printf "\n Download Android SDK: \n"
 mkdir "$ANDROID_HOME" .android \
     && cd "$ANDROID_HOME" \
