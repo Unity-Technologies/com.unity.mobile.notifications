@@ -27,6 +27,7 @@ pack:
     packages:
       paths:
         - "upm-ci~/**/*"
+        - com.unity.mobile.notifications/upm-ci~/packages/*
 
 # {% for editor in test_editors %}
 # {% for platform in test_platforms %}
