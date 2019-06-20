@@ -32,7 +32,8 @@ pack:
     packages:
       paths:
         - com.unity.mobile.notifications/upm-ci~/packages/*
-  
+        - */upm-ci~/packages/*
+        
 {% for editor in test_editors %}
 {% for platform in test_platforms %}
 test_{{ platform.name }}_{{ editor.version }}:
