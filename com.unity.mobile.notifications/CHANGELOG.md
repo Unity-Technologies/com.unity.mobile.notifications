@@ -2,13 +2,18 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.0.0-preview.23] - 2019-05-20
 
+### Fixes:
+
+- [iOS] Querying app notification settings on iOS 10 will no longer cause a crash.
+- [Android] Changing notification icon color now works.
 
 ## [1.0.0-preview.22] - 2019-05-20
 
 ### Fixes:
 
-- [Android] Notification API Java classes are nog longer stripped when building with Proguard enabled.
+- [Android] Notification API Java classes are no longer stripped when building with Proguard enabled.
 
 ## [1.0.0-preview.21] - 2019-04-23
 
