@@ -23,9 +23,11 @@ pack:
     - sudo apt-get --assume-yes update
     - sudo apt-get --assume-yes install openjdk-8-jdk
     - sudo apt-get --assume-yes install expect
+    - ls
     - ./project/prepare_env.sh
     - ./project/build_package.sh
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - ls
     - upm-ci package pack
   artifacts:
     packages:
