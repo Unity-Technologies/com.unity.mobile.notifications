@@ -22,6 +22,7 @@ pack:
     ANDROID_BUILD_TOOLS_VERSION: 26.0.2
   commands:
     - sudo apt-get --assume-yes update
+    - sudo apt-get --assume-yes install openjdk-8-jdk
     - sudo apt-get --assume-yes install android-sdk
     - dpkg -L android-sdk
     - ./project/prepare_env.sh
