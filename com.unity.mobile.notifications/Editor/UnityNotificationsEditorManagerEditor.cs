@@ -635,7 +635,7 @@ namespace Unity.Notifications
 					DrawSettingsElementList(target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, rect, childLayer);
 				}
 
-				if (setting.requiredSettings != null)
+				if (setting.requiredSettings != null && !disabled)
 				{
 					if ((bool)setting.val)
 					{
