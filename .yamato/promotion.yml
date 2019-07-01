@@ -1,5 +1,8 @@
 test_editors:
+  - version: trunk
+  - version: 2019.2
   - version: 2019.1
+  - version: 2018.4
 test_platforms:
   - name: mac
     type: Unity::VM::osx
@@ -53,8 +56,8 @@ promote:
   name: Promote to Production
   agent:
     type: Unity::VM
-    image: package-ci/ubuntu:stable
-    flavor: b1.large
+    image: package-ci/win10:stable
+    flavor: m1.large
   variables:
     UPMCI_PROMOTION: 1
   commands:

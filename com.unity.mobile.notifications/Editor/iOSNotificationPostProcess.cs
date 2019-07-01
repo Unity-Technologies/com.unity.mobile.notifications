@@ -5,7 +5,6 @@ using System.IO;
 using Unity.Notifications;
 using UnityEditor;
 using UnityEditor.Callbacks;
-
 using UnityEngine;
 
 #if PLATFORM_IOS
@@ -62,11 +61,10 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			
 			File.WriteAllText (projPath, proj.WriteToString ());
 
-
 			if (addPushNotificationCapability)
 			{
 				var useReleaseAPSEnvSetting = settings
-					.Find(i => i.key == "UnityAPSReleaseEnvironment");
+					.Find(i => i.key == "UnityUseAPSReleaseEnvironment");
 				var useReleaseAPSEnv = false;
 
 				if (useReleaseAPSEnvSetting != null)
@@ -109,13 +107,13 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			}
 			
 			if (!hasMinOSVersion)
-				Debug.Log("UserNotifications are only available on iOS 10 and above, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
+				Debug.Log("UserNotifications are only available on iOSSettings 10 and above, please make sure that you set a correct `Target minimum iOSSettings Version` in Player Settings.");
 
 			foreach (var setting in settings)
 			{				
 				if (setting.val.GetType() == typeof(bool))
 					rootDict.SetBoolean(setting.key, (bool) setting.val);
-				else if (setting.val.GetType() == typeof(PresentationOption))
+				else if (setting.val.GetType() == typeof(PresentationOption) || setting.val.GetType() == typeof(AuthorizationOption))
 					rootDict.SetInteger(setting.key, (int) setting.val);
 			}
 

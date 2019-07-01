@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Unity.Notifications;
 using UnityEditor;
 using UnityEngine;
-using Unity.Notifications.Android;
+using Unity.Notifications.AndroidSettings;
 
 
 public class UnityNotificationsEditorWindow : EditorWindow

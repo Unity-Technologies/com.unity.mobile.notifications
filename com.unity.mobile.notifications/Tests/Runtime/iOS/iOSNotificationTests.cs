@@ -28,8 +28,8 @@ class iOSNotificationTests
             Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
             Subtitle = "This is a subtitle, something, something important...",
             ShowInForeground = true,
-            ForegroundPresentationOption = (PresentationOption.NotificationPresentationOptionAlert |
-                                            PresentationOption.NotificationPresentationOptionSound),
+            ForegroundPresentationOption = (PresentationOption.Alert |
+                                            PresentationOption.Sound),
             CategoryIdentifier = "category_a",
             ThreadIdentifier = "thread1",
             Trigger = timeTrigger,
@@ -53,7 +53,5 @@ class iOSNotificationTests
         yield return new WaitForSeconds(6.0f);
         Assert.AreEqual(1, receivedNotificationCount);
         receivedNotificationCount = 0;
-    }
-
-  
+    }  
 }

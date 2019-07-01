@@ -8,7 +8,8 @@
     ],
     "includePlatforms": [
         "Android"
-        ],
+    ],
+    "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],

@@ -21,7 +21,7 @@ This package supports the following features:
 
 **Requirements:**
 
-*   Supports Android 4.1 (API 16) and iOS 10 or above.
+*   Supports Android 4.4 (API 19) and iOS 10 or above.
 *   Compatible with Unity 2018.3 or above.  
 
 
@@ -32,7 +32,7 @@ This package supports the following features:
 Every local notification must belong to a notification channel. Notification channels are only supported on Android 8.0 Oreo and above. On older Android versions, this package emulates notification channel behavior. Settings such as priority (`Importance`) set for notification channels apply to individual notifications even on Android versions prior to 8.0.
 
 
-```
+```c#
 var c = new AndroidNotificationChannel()
 {
     Id = "channel_id",
@@ -51,7 +51,7 @@ AndroidNotificationCenter.RegisterNotificationChannel(c);
 This example shows you how to schedule a simple text notification and send it to the notification channel you created in the previous step.
 
 
-```
+```c#
 var notification = new AndroidNotification();
 notification.Title = "SomeTitle";
 notification.Text = "SomeText";
@@ -64,23 +64,23 @@ AndroidNotificationCenter.SendNotification(notification, "channel_id");
 If you don’t specify a custom icon for each notification, the default Unity icon displays in the status bar instead. You can configure notification icons in the **Project Settings **window (menu: **Edit** > **Project Settings** > **Mobile Notification Settings**). Whenever you schedule a notification in your script, use the icon ID you define in the **Mobile Notification Settings** window.
 
 
-```
-notification.Icon = "my_custom_icon_id";
+```c#
+notification.SmallIcon = "my_custom_icon_id";
 ```
 
 
 You can optionally set a large icon which also displays in the notification view. The smaller icon displays as a small badge on top of the large one.
 
 
-```
-notification.LargeIcon = "my_custom_large_icon_id"
+```c#
+notification.LargeIcon = "my_custom_large_icon_id";
 ```
 
 
 Unity assigns a unique identifier to each notification after you schedule it. You can use the identifier to track the notification status or to cancel it. Notification status tracking only works on Android 6.0 Marshmallow and above.
 
 
-```
+```c#
 var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
 ```
 
@@ -88,20 +88,20 @@ var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
 Use the following code example to check if your app has delivered the notification to the device and perform any actions depending on the result.
 
 
-```
-if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Scheduled)
+```c#
+if ( AndroidNotificationCenter.CheckScheduledNotificationStatus(identifier) == NotificationStatus.Scheduled)
 {
-    // Replace the currently scheduled notification with a new notification.
-    UpdateScheduledNotifcation(identifier, newNotification);
+	// Replace the currently scheduled notification with a new notification.
+	AndroidNotificationCenter.UpdateScheduledNotification(identifier, newNotification, channel);
 }
-else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Delivered)
+else if ( AndroidNotificationCenter.CheckScheduledNotificationStatus(identifier) == NotificationStatus.Delivered)
 {
-    //Remove the notification from the status bar
-    CancelNotification(identifier)
+	//Remove the notification from the status bar
+	AndroidNotificationCenter.CancelNotification(identifier);
 }
-else if ( CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unknown)
+else if ( AndroidNotificationCenter.CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unknown)
 {
-    var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
+	AndroidNotificationCenter.SendNotification(newNotification, "channel_id");
 }
 ```
 
@@ -117,7 +117,7 @@ By default, apps remove scheduled notifications when the device restarts. To aut
 You can subscribe to the `AndroidNotificationCenter.OnNotificationReceived` event to receive a callback whenever the device receives a remote notification while your app is running.
 
 
-```
+```c#
 AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
     delegate(AndroidNotificationIntentData data)
     {
@@ -138,26 +138,24 @@ AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
 To store arbitrary string data in a notification object set the `IntentData` property.
 
 
-```
-           var notification = new AndroidNotification();
-            notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
-            AndroidNotificationCenter.SendNotification(notification, "channel_id");
+```c#
+var notification = new AndroidNotification();
+notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
+ AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
 
 If the user opens the app from the notification, you can retrieve it any and any data it has assigned to it like this:
 
 
-```
+```c#
 var notificationIntentData = AndroidNotificationCenter.GetLastNotificationIntent();
 
 if (notificationIntentData != null)
 {
-    var id = notificationIntentData.Id;
-    var channel = notificationIntentData.Channel;
-    var notification = notificationIntentData.Notification;
-
-    return notification.IntentData;
+  var id = notificationIntentData.Id;
+  var channel = notificationIntentData.Channel;
+  var notification = notificationIntentData.Notification;
 }
 ```
 
@@ -178,59 +176,60 @@ Optionally, you can ask the user for permission to only send certain notificatio
 Alternatively, you can enable the **Request Authorization on App Launch **setting in the **Project Settings **window (menu: **Edit** > **Project Settings** > **Mobile Notification Settings**), which makes the app automatically show a permissions request dialog when the user launches the app. Afterwards, you can call this method again to determine the current authorization status. The permissions request dialog won’t display again if the user has already granted or denied authorization.
 
 
-```
-using (var req = new AuthorizationRequest(AuthorizationOption.AuthorizationOptionAlert | AuthorizationOption.AuthorizationOptionBadge, true))
+```c#
+IEnumerator RequestAuthorization()
 {
-    while (!req.IsFinished)
-    {
-        yield return null;
-    };
+  using (var req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
+  {
+  while (!req.IsFinished)
+  {
+  	yield return null;
+  };
 
-    string res = "\n RequestAuthorization: \n";
-    res += "\n finished: " + req.IsFinished;
-    res += "\n granted :  " + req.Granted;
-    res += "\n error:  " + req.Error;
-    res += "\n deviceToken:  " + req.DeviceToken;
-    Debug.Log(res);
+  string res = "\n RequestAuthorization: \n";
+  res += "\n finished: " + req.IsFinished;
+  res += "\n granted :  " + req.Granted;
+  res += "\n error:  " + req.Error;
+  res += "\n deviceToken:  " + req.DeviceToken;
+  Debug.Log(res);
+}
 ```
-
-
-`}` 
 
 **Send a simple notification**
 
 
-```
+```c#
 var timeTrigger = new iOSNotificationTimeIntervalTrigger()
 {
-    TimeInterval = new TimeSpan(0, minutes, seconds),
-    Repeats = false
+TimeInterval = new TimeSpan(0, minutes, seconds),
+Repeats = false
 };
 
 var notification = new iOSNotification()
 {
-    // You can optionally specify a custom Identifier which can later be 
-    // used to cancel the notification, if you don't set one, a unique 
-    // string will be generated automatically.
-    Identifier = "_notification_01",
-    Title = title,
-    Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
-    Subtitle = "This is a subtitle, something, something important...",
-    ShowInForeground = true,
-    ForegroundPresentationOption = (PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionSound),
-    CategoryIdentifier = "category_a",
-    ThreadIdentifier = "thread1",
-    Trigger = timeTrigger,
+  // You can optionally specify a custom identifier which can later be 
+  // used to cancel the notification, if you don't set one, a unique 
+  // string will be generated automatically.
+  Identifier = "_notification_01",
+  Title = "Title",
+  Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
+  Subtitle = "This is a subtitle, something, something important...",
+  ShowInForeground = true,
+  ForegroundPresentationOption = (PresentationOption.Alert | PresentationOption.Sound),
+  CategoryIdentifier = "category_a",
+  ThreadIdentifier = "thread1",
+  Trigger = timeTrigger,
 };
 
 iOSNotificationCenter.ScheduleNotification(notification);
+
 ```
 
 
 The following code example cancels the notification if it doesn’t trigger:
 
 
-```
+```c#
 iOSNotificationCenter.RemoveScheduledNotification(notification.Identifier);
 ```
 
@@ -238,8 +237,8 @@ iOSNotificationCenter.RemoveScheduledNotification(notification.Identifier);
 The following code example removes the notification from the Notification Center if it was already shown to the user:
 
 
-```
-iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier)
+```c#
+iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier);
 ```
 
 
@@ -252,7 +251,7 @@ iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier)
 As well as the time interval trigger, you can use calendar and location triggers. All the fields in `iOSNotificationCalendarTrigger` are optional, but you need to set at least one field for the trigger to work. For example, if you only set the hour and minute fields, the system  automatically triggers the notification on the next specified hour and minute.
 
 
-```
+```c#
 var calendarTrigger = new iOSNotificationCalendarTrigger()
 {
     // Year = 2018,
@@ -271,10 +270,10 @@ You can also create location triggers if you want to schedule the delivery of a 
 In this example, the center coordinate is defined using the WGS 84 system. The app triggers the notification when the user enters an area within a 250 meter radius around the Eiffel Tower in Paris.
 
 
-```
+```c#
 var locationTrigger = new iOSNotificationLocationTrigger()
 {
-    Vector2 Center = new Vector2(2.294498f, 48.858263f),
+    Center = new Vector2(2.294498f, 48.858263f),
     Radius = 250f,
     NotifyOnEntry = true,
     NotifyOnExit = false,
@@ -287,12 +286,12 @@ var locationTrigger = new iOSNotificationLocationTrigger()
 If your app triggers a notification while it’s running, you can perform a custom action instead of showing a notification alert. By default, if your app triggers a local notification while it is in the foreground, the device won’t display an alert for that notification. If you want the notification to behave as though the device isn’t running the app, set the `ShowInForeground` property when you schedule the notification:
 
 
-```
-notification.ShowInForeground = True
+```c#
+notification.ShowInForeground = true;
 
 // In this case you need to specify its 'ForegroundPresentationOption'
+notification.ForegroundPresentationOption = (PresentationOption.Sound |                                                     PresentationOption.Alert);
 
-notification.ForegroundPresentationOption = (PresentationOption.NotificationPresentationOptionSound | PresentationOption.NotificationPresentationOptionAlert)
 ```
 
 
@@ -301,7 +300,7 @@ Alternatively, you can perform another action when the app triggers the notifica
 To modify or hide the content of a remote notification your app receives while its running, subscribe to the `OnRemoteNotificationReceived `event. If you do this, the remote notification won’t display when your app is running. If you still want to show an alert for it, schedule a local notification using the remote notification’s content, like this:
 
 
-```
+```c#
 iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
 {
     // When a remote notification is received, modify its contents and show it
@@ -318,7 +317,7 @@ iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
         Body =  "Remote : " + notification.Body,
         Subtitle =  "Remote: " + notification.Subtitle,
         ShowInForeground = true,
-        ForegroundPresentationOption = PresentationOption.NotificationPresentationOptionSound | PresentationOption.NotificationPresentationOptionAlert | PresentationOption.NotificationPresentationOptionBadge,
+				ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert | PresentationOption.Badge,
         CategoryIdentifier = notification.CategoryIdentifier,
         ThreadIdentifier = notification.ThreadIdentifier,
         Trigger = timeTrigger,
@@ -326,7 +325,6 @@ iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
     iOSNotificationCenter.ScheduleNotification(n);
 
     Debug.Log("Rescheduled remote notifications with id: " + notification.Identifier);
-
 };
 ```
 
@@ -336,8 +334,8 @@ iOSNotificationCenter.OnRemoteNotificationReceived += notification =>
 To store arbitrary string data in a notification object, set the `Data` property:
 
 
-```
-var notification = new iOSNotification()();
+```c#
+var notification = new iOSNotification();
 notification.Data = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
 //..assign other fields..
 iOSNotificationCenter.ScheduleNotification(notification);
@@ -347,8 +345,8 @@ iOSNotificationCenter.ScheduleNotification(notification);
 The following code example shows how to retrieve the last notification the app received:
 
 
-```
-var n = iOSNotificationCenter.GetLastNotification();
+```c#
+var n = iOSNotificationCenter.GetLastRespondedNotification();
 if (n != null)
 {
     var msg = "Last Received Notification : " + n.Identifier + "\n";
@@ -368,12 +366,16 @@ else
 ```
 
 
-If the user opens the app from a notification, `GetLastNotification` also returns that notification. Otherwise, `GetLastNotification` returns null.
+If the user opens the app from a notification, `GetLastRespondedNotification` also returns that notification. Otherwise it returns null.
 
 
 ## FAQ
 
  
+
+**Why are Notifications not delivered on certain Huawei and Xiaomi phones when my app is closed and not running in the background ?**
+
+Seems that Huawei (including Honor) and Xiaomi utilize aggresive batter saver [techniques](https://stackoverflow.com/questions/47145722/how-to-deal-with-huaweis-and-xiaomis-battery-optimizations)  which restrict app background activities unless the app has been whitelisted by the user in device settings. This means that any scheduled notifications will not be delivered if the app is closed or not running in the bacgkround. We are not aware of any way to workaround this behaviour besides encouraging the user to whitelist your app.
 
 **What can I do if notifications with a location trigger don’t work?**
 

@@ -31,8 +31,9 @@
 
 - (void)checkAuthorizationFinished
 {
+    bool requestRejected = self.authorizationRequestFinished && !self.authorized;
     
-    if (self.needRemoteNotifications)
+    if (!requestRejected && self.needRemoteNotifications)
         if (!self.remoteNotificationsRegistered)
             return;
     
@@ -51,6 +52,8 @@
     if ( !SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
+    registerRemote = true;
+    
     self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
@@ -68,16 +71,19 @@
         authData -> deviceToken = "";
         
         self.authData = authData;
-
-        if (granted)
+        self.authorized = granted;
+        if (self.authorized)
         {
-            self.authorizationRequestFinished = YES;
-            self.authorized = YES;
             if (registerRemote)
             {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
+                    self.authorizationRequestFinished = YES;
                 });
+            }
+            else
+            {
+                self.authorizationRequestFinished = YES;
             }
         }
         else
@@ -253,9 +259,23 @@
         notificationData -> triggerType = PUSH_TRIGGER;
     }
     
-    notificationData -> data = (char*) [[request.content.userInfo objectForKey:@"data"] UTF8String];
-
-              
+    if ([[request.content.userInfo valueForKey:@"data"] isKindOfClass:[NSDictionary class]]) {
+        NSDictionary* dataDict = [request.content.userInfo objectForKey:@"data"];
+        NSError *error;
+        NSData *data = [NSJSONSerialization dataWithJSONObject:dataDict
+                                                       options:0
+                                                         error:&error];
+        if (! data) {
+            NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
+        } else {
+            notificationData -> data = (char*) [data bytes];
+        }
+    }
+    else if ([[request.content.userInfo valueForKey:@"data"] isKindOfClass:[NSString class]]) {
+        
+        notificationData -> data = (char*) [[request.content.userInfo objectForKey:@"data"] UTF8String];
+    }
+    
     return notificationData;
 }
 

@@ -210,7 +210,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         /// <remarks>
         /// When authorized, use the alertSetting, badgeSetting, and soundSetting properties to specify which types of interactions are allowed.
-        /// When the value is Denied, the system doesn't deliver notifications to your app, and the system ignores any attempts to schedule local notifications.
+        /// When the `AuthorizationStatus` value is `Denied`, the system doesn't deliver notifications to your app, and the system ignores any attempts to schedule local notifications.
         /// </remarks>
         public AuthorizationStatus AuthorizationStatus
         {
