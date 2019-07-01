@@ -1,5 +1,6 @@
 test_editors:
   - version: 2019.1
+  - version: trunk
 test_platforms:
   - name: mac
     type: Unity::VM::osx
