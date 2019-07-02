@@ -1,15 +1,13 @@
 {
     "name": "Unity.Notifications.Tests",
     "references": [
-        "Unity.Notifications",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Unity.Notifications"
     ],
     "includePlatforms": [
         "Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
