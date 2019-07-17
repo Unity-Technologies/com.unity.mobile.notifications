@@ -9,14 +9,13 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Parcel;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.Keep;
@@ -24,16 +23,10 @@ import android.util.Base64;
 import android.util.Log;
 import android.content.SharedPreferences;
 
-import static android.app.Notification.DEFAULT_VIBRATE;
-import static android.app.Notification.PRIORITY_DEFAULT;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -46,12 +39,11 @@ import java.lang.Integer;
 @Keep
 public class UnityNotificationManager extends BroadcastReceiver
 {
-
-    public Context mContext;
-    public Activity mActivity;
     private static NotificationCallback mNotificationCallback;
-    public static NotificationManager mManager;
+    public static UnityNotificationManager mManager;
 
+    public Context mContext = null;
+    public Activity mActivity = null;
     public boolean reschedule_on_restart = false;
 
     /// Static stuff TODO cleanup
@@ -77,33 +69,19 @@ public class UnityNotificationManager extends BroadcastReceiver
         return 0;
     }
 
-    public static UnityNotificationManager getNotificationManagerImpl(Context context) {
+    public static UnityNotificationManager InitializeNotificationManager(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mManager = new UnityNotificationManagerOreo(context, (Activity) context);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            return new UnityNotificationManagerOreo(context, (Activity) context);
-
-        }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-        {
-            return new UnityNotificationManagerNougat(context, (Activity) context);
-
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mManager = new UnityNotificationManagerNougat(context, (Activity) context);
         }
 
-        return new UnityNotificationManager(context, (Activity) context);
-
+        return mManager;
     }
 
-    public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-        {
-            return new UnityNotificationManager(context, activity);
-        }
-        else
-        {
-            return new UnityNotificationManagerOreo(context, activity);
-        }
+    public static UnityNotificationManager getNotificationManagerImpl() {
+        return mManager;
     }
 
     public static String SerializeNotificationIntent(Intent intent) {
@@ -292,16 +270,23 @@ public class UnityNotificationManager extends BroadcastReceiver
         super();
     }
 
-    public UnityNotificationManager(Context context, Activity activity)
+    public UnityNotificationManager(Context context)
     {
         super();
-        mContext = context;
-        mActivity = activity;
-
         try {
-            ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
+
+            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
+
+            String activityClassName = null;
+
+            PackageManager pm = context.getPackageManager();
+            pm.activity
+
             Boolean reschedule_on_restart = bundle.getBoolean("reschedule_notifications_on_restart");
+
+            if (bundle.containsKey("custom_notification_android_activity"))
+                activityClassName = bundle.getString("custom_notification_android_activity");
 
             if (reschedule_on_restart)
             {
@@ -313,9 +298,15 @@ public class UnityNotificationManager extends BroadcastReceiver
                         PackageManager.DONT_KILL_APP);
             }
 
+            if (activityClassName == null)
+            {
+                activityClassName =
+            }
+
             this.reschedule_on_restart = reschedule_on_restart;
 
-//            Log.w("UnityNotifications", String.format("Reschedule notifications on restart : %b", reschedule_on_restart));
+            mContext = context;
+            mActivity = context.getApplicationContext().ac
 
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("UnityNotifications", "Failed to load meta-data, NameNotFound: " + e.getMessage());
@@ -346,7 +337,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         int id = data_intent.getIntExtra("id", 0);
 
-        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, UnityNotificationManager.GetUnityActivity());
+        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, GetAppActivity());//UnityNotificationManager.GetAppActivity());
 
         // - - - - - -
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
@@ -357,16 +348,14 @@ public class UnityNotificationManager extends BroadcastReceiver
         UnityNotificationManager.scheduleNotificationIntentAlarm(intent, mContext, broadcast);
     }
 
-    public static Class<?> GetUnityActivity()
+    public static Class<?> GetAppActivity()
     {
         String className = "com.unity3d.player.UnityPlayerActivity";
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException ignored) {
             return null;
-
         }
-
     }
 
     public static Intent buildOpenAppIntent(Intent data_intent, Context context, Class c)

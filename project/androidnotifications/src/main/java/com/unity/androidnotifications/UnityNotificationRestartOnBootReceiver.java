@@ -1,8 +1,6 @@
 package com.unity.androidnotifications;
 
-import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +32,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 if (fireTimeDate.after(currentDate)) {
                     Log.w("UnityNotifications", String.format(" Re-ScheduleIntent on boot : %d", id));
 
-                    Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationManager.GetUnityActivity());
+                    Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationManager.GetAppActivity());
 
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, id, openAppIntent, 0);
                     Intent intent = UnityNotificationManager.prepareNotificationIntent(data_intent, context, pendingIntent);
