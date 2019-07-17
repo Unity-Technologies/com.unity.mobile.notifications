@@ -8,9 +8,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
-        <provider
-            android:name=".UnityNotificationInitProvider"
-            android:authorities="${applicationId}.UnityNotificationInitProvider" />
     </application>
 
 </manifest>

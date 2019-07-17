@@ -44,6 +44,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public Context mContext = null;
     public Activity mActivity = null;
+    public Class mOpenActivity = null;
     public boolean reschedule_on_restart = false;
 
     /// Static stuff TODO cleanup
@@ -69,7 +70,11 @@ public class UnityNotificationManager extends BroadcastReceiver
         return 0;
     }
 
-    public static UnityNotificationManager InitializeNotificationManager(Context context) {
+    public static UnityNotificationManager getNotificationManagerImpl(Context context) {
+
+        if (mManager != null)
+            return mManager;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mManager = new UnityNotificationManagerOreo(context, (Activity) context);
 
@@ -80,7 +85,19 @@ public class UnityNotificationManager extends BroadcastReceiver
         return mManager;
     }
 
-    public static UnityNotificationManager getNotificationManagerImpl() {
+
+    public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
+
+        if (mManager != null)
+            return mManager;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mManager = new UnityNotificationManagerOreo(context, activity);
+
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mManager = new UnityNotificationManagerNougat(context, activity);
+        }
+
         return mManager;
     }
 
@@ -270,23 +287,18 @@ public class UnityNotificationManager extends BroadcastReceiver
         super();
     }
 
-    public UnityNotificationManager(Context context)
+    public UnityNotificationManager(Context context, Activity activity)
     {
         super();
+        mContext = context;
+        mActivity = activity;
+
         try {
 
-            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
 
-            String activityClassName = null;
-
-            PackageManager pm = context.getPackageManager();
-            pm.activity
-
             Boolean reschedule_on_restart = bundle.getBoolean("reschedule_notifications_on_restart");
-
-            if (bundle.containsKey("custom_notification_android_activity"))
-                activityClassName = bundle.getString("custom_notification_android_activity");
 
             if (reschedule_on_restart)
             {
@@ -298,15 +310,12 @@ public class UnityNotificationManager extends BroadcastReceiver
                         PackageManager.DONT_KILL_APP);
             }
 
-            if (activityClassName == null)
-            {
-                activityClassName =
-            }
-
             this.reschedule_on_restart = reschedule_on_restart;
 
-            mContext = context;
-            mActivity = context.getApplicationContext().ac
+            mOpenActivity = GetOpenAppActivity(context, false);
+            if (mOpenActivity == null)
+                mOpenActivity = activity.getClass();
+
 
         } catch (PackageManager.NameNotFoundException e) {
             Log.e("UnityNotifications", "Failed to load meta-data, NameNotFound: " + e.getMessage());
@@ -314,6 +323,41 @@ public class UnityNotificationManager extends BroadcastReceiver
             Log.e("UnityNotifications", "Failed to load meta-data, NullPointer: " + e.getMessage());
         }
 
+    }
+
+    public static Class<?> GetOpenAppActivity(Context context, Boolean fallbackToDefault)
+    {
+        ApplicationInfo ai = null;
+        try {
+            ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Bundle bundle = ai.metaData;
+
+        String customActivityClassName = null;
+        Class activityClass = null;
+
+        if (bundle.containsKey("custom_notification_android_activity")) {
+            customActivityClassName = bundle.getString("custom_notification_android_activity");
+
+            try {
+                activityClass = Class.forName(customActivityClassName);
+            } catch (ClassNotFoundException ignored) {
+                ;
+            }
+        }
+
+        if (activityClass == null && fallbackToDefault)
+        {
+            try {
+                return Class.forName("com.unity3d.player.UnityPlayerActivity");
+            } catch (ClassNotFoundException ignored) {
+                ;
+            }
+        }
+
+        return activityClass;
     }
 
     public NotificationManager getNotificationManager()
@@ -337,7 +381,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         int id = data_intent.getIntExtra("id", 0);
 
-        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, GetAppActivity());//UnityNotificationManager.GetAppActivity());
+        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, mOpenActivity);//UnityNotificationManager.GetAppActivity());
 
         // - - - - - -
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
@@ -346,16 +390,6 @@ public class UnityNotificationManager extends BroadcastReceiver
         // - - - - - -
         PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         UnityNotificationManager.scheduleNotificationIntentAlarm(intent, mContext, broadcast);
-    }
-
-    public static Class<?> GetAppActivity()
-    {
-        String className = "com.unity3d.player.UnityPlayerActivity";
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException ignored) {
-            return null;
-        }
     }
 
     public static Intent buildOpenAppIntent(Intent data_intent, Context context, Class c)

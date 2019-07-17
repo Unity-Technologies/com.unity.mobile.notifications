@@ -559,10 +559,10 @@ namespace Unity.Notifications
 				GUI.EndGroup();
 				
 				
-				var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 55f, bodyRect.width, 55f);
+				var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 85f, bodyRect.width, 55f);
 				DrawHeader(iconListRectHeader, infoStringAndroid, headerMsgStyle);
 				
-				var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 65f, iconListRectHeader.width, iconListRectHeader.height-55f);
+				var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 95f, iconListRectHeader.width, iconListRectHeader.height-55f);
 
 				m_ReorderableList.DoList(iconListRectBody);
 				if (!drawInInspector)
@@ -602,17 +602,21 @@ namespace Unity.Notifications
 				
 				var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
 				
-				var width = rect.width - kSlotSize * 3 - layer * 13;
+				var width = rect.width - kSlotSize * 4.5f - layer * 13;
 
 				styleLabel.fixedWidth = width;
 				styleLabel.wordWrap = true;
-
 				
 				GUILayout.Label(new GUIContent(setting.label, setting.tooltip), styleLabel);
 
 				if (setting.val.GetType() == typeof(bool))
 				{
 					setting.val = (object)EditorGUILayout.Toggle((bool)setting.val, styleToggle);
+				}
+				else if (setting.val.GetType() == typeof(string))
+				{
+					setting.val = (object) EditorGUILayout.TextField((string) setting.val);
+
 				}
 				else if (setting.val.GetType() == typeof(PresentationOption))
 				{
