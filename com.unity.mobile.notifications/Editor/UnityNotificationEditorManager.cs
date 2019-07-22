@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Linq;
 using Unity.Collections.LowLevel.Unsafe;
@@ -15,6 +16,7 @@ using Unity.Notifications;
 
 #pragma warning disable 219
 
+[assembly: InternalsVisibleTo("Unity.Notifications.Tests")]
 namespace Unity.Notifications
 {
     internal enum NotificationIconType
@@ -253,7 +255,6 @@ namespace Unity.Notifications
             }
             catch (InvalidCastException ex)
             {
-                Debug.LogWarning(ex.ToString());
                 AndroidNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
             }
 
@@ -276,7 +277,6 @@ namespace Unity.Notifications
             }
             catch (InvalidCastException ex)
             {
-                Debug.LogWarning(ex.ToString());
                 iOSNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
             }
 
@@ -329,6 +329,16 @@ namespace Unity.Notifications
             Initialize();
         }
 
+        internal static void DeleteSettings()
+        {
+            var assetRelPath = Path.Combine("Assets", ASSET_PATH);
+
+            if (File.Exists(assetRelPath))
+            {
+                File.Delete(assetRelPath);
+            }
+        }
+
         internal static UnityNotificationEditorManager Initialize()
         {
             var notificationEditorManager =
@@ -356,7 +366,7 @@ namespace Unity.Notifications
                 new NotificationEditorSetting(
                     "UnityNotificationRequestAuthorizationOnAppLaunch",
                     "Request Authorization on App Launch",
-                    "It's recommended f to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorization pop-up immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
+                    "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorization pop-up immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
                     notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
                         "UnityNotificationRequestAuthorizationOnAppLaunch", true),
                     dependentSettings: new List<NotificationEditorSetting>()
@@ -427,7 +437,7 @@ namespace Unity.Notifications
                 new NotificationEditorSetting(
                     "UnityNotificationAndroidRescheduleOnDeviceRestart",
                     "Reschedule Notifications on Device Restart",
-                    "By default Android removes all scheduled notifications when the device is restarted. Enable this to automatically reschedule all non expired notifications when the device is turned back on.",
+                    "By default AndroidSettings removes all scheduled notifications when the device is restarted. Enable this to automatically reschedule all non expired notifications when the device is turned back on.",
                     notificationEditorManager.GetAndroidNotificationEditorSettingsValue<bool>(
                         "UnityNotificationAndroidRescheduleOnDeviceRestart", false),
                     dependentSettings: null),
@@ -435,17 +445,17 @@ namespace Unity.Notifications
                 new NotificationEditorSetting(
                     "UnityNotificationAndroidUseCustomActivity",
                     "Use Custom AndroidActivity",
-                    "TODO",
+                    "Enable this if you want to override the activity which will opened when the user click on the notification. By default activity assigned to `com.unity3d.player.UnityPlayer.currentActivity` will be used.",
                     notificationEditorManager.GetAndroidNotificationEditorSettingsValue<bool>(
                         "UnityNotificationAndroidUseCustomActivity", false),
                     dependentSettings: new List<NotificationEditorSetting>()
                     {
                         new NotificationEditorSetting(
                             "UnityNotificationAndroidCustomActivityString",
-                            "Custom AndroidActivity TODO",
-                            "TODO",
+                            "Custom Android Activity Name",
+                            "The full class name of the activity that you wish to be assigned to the notification.",
                             notificationEditorManager.GetAndroidNotificationEditorSettingsValue<string>(
-                                "UnityNotificationAndroidUseCustomActivity",
+                                "UnityNotificationAndroidCustomActivityString",
                                 "com.unity3d.player.UnityPlayerActivity"),
                             dependentSettings: null
                         ),
@@ -495,7 +505,7 @@ namespace Unity.Notifications
             {
                 if (!res.Verify())
                 {
-                    Debug.LogWarning( string.Format("Failed exporting: '{0}' Android notification icon because:\n {1} ", res.Id,
+                    Debug.LogWarning( string.Format("Failed exporting: '{0}' AndroidSettings notification icon because:\n {1} ", res.Id,
                         DrawableResourceData.GenerateErrorString(res.Errors))
                     );
                     continue;

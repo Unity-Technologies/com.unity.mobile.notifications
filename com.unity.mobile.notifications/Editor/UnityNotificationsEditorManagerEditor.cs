@@ -44,7 +44,7 @@ namespace Unity.Notifications
 
 		private UnityNotificationEditorManager manager;
 		
-		public string[] toolbarStrings = new string[] {"Android", "iOS"};
+		public string[] toolbarStrings = new string[] {"AndroidSettings", "iOSSettings"};
 		
 		private string infoStringAndroid =
 			"Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +
@@ -77,10 +77,10 @@ namespace Unity.Notifications
 			m_ResourceAssets = serializedObject.FindProperty("TrackedResourceAssets");
 
 			
-			serializedObject.FindProperty("iOSRequestAuthorizationOnAppLaunch");
-
-			serializedObject.FindProperty("iOSRequestAuthorizationForRemoteNotificationsOnAppLaunch");
-			serializedObject.FindProperty("iOSRemoteNotificationForegroundPresentationOptions");
+//			serializedObject.FindProperty("iOSRequestAuthorizationOnAppLaunch");
+//
+//			serializedObject.FindProperty("iOSRequestAuthorizationForRemoteNotificationsOnAppLaunch");
+//			serializedObject.FindProperty("iOSRemoteNotificationForegroundPresentationOptions");
 
 			
 			m_ReorderableList = new ReorderableList(serializedObject, m_ResourceAssets, false, true, true, true);
@@ -497,7 +497,7 @@ namespace Unity.Notifications
 			rect = new Rect(rect.x, rect.y + 10f, rect.width, rect.height);
 #endif
 			
-			serializedObject.UpdateIfRequiredOrScript();
+			serializedObject.Update();
 
 			bool userHeader = false;//manager.toolbarInt == 0;
 			var headerRect = GetContentRect(
@@ -586,9 +586,10 @@ namespace Unity.Notifications
 				DrawSettingsElementList(BuildTargetGroup.iOS, settings, false, styleToggle, styleDropwDown, settingsPanelRect);
 				GUI.EndGroup();
 			}
+
+			serializedObject.ApplyModifiedProperties();
 			if (drawInInspector)
 				GUI.EndScrollView();
-
 		}
 
 		private void DrawSettingsElementList(BuildTargetGroup target, List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)

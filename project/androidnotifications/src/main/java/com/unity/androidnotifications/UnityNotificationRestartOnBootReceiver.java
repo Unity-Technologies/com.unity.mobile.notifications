@@ -17,7 +17,6 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent received_intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(received_intent.getAction())) {
-//            Log.w("UnityNotifications", "UnityNotificationRestartOnBootReceiver : onReceive");
 
             List<Intent> saved_notifications = UnityNotificationManager.LoadNotificationIntents(context);
 
@@ -42,11 +41,6 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 }
                 else
                 {
-//                    Log.w("UnityNotifications", String.format("\n onReceive delete intent firetime at : %s \n current time : %s \n",
-//                            fireTimeDate.toString(),
-//                            currentDate.toString()
-//                            ));
-
                     UnityNotificationManager.deleteExpiredNotificationIntent(id, context);
                 }
             }

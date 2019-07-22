@@ -40,7 +40,6 @@ public class UnityNotificationManagerNougat extends UnityNotificationManager {
             int groupAlertBehaviour = intent.getIntExtra("groupAlertBehaviour", -1);
 
             if (group != null && group.length() > 0) {
-//                Log.w("UnityNotifications", String.format("Notification Group : : %s", group));
                 notificationBuilder.setGroup(group);
             }
 

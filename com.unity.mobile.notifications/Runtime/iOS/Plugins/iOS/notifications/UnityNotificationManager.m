@@ -51,6 +51,8 @@
     if ( !SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
+    registerRemote = true;
+    
     self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
