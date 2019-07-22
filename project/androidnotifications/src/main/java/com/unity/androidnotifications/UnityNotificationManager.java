@@ -198,7 +198,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         List<Intent> intent_data_list = new ArrayList<Intent> ();
 
         if (BuildConfig.DEBUG) {
-            Log.w("UnityNotifications", String.format(" \n LoadNotificationIntents -- - Total Intents : %d \n", idsSetCopy.size()));
+            Log.w("UnityNotifications", String.format(" \n Loading serialized notification intents. Total Intents : %d \n", idsSetCopy.size()));
         }
 
         Set<String> idsMarkedForRemoval = new HashSet<String>();
@@ -364,29 +364,11 @@ public class UnityNotificationManager extends BroadcastReceiver
     }
 
 
-    public static Intent prepareNotificationIntent(Intent data_intent, Context context, PendingIntent pendingIntent)
+    public static Intent prepareNotificationIntent(Intent intent, Context context, PendingIntent pendingIntent)
     {
+
+        Intent data_intent = (Intent)intent.clone();
         int id = data_intent.getIntExtra("id", 0);
-//
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//
-//        intent.putExtra("tapIntent", pendingIntent);
-//
-//        SharedPreferences prefs = context.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
-//        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
-//        Set<String> idsSetCopy = new HashSet<String>(idsSet);
-//
-//        if (BuildConfig.DEBUG) {
-//            Log.w("UnityNotifications", String.format(" \n prepareNotificationIntent -- - Total Intents :\n"));
-//        }
-//        idsSetCopy.add(Integer.toString(id));
-//
-//        SharedPreferences.Editor editor = prefs.edit();
-//        editor.clear();
-//        editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
-//        editor.commit();
-//
-//        return intent;
 
         SharedPreferences prefs = context.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
         Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
@@ -396,7 +378,6 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         for(String sId : idsSetCopy )
         {
-            Intent intent = new Intent();// CreateNotificationIntent(mActivity);
             PendingIntent broadcast = PendingIntent.getBroadcast(context, Integer.valueOf(sId), intent, PendingIntent.FLAG_NO_CREATE);
 
             if (broadcast != null) {
@@ -419,17 +400,15 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
         else {
             validIdsSet.add(Integer.toString(id));
+            data_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            data_intent.putExtra("tapIntent", pendingIntent);
+
         }
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
         editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, validIdsSet);
         editor.apply();
-
-
-        data_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        data_intent.putExtra("tapIntent", pendingIntent);
-
 
         return data_intent;
 
@@ -451,50 +430,18 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         int id = data_intent.getIntExtra("id", 0);
 
-//        SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
-//        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
-//
-//        Set<String> idsSetCopy = new HashSet<String>(idsSet);
-//        Set<String> validIdsSet = new HashSet<String>();
-//
-//        for(String sId : idsSetCopy )
-//        {
-//            Intent intent = CreateNotificationIntent(mActivity);
-//            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, Integer.valueOf(sId), intent, PendingIntent.FLAG_NO_CREATE);
-//
-//            if (broadcast != null) {
-//                validIdsSet.add(sId);
-//            }
-//        }
-//
-//        if (android.os.Build.MANUFACTURER.equals("samsung") && validIdsSet.size() >= 499)
-//        {
-//            // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
-//            // Attempting to schedule more than that might cause the app to crash.
-//            Log.w("UnityNotifications", "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
-//                    " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.");
-//            data_intent = null;
-//
-//        }
-//        else {
-//            validIdsSet.add(Integer.toString(id));
-//            if (this.reschedule_on_restart) {
-//                UnityNotificationManager.SaveNotificationIntent(data_intent, mContext);
-//            }
-//        }
-
         Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, mOpenActivity);//UnityNotificationManager.GetAppActivity());
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
-        data_intent = prepareNotificationIntent(data_intent, mContext, pendingIntent);
+        Intent intent = prepareNotificationIntent(data_intent, mContext, pendingIntent);
 
-        if (data_intent != null) {
+        if (intent != null) {
 
             if (this.reschedule_on_restart) {
                 UnityNotificationManager.SaveNotificationIntent(data_intent, mContext);
             }
 
-            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, data_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            UnityNotificationManager.scheduleNotificationIntentAlarm(data_intent, mContext, broadcast);
+            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            UnityNotificationManager.scheduleNotificationIntentAlarm(intent, mContext, broadcast);
         }
 
         if (BuildConfig.DEBUG) {

@@ -73,13 +73,6 @@ namespace Unity.Notifications
 			m_Target = new SerializedObject(target);
 			
 			m_ResourceAssets = serializedObject.FindProperty("TrackedResourceAssets");
-
-			
-//			serializedObject.FindProperty("iOSRequestAuthorizationOnAppLaunch");
-//
-//			serializedObject.FindProperty("iOSRequestAuthorizationForRemoteNotificationsOnAppLaunch");
-//			serializedObject.FindProperty("iOSRemoteNotificationForegroundPresentationOptions");
-
 			
 			m_ReorderableList = new ReorderableList(serializedObject, m_ResourceAssets, false, true, true, true);
 			m_ReorderableList.elementHeight = kSlotSize + kIconSpacing;
@@ -153,8 +146,7 @@ namespace Unity.Notifications
 
 		internal float GetMinimumEditorWidth(float requiredWidth)
 		{
-			
-			var minWidth = kSlotSize * 6;
+			var minWidth = kSlotSize * 10;
 			if (requiredWidth < minWidth)
 				return minWidth;
 			

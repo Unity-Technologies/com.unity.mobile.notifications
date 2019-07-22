@@ -244,7 +244,7 @@ namespace Unity.Notifications
                 if (val != null)
                     return (T) val;
             }
-            catch (InvalidCastException ex)
+            catch (InvalidCastException)
             {
                 AndroidNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
             }
@@ -398,11 +398,11 @@ namespace Unity.Notifications
                                             "UnityRemoteNotificationForegroundPresentationOptions",
                                             (PresentationOption) PresentationOptionEditor.All)
                                 ),
-                                new NotificationEditorSetting("UnityAPSReleaseEnvironment",
+                                new NotificationEditorSetting("UnityUseAPSReleaseEnvironment",
                                     "Enable release environment for APS",
                                     "Enable this when signing the app with a production certificate.",
                                     notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                                        "UnityAPSReleaseEnvironment", false),
+                                        "UnityUseAPSReleaseEnvironment", false),
                                     false),
                             }
                         ),

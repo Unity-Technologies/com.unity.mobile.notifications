@@ -29,7 +29,10 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 int id = data_intent.getIntExtra("id", -1);
 
                 if (fireTimeDate.after(currentDate)) {
-                    Log.w("UnityNotifications", String.format(" Re-ScheduleIntent on boot : %d", id));
+
+                    if (BuildConfig.DEBUG) {
+                        Log.w("UnityNotifications", String.format(" Rescheduling notification on boot : %d", id));
+                    }
 
                     Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationManager.GetOpenAppActivity(context, true));
 
