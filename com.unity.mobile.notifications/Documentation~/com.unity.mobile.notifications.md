@@ -21,7 +21,7 @@ This package supports the following features:
 
 **Requirements:**
 
-*   Supports Android 4.1 (API 16) and iOS 10 or above.
+*   Supports Android 4.4 (API 19) and iOS 10 or above.
 *   Compatible with Unity 2018.3 or above.  
 
 
