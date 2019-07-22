@@ -255,8 +255,17 @@
         notificationData -> triggerType = PUSH_TRIGGER;
     }
     
-    notificationData -> data = (char*) [[request.content.userInfo objectForKey:@"data"] UTF8String];
-
+    NSDictionary* dataDict = [request.content.userInfo objectForKey:@"data"];
+    
+    NSError *error;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:dataDict
+                                                   options:0 // Pass 0 if you don't care about the readability of the generated string
+                                                     error:&error];
+    if (! data) {
+        NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
+    } else {
+        notificationData -> data = (char*) [data bytes];
+    }
               
     return notificationData;
 }
