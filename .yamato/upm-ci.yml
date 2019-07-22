@@ -59,6 +59,23 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
+run_all_test_for_publish:
+  name: Run all tests
+  agent:
+    type: Unity::VM
+    image: package-ci/ubuntu:stable
+    flavor: b1.large
+  commands:
+    - echo "Passed"
+  dependencies:
+    - .yamato/upm-ci.yml#pack
+{% for editor in test_editors %}
+{% for platform in test_platforms %}
+    - .yamato/promotion.yml#promotion_test_{{ platform.name }}_{{ editor.version }}
+{% endfor %}
+{% endfor %}
+
+
 # test_trigger:
 #   name: Tests Trigger
 #   agent:
