@@ -266,7 +266,7 @@ namespace Unity.Notifications
                 if (val != null)
                     return (T) val;
             }
-            catch (InvalidCastException ex)
+            catch (InvalidCastException)
             {
                 iOSNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
             }

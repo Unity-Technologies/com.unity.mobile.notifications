@@ -3,16 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Notifications;
-using Unity.Notifications.iOS;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.iOS.Xcode;
 using UnityEngine;
-//
-//#if PLATFORM_IOS
-//using Unity.Notifications.iOS;
-//using UnityEditor.iOS.Xcode;
-//#endif
+
+#if PLATFORM_IOS
+using Unity.Notifications.iOS;
+using UnityEditor.iOS.Xcode;
+#endif
 
 public class iOSNotificationPostProcess : MonoBehaviour {
 
