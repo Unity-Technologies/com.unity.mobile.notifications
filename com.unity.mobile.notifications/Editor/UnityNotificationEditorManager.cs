@@ -215,10 +215,14 @@ namespace Unity.Notifications
             if (!values.Contains(setting.key) || values[setting.key].ToString() != setting.val.ToString())
             {
                 values[setting.key] = setting.val;
-                
-                EditorUtility.SetDirty(this);
-                AssetDatabase.SaveAssets();
+                SerializeData();
             }
+        }
+
+        internal void SerializeData()
+        {
+            EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
         }
         
         public void SaveSetting(NotificationEditorSetting setting, BuildTargetGroup target)
@@ -458,10 +462,9 @@ namespace Unity.Notifications
             {
                 notificationEditorManager.AndroidNotificationEditorSettings = androidSettings;
             }
-
+            
             EditorUtility.SetDirty(notificationEditorManager);
             return notificationEditorManager;
-
         }
 
         internal void RegisterDrawableResource(string id, Texture2D image, NotificationIconType type)
@@ -472,16 +475,19 @@ namespace Unity.Notifications
             drawableResource.Asset = image;
          
             TrackedResourceAssets.Add(drawableResource);
+            SerializeData();
         }
 
         internal void RemoveDrawableResource(string id)
         {
             TrackedResourceAssets.RemoveAll(i => i.Id == id);
+            SerializeData();
         }
         
         internal void RemoveDrawableResource(int i)
         {
             TrackedResourceAssets.RemoveAt(i);
+            SerializeData();
         }
         
         internal Texture2D GetDrawableResourceAssetById(string id)

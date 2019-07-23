@@ -101,10 +101,14 @@ namespace Unity.Notifications
 				}
 			};
 			m_ReorderableList.onAddCallback = (list) =>
+			{
 				AddIconDataElement(list);
+			};
 
 			m_ReorderableList.onRemoveCallback = (list) =>
-				RemoveIcondDataElement(list);
+			{
+				RemoveIconDataElement(list);
+			};
 
 			m_ReorderableList.onCanAddCallback = (list) =>
 				CanAddCallbackDelegate(list);
@@ -199,15 +203,14 @@ namespace Unity.Notifications
 				
 				EditorGUI.LabelField(
 					new Rect(elementContentRect.x, elementContentRect.y, idPropWidth, 20),
-					"Identifier"
+					identifierLabelText
 				);
 				
 				EditorGUI.LabelField(
 					new Rect(elementContentRect.x, elementContentRect.y + 25, idPropWidth, 20),
-					"Type"
+					typeLabelText
 				);
 								
-				EditorGUI.BeginChangeCheck();
 							
 				var data = GetElementData(index);
 
@@ -236,6 +239,8 @@ namespace Unity.Notifications
 					data.Asset = newAsset;
 					data.Clean();
 					data.Verify();
+					manager.SerializeData();
+					Debug.Log("manager.SerializeData()");
 				}
 
 				Texture2D previewTexture = data.GetPreviewTexture(updatePreviewTexture);
@@ -279,7 +284,6 @@ namespace Unity.Notifications
 						GUI.DrawTexture(previewTextureRectPadded, previewTexture);
 					}
 				}
-								
 			}
 		}
 		
@@ -287,31 +291,32 @@ namespace Unity.Notifications
 		{
 			if (onChangedCallback != null)
 				onChangedCallback(list);
-			
-			serializedObject.Update();
+			serializedObject.ApplyModifiedProperties();
 		}
 
 
 		void AddIconDataElement( ReorderableList list)
 		{
+			serializedObject.Update();
+
 			Undo.RegisterCompleteObjectUndo(target, "Add a new icon element.");
-			var manager = UnityNotificationEditorManager.Initialize();
 			manager.RegisterDrawableResource(string.Format("icon_{0}", manager.TrackedResourceAssets.Count), null, NotificationIconType.SmallIcon);
 			
 			OnChange(list);
 		}
 
-		void RemoveIcondDataElement(ReorderableList list)
+		void RemoveIconDataElement(ReorderableList list)
 		{
-			var i = UnityNotificationEditorManager.Initialize();
-			i.RemoveDrawableResource(list.index);
+			serializedObject.Update();
+			
+			manager.RemoveDrawableResource(list.index);
 			
 			OnChange(list);
 		}
 
 		bool CanAddCallbackDelegate(ReorderableList list)
 		{
-			var trackedAssets = UnityNotificationEditorManager.Initialize().TrackedResourceAssets;
+			var trackedAssets = manager.TrackedResourceAssets;
 			if (trackedAssets.Count <= 0)
 				return true;
 			
