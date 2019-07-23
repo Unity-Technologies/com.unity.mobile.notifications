@@ -6,15 +6,16 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 
-- Fix an issue with 'Test' assemblies not being f
-- [Android] [1165178](https://issuetracker.unity3d.com/product/unity/issues/guid/1165178/) An Android exception should no longer be thrown when attempting to schedule more than 500 notifications on Samsung devices. Samsung seems to impose a fixed limit of concurrent Alarms so if the limit is reached all attempt to schedule new notifications will be ignored until the currently  scheduled ones are triggered or manually cancelled.
-- [[1114987](https://issuetracker.unity3d.com/product/unity/issues/guid/1114987/)]  Reopening the project overrides Mobile Notification Settings
+- Fixed an issue with NUnit Test assemblies not being detected correctly and which caused exceptions to be thrown in the editor.
+- [Android] [1165178](https://issuetracker.unity3d.com/product/unity/issues/guid/1165178/): An Android JAVA exception should no longer be thrown when attempting to schedule more than 500 notifications on Samsung devices. Samsung seems to impose a fixed limit of concurrent Alarms so if the limit is reached all attempts to schedule new notifications will be ignored until the currently scheduled ones are triggered or manually cancelled.
+- [[1114987](https://issuetracker.unity3d.com/product/unity/issues/guid/1114987/)]  Reopening the project should no longer override Mobile Notification Settings.
 -  [iOS] Fixed an issue with iOSNotification.data not being set correctly for remote notifications if the data field is not a string. It will not return a full JSON string for the data field.
+- [Android] Notifications cancelled using `CancelScheduledNotification` or `CancelAllScheduledNotifications` should no longer be recreated on device restart if the device is restarted before the time they were supposed to be triggered. 
 
-Changes & Improvements:
+### Changes & Improvements:
 
 -  [Android] Added an option to override  the Android Android app activity which should be opened when a notification is clicked. By default the main activity assigned to the UnityPlayer Java class will be used.
-- Exposed individual notification settings in a public Editor API (see the Unity.Notifications.UnityNotificationSettings) class.
+- Exposed notification settings (previously only accessible in UI) in a public Editor API (see the Unity.Notifications.UnityNotificationSettings) class.
 - Increased the minimum requirements to Android 4.4 (API 19)
 
 ### [1.0.2] - 2019-07-01

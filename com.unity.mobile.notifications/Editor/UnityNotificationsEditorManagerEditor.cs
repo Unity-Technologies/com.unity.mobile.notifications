@@ -43,7 +43,7 @@ namespace Unity.Notifications
 
 		private UnityNotificationEditorManager manager;
 		
-		public string[] toolbarStrings = new string[] {"AndroidSettings", "iOSSettings"};
+		public string[] toolbarStrings = new string[] {"Android", "iOS"};
 		
 		private string infoStringAndroid =
 			"Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +

@@ -815,6 +815,10 @@ public class UnityNotificationManager extends BroadcastReceiver
     public void cancelPendingNotificationIntent(int requestCode)
     {
         UnityNotificationManager.cancelPendingNotificationIntentInternal(requestCode, mContext);
+        if (this.reschedule_on_restart)
+        {
+            UnityNotificationManager.deleteExpiredNotificationIntent(requestCode, mContext);
+        }
     }
 
     public void cancelAllNotifications()
