@@ -61,7 +61,6 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			
 			File.WriteAllText (projPath, proj.WriteToString ());
 
-
 			if (addPushNotificationCapability)
 			{
 				var useReleaseAPSEnvSetting = settings
@@ -114,7 +113,7 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 			{				
 				if (setting.val.GetType() == typeof(bool))
 					rootDict.SetBoolean(setting.key, (bool) setting.val);
-				else if (setting.val.GetType() == typeof(PresentationOption))
+				else if (setting.val.GetType() == typeof(PresentationOption) || setting.val.GetType() == typeof(AuthorizationOption))
 					rootDict.SetInteger(setting.key, (int) setting.val);
 			}
 

@@ -240,7 +240,6 @@ namespace Unity.Notifications
 					data.Clean();
 					data.Verify();
 					manager.SerializeData();
-					Debug.Log("manager.SerializeData()");
 				}
 
 				Texture2D previewTexture = data.GetPreviewTexture(updatePreviewTexture);
@@ -343,7 +342,6 @@ namespace Unity.Notifications
 #endif
 			
 			serializedObject.Update();
-
 			bool userHeader = false;//manager.toolbarInt == 0;
 			var headerRect = GetContentRect(
 				new Rect(kPadding, rect.y, rect.width - kPadding, kPadding * 2),
@@ -471,6 +469,14 @@ namespace Unity.Notifications
 					if ((int)(PresentationOptionEditor)setting.val == 0)
 						setting.val = (PresentationOption)PresentationOptionEditor.All;
 				}
+				else if (setting.val.GetType() == typeof(AuthorizationOption))
+				{
+					setting.val =
+						(AuthorizationOption) EditorGUILayout.EnumFlagsField((AuthorizationOptionEditor) setting.val, styleDropwDown);
+					if ((int)(AuthorizationOptionEditor)setting.val == 0)
+						setting.val = (AuthorizationOption)AuthorizationOptionEditor.All;
+				}
+				
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.EndDisabledGroup();
 
