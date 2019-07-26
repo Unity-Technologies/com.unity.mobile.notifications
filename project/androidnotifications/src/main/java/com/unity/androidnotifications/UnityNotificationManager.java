@@ -84,6 +84,10 @@ public class UnityNotificationManager extends BroadcastReceiver
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mManager = new UnityNotificationManagerNougat(context, (Activity) context);
         }
+        else
+        {
+            mManager = new UnityNotificationManager(context, (Activity) context);
+        }
 
         return mManager;
     }
@@ -99,6 +103,10 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mManager = new UnityNotificationManagerNougat(context, activity);
+        }
+        else
+        {
+            mManager = new UnityNotificationManager(context, activity);
         }
 
         return mManager;
@@ -401,7 +409,6 @@ public class UnityNotificationManager extends BroadcastReceiver
         else {
             validIdsSet.add(Integer.toString(id));
             data_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            data_intent.putExtra("tapIntent", pendingIntent);
 
         }
 
