@@ -13,6 +13,8 @@ using UnityEngine;
 using UnityEditor.Android;
 using Unity.Notifications.iOS;
 using Unity.Notifications;
+using UnityEditor.VersionControl;
+using Object = System.Object;
 
 #pragma warning disable 219
 
@@ -353,23 +355,34 @@ namespace Unity.Notifications
 
         internal static UnityNotificationEditorManager Initialize()
         {
+           
+                     
+            var assetRelPath = Path.Combine("Assets", ASSET_PATH); 
+            
             var notificationEditorManager =
-                AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", ASSET_PATH),
-                        typeof(UnityNotificationEditorManager)) as
-                    UnityNotificationEditorManager;
-            if (notificationEditorManager == null)
-            {
-                var roothDir = Path.Combine(Application.dataPath, Path.GetDirectoryName(ASSET_PATH));
-                var assetRelPath = Path.Combine("Assets", ASSET_PATH);
+                (UnityNotificationEditorManager) AssetDatabase.LoadAssetAtPath(assetRelPath,
+                    typeof(UnityNotificationEditorManager));
 
-                if (!Directory.Exists(roothDir))
+            if (notificationEditorManager == null)
+            {                
+                var rootDir = Path.Combine(Application.dataPath, Path.GetDirectoryName(ASSET_PATH));
+                
+
+                if (!Directory.Exists(rootDir))
                 {
-                    Directory.CreateDirectory(roothDir);
+                    Directory.CreateDirectory(rootDir);
                 }
 
+                
                 notificationEditorManager = CreateInstance<UnityNotificationEditorManager>();
-                AssetDatabase.CreateAsset(notificationEditorManager, assetRelPath);
-                AssetDatabase.SaveAssets();
+                
+                if (File.Exists(assetRelPath))
+                    AssetDatabase.ImportAsset(assetRelPath);
+                else
+                {
+                    AssetDatabase.CreateAsset(notificationEditorManager, assetRelPath);
+                    AssetDatabase.SaveAssets();
+                }
             }
             
             if (notificationEditorManager.iOSNotificationEditorSettingsValues == null)

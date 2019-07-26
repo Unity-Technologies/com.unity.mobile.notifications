@@ -55,10 +55,19 @@ namespace Unity.Notifications
 		[SettingsProvider]
 		static SettingsProvider CreateMobileNotificationsSettingsProvider()
 		{
-			var provider = AssetSettingsProvider.CreateProviderFromObject("Project/Mobile Notification Settings",
-				UnityNotificationEditorManager.Initialize());
-			provider.label = "Mobile Notification Settings";
-			return provider;
+
+			var settingsAsset = UnityNotificationEditorManager.Initialize();
+
+			if (settingsAsset != null)
+			{
+				var provider =
+					AssetSettingsProvider.CreateProviderFromObject("Project/Mobile Notification Settings",
+						settingsAsset);
+				provider.label = "Mobile Notification Settings";
+				return provider;
+			}
+
+			return null;
 		}
 #endif
 		
