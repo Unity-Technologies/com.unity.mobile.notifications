@@ -384,6 +384,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
         Set<String> validIdsSet = new HashSet<String>();
 
+        data_intent.putExtra("tapIntent", pendingIntent);
         for(String sId : idsSetCopy )
         {
             PendingIntent broadcast = PendingIntent.getBroadcast(context, Integer.valueOf(sId), intent, PendingIntent.FLAG_NO_CREATE);
@@ -437,7 +438,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         int id = data_intent.getIntExtra("id", 0);
 
-        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, mOpenActivity);//UnityNotificationManager.GetAppActivity());
+        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, mOpenActivity);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
         Intent intent = prepareNotificationIntent(data_intent, mContext, pendingIntent);
 
@@ -466,9 +467,6 @@ public class UnityNotificationManager extends BroadcastReceiver
     {
         Intent openAppIntent = new Intent(context, c);
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-//        openAppIntent.putExtra("data", data_intent.getStringExtra("data"));
-
         openAppIntent.putExtras(data_intent);
 
         return openAppIntent;

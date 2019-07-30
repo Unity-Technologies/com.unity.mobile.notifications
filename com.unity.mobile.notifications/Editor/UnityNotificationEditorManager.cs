@@ -805,22 +805,25 @@ namespace Unity.Notifications
             var customActivity = (string)settings
                 .Find(i => i.key == "UnityNotificationAndroidCustomActivityString").val;
 
-
-            if (enableRescheduleOnRestart)
+            if (useCustomActivity | enableRescheduleOnRestart)
             {
                 string manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
                 XmlDocument manifestDoc = new XmlDocument();
                 manifestDoc.Load(manifestPath);
 
-                var doc = AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
-                doc = AndroidNotificationResourcesPostProcessor.AppendAndroidPermissionField(doc, "android.permission.RECEIVE_BOOT_COMPLETED");
-
                 if (useCustomActivity)
                 {
-                    doc = AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity", customActivity);
+                    manifestDoc = AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity",
+                        customActivity);
                 }
-                
-                doc.Save(manifestPath);
+
+                if (enableRescheduleOnRestart)
+                {
+                    manifestDoc = AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
+                    manifestDoc = AppendAndroidPermissionField(manifestDoc,
+                        "android.permission.RECEIVE_BOOT_COMPLETED");
+                }
+                manifestDoc.Save(manifestPath);
             }
         }
     }
