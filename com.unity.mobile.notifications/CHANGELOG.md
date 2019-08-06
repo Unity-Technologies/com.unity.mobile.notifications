@@ -2,21 +2,30 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.0.3-preview.4] - 2019-07-23
+## [1.0.3-preview.5] - 2019-07-23
 
 ### Fixes:
 
+-  [Android] Added a temporary fix for an IL2CPP compilation issue on Unity 2019.2 and above.
 - Fixed an issue with NUnit Test assemblies not being detected correctly due to which exceptions were thrown in the editor.
 - [Android] [1165178](https://issuetracker.unity3d.com/product/unity/issues/guid/1165178/): An Android JAVA exception should no longer be thrown when attempting to schedule more than 500 notifications on Samsung devices. Samsung seems to impose a fixed limit of concurrent Alarms so if the limit is reached all attempts to schedule new notifications will be ignored until the currently scheduled ones are triggered or manually cancelled.
 - [[1114987](https://issuetracker.unity3d.com/product/unity/issues/guid/1114987/)]  Reopening the project should no longer override Mobile Notification Settings.
--  [iOS] Fixed an issue with iOSNotification.data not being set correctly for remote notifications if the data field is not a string. It will now return a full JSON string for the data field.
+- [iOS] Fixed an issue with `iOSNotification.data` not being set correctly for remote notifications if the data field is not a string. It will now return a full JSON string for the data field.
 - [Android] Notifications cancelled using `CancelScheduledNotification` or `CancelAllScheduledNotifications` should no longer be recreated on device restart if the device is restarted before the time they were supposed to be triggered. 
 
 ### Changes & Improvements:
 
--  [Android] Added an option to override  the Android Android app activity which should be opened when a notification is clicked. By default the main activity assigned to the UnityPlayer Java class will be used.
-- Exposed notification settings (previously only accessible in UI) in a public Editor API (see the Unity.Notifications.UnityNotificationSettings) class.
-- Increased the minimum requirements to Android 4.4 (API 19)
+- [iOS] Turning on `Enable Push Notifications` will add the `remote-notification ` setting to `UIBackgroundModes` array in the app’s `info.plist` file.
+
+-  [iOS] The notification returned by `iOSNotificationCenter.GetLastRespondedNotification()` is now cleared each time the app is moved to the background and not only when the app is fully terminated. Now it should only return the notification used to open the app or the last notification activated by the user while the app was running in the foreground.
+
+- [Android] Added an option to override the Android  app activity which should be opened when a notification is clicked. By default the main activity assigned to the `UnityPlayer` Java class will be used.
+
+- Exposed notification settings (previously only accessible in UI) in a public Editor API (see the `Unity.Notifications.UnityNotificationSettings`) class.
+
+- [Android] Increased the minimum requirements to Android 4.4 (API 19)
+
+  
 
 ### [1.0.2] - 2019-07-01
 

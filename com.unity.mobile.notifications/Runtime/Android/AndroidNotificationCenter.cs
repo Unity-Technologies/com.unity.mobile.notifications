@@ -540,8 +540,9 @@ namespace Unity.Notifications.Android
         /// </summary>
         public long[] VibrationPattern
         {
-            get { return vibrationPattern; }
-            set { vibrationPattern = value; }
+            // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
+            get { return vibrationPattern.Select(i => (long)i).ToArray(); }
+            set { vibrationPattern = value.Select(i => (int)i).ToArray(); }
         }
         
         /// <summary>
@@ -562,7 +563,7 @@ namespace Unity.Notifications.Android
         internal bool enableLights;
         internal bool enableVibration;
         internal int lockscreenVisibility;
-        internal long[] vibrationPattern;
+        internal int[] vibrationPattern;
     }
 
     /// <summary>
@@ -588,7 +589,7 @@ namespace Unity.Notifications.Android
         
         static bool initialized;
 
-        static bool Initialize()
+        public static bool Initialize()
         {
             if (initialized)
                 return true;
@@ -771,7 +772,10 @@ namespace Unity.Notifications.Android
                 ch.enableVibration = channel.Get<bool>("enableVibration");
                 ch.canBypassDnd = channel.Get<bool>("canBypassDnd");
                 ch.canShowBadge = channel.Get<bool>("canShowBadge");
-                ch.vibrationPattern = channel.Get<long[]>("vibrationPattern");
+                // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
+                var vibrationPattern = channel.Get<long[]>("vibrationPattern");
+                if (vibrationPattern != null)
+                    ch.vibrationPattern = vibrationPattern.Select(i => (int)i).ToArray();
                 ch.lockscreenVisibility = channel.Get<int>("lockscreenVisibility");
 
                 channels.Add(ch);

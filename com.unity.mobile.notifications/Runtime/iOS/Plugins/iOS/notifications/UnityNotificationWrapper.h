@@ -9,7 +9,7 @@
 #ifndef UnityNotificationWrapper_h
 #define UnityNotificationWrapper_h
 
-typedef void (AUTHORIZATION_CALBACK)(struct iOSNotificationAuthorizationData data);
+typedef void (AUTHORIZATION_CALBACK)(struct iOSNotificationAuthorizationData* data);
 typedef void (*DATA_CALLBACK)(struct iOSNotificationData* data);
 
 void _SetNotificationReceivedDelegate(DATA_CALLBACK callback);

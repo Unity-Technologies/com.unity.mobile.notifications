@@ -138,12 +138,12 @@
 }
 
 //Called to let your app know which action was selected by the user for a given notification.
--(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)())completionHandler{
-    
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(nonnull void(^)())completionHandler
+{    
         self.lastReceivedNotification = response.notification; 
         completionHandler();
         [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
-    }
+}
 
 -(void)updateScheduledNotificationList
 {
