@@ -108,7 +108,9 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     
     // iOS 10 does not show notifications with an empty body or title fields. Since this works fine on iOS 11+ we'll add assign a string
     // with a space to maintain consistent behaviour.
-    if (!@available(iOS 11.0, *)) {
+    if (@available(iOS 11.0, *)) {
+    }
+    else {
         if (title.length == 0)
             title = @" ";
         if (body.length == 0)
@@ -276,7 +278,6 @@ long _GetApplicationBadge()
 {
     return[UIApplication sharedApplication].applicationIconBadgeNumber;
 }
-// - -
 
 bool _GetAppOpenedUsingNotification()
 {
@@ -290,6 +291,5 @@ iOSNotificationData* _GetLastNotificationData()
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     iOSNotificationData* data = [UnityNotificationManager UNNotificationRequestToiOSNotificationData : manager.lastReceivedNotification.request];
     return data;
-    
 }
 

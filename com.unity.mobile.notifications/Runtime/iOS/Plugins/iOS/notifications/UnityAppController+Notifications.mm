@@ -39,7 +39,17 @@
                         [manager updateScheduledNotificationList];
                         [manager updateDeliveredNotificationList];
                         [manager updateNotificationSettings];
+                        
                     }];
+        
+        [nc addObserverForName:UIApplicationDidEnterBackgroundNotification
+                        object:nil
+                         queue:[NSOperationQueue mainQueue]
+                    usingBlock:^(NSNotification *notification) {
+                        
+                        [UnityNotificationManager sharedInstance].lastReceivedNotification = NULL;
+                    }];
+
 
         [nc addObserverForName:UIApplicationDidFinishLaunchingNotification
                         object:nil

@@ -111,7 +111,6 @@ const int kDefaultPresentationOptions = -1;
 
     + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData : (UNNotificationRequest*) request;
     + (struct iOSNotificationData*)UNNotificationToiOSNotificationData : (UNNotification*) notification;
-    + (struct iOSNotificationData*)NSDictionaryToiOSNotificationData : (NSDictionary*) notification;
     + (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData : (UNNotificationSettings*) settings;
 
     + (void)InitiOSNotificationData : (iOSNotificationData*) notificationData;

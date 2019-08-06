@@ -117,6 +117,16 @@ public class iOSNotificationPostProcess : MonoBehaviour {
 					rootDict.SetInteger(setting.key, (int) setting.val);
 			}
 
+			if (addPushNotificationCapability)
+			{
+				PlistElementArray currentBacgkgroundModes = (PlistElementArray) rootDict["UIBackgroundModes"];
+
+				if (currentBacgkgroundModes == null)
+					currentBacgkgroundModes = rootDict.CreateArray("UIBackgroundModes");
+				
+				currentBacgkgroundModes.AddString("remote-notification");
+			}
+
 			// Write to file
 			File.WriteAllText(plistPath, plist.WriteToString());
 		
