@@ -19,6 +19,9 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [UnityNotificationLifeCycleManager sharedInstance];
+        
+        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+        center.delegate = [UnityNotificationManager sharedInstance];
     });
 }
 
@@ -50,7 +53,6 @@
                         [UnityNotificationManager sharedInstance].lastReceivedNotification = NULL;
                     }];
 
-
         [nc addObserverForName:UIApplicationDidFinishLaunchingNotification
                         object:nil
                          queue:[NSOperationQueue mainQueue]
@@ -74,7 +76,6 @@
                             [manager requestAuthorization:defaultAuthorizationOptions : registerRemoteOnLaunch];
                             manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
                         }
-
                     }];
         
         [nc addObserverForName:kUnityDidRegisterForRemoteNotificationsWithDeviceToken

@@ -56,7 +56,6 @@
     
     self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-    center.delegate = self;
     
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UnityAddRemoteNotificationCapability"] boolValue] ;
     registerRemote = supportsPushNotification == YES ? registerRemote : NO ;
