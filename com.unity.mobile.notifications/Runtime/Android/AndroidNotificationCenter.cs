@@ -572,7 +572,7 @@ namespace Unity.Notifications.Android
     public class AndroidNotificationCenter
     {
         public delegate void NotificationReceivedCallback(AndroidNotificationIntentData data);
-
+        
         /// <summary>
         /// Subscribe to this event to receive callbacks whenever a scheduled notification is shown to the user.
         /// </summary>
@@ -589,15 +589,23 @@ namespace Unity.Notifications.Android
         
         static bool initialized;
 
+        private GameObject receivedNotificationDispatcher;
+
         public static bool Initialize()
         {
             if (initialized)
                 return true;
 
+            if (AndroidReceivedNotificationMainThreadDispatcher.GetInstance() == null)
+            {
+                var receivedNotificationDispatcher = new GameObject("AndroidReceivedNotificationMainThreadDispatcher");
+                receivedNotificationDispatcher.AddComponent<AndroidReceivedNotificationMainThreadDispatcher>();
+            }
+            
             #if UNITY_EDITOR || !UNITY_ANDROID
-                return false;
+                    return false;
             #endif
-
+    
             AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
@@ -614,7 +622,7 @@ namespace Unity.Notifications.Android
 
             return initialized = true;
         }
-        
+                
         /// <summary>
         /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
         /// </summary>
@@ -623,6 +631,8 @@ namespace Unity.Notifications.Android
         /// </returns>
         public static AndroidNotificationIntentData GetLastNotificationIntent()
         {
+            if (!Initialize())
+                return null;
             
             AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
             AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
@@ -944,18 +954,11 @@ namespace Unity.Notifications.Android
                 notification = notification,
             };
         }
-
-        class NotificationCallback : AndroidJavaProxy
+        
+        internal static void ReceivedNotificationCallback(AndroidJavaObject intent)
         {
-            public NotificationCallback() : base("com.unity.androidnotifications.NotificationCallback")
-            {
-            }
-
-            public void onSentNotification(AndroidJavaObject notificationIntent)
-            {
-                var data = ParseNotificationIntentData(notificationIntent);
-                OnNotificationReceived(data);
-            }
+            var data = ParseNotificationIntentData(intent);
+            OnNotificationReceived(data);
         }
     }
 }

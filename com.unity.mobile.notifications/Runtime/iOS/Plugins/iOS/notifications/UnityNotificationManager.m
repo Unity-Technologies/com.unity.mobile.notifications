@@ -258,11 +258,10 @@
         notificationData -> triggerType = PUSH_TRIGGER;
     }
     
-    if ([[request.content.userInfo valueForKey:@"data"] isKindOfClass:[NSDictionary class]]) {
-        NSDictionary* dataDict = [request.content.userInfo objectForKey:@"data"];
+    if ([NSJSONSerialization isValidJSONObject: [request.content.userInfo objectForKey:@"data"]]) {
         NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject:dataDict
-                                                       options:0
+        NSData *data = [NSJSONSerialization dataWithJSONObject:[request.content.userInfo objectForKey:@"data"]
+                                                       options:NSJSONWritingPrettyPrinted
                                                          error:&error];
         if (! data) {
             NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
@@ -270,9 +269,22 @@
             notificationData -> data = (char*) [data bytes];
         }
     }
-    else if ([[request.content.userInfo valueForKey:@"data"] isKindOfClass:[NSString class]]) {
-        
-        notificationData -> data = (char*) [[request.content.userInfo objectForKey:@"data"] UTF8String];
+    else
+    {
+        if ([[request.content.userInfo valueForKey:@"data"] isKindOfClass:[NSNumber class]] )
+        {
+            NSNumber *value = (NSNumber*)[request.content.userInfo valueForKey:@"data"];
+            
+            if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(value))) {
+                notificationData -> data = (value == 1) ? "true" : "false";
+            }
+            else {
+                notificationData -> data = (char*)[[value description] UTF8String];
+            }
+        }
+        else {
+            notificationData -> data = (char*) [[[request.content.userInfo objectForKey:@"data"]description] UTF8String];
+        }
     }
     
     return notificationData;

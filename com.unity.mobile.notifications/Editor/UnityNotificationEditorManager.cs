@@ -387,7 +387,8 @@ namespace Unity.Notifications
             
             if (notificationEditorManager.iOSNotificationEditorSettingsValues == null)
             {
-                notificationEditorManager.iOSNotificationEditorSettingsValues = new NotificationEditorSettingsCollection();
+                notificationEditorManager.iOSNotificationEditorSettingsValues =
+                    new NotificationEditorSettingsCollection();
             }
 
             if (notificationEditorManager.AndroidNotificationEditorSettingsValues == null)
@@ -413,52 +414,52 @@ namespace Unity.Notifications
                             "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Alternatively you can specify them when creating a `AuthorizationRequest` from a script.",
                             notificationEditorManager.GetiOSNotificationEditorSettingsValue<AuthorizationOption>(
                                 "UnityNotificationDefaultAuthorizationOptions",
-                                (AuthorizationOption) AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
-                        ),
-
-
-                        new NotificationEditorSetting(
-                            "UnityAddRemoteNotificationCapability",
-                            "Enable Push Notifications",
-                            "Enable this to add the push notification capability to you Xcode project.",
-                            notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                                "UnityAddRemoteNotificationCapability", false),
-                            false,
-                            dependentSettings: new List<NotificationEditorSetting>()
-                            {
-                                new NotificationEditorSetting(
-                                    "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                                    "Register for Push Notifications on App Launch",
-                                    "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
-                                    notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                                        "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                                        false)
-                                ),
-                                new NotificationEditorSetting(
-                                    "UnityRemoteNotificationForegroundPresentationOptions",
-                                    "Remote Notification Foreground Presentation Options",
-                                    "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorization to use them (the user might change it at any time). ",
-                                    notificationEditorManager
-                                        .GetiOSNotificationEditorSettingsValue<PresentationOption>(
-                                            "UnityRemoteNotificationForegroundPresentationOptions",
-                                            (PresentationOption) PresentationOptionEditor.All)
-                                ),
-                                new NotificationEditorSetting("UnityUseAPSReleaseEnvironment",
-                                    "Enable release environment for APS",
-                                    "Enable this when signing the app with a production certificate.",
-                                    notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
-                                        "UnityUseAPSReleaseEnvironment", false),
-                                    false),
-                            }
+                                (AuthorizationOption) AuthorizationOption.Alert | AuthorizationOption.Badge |
+                                AuthorizationOption.Sound)
                         ),
                     }),
+
+                new NotificationEditorSetting(
+                    "UnityAddRemoteNotificationCapability",
+                    "Enable Push Notifications",
+                    "Enable this to add the push notification capability to you Xcode project.",
+                    notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                        "UnityAddRemoteNotificationCapability", false),
+                    false,
+                    dependentSettings: new List<NotificationEditorSetting>()
+                    {
+                        new NotificationEditorSetting(
+                            "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
+                            "Register for Push Notifications on App Launch",
+                            "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
+                            notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                                "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
+                                false)
+                        ),
+                        new NotificationEditorSetting(
+                            "UnityRemoteNotificationForegroundPresentationOptions",
+                            "Remote Notification Foreground Presentation Options",
+                            "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorization to use them (the user might change it at any time). ",
+                            notificationEditorManager
+                                .GetiOSNotificationEditorSettingsValue<PresentationOption>(
+                                    "UnityRemoteNotificationForegroundPresentationOptions",
+                                    (PresentationOption) PresentationOptionEditor.All)
+                        ),
+                        new NotificationEditorSetting("UnityUseAPSReleaseEnvironment",
+                            "Enable release environment for APS",
+                            "Enable this when signing the app with a production certificate.",
+                            notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                                "UnityUseAPSReleaseEnvironment", false),
+                            false),
+                    }
+                ),
 
                 new NotificationEditorSetting("UnityUseLocationNotificationTrigger",
                     "Include CoreLocation framework",
                     "If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.",
                     notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
                         "UnityUseLocationNotificationTrigger", false),
-                    false),
+                    false)
             };
 
             

@@ -630,7 +630,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
         catch (RuntimeException ex)
         {
-            Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when app is not running!");
+            Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when the app is not running!");
         }
 
         UnityNotificationManager.deleteExpiredNotificationIntent(id, context);
