@@ -2,6 +2,15 @@
 
 All notable changes to this package will be documented in this file.
 
+
+
+## [1.0.3-preview.7] - TBA
+
+### Fixes:
+
+- [iOS] `iOSNotification.data` should no longer become corrupted after retrieving multiple notifications.
+- 
+
 ## [1.0.3-preview.6] - 2019-08-12
 
 ### Fixes:
