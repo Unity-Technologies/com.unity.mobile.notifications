@@ -4,16 +4,7 @@ All notable changes to this package will be documented in this file.
 
 
 
-## [1.0.3-preview.7] - TBA
-
-### Fixes:
-
-- [iOS] `iOSNotification.data` should no longer become corrupted after retrieving multiple notifications.
-- 
-
-## [1.0.3-preview.6] - 2019-08-12
-
-### Fixes:
+## [1.0.3] - 2019-08-21
 
 - [iOS] It's no longer necessary to enable the `Request Authorization on App Start` setting in UI to be able to turn on  `Enable Push Notifications`.
 - [iOS] `GetLastRespondedNotification` should now properly return the notification used to open the app even if "Request Authorization on App Start" is turned off. 
