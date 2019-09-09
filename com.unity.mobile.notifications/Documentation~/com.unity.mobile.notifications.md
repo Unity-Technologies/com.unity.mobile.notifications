@@ -337,7 +337,7 @@ To store arbitrary string data in a notification object, set the `Data` property
 ```c#
 var notification = new iOSNotification();
 notification.Data = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
-//..assign other fields..
+//.f.assign other fields..
 iOSNotificationCenter.ScheduleNotification(notification);
 ```
 
@@ -371,7 +371,13 @@ If the user opens the app from a notification, `GetLastRespondedNotification` al
 
 ## FAQ
 
- 
+**Why are small Android icons white in the editor notification settings preview ?**
+
+Small notification icons are [required](https://material.io/design/platform-guidance/android-notifications.html#anatomy-of-a-notification) to be monochrome and Android ignores all non-alpha channels in the icon image, therefore Unity automatically strips all  RGB channels. You can also provide icons by putting them in the `\Assets\Plugins\Android\res\drawable-{scaleFactor}`folder in that case they will not be automatically processed, however icons which contain non alpha channel will not be correctly displayed on Android 5.0 and above.
+
+The notification color can be modified by setting the `AndroidNotification.Color` property.
+
+
 
 **Why are Notifications not delivered on certain Huawei and Xiaomi phones when my app is closed and not running in the background ?**
 
