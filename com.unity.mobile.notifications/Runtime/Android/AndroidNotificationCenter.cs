@@ -541,7 +541,12 @@ namespace Unity.Notifications.Android
         public long[] VibrationPattern
         {
             // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
-            get { return vibrationPattern.Select(i => (long)i).ToArray(); }
+            get
+            {
+                if (vibrationPattern == null)
+                    return null;
+                return vibrationPattern.Select(i => (long)i).ToArray();
+            }
             set { vibrationPattern = value.Select(i => (int)i).ToArray(); }
         }
         
@@ -679,7 +684,7 @@ namespace Unity.Notifications.Android
                 channel.enableVibration,
                 channel.canBypassDnd,
                 channel.canShowBadge,
-                channel.vibrationPattern,
+                channel.VibrationPattern,
                 Enum.IsDefined(typeof(LockScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
             );
         }

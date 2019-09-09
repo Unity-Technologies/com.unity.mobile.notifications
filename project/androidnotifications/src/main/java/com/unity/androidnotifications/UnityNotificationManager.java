@@ -633,7 +633,10 @@ public class UnityNotificationManager extends BroadcastReceiver
             Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when the app is not running!");
         }
 
-        UnityNotificationManager.deleteExpiredNotificationIntent(id, context);
+        boolean isRepeatable = intent.getLongExtra("repeatInterval", 0L) > 0;
+
+        if (!isRepeatable)
+            UnityNotificationManager.deleteExpiredNotificationIntent(id, context);
     }
 
     public void registerNotificationChannel(

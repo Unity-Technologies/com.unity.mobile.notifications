@@ -2,9 +2,16 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.0.4-preview.1] - 2019-09-9
 
+### Fixes:
+
+- [Android] Trying to register an ``AndroidNotificationChannel` with a specified`VibrationPattern` should no longer trigger a missing method exception.
+- [Android] [[1178665](https://issuetracker.unity3d.com/product/unity/issues/guid/1178665/)]Repeatable notifications should now work properly and should be recreated when the device is restarted.
 
 ## [1.0.3] - 2019-08-21
+
+### Fixes:
 
 - [iOS] It's no longer necessary to enable the `Request Authorization on App Start` setting in UI to be able to turn on  `Enable Push Notifications`.
 - [iOS] `GetLastRespondedNotification` should now properly return the notification used to open the app even if "Request Authorization on App Start" is turned off. 

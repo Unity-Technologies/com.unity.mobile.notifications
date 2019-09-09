@@ -27,8 +27,9 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 Date fireTimeDate=new Date(fireTime);
 
                 int id = data_intent.getIntExtra("id", -1);
+                boolean isRepeatable = data_intent.getLongExtra("repeatInterval", 0L) > 0;
 
-                if (fireTimeDate.after(currentDate)) {
+                if (fireTimeDate.after(currentDate) || isRepeatable) {
 
                     if (BuildConfig.DEBUG) {
                         Log.w("UnityNotifications", String.format(" Rescheduling notification on boot : %d", id));
