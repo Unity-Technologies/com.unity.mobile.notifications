@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#set -xeuo pipefail
+#set -x
+
+printf "Cloning sample project:\n\n"
+
+cd com.unity.mobile.notifications
+
+mkdir Samples
+
+cd Samples
+
+git clone https://github.com/Unity-Technologies/NotificationsSamples.git tmp
+
+rm -rf tmp/Editor
+rm -rf tmp/Plugins
+
+mv tmp/Assets NotificationsSamples
+
+mv tmp/README.md NotificationsSamples/README.md
+mv tmp/License.md NotificationsSamples/Licnese.md
+
+rm -rf tmp
+
+cd NotificationsSamples
+touch .sample.json
+echo "{\"displayName\": \"Notification Samples\",\"description\": \"Description for sample\"}" >> .sample.json
+
+

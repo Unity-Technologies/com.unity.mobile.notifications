@@ -547,7 +547,11 @@ namespace Unity.Notifications.Android
                     return null;
                 return vibrationPattern.Select(i => (long)i).ToArray();
             }
-            set { vibrationPattern = value.Select(i => (int)i).ToArray(); }
+            set
+            {
+                if (value != null)
+                    vibrationPattern = value.Select(i => (int)i).ToArray();
+            }
         }
         
         /// <summary>

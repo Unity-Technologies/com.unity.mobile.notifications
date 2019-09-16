@@ -501,11 +501,15 @@ namespace Unity.Notifications.iOS
             }
         }
 
+        private static string GenerateUniqueID()
+        {
+            return Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()).ToString();
+        }
+
         /// <summary>
         /// Create a new instance of <see cref="iOSNotificationCenter.iOSNotification"/> and automatically generate an unique string for <see cref="iOSNotificationCenter.iOSNotification.identifier"/>  with all optional fields set to default values.
         /// </summary>
-        public iOSNotification() : this(
-            Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()).ToString())
+        public iOSNotification() : this(GenerateUniqueID())
         {
             
         }
@@ -559,6 +563,14 @@ namespace Unity.Notifications.iOS
         }
 
         internal iOSNotificationData data;
+
+        internal void Verify()
+        {
+            if (data.identifier == null)
+            {
+                data.identifier = GenerateUniqueID();
+            }
+        }
 
     }
 
@@ -969,6 +981,7 @@ namespace Unity.Notifications.iOS
             if (!Initialize())
                 return;
             
+            notification.Verify();
             iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
         }
 

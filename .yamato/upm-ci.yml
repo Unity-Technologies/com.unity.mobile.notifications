@@ -29,6 +29,7 @@ pack:
     - ls
     - ./project/prepare_env.sh
     - ./project/build_package.sh
+    - ./add_sample.sh
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
     - ls
     - upm-ci package pack --package-path com.unity.mobile.notifications
