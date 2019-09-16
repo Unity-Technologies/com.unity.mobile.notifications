@@ -12,8 +12,8 @@ cd Samples
 
 git clone https://github.com/Unity-Technologies/NotificationsSamples.git tmp
 
-rm -rf tmp/Editor
-rm -rf tmp/Plugins
+rm -rf tmp/Assets/Editor
+rm -rf tmp/Assets/Plugins
 
 mv tmp/Assets NotificationsSamples
 

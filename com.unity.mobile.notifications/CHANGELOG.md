@@ -4,11 +4,12 @@ All notable changes to this package will be documented in this file.
 
 
 
-## [1.0.4-preview.alpha.1] - 2019-09-16
+## [1.0.4-preview.2] - 2019-09-16
 
 ### Fixes:
 
-- It should now be possible to set `AndroidNotificationChannel.VibrationPattern` to null.
+- Embedded the [Notification Samples project](https://github.com/Unity-Technologies/NotificationsSamples) into the package, I can now be imported from the Package Manager UI.
+- [Android] It should now be possible to set `AndroidNotificationChannel.VibrationPattern` to null.
 
 ## [1.0.4-preview.1] - 2019-09-9
 
