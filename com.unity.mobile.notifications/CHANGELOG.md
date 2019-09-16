@@ -2,12 +2,20 @@
 
 All notable changes to this package will be documented in this file.
 
+
+
+## [1.0.4-preview.alpha.1] - 2019-09-16
+
+### Fixes:
+
+- It should now be possible to set `AndroidNotificationChannel.VibrationPattern` to null.
+
 ## [1.0.4-preview.1] - 2019-09-9
 
 ### Fixes:
 
-- [Android] Trying to register an ``AndroidNotificationChannel` with a specified`VibrationPattern` should no longer trigger a missing method exception.
-- [Android] [[1178665](https://issuetracker.unity3d.com/product/unity/issues/guid/1178665/)] Repeatable notifications should now work properly and should be recreated when the device is restarted.
+- [Android] Trying to register an ``AndroidNotificationChannel` with a specified `VibrationPattern` should no longer trigger a missing method exception.
+-  [Android] [[1178665](https://issuetracker.unity3d.com/product/unity/issues/guid/1178665/)] Repeatable notifications should now work properly and should be recreated when the device is restarted. 1.0.4-preview.alpha.1
 
 ## [1.0.3] - 2019-08-21
 
