@@ -4,6 +4,12 @@ All notable changes to this package will be documented in this file.
 
 
 
+## [1.0.4-preview.3] - 2019-10-09
+
+### Fixes:
+
+- [iOS] Remote notification `deviceToken` is now be returned correctly (and without angle brackets)on iOS 13.
+
 ## [1.0.4-preview.2] - 2019-09-16
 
 ### Fixes:

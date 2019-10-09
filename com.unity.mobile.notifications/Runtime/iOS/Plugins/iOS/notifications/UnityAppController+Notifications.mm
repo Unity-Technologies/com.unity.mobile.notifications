@@ -85,9 +85,13 @@
                         NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken");
                         UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
                         manager.remoteNotificationsRegistered = UNAuthorizationStatusDenied;
-                        manager.deviceToken = [NSString stringWithFormat:@"%@",notification.userInfo];
+            
+                        if ([notification.userInfo isKindOfClass:[NSData class]])
+                        {
+                            NSData* data = (NSData*)notification.userInfo;
+                            [manager setDeviceTokenFromNSData: (NSData*)notification.userInfo];
+                        }
                         [manager checkAuthorizationFinished];
-
                     }];
 
         [nc addObserverForName:kUnityDidFailToRegisterForRemoteNotificationsWithError

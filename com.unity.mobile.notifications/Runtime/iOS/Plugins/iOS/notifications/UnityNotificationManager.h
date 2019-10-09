@@ -120,4 +120,5 @@ const int kDefaultPresentationOptions = -1;
     - (void)updateDeliveredNotificationList;
     - (void)updateNotificationSettings;
     - (void)requestAuthorization: (NSInteger)authorizationOptions : (BOOL) registerRemote;
+    - (void)setDeviceTokenFromNSData:(NSData*)deviceToken;
 @end

@@ -96,6 +96,20 @@
     }];
 }
 
+- (void)setDeviceTokenFromNSData:(NSData *)deviceTokenData {
+        
+        NSUInteger len = deviceTokenData.length;
+        if (len == 0) {
+            return;
+        }
+        const unsigned char *buffer = deviceTokenData.bytes;
+        NSMutableString *str  = [NSMutableString stringWithCapacity:(len * 2)];
+        for (int i = 0; i < len; ++i) {
+            [str appendFormat:@"%02x", buffer[i]];
+        }
+        self.deviceToken = [str copy];
+}
+
 //Called when a notification is delivered to a foreground app.
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
     
