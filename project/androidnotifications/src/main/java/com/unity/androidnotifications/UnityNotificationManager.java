@@ -545,6 +545,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         .setContentIntent(tapIntent)
         .setAutoCancel(autoCancel);
 
+        notificationBuilder.setShowWhen(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
             if (color != 0)
@@ -556,6 +557,7 @@ public class UnityNotificationManager extends BroadcastReceiver
                 }
             }
         }
+
 
         if (number >= 0)
             notificationBuilder.setNumber(number);
