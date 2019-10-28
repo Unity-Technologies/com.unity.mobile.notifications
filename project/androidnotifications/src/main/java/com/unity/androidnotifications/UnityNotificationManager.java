@@ -356,10 +356,21 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         if (activityClass == null && fallbackToDefault)
         {
+            Log.w("UnityNotifications", "No custom_notification_android_activity found, attempting to find app activity class");
+
+            String classToFind = "com.unity3d.player.UnityPlayerActivity";
             try {
-                return Class.forName("com.unity3d.player.UnityPlayerActivity");
+                return Class.forName(classToFind);
             } catch (ClassNotFoundException ignored) {
-                ;
+                Log.w("UnityNotifications", String.format("Attempting to find : %s, failed!", classToFind));
+                classToFind = String.format("%s.UnityPlayerActivity", context.getPackageName());
+                try {
+                    return Class.forName(classToFind);
+                }
+                catch (ClassNotFoundException ignored1)
+                {
+                    Log.w("UnityNotifications", String.format("Attempting to find class based on package name: %s, failed!", classToFind));
+                }
             }
         }
 
