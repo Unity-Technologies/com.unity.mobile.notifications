@@ -515,6 +515,8 @@ public class UnityNotificationManager extends BroadcastReceiver
         int color = intent.getIntExtra("color", 0);
         int number = intent.getIntExtra("number", 0);
 
+        boolean showTimestamp = intent.getBooleanExtra("showTimestamp", false);
+        long timestampValue = intent.getLongExtra("timestamp", -1);
 
         if (smallIcon == 0)
         {
@@ -540,12 +542,11 @@ public class UnityNotificationManager extends BroadcastReceiver
         }
 
         notificationBuilder.setContentTitle(textTitle)
-        .setContentText(textContent)
-        .setSmallIcon(smallIcon)
-        .setContentIntent(tapIntent)
-        .setAutoCancel(autoCancel);
+                .setContentText(textContent)
+                .setSmallIcon(smallIcon)
+                .setContentIntent(tapIntent)
+                .setAutoCancel(autoCancel);
 
-        notificationBuilder.setShowWhen(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
             if (color != 0)
@@ -558,16 +559,21 @@ public class UnityNotificationManager extends BroadcastReceiver
             }
         }
 
-
         if (number >= 0)
             notificationBuilder.setNumber(number);
 
         if (style == 2)
             notificationBuilder.setStyle(new Notification.BigTextStyle().bigText(textContent));
 
+        notificationBuilder.setWhen(timestampValue);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            notificationBuilder.setShowWhen(showTimestamp);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
         {
-            notificationBuilder.setWhen(fireTime);
             notificationBuilder.setUsesChronometer(usesChronometer);
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
@@ -642,16 +648,16 @@ public class UnityNotificationManager extends BroadcastReceiver
     }
 
     public void registerNotificationChannel(
-        String id,
-        String title,
-        int importance,
-        String description,
-        boolean enableLights,
-        boolean enableVibration,
-        boolean canBypassDnd,
-        boolean canShowBadge,
-        long[] vibrationPattern,
-        int lockscreenVisibility)
+            String id,
+            String title,
+            int importance,
+            String description,
+            boolean enableLights,
+            boolean enableVibration,
+            boolean canBypassDnd,
+            boolean canShowBadge,
+            long[] vibrationPattern,
+            int lockscreenVisibility)
     {
         SharedPreferences prefs = mContext.getSharedPreferences(UNITY_NOTIFICATION_SETTINGS, Context.MODE_PRIVATE);
         Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
@@ -694,23 +700,23 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public void deleteNotificationChannel(String id)
     {
-            SharedPreferences prefs = mContext.getSharedPreferences(UNITY_NOTIFICATION_SETTINGS, Context.MODE_PRIVATE);
-            Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
+        SharedPreferences prefs = mContext.getSharedPreferences(UNITY_NOTIFICATION_SETTINGS, Context.MODE_PRIVATE);
+        Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
 
-            if (channelIdsSet.contains(id)) {
+        if (channelIdsSet.contains(id)) {
 
-                channelIdsSet.remove(id);
+            channelIdsSet.remove(id);
 
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.clear();
-                editor.putStringSet("ChannelIDs", channelIdsSet);
-                editor.commit();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
+            editor.putStringSet("ChannelIDs", channelIdsSet);
+            editor.commit();
 
-                SharedPreferences channelPrefs = mContext.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
-                editor = channelPrefs.edit();
-                editor.clear();
-                editor.commit();
-            }
+            SharedPreferences channelPrefs = mContext.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
+            editor = channelPrefs.edit();
+            editor.clear();
+            editor.commit();
+        }
     }
 
     public NotificationChannelWrapper getNotificationChannel(String id)
