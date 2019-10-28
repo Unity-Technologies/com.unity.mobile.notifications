@@ -912,36 +912,16 @@ namespace Unity.Notifications.Android
             AndroidJavaObject notificationIntent =
                 new AndroidJavaObject("android.content.Intent", context, managerClass);
 
-            AndroidJavaObject androidContext = notificationManager.Get<AndroidJavaObject>("mContext");
-
-            int smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-                notification.smallIcon, androidContext, activity);
-            int largeIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-                notification.largeIcon, androidContext, activity);
-
-
-            if (smallIconId == 0)
-            {
-                smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-                    DEFAULT_APP_ICON_ADAPTIVE, androidContext, activity);
-
-                if (smallIconId == 0)
-                {
-                    smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-                        DEFAULT_APP_ICON_LEGACY, androidContext, activity);
-                }
-            }
-
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channel);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.title);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.text);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIcon", smallIconId);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", notification.smallIcon);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.shouldAutoCancel);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.usesStopwatch);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", notification.fireTime);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.repeatInterval);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIcon", largeIconId);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIconStr", notification.largeIcon);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);

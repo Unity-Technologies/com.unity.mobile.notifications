@@ -56,21 +56,26 @@ public class UnityNotificationManager extends BroadcastReceiver
     public static final String SHARED_PREFS_NOTIFICATION_IDS = "UNITY_NOTIFICATION_IDS";
     public static final String DEFAULT_APP_ICON = "app_icon";
 
-    public static int findResourceidInContextByName(String name, Context context, Activity activity)
+    public static int findResourceidInContextByName(String name, Context context)
     {
         if (name == null)
             return 0;
 
-        Resources res = context.getResources();
-        if (res != null)
-        {
-            int id = res.getIdentifier(name, "mipmap", activity.getPackageName());
-            if (id == 0)
-                return res.getIdentifier(name, "drawable", activity.getPackageName());
-            else
-                return id;
+        try {
+            Resources res = context.getResources();
+            if (res != null) {
+                int id = res.getIdentifier(name, "mipmap", context.getPackageName());//, activity.getPackageName());
+                if (id == 0)
+                    return res.getIdentifier(name, "drawable", context.getPackageName());//, activity.getPackageName());
+                else
+                    return id;
+            }
+            return 0;
         }
-        return 0;
+        catch (Resources.NotFoundException e)
+        {
+            return 0;
+        }
     }
 
     public static UnityNotificationManager getNotificationManagerImpl(Context context) {
@@ -423,7 +428,7 @@ public class UnityNotificationManager extends BroadcastReceiver
     }
 
 
-    public void scheduleNotificationIntent(Intent data_intent_source)//int id, String channelID, String textTitle, String textContent, String smallIcon, boolean autoCancel, String category, int visibility, long[] vibrationPattern, boolean usesChronometer, Date originalTime, Date fireTime, long repeatInterval)
+    public void scheduleNotificationIntent(Intent data_intent_source)
     {
 
         Instant starts = null;
@@ -505,11 +510,9 @@ public class UnityNotificationManager extends BroadcastReceiver
         String channelID = intent.getStringExtra("channelID");
         String textTitle = intent.getStringExtra("textTitle");
         String textContent = intent.getStringExtra("textContent");
-        int smallIcon = intent.getIntExtra("smallIcon", 0);// R.drawable.ic_launcher_background);
         boolean autoCancel = intent.getBooleanExtra("autoCancel", true);
         long fireTime = intent.getLongExtra("fireTime", -1);
         boolean usesChronometer = intent.getBooleanExtra("usesChronometer", false);
-        int largeIcon = intent.getIntExtra("largeIcon", 0);
         int lockscreenVisibility = intent.getIntExtra("lockscreenVisibility", 0);
         int style = intent.getIntExtra("style", 0);
         int color = intent.getIntExtra("color", 0);
@@ -518,9 +521,35 @@ public class UnityNotificationManager extends BroadcastReceiver
         boolean showTimestamp = intent.getBooleanExtra("showTimestamp", false);
         long timestampValue = intent.getLongExtra("timestamp", -1);
 
-        if (smallIcon == 0)
+        String smallIconStr = intent.getStringExtra("smallIconStr");
+        String largeIconStr = intent.getStringExtra("largeIconStr");
+
+        int smallIconId = UnityNotificationManager.findResourceidInContextByName(smallIconStr, context);
+        int largeIconId = UnityNotificationManager.findResourceidInContextByName(largeIconStr, context);
+//        int smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
+//            notification.smallIcon, androidContext, activity);
+//        int largeIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
+//            notification.largeIcon, androidContext, activity);
+//
+//
+//
+//
+//        if (smallIconId == 0)
+//        {
+//            smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
+//                DEFAULT_APP_ICON_ADAPTIVE, androidContext, activity);
+//
+//            if (smallIconId == 0)
+//            {
+//                smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
+//                    DEFAULT_APP_ICON_LEGACY, androidContext, activity);
+//            }
+//        }
+
+
+        if (smallIconId == 0)
         {
-            smallIcon = R.drawable.default_icon;
+            smallIconId = R.drawable.default_icon;
         }
 
         PendingIntent tapIntent = (PendingIntent)intent.getParcelableExtra("tapIntent");
@@ -536,14 +565,14 @@ public class UnityNotificationManager extends BroadcastReceiver
             notificationBuilder = new Notification.Builder(context, channelID);
         }
 
-        if (largeIcon != 0)
+        if (largeIconId != 0)
         {
-            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), largeIcon));
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), largeIconId));
         }
 
         notificationBuilder.setContentTitle(textTitle)
                 .setContentText(textContent)
-                .setSmallIcon(smallIcon)
+                .setSmallIcon(smallIconId)
                 .setContentIntent(tapIntent)
                 .setAutoCancel(autoCancel);
 
