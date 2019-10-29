@@ -2,7 +2,15 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.0.4-preview.4 - 2019-10-29
 
+### Fixes:
+
+- [Android] Icon resources will now be queried when the notification is supposed to be triggered instead of when it's scheduled. This should fix crashes due to missing resources in cases where the app is updated after a notification is scheduled but before it's delivered.
+
+### Changes & Improvements:
+
+- [Android] Added 'AndroidNotification.ShowTimestamp' to allow displaying timestamp on delivered notifications. The specific time stamp value can be overriden using 'AndroidNotification.CustomTimestamp' if it's not set the time at which the notification was delivered will be shown.
 
 ## [1.0.4-preview.3] - 2019-10-09
 
