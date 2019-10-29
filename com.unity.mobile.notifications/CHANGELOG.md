@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.0.4-preview.4 - 2019-10-29
+## [1.0.4-preview.4] - 2019-10-29
 
 ### Fixes:
 
