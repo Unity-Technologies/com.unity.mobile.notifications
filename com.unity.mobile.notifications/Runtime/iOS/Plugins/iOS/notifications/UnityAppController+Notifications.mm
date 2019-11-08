@@ -4,6 +4,7 @@
 //
 //  Copyright © 2018 Unity Technologies. All rights reserved.
 //
+#if TARGET_OS_IOS
 
 #import <objc/runtime.h>
 
@@ -110,3 +111,4 @@
     return sharedInstance;
 }
 @end
+#endif

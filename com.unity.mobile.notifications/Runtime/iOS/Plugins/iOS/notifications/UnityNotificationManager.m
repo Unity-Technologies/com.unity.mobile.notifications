@@ -5,6 +5,7 @@
 //  Created by Paulius on 24/07/2018.
 //  Copyright © 2018 Unity Technologies. All rights reserved.
 //
+#if TARGET_OS_IOS
 
 #import "UnityNotificationManager.h"
 
@@ -323,3 +324,4 @@
 }
 
 @end
+#endif
