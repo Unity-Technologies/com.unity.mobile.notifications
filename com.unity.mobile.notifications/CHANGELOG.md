@@ -2,6 +2,14 @@
 
 All notable changes to this package will be documented in this file.
 
+
+
+## [1.0.4-preview.5] - 2019-11-13
+
+### Fixes:
+
+- [iOS/tvOS] The iOS source plugins provided by the package will no longer be included when building for Apple TV.
+
 ## [1.0.4-preview.4] - 2019-10-29
 
 ### Fixes:
