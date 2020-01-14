@@ -515,6 +515,8 @@ public class UnityNotificationManager extends BroadcastReceiver
         int color = intent.getIntExtra("color", 0);
         int number = intent.getIntExtra("number", 0);
 
+        boolean showTimestamp = intent.getBooleanExtra("showTimestamp", false);
+        long timestampValue = intent.getLongExtra("timestamp", -1);
 
         if (smallIcon == 0)
         {
@@ -563,9 +565,15 @@ public class UnityNotificationManager extends BroadcastReceiver
         if (style == 2)
             notificationBuilder.setStyle(new Notification.BigTextStyle().bigText(textContent));
 
+        notificationBuilder.setWhen(fireTime);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            notificationBuilder.setShowWhen(true);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
         {
-            notificationBuilder.setWhen(fireTime);
             notificationBuilder.setUsesChronometer(usesChronometer);
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)

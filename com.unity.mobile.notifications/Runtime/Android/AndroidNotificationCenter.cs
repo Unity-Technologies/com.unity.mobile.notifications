@@ -183,23 +183,28 @@ namespace Unity.Notifications.Android
             set { smallIcon = value; }
         }
 
+        private static long DatetimeToLong(DateTime value)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan diff = value.ToUniversalTime() - origin;
+
+            return (long) Math.Floor(diff.TotalMilliseconds);
+
+        }
+
+        private static DateTime LongToDatetime(long value)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return origin.AddMilliseconds(value).ToLocalTime();
+        }
+        
         /// <summary>
         /// The date and time when the notification should be delivered.
         /// </summary>
         public DateTime FireTime
         {
-            get
-            {
-                DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                return origin.AddMilliseconds(fireTime).ToLocalTime();
-            }
-            set
-            {
-                DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                TimeSpan diff = value.ToUniversalTime() - origin;
-
-                fireTime = (long) Math.Floor(diff.TotalMilliseconds);
-            }
+            get { return LongToDatetime(fireTime); }
+            set { fireTime = DatetimeToLong(value); }
         }
 
         /// <summary>
@@ -350,7 +355,29 @@ namespace Unity.Notifications.Android
             get { return intentData; }
             set { intentData = value; }
         }
-                
+        
+        /// <summary>
+        /// Enable it to show a timestamp on the notification when it's delivered, unless the "CustomTimestamp" property is set "FireTime" will be shown. 
+        /// </summary>
+        public bool ShowTimestamp
+        {
+            get { return showTimestamp; }
+            set { showTimestamp = value; }
+        }
+        
+        /// <summary>
+        /// Set this to show custom date instead of the notification's "FireTime" as the notification's timestamp'. 
+        /// </summary>
+        public DateTime CustomTimestamp
+        {
+            get { return LongToDatetime(customTimestamp); }
+            set
+            {
+                showCustomTimestamp = true;
+                customTimestamp = DatetimeToLong(value);
+            }
+        }
+
         internal string title;
         internal string text;
         
@@ -375,6 +402,10 @@ namespace Unity.Notifications.Android
         internal string sortKey;
         internal int groupAlertBehaviour;
 
+        internal bool showTimestamp;
+        internal long customTimestamp;
+
+        internal bool showCustomTimestamp;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
@@ -394,12 +425,17 @@ namespace Unity.Notifications.Android
             usesStopwatch = false;
             intentData = "";            
             this.fireTime = -1;
-            this.group = "";
+            group = "";
             this.groupSummary = false;
             this.sortKey = "";
             this.groupAlertBehaviour = -1;
+
+            customTimestamp = -1;
+            showTimestamp = false;
+            showCustomTimestamp = false;
             
             this.FireTime = fireTime;
+
         }
 
         /// <summary>
@@ -914,7 +950,14 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", notification.groupSummary);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.sortKey);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", notification.groupAlertBehaviour);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.showTimestamp);
+
+            long timestampValue =
+                notification.showCustomTimestamp ? notification.customTimestamp : notification.fireTime;
             
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.showTimestamp);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
+
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
 
