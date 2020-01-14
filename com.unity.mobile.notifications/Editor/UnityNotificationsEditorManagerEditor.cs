@@ -337,7 +337,7 @@ namespace Unity.Notifications
 				return;
 
 			var width = GetMinimumEditorWidth(EditorGUIUtility.currentViewWidth - 300f);
-			var rect = new Rect(10f, 0f, width, 400f);
+			var rect = new Rect(10f, 0f, width, Screen.height);
 			OnInspectorGUI(rect);
 		}
 		
@@ -437,6 +437,10 @@ namespace Unity.Notifications
 				GUI.BeginGroup(settingsPanelRect);
 				DrawSettingsElementList(BuildTargetGroup.iOS, settings, false, styleToggle, styleDropwDown, settingsPanelRect);
 				GUI.EndGroup();
+				
+				if (!drawInInspector)
+					EditorGUILayout.GetControlRect(true, 4 * kSlotSize);
+
 			}
 
 			serializedObject.ApplyModifiedProperties();
