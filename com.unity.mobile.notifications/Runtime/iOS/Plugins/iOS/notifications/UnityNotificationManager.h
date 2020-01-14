@@ -5,6 +5,8 @@
 //  Copyright © 2018 Unity Technologies. All rights reserved.
 //
 
+#if TARGET_OS_IOS
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <UserNotifications/UserNotifications.h>
@@ -122,3 +124,5 @@ const int kDefaultPresentationOptions = -1;
     - (void)requestAuthorization: (NSInteger)authorizationOptions : (BOOL) registerRemote;
     - (void)setDeviceTokenFromNSData:(NSData*)deviceToken;
 @end
+
+#endif

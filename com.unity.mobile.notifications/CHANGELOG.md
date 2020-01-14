@@ -4,25 +4,21 @@ All notable changes to this package will be documented in this file.
 
 
 
-## [1.0.4-preview.3] - 2019-10-09
+## [1.0.4] - 2019-11-19
 
 ### Fixes:
 
+- [iOS/tvOS] The iOS source plugins provided by the package will no longer be included when building for Apple TV.
+- [Android] Icon resources will now be queried when the notification is supposed to be triggered instead of when it's scheduled. This should fix crashes due to missing resources in cases where the app is updated after a notification is scheduled but before it's delivered.
 - [iOS] Remote notification `deviceToken` is now be returned correctly (and without angle brackets)on iOS 13.
-
-## [1.0.4-preview.2] - 2019-09-16
-
-### Fixes:
-
 - Embedded the [Notification Samples project](https://github.com/Unity-Technologies/NotificationsSamples) into the package, I can now be imported from the Package Manager UI.
 - [Android] It should now be possible to set `AndroidNotificationChannel.VibrationPattern` to null.
-
-## [1.0.4-preview.1] - 2019-09-9
-
-### Fixes:
-
 - [Android] Trying to register an ``AndroidNotificationChannel` with a specified `VibrationPattern` should no longer trigger a missing method exception.
 -  [Android] [[1178665](https://issuetracker.unity3d.com/product/unity/issues/guid/1178665/)] Repeatable notifications should now work properly and should be recreated when the device is restarted. 1.0.4-preview.alpha.1
+
+### Changes & Improvements:
+
+- [Android] Added 'AndroidNotification.ShowTimestamp' to allow displaying timestamp on delivered notifications. The specific time stamp value can be overriden using 'AndroidNotification.CustomTimestamp' if it's not set the time at which the notification was delivered will be shown.
 
 ## [1.0.3] - 2019-08-21
 

@@ -5,6 +5,7 @@
 //  Copyright © 2018 Unity Technologies. All rights reserved.
 //
 
+#if TARGET_OS_IOS
 #import <Foundation/Foundation.h>
 
 #if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
@@ -292,4 +293,4 @@ iOSNotificationData* _GetLastNotificationData()
     iOSNotificationData* data = [UnityNotificationManager UNNotificationRequestToiOSNotificationData : manager.lastReceivedNotification.request];
     return data;
 }
-
+#endif
