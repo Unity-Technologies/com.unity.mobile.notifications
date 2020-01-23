@@ -1,7 +1,7 @@
 test_editors:
   - version: trunk
+  - version: 2019.3
   - version: 2019.2
-  - version: 2019.1
   - version: 2018.4
 test_platforms:
   - name: mac
