@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 using Random = System.Random;
 
@@ -911,7 +910,7 @@ namespace Unity.Notifications.Android
 
             AndroidJavaObject notificationIntent =
                 new AndroidJavaObject("android.content.Intent", context, managerClass);
-
+            
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channel);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.title);
@@ -935,7 +934,6 @@ namespace Unity.Notifications.Android
             long timestampValue =
                 notification.showCustomTimestamp ? notification.customTimestamp : notification.fireTime;
             
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.showTimestamp);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
 
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);

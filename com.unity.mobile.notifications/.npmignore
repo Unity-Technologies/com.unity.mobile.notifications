@@ -30,3 +30,10 @@ TestRunnerOptions.json
 
 publish_package.bat
 publish_package.bat.meta
+
+upm-ci~/**
+.Editor/**
+.yamato/**
+*.zip*
+TestRunnerOptions.json
+.idea/**
