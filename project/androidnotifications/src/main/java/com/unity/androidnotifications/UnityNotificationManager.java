@@ -54,6 +54,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public static final String UNITY_NOTIFICATION_SETTINGS = "UNITY_NOTIFICATIONS";
     public static final String SHARED_PREFS_NOTIFICATION_IDS = "UNITY_NOTIFICATION_IDS";
+    public static final String UNITY_STORED_NOTIFICATION_IDS = "UNITY_STORED_NOTIFICATION_IDS";
     public static final String DEFAULT_APP_ICON = "app_icon";
 
     public static int findResourceidInContextByName(String name, Context context)
@@ -158,7 +159,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         editor.commit();
 
         // Store IDs
-        SharedPreferences idsPrefs = context.getSharedPreferences("UNITY_STORED_NOTIFICATION_IDS", Context.MODE_PRIVATE);
+        SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
@@ -180,7 +181,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public static void deleteExpiredNotificationIntent(String id, Context context)
     {
-        SharedPreferences idsPrefs = context.getSharedPreferences("UNITY_STORED_NOTIFICATION_IDS", Context.MODE_PRIVATE);
+        SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
         if (BuildConfig.DEBUG) {
@@ -204,7 +205,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public static List<Intent> LoadNotificationIntents(Context context)
     {
-        SharedPreferences idsPrefs = context.getSharedPreferences("UNITY_STORED_NOTIFICATION_IDS", Context.MODE_PRIVATE);
+        SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
 
@@ -231,6 +232,13 @@ public class UnityNotificationManager extends BroadcastReceiver
                 idsMarkedForRemoval.add(id);
             }
 
+            if (BuildConfig.DEBUG) {
+                try {
+                    Log.w("UnityNotifications", "id: " + id + " status: " + Integer.toString(UnityNotificationManager.getNotificationManagerImpl(context).checkNotificationStatus(Integer.parseInt(id))));
+                } catch (Exception ex) {
+                    ;
+                }
+            }
         }
 
         for (String id : idsMarkedForRemoval) {
@@ -268,6 +276,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         String[] vibrationPatternStr = prefs.getString("vibrationPattern", "[]").split(",");
 
         long[] vibrationPattern = new long[vibrationPatternStr.length];
+
 
         if (vibrationPattern.length > 1)
         {
@@ -394,7 +403,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         Intent data_intent = (Intent)intent.clone();
         int id = data_intent.getIntExtra("id", 0);
 
-        SharedPreferences prefs = context.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
@@ -766,7 +775,7 @@ public class UnityNotificationManager extends BroadcastReceiver
 
     public int[] getScheduledNotificationIDs()
     {
-        SharedPreferences prefs = mContext.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
         String[] idsArrStr = idsSet.toArray(new String[idsSet.size()]);
@@ -853,7 +862,7 @@ public class UnityNotificationManager extends BroadcastReceiver
             broadcast.cancel();
         }
 
-        SharedPreferences prefs = context.getSharedPreferences("UNITY_NOTIFICATIONS", Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
 
