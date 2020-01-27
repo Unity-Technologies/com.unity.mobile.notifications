@@ -2,7 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.0.4-preview.6] - 2019-01-27
 
+### Fixes:
+- [Android] Duplicate notifications will no longer be scheduled after the device is restarted (when "Reschedule Notification on Device Restart" is turned on).
+- [Android] Unity's Notification package will no longer attempt to load AlarmManager intents which were not scheduledby it.
+- [Editor] It's now possible to use `Unity.Notifications' editor classes without having to create manually referenc it in your asmdef file.
 
 ## [1.0.4-preview.5] - 2019-11-13
 
