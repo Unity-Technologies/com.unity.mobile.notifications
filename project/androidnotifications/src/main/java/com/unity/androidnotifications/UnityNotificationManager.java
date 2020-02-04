@@ -156,7 +156,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         String data = UnityNotificationManager.SerializeNotificationIntent(intent);
         editor.putString("data", data);
 
-        editor.commit();
+        editor.apply();
 
         // Store IDs
         SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
@@ -168,7 +168,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         SharedPreferences.Editor idsEditor = idsPrefs.edit();
         idsEditor.clear();
         idsEditor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
-        idsEditor.commit();
+        idsEditor.apply();
 
         UnityNotificationManager.LoadNotificationIntents(context);
 
@@ -195,11 +195,11 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         SharedPreferences.Editor editor = idsPrefs.edit();
         editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
-        editor.commit();
+        editor.apply();
 
         SharedPreferences notificationPrefs =
                 context.getSharedPreferences(String.format("u_notification_data_%s", id), Context.MODE_PRIVATE);
-        notificationPrefs.edit().clear().commit();
+        notificationPrefs.edit().clear().apply();
 
     }
 
@@ -715,7 +715,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
         editor.putStringSet("ChannelIDs", channelIdsSet);
-        editor.commit();
+        editor.apply();
 
         SharedPreferences channelPrefs = mContext.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
         editor = channelPrefs.edit();
@@ -730,7 +730,7 @@ public class UnityNotificationManager extends BroadcastReceiver
         editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
         editor.putInt("lockscreenVisibility", lockscreenVisibility);
 
-        editor.commit();
+        editor.apply();
     }
 
     public Object[] getNotificationChannels()
@@ -759,12 +759,12 @@ public class UnityNotificationManager extends BroadcastReceiver
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
             editor.putStringSet("ChannelIDs", channelIdsSet);
-            editor.commit();
+            editor.apply();
 
             SharedPreferences channelPrefs = mContext.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
             editor = channelPrefs.edit();
             editor.clear();
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -873,7 +873,7 @@ public class UnityNotificationManager extends BroadcastReceiver
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
             editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
-            editor.commit();
+            editor.apply();
         }
     }
 
