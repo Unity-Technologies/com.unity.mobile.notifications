@@ -894,16 +894,21 @@ public class UnityNotificationManager extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        if (!intent.hasExtra("channelID") || !intent.hasExtra("smallIconStr"))
-            return;
+        try{
+            if (!intent.hasExtra("channelID") || !intent.hasExtra("smallIconStr"))
+                return;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-        {
-            UnityNotificationManagerNougat.sendNotificationNougat(intent, context);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            {
+                UnityNotificationManagerNougat.sendNotificationNougat(intent, context);
+            }
+            else {
+                UnityNotificationManager.sendNotification(intent, context);
+            }
         }
-        else {
-            UnityNotificationManager.sendNotification(intent, context);
+        catch (BadParcelableException e)
+        {
+            Log.w("UnityNotifications", e.toString());
         }
     }
-
 }
