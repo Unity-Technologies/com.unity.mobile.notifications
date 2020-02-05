@@ -17,7 +17,7 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
-imoort android.os.Exceptions.BadParcelableException;
+import android.os.Exceptions.BadParcelableException;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.Keep;
 import android.util.Base64;
