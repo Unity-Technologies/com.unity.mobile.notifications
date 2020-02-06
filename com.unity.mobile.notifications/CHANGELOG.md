@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.0.4-preview.7] - 2019-02-06
+
+### Fixes:
+
+- [Android] Write all `SharedPreferences` to disk asynchronously.
+
 ## [1.0.4-preview.6] - 2019-01-27
 
 ### Fixes:
@@ -43,7 +49,7 @@ All notable changes to this package will be documented in this file.
 ### Fixes:
 
 - [Android] Trying to register an ``AndroidNotificationChannel` with a specified `VibrationPattern` should no longer trigger a missing method exception.
--  [Android] [[1178665](https://issuetracker.unity3d.com/product/unity/issues/guid/1178665/)] Repeatable notifications should now work properly and should be recreated when the device is restarted. 1.0.4-preview.alpha.1
+-  [Android][[1178665](https://issuetracker.unity3d.com/product/unity/issues/guid/1178665/)] Repeatable notifications should now work properly and should be recreated when the device is restarted. 1.0.4-preview.alpha.1
 
 ## [1.0.3] - 2019-08-21
 
