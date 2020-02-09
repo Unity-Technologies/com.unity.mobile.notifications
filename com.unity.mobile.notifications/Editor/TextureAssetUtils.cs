@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
+#pragma warning disable 0219
 namespace Unity.Notifications
 {
     internal static class TextureAssetUtils
@@ -123,3 +124,4 @@ namespace Unity.Notifications
 
     }
 }
+#pragma warning restore 0219

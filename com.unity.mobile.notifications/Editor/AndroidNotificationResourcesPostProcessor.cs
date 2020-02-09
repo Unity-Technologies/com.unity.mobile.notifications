@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEditor.Android;
 
 #if UNITY_EDITOR && PLATFORM_ANDROID
+
+#pragma warning disable 0219
 namespace Unity.Notifications
 {
     public class AndroidNotificationResourcesPostProcessor : IPostGenerateGradleAndroidProject
@@ -139,4 +141,5 @@ namespace Unity.Notifications
         }
     }
 }
+#pragma warning restore 0219
 #endif
