@@ -1,0 +1,13 @@
+check_format:
+  name : Check format
+  agent:
+    type: Unity::VM
+    image: package-ci/ubuntu:stable
+    flavor: b1.small
+  commands:
+    - git clone --branch stable git@github.cds.internal.unity3d.com:unity/unity-meta.git
+    - perl unity-meta/Tools/Format/format.pl --dry-run --hgarg metahash=badf00d --hgarg metabranch=stable ./com.unity.mobile.notifications/Editor ./com.unity.mobile.notifications/Runtime ./com.unity.mobile.notifications/Tests
+  triggers:
+    branches:
+      only:
+        - "/.*/"
