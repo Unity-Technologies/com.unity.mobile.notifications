@@ -1,0 +1,1 @@
+Taken from https://github.cds.internal.unity3d.com/unity/MobileNotifications-TestProject
