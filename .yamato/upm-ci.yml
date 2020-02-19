@@ -68,14 +68,24 @@ run_all_test_for_publish:
     flavor: b1.large
   commands:
     - echo "Passed"
+  triggers:
+    branches:
+      only:
+        - "/.*/"
+  artifacts:
+    logs:
+      paths:
+        - "upm-ci~/test-results/**/*"
+    packages:
+      paths:
+        - "upm-ci~/packages/**/*"
   dependencies:
     - .yamato/upm-ci.yml#pack
-{% for editor in test_editors %}
-{% for platform in test_platforms %}
+    {% for editor in test_editors %}
+    {% for platform in test_platforms %}
     - .yamato/promotion.yml#promotion_test_{{ platform.name }}_{{ editor.version }}
-{% endfor %}
-{% endfor %}
-
+    {% endfor %}
+    {% endfor %}
 
 # test_trigger:
 #   name: Tests Trigger
