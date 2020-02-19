@@ -9,3 +9,4 @@ com.unity.mobile.notifications/Documentation/*
 android-sdk/*
 Editor/*
 *.sln
+*.csproj
