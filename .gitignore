@@ -8,3 +8,4 @@ com.unity.mobile.notifications/Documentation/*
 .Editor/*
 android-sdk/*
 Editor/*
+*.sln
