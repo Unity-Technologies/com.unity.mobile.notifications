@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;
@@ -10,7 +10,6 @@ namespace Unity.Notifications
 {
     public class AndroidNotificationResourcesPostProcessor : IPostGenerateGradleAndroidProject
     {
-
         public static XmlDocument AppendAndroidPermissionField(XmlDocument xmlDoc, string key)
         {
             // <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -27,9 +26,9 @@ namespace Unity.Notifications
                             return xmlDoc;
                     }
             }
-            
+
             metaDataNode.SetAttribute("name", "http://schemas.android.com/apk/res/android", key);
-           
+
             parentNode.AppendChild(metaDataNode);
 
             return xmlDoc;
@@ -37,9 +36,8 @@ namespace Unity.Notifications
 
         public static XmlDocument AppendAndroidMetadataField(XmlDocument xmlDoc, string key, string value)
         {
-            
             string xpath = "manifest/application/meta-data";
-            
+
             var nodes = xmlDoc.SelectNodes(xpath);
             var fieldSet = false;
 
@@ -58,19 +56,18 @@ namespace Unity.Notifications
                     if (fieldSet)
                     {
                         ((XmlElement)node).SetAttribute("value", "http://schemas.android.com/apk/res/android", value);
-                        break;   
+                        break;
                     }
-                       
                 }
             }
-            
+
             if (!fieldSet)
             {
                 XmlElement metaDataNode = xmlDoc.CreateElement("meta-data");
-                
+
                 metaDataNode.SetAttribute("name", "http://schemas.android.com/apk/res/android", key);
                 metaDataNode.SetAttribute("value", "http://schemas.android.com/apk/res/android", value);
-                            
+
                 var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
                 if (applicationNode != null)
                 {
@@ -79,7 +76,7 @@ namespace Unity.Notifications
             }
             return xmlDoc;
         }
-        
+
         public int callbackOrder
         {
             get { return 0; }
@@ -98,7 +95,7 @@ namespace Unity.Notifications
                 {
                     projectPath = Path.Combine(projectPath, PlayerSettings.productName);
                 }
-                
+
                 var fileInfo = new FileInfo(string.Format("{0}/src/main/res/{1}", projectPath, icon.Key));
                 if (fileInfo.Directory != null)
                 {
@@ -106,12 +103,12 @@ namespace Unity.Notifications
                     File.WriteAllBytes(fileInfo.FullName, icon.Value);
                 }
             }
-            
+
             var settings = UnityNotificationEditorManager.Initialize().AndroidNotificationEditorSettingsFlat;
-            
+
             var enableRescheduleOnRestart = (bool)settings
                 .Find(i => i.key == "UnityNotificationAndroidRescheduleOnDeviceRestart").val;
-            
+
             var useCustomActivity = (bool)settings
                 .Find(i => i.key == "UnityNotificationAndroidUseCustomActivity").val;
 

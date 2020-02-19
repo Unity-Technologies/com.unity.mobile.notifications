@@ -13,4 +13,5 @@ namespace Unity.Notifications.Android
         {
             AndroidReceivedNotificationMainThreadDispatcher.EnqueueReceivedNotification(notificationIntent);
         }
-    }}
+    }
+}

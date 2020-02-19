@@ -1,4 +1,4 @@
-﻿namespace Unity.Notifications
+namespace Unity.Notifications
 {
     internal enum NotificationIconType
     {

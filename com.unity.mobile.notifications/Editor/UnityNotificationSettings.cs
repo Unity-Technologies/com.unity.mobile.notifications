@@ -18,12 +18,10 @@ namespace Unity.Notifications
             else if (target == BuildTargetGroup.iOS)
             {
                 setting = manager.iOSNotificationEditorSettingsFlat.Find(i => i.key == key);
-
             }
 
             return setting;
         }
-
 
         private static void SetSettingValue<T>(BuildTargetGroup target, string key, T value)
         {
@@ -40,7 +38,7 @@ namespace Unity.Notifications
         private static T GetSettingValue<T>(BuildTargetGroup target, string key)
         {
             var setting = GetSetting(target, key);
-            return (T) setting.val;
+            return (T)setting.val;
         }
 
         public static class AndroidSettings
@@ -107,7 +105,7 @@ namespace Unity.Notifications
                     SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationOnAppLaunch", value);
                 }
             }
-            
+
             /// <summary>
             /// Configure the notification interaction types your app will include in the authorisation request if RequestAuthorizationOnAppLaunch is enabled. Alternatively you can specify them when creating a `AuthorizationRequest` from a script.
             /// </summary>
@@ -137,12 +135,12 @@ namespace Unity.Notifications
                     SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityAddRemoteNotificationCapability", value);
                 }
             }
-            
+
             /// <summary>
             /// If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.
             /// </summary>
-            public static bool NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch 
-            {                 
+            public static bool NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch
+            {
                 get
                 {
                     return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch");
@@ -150,7 +148,7 @@ namespace Unity.Notifications
                 set
                 {
                     SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", value);
-                } 
+                }
             }
 
             /// <summary>
@@ -167,7 +165,7 @@ namespace Unity.Notifications
                     SetSettingValue<PresentationOption>(BuildTargetGroup.iOS, "UnityRemoteNotificationForegroundPresentationOptions", value);
                 }
             }
-            
+
             /// <summary>
             /// Enable this when signing the app with a production certificate.
             /// </summary>
@@ -180,14 +178,14 @@ namespace Unity.Notifications
                 set
                 {
                     SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseAPSReleaseEnvironment", value);
-                } 
-
+                }
             }
-            
+
             /// <summary>
             /// If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.
             /// </summary>
-            public static bool UseLocationNotificationTrigger {                 
+            public static bool UseLocationNotificationTrigger
+            {
                 get
                 {
                     return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseLocationNotificationTrigger");
@@ -195,7 +193,7 @@ namespace Unity.Notifications
                 set
                 {
                     SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseLocationNotificationTrigger", value);
-                } 
+                }
             }
         }
     }

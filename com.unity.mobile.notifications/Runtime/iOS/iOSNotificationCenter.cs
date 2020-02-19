@@ -26,7 +26,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         Authorized
     }
-    
+
     /// <summary>
     /// Presentation styles for alerts.
     /// </summary>
@@ -66,7 +66,7 @@ namespace Unity.Notifications.iOS
     }
 
     /// <summary>
-    /// Enum indicating the current status of a notification setting. 
+    /// Enum indicating the current status of a notification setting.
     /// </summary>
     public enum NotificationSetting
     {
@@ -74,12 +74,12 @@ namespace Unity.Notifications.iOS
         /// The app does not support this notification setting.
         /// </summary>
         NotSupported  = 0,
-        
+
         /// <summary>
         /// The notification setting is turned off.
         /// </summary>
         Disabled,
-        
+
         /// <summary>
         /// The notification setting is turned on.
         /// </summary>
@@ -96,17 +96,17 @@ namespace Unity.Notifications.iOS
         /// The ability to update the app’s badge.
         /// </summary>
         Badge   = (1 << 0),
-        
+
         /// <summary>
         /// The ability to play sounds.
         /// </summary>
         Sound   = (1 << 1),
-        
+
         /// <summary>
         /// The ability to display alerts.
         /// </summary>
         Alert   = (1 << 2),
-        
+
         /// <summary>
         /// The ability to display notifications in a CarPlay environment.
         /// </summary>
@@ -119,17 +119,17 @@ namespace Unity.Notifications.iOS
     public enum PresentationOption
     {
         None  = 0,
-        
+
         /// <summary>
         /// Apply the notification's badge value to the app’s icon.
         /// </summary>
         Badge = 1 << 0,
-        
+
         /// <summary>
         /// Play the sound associated with the notification.
         /// </summary>
         Sound = 1 << 1,
-        
+
         /// <summary>
         /// Display the alert using the content provided by the notification.
         /// </summary>
@@ -138,12 +138,12 @@ namespace Unity.Notifications.iOS
 
     internal enum NotificationTriggerType
     {
-        TimeTrigger = 0, 
+        TimeTrigger = 0,
         CalendarTrigger = 10,
         LocationTrigger = 20,
         PushTrigger = 3
     }
-    
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct iOSNotificationData
     {
@@ -159,14 +159,14 @@ namespace Unity.Notifications.iOS
         public string data;
         public bool showInForeground;
         public Int32 showInForegroundPresentationOptions;
-        
+
         // Trigger
         public Int32 triggerType;
         public bool repeats;
-        
+
         //Time trigger
         public Int32 timeTriggerInterval;
-        
+
         //Calendar trigger
         public Int32 calendarTriggerYear;
         public Int32 calendarTriggerMonth;
@@ -174,7 +174,7 @@ namespace Unity.Notifications.iOS
         public Int32 calendarTriggerHour;
         public Int32 calendarTriggerMinute;
         public Int32 calendarTriggerSecond;
-        
+
         //Location trigger
         public float locationTriggerCenterX;
         public float locationTriggerCenterY;
@@ -200,11 +200,11 @@ namespace Unity.Notifications.iOS
         internal int alertSetting;
         internal int badgeSetting;
         internal int soundSetting;
-        
+
         internal int alertStyle;
         internal int showPreviewsSetting;
-            
-        
+
+
         /// <summary>
         /// When the value is set to Authorized your app is allowed to schedule and receive local and remote notifications.
         /// </summary>
@@ -214,7 +214,7 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public AuthorizationStatus AuthorizationStatus
         {
-            get { return (AuthorizationStatus) authorizationStatus; }
+            get { return (AuthorizationStatus)authorizationStatus; }
         }
 
         /// <summary>
@@ -222,15 +222,15 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public NotificationSetting NotificationCenterSetting
         {
-            get { return (NotificationSetting) notificationCenterSetting; }
+            get { return (NotificationSetting)notificationCenterSetting; }
         }
 
-    /// <summary>
+        /// <summary>
         /// The setting that indicates whether your app’s notifications appear onscreen when the device is locked.
         /// </summary>
         public NotificationSetting LockScreenSetting
         {
-            get { return (NotificationSetting) lockScreenSetting;}
+            get { return (NotificationSetting)lockScreenSetting;}
         }
 
         /// <summary>
@@ -246,9 +246,9 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public NotificationSetting AlertSetting
         {
-            get { return  (NotificationSetting)alertSetting;}
+            get { return (NotificationSetting)alertSetting;}
         }
-        
+
         /// <summary>
         /// The authorization status for badging your app’s icon.
         /// </summary>
@@ -264,7 +264,7 @@ namespace Unity.Notifications.iOS
         {
             get { return (NotificationSetting)soundSetting;}
         }
-                            
+
         /// <summary>
         /// The type of alert that the app may display when the device is unlocked.
         /// </summary>
@@ -274,15 +274,15 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public AlertStyle AlertStyle
         {
-            get { return  (AlertStyle)alertStyle; }
+            get { return (AlertStyle)alertStyle; }
         }
-        
+
         /// <summary>
         /// The setting that indicates whether the app shows a preview of the notification's content.
         /// </summary>
         public ShowPreviewsSetting ShowPreviewsSetting
         {
-            get { return  (ShowPreviewsSetting)showPreviewsSetting;}
+            get { return (ShowPreviewsSetting)showPreviewsSetting;}
         }
     }
 
@@ -306,7 +306,7 @@ namespace Unity.Notifications.iOS
             get { return data.identifier; }
             set { data.identifier = value; }
         }
-        
+
         /// <summary>
         /// The identifier of the app-defined category object.
         /// </summary>
@@ -315,14 +315,14 @@ namespace Unity.Notifications.iOS
             get { return data.categoryIdentifier; }
             set { data.categoryIdentifier = value; }
         }
-        
+
         /// <summary>
         /// An identifier that used to group related notifications together.
         /// Automatic notification grouping according to the thread identifier is only supported on iOS 12 and above.
         /// </remarks>
         public string ThreadIdentifier
         {
-            get { return  data.threadIdentifier; }
+            get { return data.threadIdentifier; }
             set {  data.threadIdentifier = value; }
         }
 
@@ -331,7 +331,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string Title
         {
-            get { return  data.title; }
+            get { return data.title; }
             set {  data.title = value; }
         }
 
@@ -340,16 +340,16 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string Subtitle
         {
-            get { return  data.subtitle; }
+            get { return data.subtitle; }
             set {  data.subtitle = value; }
         }
-        
+
         /// <summary>
         /// The message displayed in the notification alert.
         /// </summary>
         public string Body
         {
-            get { return  data.body; }
+            get { return data.body; }
             set {  data.body = value; }
         }
 
@@ -361,32 +361,33 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public bool ShowInForeground
         {
-            get { return  data.showInForeground; }
+            get { return data.showInForeground; }
             set {  data.showInForeground = value; }
         }
 
-        
+
         /// <summary>
-        /// Presentation options for displaying the local of notification when the app is running. Only works if  <see cref="iOSNotification.ShowInForeground"/> is enabled and user has allowed enabled the requested options for your app. 
+        /// Presentation options for displaying the local of notification when the app is running. Only works if  <see cref="iOSNotification.ShowInForeground"/> is enabled and user has allowed enabled the requested options for your app.
         /// </summary>
         public PresentationOption ForegroundPresentationOption
         {
-            get {
-                return (PresentationOption) data.showInForegroundPresentationOptions; 
+            get
+            {
+                return (PresentationOption)data.showInForegroundPresentationOptions;
             }
-            set { data.showInForegroundPresentationOptions = (int) value; }
+            set { data.showInForegroundPresentationOptions = (int)value; }
         }
-            
+
 
         /// <summary>
         /// The number to display as a badge on the app’s icon.
         /// </summary>
         public int Badge
         {
-            get { return  data.badge; }
+            get { return data.badge; }
             set {  data.badge = value; }
         }
-        
+
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
         /// </summary>
@@ -413,7 +414,7 @@ namespace Unity.Notifications.iOS
             {
                 if (value is iOSNotificationTimeIntervalTrigger)
                 {
-                    var trigger = (iOSNotificationTimeIntervalTrigger) value;
+                    var trigger = (iOSNotificationTimeIntervalTrigger)value;
                     data.triggerType = iOSNotificationTimeIntervalTrigger.Type;
                     data.timeTriggerInterval = trigger.timeInterval;
 
@@ -428,11 +429,10 @@ namespace Unity.Notifications.iOS
                             Debug.LogWarning("Time interval must be at least 60 for repeating notifications.");
                         }
                     }
-
                 }
                 else if (value is iOSNotificationCalendarTrigger)
                 {
-                    var trigger = (iOSNotificationCalendarTrigger) value;
+                    var trigger = (iOSNotificationCalendarTrigger)value;
                     data.triggerType = iOSNotificationCalendarTrigger.Type;
                     data.calendarTriggerYear = trigger.Year != null ? trigger.Year.Value : -1;
                     data.calendarTriggerMonth = trigger.Month != null ? trigger.Month.Value : -1;
@@ -441,11 +441,10 @@ namespace Unity.Notifications.iOS
                     data.calendarTriggerMinute = trigger.Minute != null ? trigger.Minute.Value : -1;
                     data.calendarTriggerSecond = trigger.Second != null ? trigger.Second.Value : -1;
                     data.repeats = trigger.Repeats;
-
                 }
                 else if (value is iOSNotificationLocationTrigger)
                 {
-                    var trigger = (iOSNotificationLocationTrigger) value;
+                    var trigger = (iOSNotificationLocationTrigger)value;
                     data.triggerType = iOSNotificationLocationTrigger.Type;
                     data.locationTriggerCenterX = trigger.Center.x;
                     data.locationTriggerCenterY = trigger.Center.x;
@@ -455,7 +454,7 @@ namespace Unity.Notifications.iOS
                 }
                 else if (value is iOSNotificationPushTrigger)
                 {
-                    data.triggerType = 3;   
+                    data.triggerType = 3;
                 }
             }
 
@@ -474,12 +473,12 @@ namespace Unity.Notifications.iOS
                 {
                     trigger = new iOSNotificationCalendarTrigger()
                     {
-                        Year = (data.calendarTriggerYear > 0) ? (int?) data.calendarTriggerYear : null,
-                        Month = (data.calendarTriggerMonth > 0) ? (int?) data.calendarTriggerMonth : null,
-                        Day = (data.calendarTriggerDay > 0) ? (int?) data.calendarTriggerDay : null,
-                        Hour = (data.calendarTriggerHour >= 0) ? (int?) data.calendarTriggerHour : null,
-                        Minute = (data.calendarTriggerMinute >= 0) ? (int?) data.calendarTriggerMinute : null,
-                        Second = (data.calendarTriggerSecond >= 0) ? (int?) data.calendarTriggerSecond : null,
+                        Year = (data.calendarTriggerYear > 0) ? (int?)data.calendarTriggerYear : null,
+                        Month = (data.calendarTriggerMonth > 0) ? (int?)data.calendarTriggerMonth : null,
+                        Day = (data.calendarTriggerDay > 0) ? (int?)data.calendarTriggerDay : null,
+                        Hour = (data.calendarTriggerHour >= 0) ? (int?)data.calendarTriggerHour : null,
+                        Minute = (data.calendarTriggerMinute >= 0) ? (int?)data.calendarTriggerMinute : null,
+                        Second = (data.calendarTriggerSecond >= 0) ? (int?)data.calendarTriggerSecond : null,
                         Repeats = data.repeats
                     };
                 }
@@ -511,7 +510,6 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public iOSNotification() : this(GenerateUniqueID())
         {
-            
         }
 
         /// <summary>
@@ -519,7 +517,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         /// <param name="identifier">  Unique identifier for the local notification tha can later be used to track or change it's status.</param>
         public iOSNotification(string identifier)
-        {          
+        {
             data = new iOSNotificationData();
             data.identifier = identifier;
             data.title = "";
@@ -528,18 +526,18 @@ namespace Unity.Notifications.iOS
             data.subtitle = "";
             data.categoryIdentifier = "";
             data.threadIdentifier = "";
-            
+
             data.data = "";
             data.showInForeground = false;
-            data.showInForegroundPresentationOptions = (int) (PresentationOption.Alert |
-                                                         PresentationOption.Sound);
+            data.showInForegroundPresentationOptions = (int)(PresentationOption.Alert |
+                PresentationOption.Sound);
 
             data.triggerType = -1;
             data.repeats = false;
-    
+
             //Time trigger
             data.timeTriggerInterval = -1;
-            
+
             //Calendar trigger
             data.calendarTriggerYear = -1;
             data.calendarTriggerMonth = -1;
@@ -547,14 +545,13 @@ namespace Unity.Notifications.iOS
             data.calendarTriggerHour = -1;
             data.calendarTriggerMinute = -1;
             data.calendarTriggerSecond = -1;
-            
+
             //Location trigger
             data.locationTriggerCenterX = 0f;
             data.locationTriggerCenterY = 0f;
             data.locationTriggerRadius = 2f;
             data.locationTriggerNotifyOnEntry = true;
             data.locationTriggerNotifyOnExit = false;
-
         }
 
         internal iOSNotification(iOSNotificationData data)
@@ -571,14 +568,13 @@ namespace Unity.Notifications.iOS
                 data.identifier = GenerateUniqueID();
             }
         }
-
     }
 
     /// <summary>
     /// iOSNotificationTrigger interface is implemented by notification trigger types representing an event that triggers the delivery of a notification.
     /// </summary>
     public interface iOSNotificationTrigger {}
-    
+
     /// <summary>
     /// A trigger condition that causes a notification to be delivered when the user's device enters or exits the specified geographic region.
     /// </summary>
@@ -598,17 +594,17 @@ namespace Unity.Notifications.iOS
         /// The center point of the geographic area.
         /// </summary>
         public Vector2 Center { get; set; }
-        
+
         /// <summary>
         /// The radius (measured in meters) that defines the geographic area’s outer boundary.
         /// </summary>
         public float Radius { get; set; }
-        
+
         /// <summary>
         /// When this property is enabled, a device crossing from outside the region to inside the region triggers the delivery of a notification
         /// </summary>
         public bool NotifyOnEntry { get; set; }
-        
+
         /// <summary>
         /// When this property is enabled, a device crossing from inside the region to outside the region triggers the delivery of a notification
         /// </summary>
@@ -640,15 +636,15 @@ namespace Unity.Notifications.iOS
     public struct iOSNotificationTimeIntervalTrigger : iOSNotificationTrigger
     {
         public static int Type { get { return (int)NotificationTriggerType.TimeTrigger; }}
-        
+
         internal int timeInterval;
-        
+
         public TimeSpan TimeInterval
         {
             get { return TimeSpan.FromMilliseconds(timeInterval); }
             set
             {
-                timeInterval = (int) value.TotalSeconds;
+                timeInterval = (int)value.TotalSeconds;
             }
         }
         public bool Repeats { get; set; }
@@ -664,7 +660,7 @@ namespace Unity.Notifications.iOS
     public struct iOSNotificationCalendarTrigger : iOSNotificationTrigger
     {
         public static int Type { get { return (int)NotificationTriggerType.CalendarTrigger; }}
-        
+
         /// <summary>
         /// Year
         /// </summary>
@@ -694,7 +690,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public bool Repeats { get; set; }
     }
-    
+
     /// <summary>
     /// Use this to request authorization to interact with the user when you with to deliver local and remote notifications are delivered to the user's device.
     /// </summary>
@@ -711,7 +707,7 @@ namespace Unity.Notifications.iOS
     ///     {
     ///         yield return null;
     ///     };
-    /// 
+    ///
     ///     string result = "\n RequestAuthorization: \n";
     ///     result += "\n finished: " + req.IsFinished;
     ///     result += "\n granted :  " + req.Granted;
@@ -727,12 +723,12 @@ namespace Unity.Notifications.iOS
         /// Indicates whether the authorization request has completed.
         /// </summary>
         public bool IsFinished { get; private set; }
-        
+
         /// <summary>
         /// A property indicating whether authorization was granted. The value of this parameter is set to true when authorization was granted for one or more options. The value is set to false when authorization is denied for all options.
         /// </summary>
         public bool Granted { get; private set; }
-        
+
         /// <summary>
         /// Contains error information of the request failed for some reason or an empty string if no error occurred.
         /// </summary>
@@ -745,7 +741,7 @@ namespace Unity.Notifications.iOS
         public string DeviceToken { get; private set; }
 
         internal delegate void AuthorizationRequestCallback(iOSAuthorizationRequestData notification);
-        internal static event AuthorizationRequestCallback OnAuthRequest = delegate { };
+        internal static event AuthorizationRequestCallback OnAuthRequest = delegate {};
 
         /// <summary>
         /// Initiate an authorization request.
@@ -755,18 +751,17 @@ namespace Unity.Notifications.iOS
         /// If registration succeeds the DeviceToken will be returned. You should pass this token along to the server you use to generate remote notifications for the device. </param>
         public AuthorizationRequest(AuthorizationOption authorizationOption, bool registerForRemoteNotifications)
         {
-            
             iOSNotificationsWrapper.RegisterAuthorizationRequestCallback();
             iOSNotificationsWrapper.RequestAuthorization((int)authorizationOption, registerForRemoteNotifications);
-            
+
             iOSNotificationCenter.OnAuthorizationRequestCompleted += data =>
-                {
-                    Debug.Log("            iOSNotificationsWrapper.onAuthenticationRequestFinished += data => ");
-                    IsFinished = data.finished;
-                    Granted = data.granted;
-                    Error = data.error;
-                    DeviceToken = data.deviceToken;
-                }
+            {
+                Debug.Log("            iOSNotificationsWrapper.onAuthenticationRequestFinished += data => ");
+                IsFinished = data.finished;
+                Granted = data.granted;
+                Error = data.error;
+                DeviceToken = data.deviceToken;
+            }
             ;
         }
 
@@ -776,34 +771,35 @@ namespace Unity.Notifications.iOS
             Granted = data.granted;
             Error = data.error;
         }
-        
+
         public void Dispose()
         {
             ;// TODO
         }
     }
-    
-    
+
+
     /// <summary>
     /// Use the iOSNotificationCenter to register notification channels and schedule local notifications.
     /// </summary>
     public class iOSNotificationCenter
     {
         private static bool initialized;
-        
+
         public delegate void NotificationReceivedCallback(iOSNotification notification);
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a local notification or a remote is shown to the user.
         /// </summary>
-        public static event NotificationReceivedCallback OnNotificationReceived{
+        public static event NotificationReceivedCallback OnNotificationReceived
+        {
             add
             {
-            if (!onNotificationReceivedCallbackSet)
-            {
-                iOSNotificationsWrapper.RegisterOnReceivedCallback();
-                onNotificationReceivedCallbackSet = true;
-            }
+                if (!onNotificationReceivedCallbackSet)
+                {
+                    iOSNotificationsWrapper.RegisterOnReceivedCallback();
+                    onNotificationReceivedCallbackSet = true;
+                }
 
                 onNotificationReceived += value;
             }
@@ -814,7 +810,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool onNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback onNotificationReceived = delegate(iOSNotification notification) {  };
+        private static event NotificationReceivedCallback onNotificationReceived = delegate(iOSNotification notification) {};
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
@@ -823,7 +819,7 @@ namespace Unity.Notifications.iOS
         /// If you want remote notifications to be shown automatically subscribe to the [[OnNotificationReceived]] even instead and check the
         /// [[Notification.Trigger]] class type to determine whether the received notification is a remote notification.
         /// </summary>
-        public static event NotificationReceivedCallback OnRemoteNotificationReceived 
+        public static event NotificationReceivedCallback OnRemoteNotificationReceived
         {
             add
             {
@@ -842,29 +838,29 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool onRemoteNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback onRemoteNotificationReceived = delegate(iOSNotification notification) {  };
+        private static event NotificationReceivedCallback onRemoteNotificationReceived = delegate(iOSNotification notification) {};
 
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
-        internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted = delegate { };
+        internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted = delegate {};
 
 
         static bool Initialize()
         {
             #if UNITY_EDITOR || !PLATFORM_IOS
-                        return false;
+            return false;
             #elif PLATFORM_IOS
 
             if (initialized)
                 return true;
-            
+
             iOSNotificationsWrapper.RegisterOnReceivedCallback();
             return initialized = true;
             #endif
         }
-        
+
         /// <summary>
-        /// Use this to retrieve the last local or remote notification received by the app. 
+        /// Use this to retrieve the last local or remote notification received by the app.
         /// </summary>
         /// <returns>
         /// Returns the last local or remote notification used to open the app or clicked on by the user. If no notification is available it returns null.
@@ -875,7 +871,7 @@ namespace Unity.Notifications.iOS
 
             if (data == null)
                 return null;
-            
+
             var notification = new iOSNotification(data.Value.identifier);
             notification.data = data.Value;
 
@@ -912,7 +908,6 @@ namespace Unity.Notifications.iOS
             iOSNotificationsWrapper._RemoveDeliveredNotification(identifier);
         }
 
-
         /// <summary>
         /// Unschedules all pending notification.
         /// </summary>
@@ -931,7 +926,6 @@ namespace Unity.Notifications.iOS
             if (!Initialize())
                 return;
             iOSNotificationsWrapper._RemoveAllDeliveredNotifications();
-
         }
 
         /// <summary>
@@ -941,7 +935,7 @@ namespace Unity.Notifications.iOS
         {
             return iOSNotificationsWrapper.GetNotificationSettings();
         }
-        
+
         /// <summary>
         /// Returns all notifications that are currently scheduled.
         /// </summary>
@@ -956,7 +950,7 @@ namespace Unity.Notifications.iOS
 
             return iOSNotifications.ToArray();
         }
-        
+
         /// <summary>
         /// Returns all of the app’s delivered notifications that are currently shown in the Notification Center.
         /// </summary>
@@ -972,7 +966,6 @@ namespace Unity.Notifications.iOS
             return iOSNotifications.ToArray();
         }
 
-
         /// <summary>
         /// Schedules a local notification for delivery.
         /// </summary>
@@ -980,7 +973,7 @@ namespace Unity.Notifications.iOS
         {
             if (!Initialize())
                 return;
-            
+
             notification.Verify();
             iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
         }
@@ -991,9 +984,9 @@ namespace Unity.Notifications.iOS
             notification.data = data;
             onRemoteNotificationReceived(notification);
         }
-        
+
         internal static void onSentNotification(iOSNotificationData data)
-        {                
+        {
             var notification = new iOSNotification(data.identifier);
             notification.data = data;
             onNotificationReceived(notification);

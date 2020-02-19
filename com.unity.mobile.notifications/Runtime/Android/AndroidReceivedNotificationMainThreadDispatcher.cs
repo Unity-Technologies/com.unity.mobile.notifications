@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.Notifications.Android
-{    
-    public class AndroidReceivedNotificationMainThreadDispatcher : MonoBehaviour {
-
+{
+    public class AndroidReceivedNotificationMainThreadDispatcher : MonoBehaviour
+    {
         private static AndroidReceivedNotificationMainThreadDispatcher instance = null;
 
         private static Queue<AndroidJavaObject>  receivedNotificationQueue = new Queue<AndroidJavaObject>();
@@ -22,9 +22,10 @@ namespace Unity.Notifications.Android
         {
             return instance;
         }
-        
-        public void Update() {
-            lock(receivedNotificationQueue) {
+
+        public void Update()
+        {
+            lock (receivedNotificationQueue) {
                 while (receivedNotificationQueue.Count > 0)
                 {
                     var intentData = receivedNotificationQueue.Dequeue();
@@ -33,14 +34,17 @@ namespace Unity.Notifications.Android
             }
         }
 
-        void Awake() {
-            if (instance == null) {
+        void Awake()
+        {
+            if (instance == null)
+            {
                 instance = this;
                 DontDestroyOnLoad(this.gameObject);
             }
         }
 
-        void OnDestroy() {
+        void OnDestroy()
+        {
             instance = null;
         }
     }

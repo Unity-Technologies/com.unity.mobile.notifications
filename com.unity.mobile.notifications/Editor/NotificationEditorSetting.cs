@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Unity.Notifications
 {
@@ -14,7 +14,7 @@ namespace Unity.Notifications
         public List<string> requiredSettings;
 
         public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist = true,
-            List<NotificationEditorSetting> dependentSettings = null, List<string> requiredSettings = null)
+                                         List<NotificationEditorSetting> dependentSettings = null, List<string> requiredSettings = null)
         {
             this.key = key;
             this.label = label;

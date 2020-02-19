@@ -23,13 +23,13 @@ namespace Unity.Notifications.Android
         /// A notification with no importance: does not show in the shade.
         /// </summary>
         None = 0,
-        
+
         /// <summary>
-        /// Low importance, notification is shown everywhere, but is not intrusive. 
+        /// Low importance, notification is shown everywhere, but is not intrusive.
         /// </summary>
         Low = 2,
 
-        /// <summary> 
+        /// <summary>
         /// Default importance, notification is shown everywhere, makes noise, but does not intrude visually.
         /// </summary>
         Default = 3,
@@ -118,13 +118,13 @@ namespace Unity.Notifications.Android
         /// All notifications in a group with sound or vibration will make sound or vibrate, so this notification will not be muted when it is in a group.
         /// </summary>
         GroupAlertAll = 0,
-        
+
         /// <summary>
         /// The summary notification in a group will be silenced (no sound or vibration) even if they would otherwise make sound or vibrate.
         /// Use this to mute this notification if this notification is a group summary.
         /// </summary>
         GroupAlertSummary = 1,
-        
+
         /// <summary>
         /// All children notification in a group will be silenced (no sound or vibration) even if they would otherwise make sound or vibrate.
         /// Use this to mute this notification if this notification is a group child. This must be set on all children notifications you want to mute.
@@ -133,7 +133,7 @@ namespace Unity.Notifications.Android
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class AndroidNotificationIntentData
     {
@@ -145,7 +145,7 @@ namespace Unity.Notifications.Android
         public string Channel { get { return channel; }}
         public AndroidNotification Notification { get { return notification; }}
     }
-    
+
     /// <summary>
     /// The AndroidNotification is used schedule a local notification, which includes the content of the notification.
     /// </summary>
@@ -170,7 +170,7 @@ namespace Unity.Notifications.Android
             get { return text; }
             set { text = value; }
         }
-        
+
         /// <summary>
         /// Notification small icon.
         /// It will be used to represent the notification in the status bar and content view (unless overridden there by a large icon)
@@ -187,8 +187,7 @@ namespace Unity.Notifications.Android
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan diff = value.ToUniversalTime() - origin;
 
-            return (long) Math.Floor(diff.TotalMilliseconds);
-
+            return (long)Math.Floor(diff.TotalMilliseconds);
         }
 
         private static DateTime LongToDatetime(long value)
@@ -196,7 +195,7 @@ namespace Unity.Notifications.Android
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return origin.AddMilliseconds(value).ToLocalTime();
         }
-        
+
         /// <summary>
         /// The date and time when the notification should be delivered.
         /// </summary>
@@ -212,7 +211,7 @@ namespace Unity.Notifications.Android
         /// </summary>
         public TimeSpan? RepeatInterval
         {
-            get { return  TimeSpan.FromMilliseconds(repeatInterval); }
+            get { return TimeSpan.FromMilliseconds(repeatInterval); }
             set
             {
                 if (value != null)
@@ -239,8 +238,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public NotificationStyle Style
         {
-            get { return (NotificationStyle) style; }
-            set { style = (int) value; }
+            get { return (NotificationStyle)style; }
+            set { style = (int)value; }
         }
 
         /// <summary>
@@ -259,7 +258,7 @@ namespace Unity.Notifications.Android
                 int g = (color >> 8) & 0xff;
                 int b = (color) & 0xff;
 
-                return new Color32((byte) a, (byte) r, (byte) g, (byte) b);
+                return new Color32((byte)a, (byte)r, (byte)g, (byte)b);
             }
             set
             {
@@ -267,9 +266,9 @@ namespace Unity.Notifications.Android
                     color = 0;
                 else
                 {
-                    var color32 = (Color32) value.Value;
+                    var color32 = (Color32)value.Value;
                     color = (color32.a & 0xff) << 24 | (color32.r & 0xff) << 16 | (color32.g & 0xff) << 8 |
-                              (color32.b & 0xff);
+                        (color32.b & 0xff);
                 }
             }
         }
@@ -313,10 +312,10 @@ namespace Unity.Notifications.Android
             get { return group; }
             set { group = value; }
         }
-        
+
         /// <summary>
         /// Set this notification to be the group summary for a group of notifications. Requires the 'Group' property to also be set.
-        /// Grouped notifications may display in a cluster or stack on devices which support such rendering. 
+        /// Grouped notifications may display in a cluster or stack on devices which support such rendering.
         /// Only available on Android 7.0 (API level 24) and above.
         /// </summary>
         public bool GroupSummary
@@ -324,7 +323,7 @@ namespace Unity.Notifications.Android
             get { return groupSummary; }
             set { groupSummary = value; }
         }
-        
+
         /// <summary>
         /// Sets the group alert behavior for this notification. Set this property to mute this notification if alerts for this notification's group should be handled by a different notification.
         /// This is only applicable for notifications that belong to a group. This must be set on all notifications you want to mute.
@@ -335,9 +334,9 @@ namespace Unity.Notifications.Android
             get { return (GroupAlertBehaviours)groupAlertBehaviour; }
             set { groupAlertBehaviour = (int)value; }
         }
-        
+
         /// <summary>
-        /// The sort key will be used to order this notification among other notifications from the same package. 
+        /// The sort key will be used to order this notification among other notifications from the same package.
         /// Notifications will be sorted lexicographically using this value.
         /// </summary>
         public string SortKey
@@ -345,27 +344,27 @@ namespace Unity.Notifications.Android
             get { return sortKey; }
             set { sortKey = value; }
         }
-        
+
         /// <summary>
-        /// Use this to save arbitrary string data related to the notification. 
+        /// Use this to save arbitrary string data related to the notification.
         /// </summary>
         public string IntentData
         {
             get { return intentData; }
             set { intentData = value; }
         }
-        
+
         /// <summary>
-        /// Enable it to show a timestamp on the notification when it's delivered, unless the "CustomTimestamp" property is set "FireTime" will be shown. 
+        /// Enable it to show a timestamp on the notification when it's delivered, unless the "CustomTimestamp" property is set "FireTime" will be shown.
         /// </summary>
         public bool ShowTimestamp
         {
             get { return showTimestamp; }
             set { showTimestamp = value; }
         }
-        
+
         /// <summary>
-        /// Set this to show custom date instead of the notification's "FireTime" as the notification's timestamp'. 
+        /// Set this to show custom date instead of the notification's "FireTime" as the notification's timestamp'.
         /// </summary>
         public DateTime CustomTimestamp
         {
@@ -379,7 +378,7 @@ namespace Unity.Notifications.Android
 
         internal string title;
         internal string text;
-        
+
         internal string smallIcon;
         internal long fireTime;
         internal bool shouldAutoCancel;
@@ -394,10 +393,10 @@ namespace Unity.Notifications.Android
         internal long repeatInterval;
 
         internal string intentData;
-        
+
         internal string group;
         internal bool groupSummary;
-        
+
         internal string sortKey;
         internal int groupAlertBehaviour;
 
@@ -418,11 +417,11 @@ namespace Unity.Notifications.Android
             smallIcon = "";
             shouldAutoCancel = false;
             largeIcon = "";
-            style = (int) NotificationStyle.None;
+            style = (int)NotificationStyle.None;
             color = 0;
             number = -1;
             usesStopwatch = false;
-            intentData = "";            
+            intentData = "";
             this.fireTime = -1;
             group = "";
             this.groupSummary = false;
@@ -432,9 +431,8 @@ namespace Unity.Notifications.Android
             customTimestamp = -1;
             showTimestamp = false;
             showCustomTimestamp = false;
-            
-            this.FireTime = fireTime;
 
+            this.FireTime = fireTime;
         }
 
         /// <summary>
@@ -450,7 +448,7 @@ namespace Unity.Notifications.Android
         }
 
         public AndroidNotification(String title, String text, DateTime fireTime, TimeSpan repeatInterval,
-            String smallIcon)
+                                   String smallIcon)
             : this(title, text, fireTime, repeatInterval)
         {
             this.SmallIcon = smallIcon;
@@ -467,13 +465,13 @@ namespace Unity.Notifications.Android
             this.id = id;
             this.title = title;
             this.description = description;
-            this.importance = (int) importance;
+            this.importance = (int)importance;
 
             canBypassDnd = false;
             canShowBadge = true;
             enableLights = false;
             enableVibration = true;
-            lockscreenVisibility = (int) LockScreenVisibility.Public;
+            lockscreenVisibility = (int)LockScreenVisibility.Public;
             vibrationPattern = null;
         }
 
@@ -517,8 +515,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public Importance Importance
         {
-            get { return (Importance) importance; }
-            set { importance = (int) value; }
+            get { return (Importance)importance; }
+            set { importance = (int)value; }
         }
 
         /// <summary>
@@ -566,8 +564,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public LockScreenVisibility LockScreenVisibility
         {
-            get { return (LockScreenVisibility) lockscreenVisibility; }
-            set { lockscreenVisibility = (int) value; }
+            get { return (LockScreenVisibility)lockscreenVisibility; }
+            set { lockscreenVisibility = (int)value; }
         }
 
         /// <summary>
@@ -588,7 +586,7 @@ namespace Unity.Notifications.Android
                     vibrationPattern = value.Select(i => (int)i).ToArray();
             }
         }
-        
+
         /// <summary>
         /// Returns false if the user has blocked this notification in the settings app. Channels can be manually blocked by settings it's Importance to None.
         /// </summary>
@@ -616,21 +614,21 @@ namespace Unity.Notifications.Android
     public class AndroidNotificationCenter
     {
         public delegate void NotificationReceivedCallback(AndroidNotificationIntentData data);
-        
+
         /// <summary>
         /// Subscribe to this event to receive callbacks whenever a scheduled notification is shown to the user.
         /// </summary>
-        public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
+        public static event NotificationReceivedCallback OnNotificationReceived = delegate {};
 
         const int ANDROID_OREO = 26;
         const int ANDROID_M = 23;
-        
+
         const string DEFAULT_APP_ICON_ADAPTIVE = "ic_launcher_foreground";
         const string DEFAULT_APP_ICON_LEGACY = "app_icon";
 
         static AndroidJavaObject notificationManager;
         static int AndroidSDK;
-        
+
         static bool initialized;
 
         private GameObject receivedNotificationDispatcher;
@@ -645,11 +643,11 @@ namespace Unity.Notifications.Android
                 var receivedNotificationDispatcher = new GameObject("AndroidReceivedNotificationMainThreadDispatcher");
                 receivedNotificationDispatcher.AddComponent<AndroidReceivedNotificationMainThreadDispatcher>();
             }
-            
+
             #if UNITY_EDITOR || !UNITY_ANDROID
-                    return false;
+            return false;
             #endif
-    
+
             AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
@@ -666,7 +664,7 @@ namespace Unity.Notifications.Android
 
             return initialized = true;
         }
-                
+
         /// <summary>
         /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
         /// </summary>
@@ -677,12 +675,12 @@ namespace Unity.Notifications.Android
         {
             if (!Initialize())
                 return null;
-            
-            AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+
+            AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
- 
+
             AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
-                            
+
             return ParseNotificationIntentData(intent);
         }
 
@@ -713,7 +711,7 @@ namespace Unity.Notifications.Android
             {
                 throw new Exception(string.Format("Cannot register notification channel: {} , the channel Description is not set.", channel.id));
             }
-            
+
             notificationManager.Call("registerNotificationChannel",
                 channel.id,
                 channel.title,
@@ -858,7 +856,7 @@ namespace Unity.Notifications.Android
             if (notificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
                 SendNotification(id, notification, channel);
         }
-        
+
         /// <summary>
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The specified id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
@@ -870,7 +868,7 @@ namespace Unity.Notifications.Android
 
             SendNotification(id, notification, channel);
         }
-        
+
         /// <summary>
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The returned id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
@@ -893,7 +891,7 @@ namespace Unity.Notifications.Android
         public static NotificationStatus CheckScheduledNotificationStatus(int id)
         {
             var status = notificationManager.Call<int>("checkNotificationStatus", id);
-            return (NotificationStatus) status;
+            return (NotificationStatus)status;
         }
 
         internal static void SendNotification(int id, AndroidNotification notification, string channel)
@@ -910,7 +908,7 @@ namespace Unity.Notifications.Android
 
             AndroidJavaObject notificationIntent =
                 new AndroidJavaObject("android.content.Intent", context, managerClass);
-            
+
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channel);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.title);
@@ -933,7 +931,7 @@ namespace Unity.Notifications.Android
 
             long timestampValue =
                 notification.showCustomTimestamp ? notification.customTimestamp : notification.fireTime;
-            
+
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
 
             notificationManager.Call("scheduleNotificationIntent", notificationIntent);
@@ -952,7 +950,6 @@ namespace Unity.Notifications.Android
 
         internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
         {
-
             var id = notificationIntent.Call<int>("getIntExtra", "id", -1);
             var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
 
@@ -976,7 +973,7 @@ namespace Unity.Notifications.Android
             notification.groupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
             notification.sortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
             notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
-          
+
             return new AndroidNotificationIntentData
             {
                 id = id,
@@ -984,7 +981,7 @@ namespace Unity.Notifications.Android
                 notification = notification,
             };
         }
-        
+
         internal static void ReceivedNotificationCallback(AndroidJavaObject intent)
         {
             var data = ParseNotificationIntentData(intent);
