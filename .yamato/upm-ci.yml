@@ -61,8 +61,8 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-run_all_test:
-  name: Run all tests
+test_trigger:
+  name: Tests Trigger
   agent:
     type: Unity::VM
     image: package-ci/ubuntu:stable
@@ -88,33 +88,6 @@ run_all_test:
     {% endfor %}
     {% endfor %}
 
-# test_trigger:
-#   name: Tests Trigger
-#   agent:
-#     type: Unity::VM
-#     image: package-ci/win10:stable
-#     flavor: b1.large
-#   commands:
-#     - dir
-#   triggers:
-#     branches:
-#       only:
-#         - "/.*/"
-#   artifacts:
-#     logs:
-#       paths:
-#         - "upm-ci~/test-results/**/*"
-#     packages:
-#       paths:
-#         - "upm-ci~/packages/**/*"
-#   dependencies:
-#     - .yamato/upm-ci.yml#pack
-#     {% for editor in test_editors %}
-#     {% for platform in test_platforms %}
-#     - .yamato/upm-ci.yml#test_{{platform.name}}_{{editor.version}}
-#     {% endfor %}
-#     {% endfor %}
-
 publish:
   name: Publish to Internal Registry
   agent:
@@ -134,8 +107,8 @@ publish:
         - "upm-ci~/packages/*.tgz"
   dependencies:
     - .yamato/upm-ci.yml#pack
-{% for editor in test_editors %}
-{% for platform in test_platforms %}
+    {% for editor in test_editors %}
+    {% for platform in test_platforms %}
     - .yamato/promotion.yml#promotion_test_{{ platform.name }}_{{ editor.version }}
-{% endfor %}
-{% endfor %}
+    {% endfor %}
+    {% endfor %}

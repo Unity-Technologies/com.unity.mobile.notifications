@@ -32,25 +32,25 @@ promotion_test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-# promotion_test_trigger:
-#   name: Promotion Tests Trigger
-#   agent:
-#     type: Unity::VM
-#     image: package-ci/win10:stable
-#     flavor: b1.large
-#   artifacts:
-#     logs:
-#       paths:
-#         - "upm-ci~/test-results/**/*"
-#     packages:
-#       paths:
-#         - "upm-ci~/packages/**/*"
-#   dependencies:
-# {% for editor in test_editors %}
-# {% for platform in test_platforms %}
-#     - .yamato/promotion.yml#promotion_test_{{platform.name}}_{{editor.version}}
-# {% endfor %}
-# {% endfor %}
+promotion_test_trigger:
+  name: Promotion Tests Trigger
+  agent:
+    type: Unity::VM
+    image: package-ci/ubuntu:stable
+    flavor: b1.large
+  artifacts:
+    logs:
+      paths:
+        - "upm-ci~/test-results/**/*"
+    packages:
+      paths:
+        - "upm-ci~/packages/**/*"
+  dependencies:
+    {% for editor in test_editors %}
+    {% for platform in test_platforms %}
+    - .yamato/promotion.yml#promotion_test_{{platform.name}}_{{editor.version}}
+    {% endfor %}
+    {% endfor %}
 
 promote:
   name: Promote to Production
@@ -73,8 +73,8 @@ promote:
         - "upm-ci~/packages/*.tgz"
   dependencies:
     - .yamato/upm-ci.yml#pack
-{% for editor in test_editors %}
-{% for platform in test_platforms %}
+    {% for editor in test_editors %}
+    {% for platform in test_platforms %}
     - .yamato/promotion.yml#promotion_test_{{ platform.name }}_{{ editor.version }}
-{% endfor %}
-{% endfor %}
+    {% endfor %}
+    {% endfor %}
