@@ -15,7 +15,7 @@
 
 @end
 
-@interface UnityNotificationLifeCycleManager  : NSObject
+@interface UnityNotificationLifeCycleManager : NSObject
 
 + (instancetype)sharedInstance;
 

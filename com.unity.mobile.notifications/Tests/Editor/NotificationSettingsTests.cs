@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using NUnit.Framework;
@@ -18,7 +18,6 @@ namespace Unity.Notifications.Tests
         {
             UnityNotificationEditorManager.DeleteSettings();
         }
-        
 
         [Test]
         public void SetAndroidNotifcationSettings_Works()
@@ -26,12 +25,12 @@ namespace Unity.Notifications.Tests
             UnityNotificationSettings.AndroidSettings.CustomActivityString = "com.test.dummy.activity";
             UnityNotificationSettings.AndroidSettings.UseCustomActivity = true;
             UnityNotificationSettings.AndroidSettings.RescheduleOnDeviceRestart = true;
-            
+
             Assert.AreEqual("com.test.dummy.activity", UnityNotificationSettings.AndroidSettings.CustomActivityString);
             Assert.IsTrue(UnityNotificationSettings.AndroidSettings.UseCustomActivity);
             Assert.IsTrue(UnityNotificationSettings.AndroidSettings.RescheduleOnDeviceRestart);
         }
-        
+
         [Test]
         public void SetiOSNotifcationSettings_Works()
         {
@@ -48,12 +47,9 @@ namespace Unity.Notifications.Tests
             Assert.IsTrue(UnityNotificationSettings.iOSSettings.UseAPSReleaseEnvironment);
             Assert.IsTrue(UnityNotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch);
             Assert.IsTrue(UnityNotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch);
-            
+
             Assert.AreEqual(PresentationOption.Alert, UnityNotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions);
             Assert.AreEqual(PresentationOption.Alert, UnityNotificationSettings.iOSSettings.DefaultAuthorizationOptions);
-
-
         }
-
     }
 }

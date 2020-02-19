@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,7 +35,6 @@ namespace Unity.Notifications
                 {
                     return intValue;
                 }
-
                 else if (bool.TryParse(values[index], out boolValue))
                 {
                     return boolValue;
@@ -49,7 +48,7 @@ namespace Unity.Notifications
 
                 if (value is Enum)
                 {
-                    strValue = ((int) value).ToString();
+                    strValue = ((int)value).ToString();
                 }
                 else
                 {
