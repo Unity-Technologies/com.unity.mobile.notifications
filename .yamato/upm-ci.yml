@@ -9,6 +9,7 @@ test_platforms:
     type: Unity::VM::osx
     image: buildfarm/mac:stable
     flavor: m1.mac
+
 ---
 pack:
   name: Pack
@@ -38,7 +39,7 @@ pack:
     packages:
       paths:
         - "upm-ci~/**/*"
-        
+
 {% for editor in test_editors %}
 {% for platform in test_platforms %}
 test_{{ platform.name }}_{{ editor.version }}:
@@ -60,14 +61,14 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-run_all_test_for_publish:
+run_all_test:
   name: Run all tests
   agent:
     type: Unity::VM
     image: package-ci/ubuntu:stable
     flavor: b1.large
   commands:
-    - echo "Passed"
+    - dir
   triggers:
     branches:
       only:
@@ -83,7 +84,7 @@ run_all_test_for_publish:
     - .yamato/upm-ci.yml#pack
     {% for editor in test_editors %}
     {% for platform in test_platforms %}
-    - .yamato/promotion.yml#promotion_test_{{ platform.name }}_{{ editor.version }}
+    - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
 
