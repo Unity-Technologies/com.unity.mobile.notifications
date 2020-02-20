@@ -1,4 +1,4 @@
-﻿#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID
 
 using System.Collections;
 using System.Collections.Generic;
@@ -9,12 +9,12 @@ using System.Linq;
 using UnityEngine.UI;
 using System;
 
-public class AndroidManualTests : MonoBehaviour {
-
+public class AndroidManualTests : MonoBehaviour
+{
     private Transform notificationTestButton;
-	private Transform notificatonPanel;
-	
-	private List<Transform> currentNotifications;
+    private Transform notificatonPanel;
+
+    private List<Transform> currentNotifications;
 
     public void Start()
     {
@@ -32,7 +32,7 @@ public class AndroidManualTests : MonoBehaviour {
         Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 
         if (AndroidNotificationCenter.GetNotificationChannels() != null)
-            foreach(var ch in AndroidNotificationCenter.GetNotificationChannels())
+            foreach (var ch in AndroidNotificationCenter.GetNotificationChannels())
             {
                 string outStr = "\n Channel:";
 
@@ -50,17 +50,17 @@ public class AndroidManualTests : MonoBehaviour {
             }
     }
 
-   private void SetAllTestButtons()
-   {
+    private void SetAllTestButtons()
+    {
         currentNotifications = new List<Transform>();
 
-		var testPanel = transform.Find("TestPanel");
-		//notificatonPanel = transform.Find("NotificatonPanel");
+        var testPanel = transform.Find("TestPanel");
+        //notificatonPanel = transform.Find("NotificatonPanel");
 
-		var templateTestButton =testPanel.Find("TemplateButton");
-		//notificationTestButton =notificatonPanel.Find("TemplateButton");
+        var templateTestButton = testPanel.Find("TemplateButton");
+        //notificationTestButton =notificatonPanel.Find("TemplateButton");
 
-		var tests = new OrderedDictionary();
+        var tests = new OrderedDictionary();
 
         tests["Send Simple Notification in 5s Small icon"] = new Action(() => { TestSendSimpleNotification(5); });
         tests["Send Simple Notification in 10s No Icon"] = new Action(() => { TestSendSimpleNotificationNoIcon(10); });
@@ -78,63 +78,58 @@ public class AndroidManualTests : MonoBehaviour {
         tests["Cancel Displayed Notifications"] = new Action(() => { CancelDisplayed(); });
         tests["Cancel Pending Notifications"] = new Action(() => { CancelPending(); });
         tests["Receive Callback Of Newly Delivered Notification"] = new Action(() => {  ReceiveCallbackOfNewlyDeliveredNotification(); });
-        
-       
 
 
         foreach (DictionaryEntry t in tests)
-		{
-			var button = GameObject.Instantiate(templateTestButton);
-			button.SetParent(testPanel);
+        {
+            var button = GameObject.Instantiate(templateTestButton);
+            button.SetParent(testPanel);
 
-			var text = button.gameObject.GetComponentInChildren<Text>();
-			text.text = t.Key.ToString();
+            var text = button.gameObject.GetComponentInChildren<Text>();
+            text.text = t.Key.ToString();
 
-			var action = (Action) t.Value;
+            var action = (Action)t.Value;
 
-			button.GetComponent<Button>().onClick.AddListener(delegate
-			{
-				action.Invoke();
-			} );
+            button.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                action.Invoke();
+            });
+        }
 
-		}
-		
-		templateTestButton.gameObject.SetActive(false);
-   }
+        templateTestButton.gameObject.SetActive(false);
+    }
 
-        public void TestSendSimpleNotification(int seconds)
+    public void TestSendSimpleNotification(int seconds)
     {
         var notification = new AndroidNotification();
-            notification.Title = seconds.ToString() + " seconds";
-            notification.Text = seconds.ToString() +" seconds Text";
-            notification.FireTime = System.DateTime.Now.AddSeconds(seconds);
-            notification.IntentData = seconds.ToString() + " seconds";
-            notification.Color = Color.magenta;
-            notification.SmallIcon ="icon_0";;
-            
-            AndroidNotificationCenter.SendNotification(notification, "channel_id");
+        notification.Title = seconds.ToString() + " seconds";
+        notification.Text = seconds.ToString() + " seconds Text";
+        notification.FireTime = System.DateTime.Now.AddSeconds(seconds);
+        notification.IntentData = seconds.ToString() + " seconds";
+        notification.Color = Color.magenta;
+        notification.SmallIcon = "icon_0";;
 
-            AndroidNotificationCenter.OnNotificationReceived += ( id ) => {
+        AndroidNotificationCenter.SendNotification(notification, "channel_id");
+
+        AndroidNotificationCenter.OnNotificationReceived += (id) => {
             Debug.Log("Received notification : " + id.ToString());
-        
         };
     }
 
     public void TestSendSimpleNotificationNoIcon(int seconds)
     {
         var notification = new AndroidNotification();
-            notification.Title = seconds.ToString() + " seconds";
-            notification.Text = seconds.ToString() +" seconds Text";
-            notification.FireTime = System.DateTime.Now.AddSeconds(seconds);
-            notification.IntentData = seconds.ToString() + " seconds";
-            notification.Color = Color.green;
-            
-            
-            AndroidNotificationCenter.SendNotification(notification, "channel_id");
+        notification.Title = seconds.ToString() + " seconds";
+        notification.Text = seconds.ToString() + " seconds Text";
+        notification.FireTime = System.DateTime.Now.AddSeconds(seconds);
+        notification.IntentData = seconds.ToString() + " seconds";
+        notification.Color = Color.green;
 
-            AndroidNotificationCenter.OnNotificationReceived += ( id ) => {
+
+        AndroidNotificationCenter.SendNotification(notification, "channel_id");
+
+        AndroidNotificationCenter.OnNotificationReceived += (id) => {
             Debug.Log("Received notification : " + id.ToString());
-        
         };
     }
 
@@ -160,51 +155,50 @@ public class AndroidManualTests : MonoBehaviour {
 
         if (notificationIntentData != null)
         {
-
             var msg = "- - - Last Received Notification : " + notificationIntentData.Id + "\n";
-                    msg += "\n - - -  Notification channel: " + notificationIntentData.Channel;
-                    msg += "\n - - - Notification data: " + notificationIntentData.Notification;
-                    Debug.Log(msg);
+            msg += "\n - - -  Notification channel: " + notificationIntentData.Channel;
+            msg += "\n - - - Notification data: " + notificationIntentData.Notification;
+            Debug.Log(msg);
 
-                    var notification = notificationIntentData.Notification;
-                    Debug.Log("Notification intent Data: " + notification.IntentData);
+            var notification = notificationIntentData.Notification;
+            Debug.Log("Notification intent Data: " + notification.IntentData);
 
             return notification.IntentData;
-        }else{
-        
-                    Debug.Log("no received notification found!!!");
-                    return "no notification"; 
+        }
+        else
+        {
+            Debug.Log("no received notification found!!!");
+            return "no notification";
         }
     }
+
     public void CreateNotificationChannel_NotificationChannelIsCreated()
+    {
+        var ch = new AndroidNotificationChannel()
         {
-            var ch = new AndroidNotificationChannel()
-            {
-                Id = "default",
-                Name = "Default Channel",
-                Description = "Generic spam",
-            };
-            AndroidNotificationCenter.RegisterNotificationChannel(ch);
+            Id = "default",
+            Name = "Default Channel",
+            Description = "Generic spam",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannel(ch);
 
 
-            Debug.Log("Channels count: " + AndroidNotificationCenter.GetNotificationChannels().Length.ToString());
-
-        }
+        Debug.Log("Channels count: " + AndroidNotificationCenter.GetNotificationChannels().Length.ToString());
+    }
 
     public void DeleteNotificationChannels_NotificationChannelsAreDeleted()
+    {
+        Debug.Log("DeleteNotificationChannels_NotificationChannelsAreDeleted: ");
+
+        foreach (var ch in AndroidNotificationCenter.GetNotificationChannels())
         {
-
-            Debug.Log("DeleteNotificationChannels_NotificationChannelsAreDeleted: ");
-
-            foreach(var ch in AndroidNotificationCenter.GetNotificationChannels())
-            {
-                AndroidNotificationCenter.DeleteNotificationChannel(ch.Id);
-            }
+            AndroidNotificationCenter.DeleteNotificationChannel(ch.Id);
         }
+    }
 
     public void RegisterDeletedNotificationChannel()
     {
-                var c = new AndroidNotificationChannel()
+        var c = new AndroidNotificationChannel()
         {
             Id = "channel_id",
             Name = "Default Channel",
@@ -214,20 +208,19 @@ public class AndroidManualTests : MonoBehaviour {
         AndroidNotificationCenter.RegisterNotificationChannel(c);
     }
 
-
     public void CreateNotificationChannelWithInitializedSettings_ChannelSettingsAreSaved()
     {
         var chOrig = new AndroidNotificationChannel(){
-        Id = "UrgentSpamChannel",
-        Name = "spam Channel",
-        Description = "Generic spam",
-        Importance = Importance.High,
-        CanBypassDnd = true,
-        CanShowBadge = true,
-        EnableLights = true,
-        EnableVibration = true,
-        LockScreenVisibility = LockScreenVisibility.Secret,
-        VibrationPattern = new long[] { 0L, 1L, 2L },
+            Id = "UrgentSpamChannel",
+            Name = "spam Channel",
+            Description = "Generic spam",
+            Importance = Importance.High,
+            CanBypassDnd = true,
+            CanShowBadge = true,
+            EnableLights = true,
+            EnableVibration = true,
+            LockScreenVisibility = LockScreenVisibility.Secret,
+            VibrationPattern = new long[] { 0L, 1L, 2L },
         };
         AndroidNotificationCenter.RegisterNotificationChannel(chOrig);
 
@@ -245,98 +238,91 @@ public class AndroidManualTests : MonoBehaviour {
         Debug.Log(string.Format("ch.EnableVibration orig:{0} - real:{1}", chOrig.EnableVibration, ch.EnableVibration));
         Debug.Log(string.Format("ch.LockScreenVisibility orig:{0} - real:{1}", chOrig.LockScreenVisibility, ch.LockScreenVisibility));
         Debug.Log(string.Format("ch.VibrationPattern orig:{0} - real:{1}", chOrig.VibrationPattern, ch.VibrationPattern));
-
     }
 
     public void GetAllNotificationChannels()
     {
-
         var channels = AndroidNotificationCenter.GetNotificationChannels();
-        if(channels != null)
+        if (channels != null)
         {
-                foreach (var ch in channels)
+            foreach (var ch in channels)
             {
                 var desc = string.Format("id: {0} title: {1} \n m_importance: {2} m_lockscreenVisibility: {3} m_vibrationPattern.len: {4}",
-                                        ch.Id, ch.Name, (int)ch.Importance, (int)ch.LockScreenVisibility, 0);
+                    ch.Id, ch.Name, (int)ch.Importance, (int)ch.LockScreenVisibility, 0);
 
-                    Debug.Log(desc);
-
+                Debug.Log(desc);
             }
-        }else{
+        }
+        else
+        {
             Debug.Log("No channels");
         }
-        
     }
 
-
-public void SendGroupNotificationA()
-{
-    var notification = new AndroidNotification();
-    notification.Title = "10 seconds : Group A";
-    notification.Text = string.Format("10 seconds Text : Group A {0}", UnityEngine.Random.Range(0, 100));
-    notification.SmallIcon ="icon_0";;
-
-    notification.Group = "com.android.example.GROUP_A";
-            
-    notification.FireTime = System.DateTime.Now.AddSeconds(10);
-    notification.IntentData = "10 seconds";
-            
-    AndroidNotificationCenter.SendNotification(notification, "channel_id");
-}
-
-public void SendGroupNotificationASummary ()
-{
-    var notification = new AndroidNotification();
-    notification.Title = "10 seconds : Group A";
-    notification.Text = string.Format("10 seconds Text : Group A Summary {0}", UnityEngine.Random.Range(0, 100));
-    notification.SmallIcon ="icon_0";;
-            
-    notification.Group = "com.android.example.GROUP_A";
-    notification.GroupSummary = true;
-
-    notification.GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
-    notification.SortKey = string.Format("{0}", UnityEngine.Random.Range(0, 100));
-    
-    notification.FireTime = System.DateTime.Now.AddSeconds(10);
-    notification.IntentData = "10 seconds";
-    
-    AndroidNotificationCenter.SendNotification(notification, "channel_id");
-}
-  
-
-public void CancelAll()
-{
-    AndroidNotificationCenter.CancelAllNotifications();
-}
-        
-public void CancelDisplayed()
-{
-    AndroidNotificationCenter.CancelAllDisplayedNotifications();
-}
-
-public void CancelPending()
-{
-    AndroidNotificationCenter.CancelAllScheduledNotifications();
-}
-
-public void ReceiveCallbackOfNewlyDeliveredNotification()
-{
-    AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
-    delegate(AndroidNotificationIntentData data)
+    public void SendGroupNotificationA()
     {
-        var msg = "Notification received : " + data.Id + "\n";
-        msg += "\n Notification received: ";
-        msg += "\n .Title: " + data.Notification.Title;
-        msg += "\n .Body: " + data.Notification.Text;
-        msg += "\n .Channel: " + data.Channel;
-        Debug.Log(msg);
-    };
+        var notification = new AndroidNotification();
+        notification.Title = "10 seconds : Group A";
+        notification.Text = string.Format("10 seconds Text : Group A {0}", UnityEngine.Random.Range(0, 100));
+        notification.SmallIcon = "icon_0";;
 
-AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
-}
+        notification.Group = "com.android.example.GROUP_A";
 
+        notification.FireTime = System.DateTime.Now.AddSeconds(10);
+        notification.IntentData = "10 seconds";
 
+        AndroidNotificationCenter.SendNotification(notification, "channel_id");
+    }
 
+    public void SendGroupNotificationASummary()
+    {
+        var notification = new AndroidNotification();
+        notification.Title = "10 seconds : Group A";
+        notification.Text = string.Format("10 seconds Text : Group A Summary {0}", UnityEngine.Random.Range(0, 100));
+        notification.SmallIcon = "icon_0";;
+
+        notification.Group = "com.android.example.GROUP_A";
+        notification.GroupSummary = true;
+
+        notification.GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
+        notification.SortKey = string.Format("{0}", UnityEngine.Random.Range(0, 100));
+
+        notification.FireTime = System.DateTime.Now.AddSeconds(10);
+        notification.IntentData = "10 seconds";
+
+        AndroidNotificationCenter.SendNotification(notification, "channel_id");
+    }
+
+    public void CancelAll()
+    {
+        AndroidNotificationCenter.CancelAllNotifications();
+    }
+
+    public void CancelDisplayed()
+    {
+        AndroidNotificationCenter.CancelAllDisplayedNotifications();
+    }
+
+    public void CancelPending()
+    {
+        AndroidNotificationCenter.CancelAllScheduledNotifications();
+    }
+
+    public void ReceiveCallbackOfNewlyDeliveredNotification()
+    {
+        AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
+            delegate(AndroidNotificationIntentData data)
+        {
+            var msg = "Notification received : " + data.Id + "\n";
+            msg += "\n Notification received: ";
+            msg += "\n .Title: " + data.Notification.Title;
+            msg += "\n .Body: " + data.Notification.Text;
+            msg += "\n .Channel: " + data.Channel;
+            Debug.Log(msg);
+        };
+
+        AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
+    }
 }
 
 #endif
