@@ -85,7 +85,7 @@ namespace Unity.Notifications
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
-            InjectGradleDependencies(projectPath);
+            InsertGradleDependencies(projectPath);
 
             var icons = UnityNotificationEditorManager.Initialize().GenerateDrawableResourcesForExport();
 
