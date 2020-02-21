@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;
@@ -84,6 +85,8 @@ namespace Unity.Notifications
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
+            InjectGradleDependencies(projectPath);
+
             var icons = UnityNotificationEditorManager.Initialize().GenerateDrawableResourcesForExport();
 
             var directories = Directory.GetDirectories(projectPath);
@@ -135,6 +138,38 @@ namespace Unity.Notifications
                 }
                 manifestDoc.Save(manifestPath);
             }
+        }
+
+        private void InsertGradleDependencies(string projectPath)
+        {
+            var gradleFilePath = Path.Combine(projectPath, "build.gradle");
+            if (!File.Exists(gradleFilePath))
+                return;
+
+            var contentLines = File.ReadAllLines(gradleFilePath).ToList();
+            bool dependenciesStart = false;
+            int indexToInsert = -1;
+            for (int i = 0; i < contentLines.Count; ++i)
+            {
+                var line = contentLines[i];
+                if (string.IsNullOrEmpty(line))
+                    continue;
+
+                if (!dependenciesStart && line.TrimStart().StartsWith("dependencies"))
+                {
+                    dependenciesStart = true;
+                }
+
+                if (dependenciesStart && line.TrimStart().Contains("}"))
+                {
+                    indexToInsert = i;
+                    break;
+                }
+            }
+
+            contentLines.Insert(indexToInsert, "    implementation 'com.android.support:appcompat-v7:27.1.1'");
+
+            File.WriteAllLines(gradleFilePath, contentLines);
         }
     }
 }
