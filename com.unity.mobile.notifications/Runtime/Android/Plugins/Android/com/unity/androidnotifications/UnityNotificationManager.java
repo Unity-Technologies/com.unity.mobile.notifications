@@ -549,31 +549,10 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         int smallIconId = UnityNotificationManager.findResourceidInContextByName(smallIconStr, context);
         int largeIconId = UnityNotificationManager.findResourceidInContextByName(largeIconStr, context);
-//        int smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-//            notification.smallIcon, androidContext, activity);
-//        int largeIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-//            notification.largeIcon, androidContext, activity);
-//
-//
-//
-//
-//        if (smallIconId == 0)
-//        {
-//            smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-//                DEFAULT_APP_ICON_ADAPTIVE, androidContext, activity);
-//
-//            if (smallIconId == 0)
-//            {
-//                smallIconId = notificationManager.CallStatic<int>("findResourceidInContextByName",
-//                    DEFAULT_APP_ICON_LEGACY, androidContext, activity);
-//            }
-//        }
 
-
-        // if (smallIconId == 0)
-        // {
-        //     smallIconId = R.drawable.default_icon;
-        // }
+        if (smallIconId == 0) {
+            smallIconId = context.getApplicationInfo().icon;
+        }
 
         PendingIntent tapIntent = (PendingIntent)intent.getParcelableExtra("tapIntent");
 
