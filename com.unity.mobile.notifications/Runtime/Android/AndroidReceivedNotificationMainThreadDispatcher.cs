@@ -24,11 +24,11 @@ namespace Unity.Notifications.Android
         }
 
         public void Update()
-        {         
+        {
             var tempList = new List<AndroidJavaObject>();
             // Note: Don't call callbacks while locking receivedNotificationQueue, otherwise there's a risk
             //       that callback might introduce an operations which would create a deadlock
-            lock (receivedNotificationQueue) 
+            lock (receivedNotificationQueue)
             {
                 tempList.AddRange(receivedNotificationQueue);
                 receivedNotificationQueue.Clear();
