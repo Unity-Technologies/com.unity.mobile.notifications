@@ -37,8 +37,8 @@ namespace Unity.Notifications
             if (string.IsNullOrEmpty(content))
                 return;
 
-            // Find the first '}' after 'dependencies'.
-            var regex = new Regex(@"dependencies[\s\S]+?(?<index>}+?)");
+            // Find the first '}' after 'dependencies' which has 'implementation' come after.
+            var regex = new Regex(@"dependencies[\s\S]+?implementation[\s\S]+?(?<index>}+?)");
             var result = regex.Match(content);
             if (result.Success)
                 File.WriteAllText(gradleFilePath, content.Insert(result.Groups["index"].Index, kDependency));
