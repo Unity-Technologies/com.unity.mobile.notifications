@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;
@@ -140,36 +141,28 @@ namespace Unity.Notifications
             }
         }
 
+        // Insert dependencies that need by mobile notification package.
         private void InsertGradleDependencies(string projectPath)
         {
+            // Here always insert a '\n' at the beginng. In gradle
+            //  1. for dependencies you can put '}' at the end of the same line for the last 'implementation';
+            //  2. but you can't put two 'implementation's in one line.
+            // so just always add a new line to make sure it work for all cases.
+            const string kDependency = "\n    implementation 'com.android.support:appcompat-v7:27.1.1'\n";
+
             var gradleFilePath = Path.Combine(projectPath, "build.gradle");
             if (!File.Exists(gradleFilePath))
                 return;
 
-            var contentLines = File.ReadAllLines(gradleFilePath).ToList();
-            bool dependenciesStart = false;
-            int indexToInsert = -1;
-            for (int i = 0; i < contentLines.Count; ++i)
-            {
-                var line = contentLines[i];
-                if (string.IsNullOrEmpty(line))
-                    continue;
+            var content = File.ReadAllText(gradleFilePath);
+            if (string.IsNullOrEmpty(content))
+                return;
 
-                if (!dependenciesStart && line.TrimStart().StartsWith("dependencies"))
-                {
-                    dependenciesStart = true;
-                }
-
-                if (dependenciesStart && line.TrimStart().Contains("}"))
-                {
-                    indexToInsert = i;
-                    break;
-                }
-            }
-
-            contentLines.Insert(indexToInsert, "    implementation 'com.android.support:appcompat-v7:27.1.1'");
-
-            File.WriteAllLines(gradleFilePath, contentLines);
+            // Find the first '}' after 'dependencies'.
+            var regex = new Regex(@"dependencies[\s\S]+?(?<index>}+?)");
+            var result = regex.Match(content);
+            if (result.Success)
+                File.WriteAllText(gradleFilePath, content.Insert(result.Groups["index"].Index, kDependency));
         }
     }
 }
