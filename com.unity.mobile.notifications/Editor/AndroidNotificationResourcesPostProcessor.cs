@@ -109,21 +109,25 @@ namespace Unity.Notifications
             XmlElement notificationManagerReceiver = null;
             XmlElement notificationRestartOnBootReceiver = null;
 
-            // Search for existing receivers.
-            foreach (XmlNode node in applicationXmlNode.ChildNodes)
+            var receiverNodes = manifestXmlDoc.SelectNodes("manifest/application/receiver");
+            if (receiverNodes != null)
             {
-                var element = node as XmlElement;
-                if (element == null || node.Name != "receiver")
-                    continue;
+                // Check existing receivers.
+                foreach (XmlNode node in receiverNodes)
+                {
+                    var element = node as XmlElement;
+                    if (element == null)
+                        continue;
 
-                var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
-                if (elementName == kNotificationManagerName)
-                    notificationManagerReceiver = element;
-                else if (elementName == kNotificationRestartOnBootName)
-                    notificationRestartOnBootReceiver = element;
+                    var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
+                    if (elementName == kNotificationManagerName)
+                        notificationManagerReceiver = element;
+                    else if (elementName == kNotificationRestartOnBootName)
+                        notificationRestartOnBootReceiver = element;
 
-                if (notificationManagerReceiver != null && notificationRestartOnBootReceiver != null)
-                    break;
+                    if (notificationManagerReceiver != null && notificationRestartOnBootReceiver != null)
+                        break;
+                }
             }
 
             // Create notification manager receiver if necessary.
@@ -178,8 +182,11 @@ namespace Unity.Notifications
 
         internal static void AppendAndroidMetadataField(XmlDocument xmlDoc, string name, string value)
         {
-            var nodes = xmlDoc.SelectNodes("manifest/application/meta-data");
+            var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
+            if (applicationNode == null)
+                return;
 
+            var nodes = xmlDoc.SelectNodes("manifest/application/meta-data");
             if (nodes != null)
             {
                 // Check if there is a 'meta-data' with the same name.
@@ -197,10 +204,6 @@ namespace Unity.Notifications
                     }
                 }
             }
-
-            var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
-            if (applicationNode == null)
-                return;
 
             XmlElement metaDataNode = xmlDoc.CreateElement("meta-data");
             metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
