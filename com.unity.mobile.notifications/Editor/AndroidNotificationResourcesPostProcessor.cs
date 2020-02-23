@@ -84,14 +84,14 @@ namespace Unity.Notifications
             if (useCustomActivity)
             {
                 var customActivity = (string)settings.Find(i => i.key == "UnityNotificationAndroidCustomActivityString").val;
-                manifestDoc = AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity", customActivity);
+                AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity", customActivity);
             }
 
             var enableRescheduleOnRestart = (bool)settings.Find(i => i.key == "UnityNotificationAndroidRescheduleOnDeviceRestart").val;
             if (enableRescheduleOnRestart)
             {
-                manifestDoc = AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
-                manifestDoc = AppendAndroidPermissionField(manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
+                AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
+                AppendAndroidPermissionField(manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
 
             manifestDoc.Save(manifestPath);
@@ -112,14 +112,15 @@ namespace Unity.Notifications
             // Search for existing receivers.
             foreach (XmlNode node in applicationXmlNode.ChildNodes)
             {
-                if (!node.Name.Equals("receiver"))
+                var element = node as XmlElement;
+                if (element == null || node.Name != "receiver")
                     continue;
 
-                var elementName = ((XmlElement)node).GetAttribute("name");
-                if (elementName.Equals(kNotificationManagerName))
-                    notificationManagerReceiver = node as XmlElement;
-                else if (elementName.Equals(kNotificationRestartOnBootName))
-                    notificationRestartOnBootReceiver = node as XmlElement;
+                var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
+                if (elementName == kNotificationManagerName)
+                    notificationManagerReceiver = element;
+                else if (elementName == kNotificationRestartOnBootName)
+                    notificationRestartOnBootReceiver = element;
 
                 if (notificationManagerReceiver != null && notificationRestartOnBootReceiver != null)
                     break;
@@ -153,71 +154,59 @@ namespace Unity.Notifications
             notificationRestartOnBootReceiver.SetAttribute("enabled", kAndroidNamespaceURI, "false");
         }
 
-        internal static XmlDocument AppendAndroidPermissionField(XmlDocument xmlDoc, string key)
+        internal static void AppendAndroidPermissionField(XmlDocument xmlDoc, string name)
         {
-            // <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-            string xpath = "manifest";
-            var parentNode = xmlDoc.SelectSingleNode(xpath);
-            XmlElement metaDataNode = xmlDoc.CreateElement("uses-permission");
+            var manifestNode = xmlDoc.SelectSingleNode("manifest");
+            if (manifestNode == null)
+                return;
 
-            foreach (XmlNode node in parentNode.ChildNodes)
+            foreach (XmlNode node in manifestNode.ChildNodes)
             {
-                if (node.Name == "uses-permission")
-                    foreach (XmlAttribute attr in node.Attributes)
-                    {
-                        if (attr.Value == key)
-                            return xmlDoc;
-                    }
+                if (!(node is XmlElement) || node.Name != "uses-permission")
+                    continue;
+
+                var elementName = ((XmlElement)node).GetAttribute("name", kAndroidNamespaceURI);
+                if (elementName == name)
+                    return;
             }
 
-            metaDataNode.SetAttribute("name", kAndroidNamespaceURI, key);
+            XmlElement metaDataNode = xmlDoc.CreateElement("uses-permission");
+            metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
 
-            parentNode.AppendChild(metaDataNode);
-
-            return xmlDoc;
+            manifestNode.AppendChild(metaDataNode);
         }
 
-        internal static XmlDocument AppendAndroidMetadataField(XmlDocument xmlDoc, string key, string value)
+        internal static void AppendAndroidMetadataField(XmlDocument xmlDoc, string name, string value)
         {
-            string xpath = "manifest/application/meta-data";
-
-            var nodes = xmlDoc.SelectNodes(xpath);
-            var fieldSet = false;
+            var nodes = xmlDoc.SelectNodes("manifest/application/meta-data");
 
             if (nodes != null)
             {
+                // Check if there is a 'meta-data' with the same name.
                 foreach (XmlNode node in nodes)
                 {
-                    foreach (XmlAttribute attr in node.Attributes)
-                    {
-                        if (attr.Value == key)
-                        {
-                            fieldSet = true;
-                        }
-                    }
+                    var element = node as XmlElement;
+                    if (element == null)
+                        continue;
 
-                    if (fieldSet)
+                    var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
+                    if (elementName == name)
                     {
-                        ((XmlElement)node).SetAttribute("value", kAndroidNamespaceURI, value);
-                        break;
+                        element.SetAttribute("value", kAndroidNamespaceURI, value);
+                        return;
                     }
                 }
             }
 
-            if (!fieldSet)
-            {
-                XmlElement metaDataNode = xmlDoc.CreateElement("meta-data");
+            var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
+            if (applicationNode == null)
+                return;
 
-                metaDataNode.SetAttribute("name", kAndroidNamespaceURI, key);
-                metaDataNode.SetAttribute("value", kAndroidNamespaceURI, value);
+            XmlElement metaDataNode = xmlDoc.CreateElement("meta-data");
+            metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
+            metaDataNode.SetAttribute("value", kAndroidNamespaceURI, value);
 
-                var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
-                if (applicationNode != null)
-                {
-                    applicationNode.AppendChild(metaDataNode);
-                }
-            }
-            return xmlDoc;
+            applicationNode.AppendChild(metaDataNode);
         }
     }
 }
