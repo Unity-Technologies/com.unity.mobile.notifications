@@ -1,6 +1,6 @@
 package com.unity.androidnotifications;
 
-import com.unity3d.player.*;
+// import com.unity3d.player;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -187,9 +187,9 @@ public class UnityNotificationManager extends BroadcastReceiver
         SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
         Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
 
-        if (BuildConfig.DEBUG) {
-            Log.w("UnityNotifications", String.format("\n Deleting expired notification intent : %s ", id));
-        }
+        // if (BuildConfig.DEBUG) {
+        //     Log.w("UnityNotifications", String.format("\n Deleting expired notification intent : %s ", id));
+        // }
 
         cancelPendingNotificationIntentInternal(Integer.valueOf(id), context);
 
@@ -214,9 +214,9 @@ public class UnityNotificationManager extends BroadcastReceiver
 
         List<Intent> intent_data_list = new ArrayList<Intent> ();
 
-        if (BuildConfig.DEBUG) {
-            Log.w("UnityNotifications", String.format(" \n Loading serialized notification intents. Total Intents : %d \n", idsSetCopy.size()));
-        }
+        // if (BuildConfig.DEBUG) {
+        //     Log.w("UnityNotifications", String.format(" \n Loading serialized notification intents. Total Intents : %d \n", idsSetCopy.size()));
+        // }
 
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
@@ -235,13 +235,13 @@ public class UnityNotificationManager extends BroadcastReceiver
                 idsMarkedForRemoval.add(id);
             }
 
-            if (BuildConfig.DEBUG) {
-                try {
-                    Log.w("UnityNotifications", "id: " + id + " status: " + Integer.toString(UnityNotificationManager.getNotificationManagerImpl(context).checkNotificationStatus(Integer.parseInt(id))));
-                } catch (Exception ex) {
-                    ;
-                }
-            }
+            // if (BuildConfig.DEBUG) {
+            //     try {
+            //         Log.w("UnityNotifications", "id: " + id + " status: " + Integer.toString(UnityNotificationManager.getNotificationManagerImpl(context).checkNotificationStatus(Integer.parseInt(id))));
+            //     } catch (Exception ex) {
+            //         ;
+            //     }
+            // }
         }
 
         for (String id : idsMarkedForRemoval) {
@@ -422,9 +422,9 @@ public class UnityNotificationManager extends BroadcastReceiver
             }
         }
 
-        if (BuildConfig.DEBUG) {
-            Log.w("UnityNotifications", "Currently scheduled : " + Integer.toString(validIdsSet.size()));
-        }
+        // if (BuildConfig.DEBUG) {
+        //     Log.w("UnityNotifications", "Currently scheduled : " + Integer.toString(validIdsSet.size()));
+        // }
 
         if (android.os.Build.MANUFACTURER.equals("samsung") && validIdsSet.size() >= 499)
         {
@@ -447,17 +447,19 @@ public class UnityNotificationManager extends BroadcastReceiver
         editor.apply();
 
         return data_intent;
+
     }
 
 
     public void scheduleNotificationIntent(Intent data_intent_source)
     {
+
         Instant starts = null;
-        if (BuildConfig.DEBUG) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                starts = Instant.now();
-            }
-        }
+        // if (BuildConfig.DEBUG) {
+        //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //         starts = Instant.now();
+        //     }
+        // }
 
         String d = UnityNotificationManager.SerializeNotificationIntent(data_intent_source);
         Intent data_intent = UnityNotificationManager.DeserializeNotificationIntent(d, mContext);
@@ -478,15 +480,15 @@ public class UnityNotificationManager extends BroadcastReceiver
             UnityNotificationManager.scheduleNotificationIntentAlarm(intent, mContext, broadcast);
         }
 
-        if (BuildConfig.DEBUG) {
-            if (starts != null) {
-                Instant ends = null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    ends = Instant.now();
-                    Log.w("UnityNotifications", Long.toString(Duration.between(starts, ends).toMillis()));
-                }
-            }
-        }
+        // if (BuildConfig.DEBUG) {
+        //     if (starts != null) {
+        //         Instant ends = null;
+        //         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //             ends = Instant.now();
+        //             Log.w("UnityNotifications", Long.toString(Duration.between(starts, ends).toMillis()));
+        //         }
+        //     }
+        // }
     }
 
     public static Intent buildOpenAppIntent(Intent data_intent, Context context, Class c)
