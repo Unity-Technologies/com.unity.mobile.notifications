@@ -10,6 +10,7 @@ namespace Unity.Notifications
     public class AndroidNotificationResourcesPostProcessor : IPostGenerateGradleAndroidProject
     {
         public int callbackOrder => 0;
+        const string kAndroidNamespaceURI = "http://schemas.android.com/apk/res/android";
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
@@ -17,14 +18,14 @@ namespace Unity.Notifications
 
             CopyNotificationResources(projectPath);
 
-            InsertAndroidManifest(projectPath);
+            InjectAndroidManifest(projectPath);
         }
 
         // Insert dependencies that need by mobile notification package.
         private void InsertGradleDependencies(string projectPath)
         {
-            // Here always insert a '\n' at the beginng. In gradle
-            //  1. for dependencies you can put '}' at the end of the same line for the last 'implementation';
+            // Here always insert a '\n' at the beginning, as in gradle:
+            //  1. for dependencies, you can put '}' at the end of the last 'implementation' line;
             //  2. but you can't put two 'implementation's in one line.
             // so just always add a new line to make sure it work for all cases.
             const string kDependency = "\n    implementation 'com.android.support:appcompat-v7:27.1.1'\n";
@@ -65,32 +66,90 @@ namespace Unity.Notifications
             }
         }
 
-        private void InsertAndroidManifest(string projectPath)
+        private void InjectAndroidManifest(string projectPath)
         {
+            var manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
+            if (!File.Exists(manifestPath))
+                return;
+
+            XmlDocument manifestDoc = new XmlDocument();
+            manifestDoc.Load(manifestPath);
+
+            InjectReceivers(manifestDoc);
+
             var settings = UnityNotificationEditorManager.Initialize().AndroidNotificationEditorSettingsFlat;
 
-            var enableRescheduleOnRestart = (bool)settings.Find(i => i.key == "UnityNotificationAndroidRescheduleOnDeviceRestart").val;
             var useCustomActivity = (bool)settings.Find(i => i.key == "UnityNotificationAndroidUseCustomActivity").val;
-            var customActivity = (string)settings.Find(i => i.key == "UnityNotificationAndroidCustomActivityString").val;
-
-            if (useCustomActivity || enableRescheduleOnRestart)
+            if (useCustomActivity)
             {
-                var manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
-                XmlDocument manifestDoc = new XmlDocument();
-                manifestDoc.Load(manifestPath);
-
-                if (useCustomActivity)
-                {
-                    manifestDoc = AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity", customActivity);
-                }
-                if (enableRescheduleOnRestart)
-                {
-                    manifestDoc = AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
-                    manifestDoc = AppendAndroidPermissionField(manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
-                }
-
-                manifestDoc.Save(manifestPath);
+                var customActivity = (string)settings.Find(i => i.key == "UnityNotificationAndroidCustomActivityString").val;
+                manifestDoc = AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity", customActivity);
             }
+
+            var enableRescheduleOnRestart = (bool)settings.Find(i => i.key == "UnityNotificationAndroidRescheduleOnDeviceRestart").val;
+            if (enableRescheduleOnRestart)
+            {
+                manifestDoc = AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
+                manifestDoc = AppendAndroidPermissionField(manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
+            }
+
+            manifestDoc.Save(manifestPath);
+        }
+
+        internal static void InjectReceivers(XmlDocument manifestXmlDoc)
+        {
+            const string kNotificationManagerName = "com.unity.androidnotifications.UnityNotificationManager";
+            const string kNotificationRestartOnBootName = "com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver";
+
+            var applicationXmlNode = manifestXmlDoc.SelectSingleNode("manifest/application");
+            if (applicationXmlNode == null)
+                return;
+
+            XmlElement notificationManagerReceiver = null;
+            XmlElement notificationRestartOnBootReceiver = null;
+
+            // Search for existing receivers.
+            foreach (XmlNode node in applicationXmlNode.ChildNodes)
+            {
+                if (!node.Name.Equals("receiver"))
+                    continue;
+
+                var elementName = ((XmlElement)node).GetAttribute("name");
+                if (elementName.Equals(kNotificationManagerName))
+                    notificationManagerReceiver = node as XmlElement;
+                else if (elementName.Equals(kNotificationRestartOnBootName))
+                    notificationRestartOnBootReceiver = node as XmlElement;
+
+                if (notificationManagerReceiver != null && notificationRestartOnBootReceiver != null)
+                    break;
+            }
+
+            // Create notification manager receiver if necessary.
+            if (notificationManagerReceiver == null)
+            {
+                notificationManagerReceiver = manifestXmlDoc.CreateElement("receiver");
+                notificationManagerReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationManagerName);
+
+                applicationXmlNode.AppendChild(notificationManagerReceiver);
+            }
+            notificationManagerReceiver.SetAttribute("exported", kAndroidNamespaceURI, "true");
+
+            // Create notification restart-on-boot receiver if necessary.
+            if (notificationRestartOnBootReceiver == null)
+            {
+                notificationRestartOnBootReceiver = manifestXmlDoc.CreateElement("receiver");
+                notificationRestartOnBootReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationRestartOnBootName);
+
+                var intentFilterNode = manifestXmlDoc.CreateElement("intent-filter");
+
+                var actionNode = manifestXmlDoc.CreateElement("action");
+                actionNode.SetAttribute("name", kAndroidNamespaceURI, "android.intent.action.BOOT_COMPLETED");
+
+                intentFilterNode.AppendChild(actionNode);
+                notificationRestartOnBootReceiver.AppendChild(intentFilterNode);
+                applicationXmlNode.AppendChild(notificationRestartOnBootReceiver);
+            }
+            notificationRestartOnBootReceiver.SetAttribute("enabled", kAndroidNamespaceURI, "false");
         }
 
         internal static XmlDocument AppendAndroidPermissionField(XmlDocument xmlDoc, string key)
@@ -110,7 +169,7 @@ namespace Unity.Notifications
                     }
             }
 
-            metaDataNode.SetAttribute("name", "http://schemas.android.com/apk/res/android", key);
+            metaDataNode.SetAttribute("name", kAndroidNamespaceURI, key);
 
             parentNode.AppendChild(metaDataNode);
 
@@ -138,7 +197,7 @@ namespace Unity.Notifications
 
                     if (fieldSet)
                     {
-                        ((XmlElement)node).SetAttribute("value", "http://schemas.android.com/apk/res/android", value);
+                        ((XmlElement)node).SetAttribute("value", kAndroidNamespaceURI, value);
                         break;
                     }
                 }
@@ -148,8 +207,8 @@ namespace Unity.Notifications
             {
                 XmlElement metaDataNode = xmlDoc.CreateElement("meta-data");
 
-                metaDataNode.SetAttribute("name", "http://schemas.android.com/apk/res/android", key);
-                metaDataNode.SetAttribute("value", "http://schemas.android.com/apk/res/android", value);
+                metaDataNode.SetAttribute("name", kAndroidNamespaceURI, key);
+                metaDataNode.SetAttribute("value", kAndroidNamespaceURI, value);
 
                 var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
                 if (applicationNode != null)
