@@ -1,4 +1,5 @@
-#if UNITY_EDITOR && PLATFORM_ANDROID
+#if UNITY_ANDROID
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -33,17 +34,19 @@ namespace Unity.Notifications
 
             var gradleFilePath = Path.Combine(projectPath, "build.gradle");
             if (!File.Exists(gradleFilePath))
-                return;
+                throw new FileNotFoundException(string.Format("'{0}' doesn't exist.", gradleFilePath));
 
             var content = File.ReadAllText(gradleFilePath);
             if (string.IsNullOrEmpty(content))
-                return;
+                throw new ArgumentException(string.Format("'{0}' is empty.", gradleFilePath));
 
             // Find the first '}' after 'dependencies' which has 'implementation' come after.
             var regex = new Regex(@"dependencies[\s\S]+?implementation[\s\S]+?(?<index>}+?)");
             var result = regex.Match(content);
-            if (result.Success)
-                File.WriteAllText(gradleFilePath, content.Insert(result.Groups["index"].Index, kDependency));
+            if (!result.Success)
+                throw new ArgumentException(string.Format("Failed to parse '{0}'.", gradleFilePath));
+
+            File.WriteAllText(gradleFilePath, content.Insert(result.Groups["index"].Index, kDependency));
         }
 
         private void CopyNotificationResources(string projectPath)
@@ -71,12 +74,12 @@ namespace Unity.Notifications
         {
             var manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
             if (!File.Exists(manifestPath))
-                return;
+                throw new FileNotFoundException(string.Format("'{0}' doesn't exist.", manifestPath));
 
             XmlDocument manifestDoc = new XmlDocument();
             manifestDoc.Load(manifestPath);
 
-            InjectReceivers(manifestDoc);
+            InjectReceivers(manifestPath, manifestDoc);
 
             var settings = UnityNotificationEditorManager.Initialize().AndroidNotificationEditorSettingsFlat;
 
@@ -84,27 +87,27 @@ namespace Unity.Notifications
             if (useCustomActivity)
             {
                 var customActivity = (string)settings.Find(i => i.key == "UnityNotificationAndroidCustomActivityString").val;
-                AppendAndroidMetadataField(manifestDoc, "custom_notification_android_activity", customActivity);
+                AppendAndroidMetadataField(manifestPath, manifestDoc, "custom_notification_android_activity", customActivity);
             }
 
             var enableRescheduleOnRestart = (bool)settings.Find(i => i.key == "UnityNotificationAndroidRescheduleOnDeviceRestart").val;
             if (enableRescheduleOnRestart)
             {
-                AppendAndroidMetadataField(manifestDoc, "reschedule_notifications_on_restart", "true");
-                AppendAndroidPermissionField(manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
+                AppendAndroidMetadataField(manifestPath, manifestDoc, "reschedule_notifications_on_restart", "true");
+                AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
 
             manifestDoc.Save(manifestPath);
         }
 
-        internal static void InjectReceivers(XmlDocument manifestXmlDoc)
+        internal static void InjectReceivers(string manifestPath, XmlDocument manifestXmlDoc)
         {
             const string kNotificationManagerName = "com.unity.androidnotifications.UnityNotificationManager";
             const string kNotificationRestartOnBootName = "com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver";
 
             var applicationXmlNode = manifestXmlDoc.SelectSingleNode("manifest/application");
             if (applicationXmlNode == null)
-                return;
+                throw new ArgumentException(string.Format("Missing 'application' node in '{0}'.", manifestPath));
 
             XmlElement notificationManagerReceiver = null;
             XmlElement notificationRestartOnBootReceiver = null;
@@ -158,11 +161,11 @@ namespace Unity.Notifications
             notificationRestartOnBootReceiver.SetAttribute("enabled", kAndroidNamespaceURI, "false");
         }
 
-        internal static void AppendAndroidPermissionField(XmlDocument xmlDoc, string name)
+        internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name)
         {
             var manifestNode = xmlDoc.SelectSingleNode("manifest");
             if (manifestNode == null)
-                return;
+                throw new ArgumentException(string.Format("Missing 'manifest' node in '{0}'.", manifestPath));
 
             foreach (XmlNode node in manifestNode.ChildNodes)
             {
@@ -180,11 +183,11 @@ namespace Unity.Notifications
             manifestNode.AppendChild(metaDataNode);
         }
 
-        internal static void AppendAndroidMetadataField(XmlDocument xmlDoc, string name, string value)
+        internal static void AppendAndroidMetadataField(string manifestPath, XmlDocument xmlDoc, string name, string value)
         {
             var applicationNode = xmlDoc.SelectSingleNode("manifest/application");
             if (applicationNode == null)
-                return;
+                throw new ArgumentException(string.Format("Missing 'application' node in '{0}'.", manifestPath));
 
             var nodes = xmlDoc.SelectNodes("manifest/application/meta-data");
             if (nodes != null)
