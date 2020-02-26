@@ -329,7 +329,6 @@ namespace Unity.Notifications.Android
             AndroidJavaClass managerClass =
                 new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
             AndroidJavaObject context = notificationManager.Get<AndroidJavaObject>("mContext");
-            AndroidJavaObject activity = notificationManager.Get<AndroidJavaObject>("mActivity");
 
             AndroidJavaObject notificationIntent =
                 new AndroidJavaObject("android.content.Intent", context, managerClass);

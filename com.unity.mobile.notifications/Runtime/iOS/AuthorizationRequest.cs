@@ -90,7 +90,6 @@ namespace Unity.Notifications.iOS
         public string DeviceToken { get; private set; }
 
         internal delegate void AuthorizationRequestCallback(iOSAuthorizationRequestData notification);
-        internal static event AuthorizationRequestCallback OnAuthRequest = delegate {};
 
         /// <summary>
         /// Initiate an authorization request.

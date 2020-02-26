@@ -83,7 +83,6 @@ namespace Unity.Notifications
             {
                 if (Event.current.type == EventType.Repaint)
                 {
-                    var boxBackground = new GUIStyle("RL Background");
                     var headerBackground = new GUIStyle("RL Header");
 
                     var paddedRect = GetContentRect(rect,
@@ -173,10 +172,6 @@ namespace Unity.Notifications
 
             if (drawableResourceDataRef != null)
             {
-                var idProperty = drawableResourceDataRef.FindPropertyRelative("Id");
-                var typeProperty = drawableResourceDataRef.FindPropertyRelative("Type");
-                var assetProperty = drawableResourceDataRef.FindPropertyRelative("Asset");
-
                 float width = Mathf.Min(elementRect.width,
                     EditorGUIUtility.labelWidth + 4 + kSlotSize + kIconSpacing + kMaxPreviewSize);
 
@@ -441,7 +436,7 @@ namespace Unity.Notifications
             foreach (var setting in settings)
             {
                 EditorGUI.BeginDisabledGroup(disabled);
-                Rect r = EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(layer * 13);
 
                 var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
