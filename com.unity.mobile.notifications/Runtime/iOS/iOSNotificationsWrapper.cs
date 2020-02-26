@@ -8,15 +8,6 @@ using UnityEngine;
 #pragma warning disable 649, 162
 namespace Unity.Notifications.iOS
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct iOSAuthorizationRequestData
-    {
-        internal bool granted;
-        internal string error;
-        internal bool finished;
-        internal string deviceToken;
-    }
-
     internal class iOSNotificationsWrapper : MonoBehaviour
     {
         [DllImport("__Internal")]
