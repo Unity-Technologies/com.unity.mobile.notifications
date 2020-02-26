@@ -3,8 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-#pragma warning disable 162, 67, 414
-
 namespace Unity.Notifications.Android
 {
     /// <summary>
@@ -69,10 +67,10 @@ namespace Unity.Notifications.Android
                 receivedNotificationDispatcher.AddComponent<AndroidReceivedNotificationMainThreadDispatcher>();
             }
 
-            #if UNITY_EDITOR || !UNITY_ANDROID
-            return false;
-            #endif
-
+#if UNITY_EDITOR || !UNITY_ANDROID
+            notificationManager = null;
+            initialized = false;
+#elif UNITY_ANDROID
             AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
@@ -87,7 +85,9 @@ namespace Unity.Notifications.Android
             AndroidJavaClass buildVersion = new AndroidJavaClass("android.os.Build$VERSION");
             AndroidSDK = buildVersion.GetStatic<int>("SDK_INT");
 
-            return initialized = true;
+            initialized = true;
+#endif
+            return initialized;
         }
 
         /// <summary>
@@ -414,5 +414,3 @@ namespace Unity.Notifications.Android
         }
     }
 }
-
-#pragma warning restore 162, 67, 414

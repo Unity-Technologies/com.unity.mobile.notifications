@@ -7,8 +7,6 @@ using UnityEngine;
 
 using Unity.Notifications.iOS;
 
-#pragma warning disable 219
-
 [assembly: InternalsVisibleTo("Unity.Notifications.Tests")]
 namespace Unity.Notifications
 {
@@ -356,7 +354,7 @@ namespace Unity.Notifications
 
                 if (res.Type == NotificationIconType.LargeIcon)
                 {
-                    var textXxhdpi = TextureAssetUtils.ScaleTexture(texture, (int)(192 * scale), (int)(192 * scale));
+                    TextureAssetUtils.ScaleTexture(texture, (int)(192 * scale), (int)(192 * scale));
                     icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXhdpi.EncodeToPNG();
                 }
             }
@@ -365,5 +363,3 @@ namespace Unity.Notifications
         }
     }
 }
-
-#pragma warning restore 219

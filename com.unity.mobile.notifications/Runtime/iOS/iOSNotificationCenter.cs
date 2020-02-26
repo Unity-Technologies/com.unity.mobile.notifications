@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 
-#pragma warning disable 67
-
 namespace Unity.Notifications.iOS
 {
     /// <summary>
@@ -223,5 +221,3 @@ namespace Unity.Notifications.iOS
         }
     }
 }
-
-#pragma warning restore 67

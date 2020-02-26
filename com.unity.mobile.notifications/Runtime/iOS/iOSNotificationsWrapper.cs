@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using AOT;
 using UnityEngine;
 
-#pragma warning disable 649, 162
 namespace Unity.Notifications.iOS
 {
     internal class iOSNotificationsWrapper : MonoBehaviour
@@ -68,12 +67,12 @@ namespace Unity.Notifications.iOS
 
 
         internal delegate void AuthorizationRequestCallback(IntPtr authdata);
-        internal static AuthorizationRequestCallback onAuthenticationRequestFinished;
+        internal static AuthorizationRequestCallback onAuthenticationRequestFinished = null;
 
 
         internal delegate void NotificationReceivedCallback(IntPtr notificationData);
-        internal static NotificationReceivedCallback onNotificationReceived;
-        internal static NotificationReceivedCallback onRemoteNotificationReceived;
+        internal static NotificationReceivedCallback onNotificationReceived = null;
+        internal static NotificationReceivedCallback onRemoteNotificationReceived = null;
 
 
         public static void RegisterAuthorizationRequestCallback()
@@ -185,7 +184,7 @@ namespace Unity.Notifications.iOS
 
             return dataList.ToArray();
 #endif
-            return null;
+            return new iOSNotificationData[] {};
         }
 
         public static iOSNotificationData[] GetScheduledNotificationData()
@@ -255,4 +254,3 @@ namespace Unity.Notifications.iOS
         }
     }
 }
-#pragma warning restore 649, 162
