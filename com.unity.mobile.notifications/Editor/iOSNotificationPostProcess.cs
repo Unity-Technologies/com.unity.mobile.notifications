@@ -3,6 +3,9 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 
 #if PLATFORM_IOS
+using System;
+using System.IO;
+using Unity.Notifications;
 using Unity.Notifications.iOS;
 using UnityEditor.iOS.Xcode;
 #endif
