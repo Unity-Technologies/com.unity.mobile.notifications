@@ -81,7 +81,4 @@ namespace Unity.Notifications
             return error;
         }
     }
-
-#if UNITY_EDITOR
-#endif
 }

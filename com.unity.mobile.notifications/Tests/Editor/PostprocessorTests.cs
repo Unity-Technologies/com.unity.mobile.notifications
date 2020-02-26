@@ -11,7 +11,7 @@ namespace Unity.Notifications.Tests
             Assert.AreEqual(true, true);
         }
 
-#if PLATFORM_ANDROID && UNITY_EDITOR
+#if UNITY_ANDROID
         [Test]
         public void AppendMetadataToManifest_WhenSameValue_Works()
         {

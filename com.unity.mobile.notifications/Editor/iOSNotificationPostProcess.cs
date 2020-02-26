@@ -1,12 +1,13 @@
 #if UNITY_IOS
-using UnityEditor;
-using UnityEditor.Callbacks;
-using UnityEngine;
 using System;
 using System.IO;
+using UnityEditor;
+using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
+using UnityEngine;
+
 using Unity.Notifications;
 using Unity.Notifications.iOS;
-using UnityEditor.iOS.Xcode;
 
 public class iOSNotificationPostProcess : MonoBehaviour
 {

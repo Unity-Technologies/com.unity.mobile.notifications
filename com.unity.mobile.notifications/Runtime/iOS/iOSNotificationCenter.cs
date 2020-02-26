@@ -72,16 +72,16 @@ namespace Unity.Notifications.iOS
 
         static bool Initialize()
         {
-            #if UNITY_EDITOR || !PLATFORM_IOS
+#if UNITY_EDITOR || !UNITY_IOS
             return false;
-            #elif PLATFORM_IOS
+#elif UNITY_IOS
 
             if (initialized)
                 return true;
 
             iOSNotificationsWrapper.RegisterOnReceivedCallback();
             return initialized = true;
-            #endif
+#endif
         }
 
         /// <summary>
