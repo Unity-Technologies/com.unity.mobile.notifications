@@ -1,11 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
-
-using Unity.Notifications;
 
 namespace Unity.Notifications.Tests
 {

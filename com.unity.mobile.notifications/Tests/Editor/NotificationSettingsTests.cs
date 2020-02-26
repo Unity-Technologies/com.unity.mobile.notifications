@@ -1,12 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Xml;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
-using UnityEngine;
-using UnityEngine.TestTools;
-
-using Unity.Notifications;
 using Unity.Notifications.iOS;
 
 namespace Unity.Notifications.Tests

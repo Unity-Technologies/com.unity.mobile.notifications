@@ -2,19 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Xml;
-using System.Xml.Linq;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
-using UnityEditor.Android;
 using Unity.Notifications.iOS;
-using Unity.Notifications;
-using UnityEditor.VersionControl;
-using Object = System.Object;
 
 #pragma warning disable 219
 

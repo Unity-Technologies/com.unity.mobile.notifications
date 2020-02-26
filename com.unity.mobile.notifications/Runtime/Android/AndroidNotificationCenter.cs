@@ -1,12 +1,9 @@
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
 #pragma warning disable 162, 67, 414
-
 
 namespace Unity.Notifications.Android
 {
@@ -306,7 +303,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return -1;
 
-            int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new Random().Next(10000));
+            int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
             SendNotification(id, notification, channel);
 
             return id;

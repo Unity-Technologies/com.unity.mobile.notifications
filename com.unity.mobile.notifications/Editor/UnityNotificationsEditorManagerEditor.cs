@@ -1,18 +1,11 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.VersionControl;
 using UnityEditorInternal;
-
 using Unity.Notifications.iOS;
 
-
 #pragma warning disable 219, 414
-
 
 namespace Unity.Notifications
 {
