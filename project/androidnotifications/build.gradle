@@ -36,22 +36,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
 
-afterEvaluate {
-    assembleDebug.doLast {
-        copy {
-            from('build/outputs/aar') {
-                include '*-debug.aar'
-            }
-            into '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android'
-        }
-    }
-
-    assembleRelease.doLast {
-        copy {
-            from('build/outputs/aar') {
-                include '*-release.aar'
-            }
-            into '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android'
-        }
-    }
-}
+android.sourceSets.main.java.srcDirs += '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android/com/unity/androidnotifications/';
