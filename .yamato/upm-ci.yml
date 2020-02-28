@@ -15,26 +15,13 @@ pack:
   name: Pack
   agent:
     type: Unity::VM
-    image: package-ci/ubuntu:stable
+    image: package-ci/win10:stable
     flavor: b1.large
 
-  variables:
-    SDK_URL: "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" 
-    ANDROID_HOME: /home/bokken/android-sdk
-    ANDROID_VERSION: 29 
-    ANDROID_BUILD_TOOLS_VERSION: 29.0.1
   commands:
-    - sudo apt-get --assume-yes update
-    - sudo apt-get --assume-yes install openjdk-8-jdk
-    - sudo apt-get --assume-yes install expect
-    - ls
-    - ./project/prepare_env.sh
-    - ./project/build_package.sh
     - ./add_sample.sh
     - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
-    - ls
     - upm-ci package pack --package-path com.unity.mobile.notifications
-    - find .
   artifacts:
     packages:
       paths:
