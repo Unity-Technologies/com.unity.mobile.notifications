@@ -15,8 +15,8 @@ pack:
   name: Pack
   agent:
     type: Unity::VM
-    image: package-ci/win10:stable
-    flavor: b1.large
+    image: package-ci/ubuntu:stable
+    flavor: b1.small
 
   commands:
     - ./add_sample.sh
