@@ -36,4 +36,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
 
-android.sourceSets.main.java.srcDirs += '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android/com/unity/androidnotifications/';
+android.sourceSets.main.java.srcDirs += '../../com.unity.mobile.notifications/Runtime/Android/Plugins/Android/';
