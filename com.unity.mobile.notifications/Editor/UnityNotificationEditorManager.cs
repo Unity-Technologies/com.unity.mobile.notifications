@@ -354,8 +354,8 @@ namespace Unity.Notifications
 
                 if (res.Type == NotificationIconType.LargeIcon)
                 {
-                    TextureAssetUtils.ScaleTexture(texture, (int)(192 * scale), (int)(192 * scale));
-                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXhdpi.EncodeToPNG();
+                    var textXxhdpi = TextureAssetUtils.ScaleTexture(texture, (int)(192 * scale), (int)(192 * scale));
+                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXxhdpi.EncodeToPNG();
                 }
             }
 
