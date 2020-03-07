@@ -1,11 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
-
-using Unity.Notifications;
 
 namespace Unity.Notifications.Tests
 {
@@ -17,7 +11,7 @@ namespace Unity.Notifications.Tests
             Assert.AreEqual(true, true);
         }
 
-#if PLATFORM_ANDROID && UNITY_EDITOR
+#if UNITY_ANDROID
         [Test]
         public void AppendMetadataToManifest_WhenSameValue_Works()
         {

@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Unity.Notifications.iOS;
 using UnityEditor;
 

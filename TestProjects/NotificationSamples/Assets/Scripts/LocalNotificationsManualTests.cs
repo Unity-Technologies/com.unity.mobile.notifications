@@ -1,4 +1,4 @@
-#if PLATFORM_IOS
+#if UNITY_IOS
 using System;
 using System.Collections;
 using System.Collections.Generic;

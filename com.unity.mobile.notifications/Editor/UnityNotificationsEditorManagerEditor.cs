@@ -1,18 +1,9 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.VersionControl;
 using UnityEditorInternal;
-
 using Unity.Notifications.iOS;
-
-
-#pragma warning disable 219, 414
-
 
 namespace Unity.Notifications
 {
@@ -92,7 +83,6 @@ namespace Unity.Notifications
             {
                 if (Event.current.type == EventType.Repaint)
                 {
-                    var boxBackground = new GUIStyle("RL Background");
                     var headerBackground = new GUIStyle("RL Header");
 
                     var paddedRect = GetContentRect(rect,
@@ -182,10 +172,6 @@ namespace Unity.Notifications
 
             if (drawableResourceDataRef != null)
             {
-                var idProperty = drawableResourceDataRef.FindPropertyRelative("Id");
-                var typeProperty = drawableResourceDataRef.FindPropertyRelative("Type");
-                var assetProperty = drawableResourceDataRef.FindPropertyRelative("Asset");
-
                 float width = Mathf.Min(elementRect.width,
                     EditorGUIUtility.labelWidth + 4 + kSlotSize + kIconSpacing + kMaxPreviewSize);
 
@@ -343,6 +329,8 @@ namespace Unity.Notifications
             if (m_Target == null)
                 return;
 
+            // TODO:
+            // Not sure why we have to do special things for UI in 2018.3.
 #if UNITY_2018_3
             rect = new Rect(rect.x, rect.y + 10f, rect.width, rect.height);
 #endif
@@ -445,11 +433,10 @@ namespace Unity.Notifications
 
         private void DrawSettingsElementList(BuildTargetGroup target, List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
         {
-            int totalHeight = 0;
             foreach (var setting in settings)
             {
                 EditorGUI.BeginDisabledGroup(disabled);
-                Rect r = EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(layer * 13);
 
                 var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
@@ -535,5 +522,3 @@ namespace Unity.Notifications
         }
     }
 }
-
-#pragma warning restore 219, 414

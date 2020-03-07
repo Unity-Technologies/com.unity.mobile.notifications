@@ -1,22 +1,11 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Xml;
-using System.Xml.Linq;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
-using UnityEditor.Android;
 using Unity.Notifications.iOS;
-using Unity.Notifications;
-using UnityEditor.VersionControl;
-using Object = System.Object;
-
-#pragma warning disable 219
 
 [assembly: InternalsVisibleTo("Unity.Notifications.Tests")]
 namespace Unity.Notifications
@@ -366,7 +355,7 @@ namespace Unity.Notifications
                 if (res.Type == NotificationIconType.LargeIcon)
                 {
                     var textXxhdpi = TextureAssetUtils.ScaleTexture(texture, (int)(192 * scale), (int)(192 * scale));
-                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXhdpi.EncodeToPNG();
+                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXxhdpi.EncodeToPNG();
                 }
             }
 
@@ -374,6 +363,3 @@ namespace Unity.Notifications
         }
     }
 }
-#endif
-
-#pragma warning restore 219

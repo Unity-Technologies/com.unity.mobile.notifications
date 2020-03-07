@@ -1,23 +1,19 @@
+#if UNITY_IOS
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using Unity.Notifications;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
 using UnityEngine;
 
-#if PLATFORM_IOS
+using Unity.Notifications;
 using Unity.Notifications.iOS;
-using UnityEditor.iOS.Xcode;
-#endif
 
 public class iOSNotificationPostProcess : MonoBehaviour
 {
     [PostProcessBuild]
     public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
     {
-        #if PLATFORM_IOS
         if (buildTarget == BuildTarget.iOS)
         {
             var projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
@@ -141,6 +137,6 @@ public class iOSNotificationPostProcess : MonoBehaviour
             preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
             File.WriteAllText(preprocessorPath, preprocessor);
         }
-        #endif
     }
 }
+#endif

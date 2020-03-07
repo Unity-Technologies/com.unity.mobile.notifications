@@ -1,0 +1,353 @@
+using System;
+using System.Runtime.InteropServices;
+using UnityEngine;
+
+namespace Unity.Notifications.iOS
+{
+    /// <summary>
+    /// Constants indicating how to present a notification in a foreground app
+    /// </summary>
+    [Flags]
+    public enum PresentationOption
+    {
+        None = 0,
+
+        /// <summary>
+        /// Apply the notification's badge value to the app’s icon.
+        /// </summary>
+        Badge = 1 << 0,
+
+        /// <summary>
+        /// Play the sound associated with the notification.
+        /// </summary>
+        Sound = 1 << 1,
+
+        /// <summary>
+        /// Display the alert using the content provided by the notification.
+        /// </summary>
+        Alert = 1 << 2,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct iOSNotificationData
+    {
+        public string identifier;
+        public string title;
+        public string body;
+        public Int32 badge;
+        public string subtitle;
+        public string categoryIdentifier;
+        public string threadIdentifier;
+
+        //Custom information
+        public string data;
+        public bool showInForeground;
+        public Int32 showInForegroundPresentationOptions;
+
+        // Trigger
+        public Int32 triggerType;
+        public bool repeats;
+
+        //Time trigger
+        public Int32 timeTriggerInterval;
+
+        //Calendar trigger
+        public Int32 calendarTriggerYear;
+        public Int32 calendarTriggerMonth;
+        public Int32 calendarTriggerDay;
+        public Int32 calendarTriggerHour;
+        public Int32 calendarTriggerMinute;
+        public Int32 calendarTriggerSecond;
+
+        //Location trigger
+        public float locationTriggerCenterX;
+        public float locationTriggerCenterY;
+        public float locationTriggerRadius;
+        public bool locationTriggerNotifyOnEntry;
+        public bool locationTriggerNotifyOnExit;
+    }
+
+    /// <summary>
+    /// The iOSNotification class is used schedule local notifications. It includes the content of the notification and the trigger conditions for delivery.
+    /// An instance of this class is also returned when receiving remote notifications..
+    /// </summary>
+    /// <remarks>
+    /// Create an instance of this class when you want to schedule the delivery of a local notification. It contains the entire notification  payload to be delivered
+    /// (which corresponds to UNNotificationContent) and  also the NotificationTrigger object with the conditions that trigger the delivery of the notification.
+    /// To schedule the delivery of your notification, pass an instance of this class to the <see cref="iOSNotificationCenter.ScheduleNotification"/>  method.
+    /// </remarks>
+    public class iOSNotification
+    {
+        /// <summary>
+        /// The unique identifier for this notification request.
+        /// If not explicitly specified the identifier  will be automatically generated when creating the notification.
+        /// </remarks>
+        public string Identifier
+        {
+            get { return data.identifier; }
+            set { data.identifier = value; }
+        }
+
+        /// <summary>
+        /// The identifier of the app-defined category object.
+        /// </summary>
+        public string CategoryIdentifier
+        {
+            get { return data.categoryIdentifier; }
+            set { data.categoryIdentifier = value; }
+        }
+
+        /// <summary>
+        /// An identifier that used to group related notifications together.
+        /// Automatic notification grouping according to the thread identifier is only supported on iOS 12 and above.
+        /// </remarks>
+        public string ThreadIdentifier
+        {
+            get { return data.threadIdentifier; }
+            set { data.threadIdentifier = value; }
+        }
+
+        /// <summary>
+        /// A short description of the reason for the notification.
+        /// </summary>
+        public string Title
+        {
+            get { return data.title; }
+            set { data.title = value; }
+        }
+
+        /// <summary>
+        /// A secondary description of the reason for the notification.
+        /// </summary>
+        public string Subtitle
+        {
+            get { return data.subtitle; }
+            set { data.subtitle = value; }
+        }
+
+        /// <summary>
+        /// The message displayed in the notification alert.
+        /// </summary>
+        public string Body
+        {
+            get { return data.body; }
+            set { data.body = value; }
+        }
+
+        /// <summary>
+        /// Indicates whether the notification alert should be shown when the app is open.
+        /// </summary>
+        /// <remarks>
+        /// Subscribe to the <see cref="iOSNotificationCenter.OnNotificationReceived"/> event to receive a callback when the notification is triggered.
+        /// </remarks>
+        public bool ShowInForeground
+        {
+            get { return data.showInForeground; }
+            set { data.showInForeground = value; }
+        }
+
+
+        /// <summary>
+        /// Presentation options for displaying the local of notification when the app is running. Only works if  <see cref="iOSNotification.ShowInForeground"/> is enabled and user has allowed enabled the requested options for your app.
+        /// </summary>
+        public PresentationOption ForegroundPresentationOption
+        {
+            get
+            {
+                return (PresentationOption)data.showInForegroundPresentationOptions;
+            }
+            set { data.showInForegroundPresentationOptions = (int)value; }
+        }
+
+
+        /// <summary>
+        /// The number to display as a badge on the app’s icon.
+        /// </summary>
+        public int Badge
+        {
+            get { return data.badge; }
+            set { data.badge = value; }
+        }
+
+        /// <summary>
+        /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
+        /// </summary>
+        public string Data
+        {
+            get { return data.data; }
+            set { data.data = value; }
+        }
+
+        /// <summary>
+        /// The conditions that trigger the delivery of the notification.
+        /// For notification that were already delivered and whose instance was returned by <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/> or <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/>
+        /// use this property to determine what caused the delivery to occur. You can do this by comparing <see cref="iOSNotification.Trigger"/>  to any of the notification trigger types that implement it, such as
+        /// <see cref="iOSNotificationLocationTrigger"/>, <see cref="iOSNotificationPushTrigger"/>, <see cref="iOSNotificationTimeIntervalTrigger"/>, <see cref="iOSNotificationCalendarTrigger"/>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// notification.Trigger is iOSNotificationPushTrigger
+        /// </code>
+        /// </example>
+        public iOSNotificationTrigger Trigger
+        {
+            set
+            {
+                if (value is iOSNotificationTimeIntervalTrigger)
+                {
+                    var trigger = (iOSNotificationTimeIntervalTrigger)value;
+                    data.triggerType = iOSNotificationTimeIntervalTrigger.Type;
+                    data.timeTriggerInterval = trigger.timeInterval;
+
+                    if (trigger.timeInterval > 60)
+                    {
+                        data.repeats = trigger.Repeats;
+                    }
+                    else
+                    {
+                        if (trigger.Repeats)
+                        {
+                            Debug.LogWarning("Time interval must be at least 60 for repeating notifications.");
+                        }
+                    }
+                }
+                else if (value is iOSNotificationCalendarTrigger)
+                {
+                    var trigger = (iOSNotificationCalendarTrigger)value;
+                    data.triggerType = iOSNotificationCalendarTrigger.Type;
+                    data.calendarTriggerYear = trigger.Year != null ? trigger.Year.Value : -1;
+                    data.calendarTriggerMonth = trigger.Month != null ? trigger.Month.Value : -1;
+                    data.calendarTriggerDay = trigger.Day != null ? trigger.Day.Value : -1;
+                    data.calendarTriggerHour = trigger.Hour != null ? trigger.Hour.Value : -1;
+                    data.calendarTriggerMinute = trigger.Minute != null ? trigger.Minute.Value : -1;
+                    data.calendarTriggerSecond = trigger.Second != null ? trigger.Second.Value : -1;
+                    data.repeats = trigger.Repeats;
+                }
+                else if (value is iOSNotificationLocationTrigger)
+                {
+                    var trigger = (iOSNotificationLocationTrigger)value;
+                    data.triggerType = iOSNotificationLocationTrigger.Type;
+                    data.locationTriggerCenterX = trigger.Center.x;
+                    data.locationTriggerCenterY = trigger.Center.x;
+                    data.locationTriggerNotifyOnEntry = trigger.NotifyOnEntry;
+                    data.locationTriggerNotifyOnExit = trigger.NotifyOnExit;
+                    data.locationTriggerRadius = trigger.Radius;
+                }
+                else if (value is iOSNotificationPushTrigger)
+                {
+                    data.triggerType = 3;
+                }
+            }
+
+            get
+            {
+                iOSNotificationTrigger trigger;
+                if (data.triggerType == iOSNotificationTimeIntervalTrigger.Type)
+                {
+                    trigger = new iOSNotificationTimeIntervalTrigger()
+                    {
+                        timeInterval = data.timeTriggerInterval,
+                        Repeats = data.repeats
+                    };
+                }
+                else if (data.triggerType == iOSNotificationCalendarTrigger.Type)
+                {
+                    trigger = new iOSNotificationCalendarTrigger()
+                    {
+                        Year = (data.calendarTriggerYear > 0) ? (int?)data.calendarTriggerYear : null,
+                        Month = (data.calendarTriggerMonth > 0) ? (int?)data.calendarTriggerMonth : null,
+                        Day = (data.calendarTriggerDay > 0) ? (int?)data.calendarTriggerDay : null,
+                        Hour = (data.calendarTriggerHour >= 0) ? (int?)data.calendarTriggerHour : null,
+                        Minute = (data.calendarTriggerMinute >= 0) ? (int?)data.calendarTriggerMinute : null,
+                        Second = (data.calendarTriggerSecond >= 0) ? (int?)data.calendarTriggerSecond : null,
+                        Repeats = data.repeats
+                    };
+                }
+                else if (data.triggerType == iOSNotificationLocationTrigger.Type)
+                {
+                    trigger = new iOSNotificationLocationTrigger()
+                    {
+                        Center = new Vector2(data.locationTriggerCenterX, data.locationTriggerCenterY),
+                        Radius = data.locationTriggerRadius,
+                        NotifyOnEntry = data.locationTriggerNotifyOnEntry,
+                        NotifyOnExit = data.locationTriggerNotifyOnExit
+                    };
+                }
+                else
+                {
+                    trigger = new iOSNotificationPushTrigger();
+                }
+                return trigger;
+            }
+        }
+
+        private static string GenerateUniqueID()
+        {
+            return Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()).ToString();
+        }
+
+        /// <summary>
+        /// Create a new instance of <see cref="iOSNotification"/> and automatically generate an unique string for <see cref="iOSNotification.identifier"/>  with all optional fields set to default values.
+        /// </summary>
+        public iOSNotification() : this(GenerateUniqueID())
+        {
+        }
+
+        /// <summary>
+        /// Specify a <see cref="iOSNotification.Identifier"/> and create a notification object with all optional fields set to default values.
+        /// </summary>
+        /// <param name="identifier">  Unique identifier for the local notification tha can later be used to track or change it's status.</param>
+        public iOSNotification(string identifier)
+        {
+            data = new iOSNotificationData();
+            data.identifier = identifier;
+            data.title = "";
+            data.body = "";
+            data.badge = -1;
+            data.subtitle = "";
+            data.categoryIdentifier = "";
+            data.threadIdentifier = "";
+
+            data.data = "";
+            data.showInForeground = false;
+            data.showInForegroundPresentationOptions = (int)(PresentationOption.Alert |
+                PresentationOption.Sound);
+
+            data.triggerType = -1;
+            data.repeats = false;
+
+            //Time trigger
+            data.timeTriggerInterval = -1;
+
+            //Calendar trigger
+            data.calendarTriggerYear = -1;
+            data.calendarTriggerMonth = -1;
+            data.calendarTriggerDay = -1;
+            data.calendarTriggerHour = -1;
+            data.calendarTriggerMinute = -1;
+            data.calendarTriggerSecond = -1;
+
+            //Location trigger
+            data.locationTriggerCenterX = 0f;
+            data.locationTriggerCenterY = 0f;
+            data.locationTriggerRadius = 2f;
+            data.locationTriggerNotifyOnEntry = true;
+            data.locationTriggerNotifyOnExit = false;
+        }
+
+        internal iOSNotification(iOSNotificationData data)
+        {
+            this.data = data;
+        }
+
+        internal iOSNotificationData data;
+
+        internal void Verify()
+        {
+            if (data.identifier == null)
+            {
+                data.identifier = GenerateUniqueID();
+            }
+        }
+    }
+}

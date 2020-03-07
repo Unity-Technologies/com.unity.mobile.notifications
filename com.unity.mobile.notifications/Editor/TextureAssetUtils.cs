@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-#pragma warning disable 0219
 namespace Unity.Notifications
 {
     internal static class TextureAssetUtils
@@ -13,7 +12,7 @@ namespace Unity.Notifications
 
             if (texture == null)
             {
-                errors.Add("no valid texture is assigned");
+                errors.Add("Texture is invalid");
                 return false;
             }
 
@@ -38,7 +37,7 @@ namespace Unity.Notifications
             }
 
             if (!isLargeEnough)
-                errors.Add(string.Format("it must be atleast {0}x{1} pixels (while it's {2}x{3})",
+                errors.Add(string.Format("Texture must be at least {0}x{1} pixels (while it's {2}x{3})",
                     minSize,
                     minSize,
                     texture.width,
@@ -46,13 +45,13 @@ namespace Unity.Notifications
                 ));
 
             if (!isSquare)
-                errors.Add(string.Format("it must have the same width and height (while it's {0}x{1})",
+                errors.Add(string.Format("Texture must have the same width and height (while it's {0}x{1})",
                     texture.width,
                     texture.height
                 ));
 
             if (!hasAlpha && needsAlpha)
-                errors.Add(string.Format("contain an alpha channel"));
+                errors.Add(string.Format("Texture must contain an alpha channel"));
 
             return isReadable && isSquare && isLargeEnough && (!needsAlpha || hasAlpha);
         }
@@ -67,8 +66,6 @@ namespace Unity.Notifications
 
             if (importer == null || !importer.isReadable)
                 return null;
-
-            var textureFormat = type == NotificationIconType.LargeIcon ? sourceTexture.format : TextureFormat.RGBA32;
 
             Texture2D texture;
             if (type == NotificationIconType.SmallIcon)
@@ -122,4 +119,3 @@ namespace Unity.Notifications
         }
     }
 }
-#pragma warning restore 0219
