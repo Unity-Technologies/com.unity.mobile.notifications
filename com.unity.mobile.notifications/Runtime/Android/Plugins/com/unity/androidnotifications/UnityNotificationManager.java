@@ -26,9 +26,6 @@ import android.content.SharedPreferences;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -45,13 +42,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public Class mOpenActivity = null;
     public boolean reschedule_on_restart = false;
 
-    /// Static stuff TODO cleanup
-    public static final String UNITY_NOTIFICATION_SETTINGS = "UNITY_NOTIFICATIONS";
-    public static final String SHARED_PREFS_NOTIFICATION_IDS = "UNITY_NOTIFICATION_IDS";
-    public static final String UNITY_STORED_NOTIFICATION_IDS = "UNITY_STORED_NOTIFICATION_IDS";
-    public static final String DEFAULT_APP_ICON = "app_icon";
+    protected static final String UNITY_NOTIFICATION_SETTINGS = "UNITY_NOTIFICATIONS";
+    protected static final String SHARED_PREFS_NOTIFICATION_IDS = "UNITY_NOTIFICATION_IDS";
+    protected static final String UNITY_STORED_NOTIFICATION_IDS = "UNITY_STORED_NOTIFICATION_IDS";
+    protected static final String DEFAULT_APP_ICON = "app_icon";
 
-    public static int findResourceidInContextByName(String name, Context context) {
+    protected static int findResourceIdInContextByName(String name, Context context) {
         if (name == null)
             return 0;
 
@@ -71,29 +67,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static UnityNotificationManager getNotificationManagerImpl(Context context) {
-        if (mManager != null)
-            return mManager;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mManager = new UnityNotificationManagerOreo(context, (Activity) context);
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mManager = new UnityNotificationManagerNougat(context, (Activity) context);
-        } else {
-            mManager = new UnityNotificationManager(context, (Activity) context);
-        }
-
-        return mManager;
+        return getNotificationManagerImpl(context, (Activity) context);
     }
 
-
+    // Called from managed code.
     public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
         if (mManager != null)
             return mManager;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mManager = new UnityNotificationManagerOreo(context, activity);
-
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mManager = new UnityNotificationManagerNougat(context, activity);
         } else {
@@ -281,7 +264,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    public static Class<?> GetOpenAppActivity(Context context, Boolean fallbackToDefault) {
+    public static Class<?> GetOpenAppActivity(Context context, boolean fallbackToDefault) {
         ApplicationInfo ai = null;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
@@ -401,12 +384,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public static void scheduleNotificationIntentAlarm(Intent intent, Context context, PendingIntent broadcast) {
         long repeatInterval = intent.getLongExtra("repeatInterval", 0L);
         long fireTime = intent.getLongExtra("fireTime", 0L);
-        int id = intent.getIntExtra("id", 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        Date fireTimeDt = new Date(fireTime);
-        Date currentDt = Calendar.getInstance().getTime();
 
         if (repeatInterval <= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -424,9 +403,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         String textTitle = intent.getStringExtra("textTitle");
         String textContent = intent.getStringExtra("textContent");
         boolean autoCancel = intent.getBooleanExtra("autoCancel", true);
-        long fireTime = intent.getLongExtra("fireTime", -1);
         boolean usesChronometer = intent.getBooleanExtra("usesChronometer", false);
-        int lockscreenVisibility = intent.getIntExtra("lockscreenVisibility", 0);
         int style = intent.getIntExtra("style", 0);
         int color = intent.getIntExtra("color", 0);
         int number = intent.getIntExtra("number", 0);
@@ -437,8 +414,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         String smallIconStr = intent.getStringExtra("smallIconStr");
         String largeIconStr = intent.getStringExtra("largeIconStr");
 
-        int smallIconId = UnityNotificationManager.findResourceidInContextByName(smallIconStr, context);
-        int largeIconId = UnityNotificationManager.findResourceidInContextByName(largeIconStr, context);
+        int smallIconId = UnityNotificationManager.findResourceIdInContextByName(smallIconStr, context);
+        int largeIconId = UnityNotificationManager.findResourceIdInContextByName(largeIconStr, context);
 
         if (smallIconId == 0) {
             smallIconId = context.getApplicationInfo().icon;
