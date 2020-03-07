@@ -26,7 +26,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
 
                 long fireTime = data_intent.getLongExtra("fireTime", 0L);
                 Date currentDate = Calendar.getInstance().getTime();
-                Date fireTimeDate=new Date(fireTime);
+                Date fireTimeDate = new Date(fireTime);
 
                 int id = data_intent.getIntExtra("id", -1);
                 boolean isRepeatable = data_intent.getLongExtra("repeatInterval", 0L) > 0;
@@ -44,9 +44,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
 
                     PendingIntent broadcast = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     UnityNotificationManager.scheduleNotificationIntentAlarm(intent, context, broadcast);
-                }
-                else
-                {
+                } else {
                     UnityNotificationManager.deleteExpiredNotificationIntent(id, context);
                 }
             }

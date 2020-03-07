@@ -21,8 +21,7 @@ import static android.app.NotificationManager.IMPORTANCE_NONE;
 @Keep
 public class UnityNotificationManagerNougat extends UnityNotificationManager {
 
-    public UnityNotificationManagerNougat(Context context, Activity activity)
-    {
+    public UnityNotificationManagerNougat(Context context, Activity activity) {
         super(context, activity);
     }
 

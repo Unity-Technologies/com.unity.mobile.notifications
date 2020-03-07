@@ -18,8 +18,7 @@ import static android.app.NotificationManager.IMPORTANCE_NONE;
 @Keep
 public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat {
 
-    public static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel)
-    {
+    public static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel) {
         NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -37,16 +36,13 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
         return wrapper;
     }
 
-    public static NotificationChannelWrapper getOreoNotificationChannel(String id, Context context)
-    {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-        {
+    public static NotificationChannelWrapper getOreoNotificationChannel(String id, Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return null;
         }
         List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
 
-        for(NotificationChannel ch : getNotificationManager(context).getNotificationChannels())
-        {
+        for (NotificationChannel ch : getNotificationManager(context).getNotificationChannels()) {
             if (ch.getId() == id)
                 return NotificationChannelToWrapper(ch);
         }
@@ -54,8 +50,7 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
     }
 
 
-    public UnityNotificationManagerOreo(Context context, Activity activity)
-    {
+    public UnityNotificationManagerOreo(Context context, Activity activity) {
         super(context, activity);
     }
 
@@ -70,10 +65,8 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
             boolean canBypassDnd,
             boolean canShowBadge,
             long[] vibrationPattern,
-            int lockscreenVisibility)
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+            int lockscreenVisibility) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(id, title, importance);
             channel.setDescription(description);
             channel.enableLights(enableLights);
@@ -88,16 +81,13 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
     }
 
     @Override
-    public NotificationChannelWrapper[] getNotificationChannels()
-    {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-        {
+    public NotificationChannelWrapper[] getNotificationChannels() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return null;
         }
         List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
 
-        for(NotificationChannel ch : getNotificationManager().getNotificationChannels())
-        {
+        for (NotificationChannel ch : getNotificationManager().getNotificationChannels()) {
             channelList.add(NotificationChannelToWrapper(ch));
         }
 
@@ -105,10 +95,8 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
     }
 
     @Override
-    public void deleteNotificationChannel(String id)
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+    public void deleteNotificationChannel(String id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().deleteNotificationChannel(id);
         }
     }
