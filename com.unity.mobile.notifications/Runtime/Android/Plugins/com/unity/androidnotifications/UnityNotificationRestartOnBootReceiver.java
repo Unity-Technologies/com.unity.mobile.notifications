@@ -1,7 +1,5 @@
 package com.unity.androidnotifications;
 
-// import com.unity3d.player;
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,7 +17,6 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent received_intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(received_intent.getAction())) {
-
             List<Intent> saved_notifications = UnityNotificationManager.LoadNotificationIntents(context);
 
             for (Intent data_intent : saved_notifications) {
@@ -32,11 +29,6 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 boolean isRepeatable = data_intent.getLongExtra("repeatInterval", 0L) > 0;
 
                 if (fireTimeDate.after(currentDate) || isRepeatable) {
-
-                    // if (BuildConfig.DEBUG) {
-                    //     Log.w("UnityNotifications", String.format(" Rescheduling notification on boot : %d at %s", id, fireTimeDate.toString()));
-                    // }
-
                     Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationManager.GetOpenAppActivity(context, true));
 
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, id, openAppIntent, 0);
