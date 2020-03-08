@@ -40,6 +40,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected boolean mRescheduleOnRestart = false;
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
+    protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
     protected static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
     protected static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
@@ -128,15 +129,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
             long[] vibrationPattern,
             int lockscreenVisibility) {
         SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
-        channelIdsSet.add(id);
+        Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
+        channelIds.add(id); // TODO: what if users create the channel again with the same id?
 
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.clear();
-        editor.putStringSet("ChannelIDs", channelIdsSet);
+        // Add to notification channel ids SharedPreferences.
+        SharedPreferences.Editor editor = prefs.edit().clear();
+        editor.putStringSet("ChannelIDs", channelIds);
         editor.apply();
 
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
+        // Store the channel into a SharedPreferences.
+        SharedPreferences channelPrefs = mContext.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         editor = channelPrefs.edit();
 
         editor.putString("title", title);
@@ -152,6 +154,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         editor.apply();
     }
 
+    protected static String GetSharedPrefsNameByChannelId(String id)
+    {
+        return String.format("unity_notification_channel_%s", id);
+    }
+
     // Get a notification channel by id.
     // This function will only be called for devices which are low than Android O.
     protected static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
@@ -159,7 +166,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return UnityNotificationManagerOreo.getOreoNotificationChannel(context, id);
         }
 
-        SharedPreferences prefs = context.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         NotificationChannelWrapper channel = new NotificationChannelWrapper();
 
         channel.id = id;
@@ -199,28 +206,27 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // This function will only be called for devices which are low than Android O.
     public void deleteNotificationChannel(String id) {
         SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
+        Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
 
-        if (channelIdsSet.contains(id)) {
-            channelIdsSet.remove(id);
+        if (!channelIds.contains(id))
+            return;
 
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.clear();
-            editor.putStringSet("ChannelIDs", channelIdsSet);
-            editor.apply();
+        // Remove from the notification channel ids SharedPreferences.
+        channelIds.remove(id);
+        SharedPreferences.Editor editor = prefs.edit().clear();
+        editor.putStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, channelIds);
+        editor.apply();
 
-            SharedPreferences channelPrefs = mContext.getSharedPreferences(String.format("unity_notification_channel_%s", id), Context.MODE_PRIVATE);
-            editor = channelPrefs.edit();
-            editor.clear();
-            editor.apply();
-        }
+        // Delete the notification channel SharedPreferences.
+        SharedPreferences channelPrefs = mContext.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+        channelPrefs.edit().clear().apply();
     }
 
     // Get all notification channels.
     // This function will only be called for devices which are low than Android O.
     public Object[] getNotificationChannels() {
         SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
+        Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>());
 
         ArrayList<NotificationChannelWrapper> channels = new ArrayList<>();
 
