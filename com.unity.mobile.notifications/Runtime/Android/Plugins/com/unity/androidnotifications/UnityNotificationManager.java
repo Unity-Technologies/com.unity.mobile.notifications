@@ -39,10 +39,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
 
-    protected static final String UNITY_NOTIFICATION_SETTINGS = "UNITY_NOTIFICATIONS";
-    protected static final String SHARED_PREFS_NOTIFICATION_IDS = "UNITY_NOTIFICATION_IDS";
-    protected static final String UNITY_STORED_NOTIFICATION_IDS = "UNITY_STORED_NOTIFICATION_IDS";
-    protected static final String DEFAULT_APP_ICON = "app_icon";
+    protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
+    protected static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
+    protected static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
     // Constructor with zero parameter is necessary for system to call onReceive() callback.
     public UnityNotificationManager() {
@@ -128,7 +127,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             boolean canShowBadge,
             long[] vibrationPattern,
             int lockscreenVisibility) {
-        SharedPreferences prefs = mContext.getSharedPreferences(UNITY_NOTIFICATION_SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
         channelIdsSet.add(id);
 
@@ -199,7 +198,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Delete a notification channel by id.
     // This function will only be called for devices which are low than Android O.
     public void deleteNotificationChannel(String id) {
-        SharedPreferences prefs = mContext.getSharedPreferences(UNITY_NOTIFICATION_SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
 
         if (channelIdsSet.contains(id)) {
@@ -220,7 +219,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Get all notification channels.
     // This function will only be called for devices which are low than Android O.
     public Object[] getNotificationChannels() {
-        SharedPreferences prefs = mContext.getSharedPreferences(UNITY_NOTIFICATION_SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> channelIdsSet = prefs.getStringSet("ChannelIDs", new HashSet<String>());
 
         ArrayList<NotificationChannelWrapper> channels = new ArrayList<>();
@@ -245,7 +244,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (intent != null) {
             if (this.mRescheduleOnRestart) {
-                UnityNotificationManager.SaveNotificationIntent(mContext, data_intent);
+                UnityNotificationManager.saveNotificationIntent(mContext, data_intent);
             }
 
             PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -267,8 +266,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Intent data_intent = (Intent) intent.clone();
         int id = data_intent.getIntExtra("id", 0);
 
-        SharedPreferences prefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
-        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> idsSet = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
         Set<String> idsSetCopy = new HashSet<String>(idsSet); // TODO: why do we want to copy?
         Set<String> validIdsSet = new HashSet<String>();
@@ -297,14 +296,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
-        editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, validIdsSet);
+        editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, validIdsSet);
         editor.apply();
 
         return data_intent;
     }
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true.
-    protected static void SaveNotificationIntent(Context context, Intent intent) {
+    protected static void saveNotificationIntent(Context context, Intent intent) {
         String notification_id = Integer.toString(intent.getIntExtra("id", 0));
         SharedPreferences prefs = context.getSharedPreferences(String.format("u_notification_data_%s", notification_id), Context.MODE_PRIVATE);
 
@@ -317,25 +316,25 @@ public class UnityNotificationManager extends BroadcastReceiver {
         editor.apply();
 
         // Store IDs
-        SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
-        Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> idsSet = idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
         idsSetCopy.add(notification_id);
 
         SharedPreferences.Editor idsEditor = idsPrefs.edit();
         idsEditor.clear();
-        idsEditor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
+        idsEditor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, idsSetCopy);
         idsEditor.apply();
 
         // TODO: why we load after saving?
-        UnityNotificationManager.LoadNotificationIntents(context);
+        UnityNotificationManager.loadNotificationIntents(context);
     }
 
     // Load all the notification intents from SharedPreferences.
-    protected static List<Intent> LoadNotificationIntents(Context context) {
-        SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
-        Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+    protected static List<Intent> loadNotificationIntents(Context context) {
+        SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> idsSet = idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
 
         List<Intent> intent_data_list = new ArrayList<Intent>();
@@ -413,8 +412,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Get all notification ids from SharedPreferences.
     protected int[] getScheduledNotificationIDs() {
-        SharedPreferences prefs = mContext.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
-        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> idsSet = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
         String[] idsArrStr = idsSet.toArray(new String[idsSet.size()]);
         int[] idsArrInt = new int[idsSet.size()];
@@ -446,8 +445,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             broadcast.cancel();
         }
 
-        SharedPreferences prefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
-        Set<String> idsSet = prefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> idsSet = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
         Set<String> idsSetCopy = new HashSet<String>(idsSet);
 
         String idStr = Integer.toString(id);
@@ -456,15 +455,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
-            editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
+            editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, idsSetCopy);
             editor.apply();
         }
     }
 
     // Delete the given id from SharedPreferences.
     protected static void deleteExpiredNotificationIntent(Context context, String id) {
-        SharedPreferences idsPrefs = context.getSharedPreferences(UNITY_STORED_NOTIFICATION_IDS, Context.MODE_PRIVATE);
-        Set<String> idsSet = idsPrefs.getStringSet(SHARED_PREFS_NOTIFICATION_IDS, new HashSet<String>());
+        SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> idsSet = idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
         cancelPendingNotificationIntent(context, Integer.valueOf(id));
 
@@ -472,7 +471,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         idsSetCopy.remove(id);
 
         SharedPreferences.Editor editor = idsPrefs.edit();
-        editor.putStringSet(SHARED_PREFS_NOTIFICATION_IDS, idsSetCopy);
+        editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, idsSetCopy);
         editor.apply();
 
         SharedPreferences notificationPrefs =

@@ -16,7 +16,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent received_intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(received_intent.getAction())) {
-            List<Intent> saved_notifications = UnityNotificationManager.LoadNotificationIntents(context);
+            List<Intent> saved_notifications = UnityNotificationManager.loadNotificationIntents(context);
 
             for (Intent data_intent : saved_notifications) {
                 long fireTime = data_intent.getLongExtra("fireTime", 0L);
