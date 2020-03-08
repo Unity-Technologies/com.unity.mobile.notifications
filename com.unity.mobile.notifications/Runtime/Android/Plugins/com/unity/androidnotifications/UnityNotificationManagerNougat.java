@@ -42,6 +42,6 @@ public class UnityNotificationManagerNougat extends UnityNotificationManager {
             }
         }
 
-        UnityNotificationManager.notify(context, id, notificationBuilder, intent);
+        UnityNotificationManager.notify(context, id, notificationBuilder.build(), intent);
     }
 }

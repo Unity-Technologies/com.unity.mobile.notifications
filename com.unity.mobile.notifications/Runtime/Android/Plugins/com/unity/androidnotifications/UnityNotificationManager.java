@@ -506,7 +506,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Notification.Builder notificationBuilder = UnityNotificationManager.buildNotification(context, intent);
         int id = intent.getIntExtra("id", -1);
 
-        UnityNotificationManager.notify(context, id, notificationBuilder, intent);
+        UnityNotificationManager.notify(context, id, notificationBuilder.build(), intent);
     }
 
     // Create a Notification.Builder from the intent.
@@ -616,8 +616,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Call the system notification service to notify the notification.
-    protected static void notify(Context context, int id, Notification.Builder notificationBuilder, Intent intent) {
-        getNotificationManager(context).notify(id, notificationBuilder.build());
+    protected static void notify(Context context, int id, Notification notification, Intent intent) {
+        getNotificationManager(context).notify(id, notification);
 
         try {
             mNotificationCallback.onSentNotification(intent);
