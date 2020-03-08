@@ -11,38 +11,6 @@ import java.util.List;
 
 @Keep
 public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat {
-
-    public static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel) {
-        NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            wrapper.id = channel.getId();
-            wrapper.name = channel.getName().toString();
-            wrapper.importance = channel.getImportance();
-            wrapper.description = channel.getDescription();
-            wrapper.enableLights = channel.shouldShowLights();
-            wrapper.enableVibration = channel.shouldVibrate();
-            wrapper.canBypassDnd = channel.canBypassDnd();
-            wrapper.canShowBadge = channel.canShowBadge();
-            wrapper.vibrationPattern = channel.getVibrationPattern();
-            wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
-        }
-        return wrapper;
-    }
-
-    public static NotificationChannelWrapper getOreoNotificationChannel(String id, Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return null;
-        }
-        List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
-
-        for (NotificationChannel ch : getNotificationManager(context).getNotificationChannels()) {
-            if (ch.getId() == id)
-                return NotificationChannelToWrapper(ch);
-        }
-        return null;
-    }
-
     public UnityNotificationManagerOreo(Context context, Activity activity) {
         super(context, activity);
     }
@@ -73,6 +41,44 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
         }
     }
 
+    public static NotificationChannelWrapper getOreoNotificationChannel(String id, Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return null;
+        }
+        List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
+
+        for (NotificationChannel ch : getNotificationManager(context).getNotificationChannels()) {
+            if (ch.getId() == id)
+                return NotificationChannelToWrapper(ch);
+        }
+        return null;
+    }
+
+    protected static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel) {
+        NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            wrapper.id = channel.getId();
+            wrapper.name = channel.getName().toString();
+            wrapper.importance = channel.getImportance();
+            wrapper.description = channel.getDescription();
+            wrapper.enableLights = channel.shouldShowLights();
+            wrapper.enableVibration = channel.shouldVibrate();
+            wrapper.canBypassDnd = channel.canBypassDnd();
+            wrapper.canShowBadge = channel.canShowBadge();
+            wrapper.vibrationPattern = channel.getVibrationPattern();
+            wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
+        }
+        return wrapper;
+    }
+
+    @Override
+    public void deleteNotificationChannel(String id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getNotificationManager().deleteNotificationChannel(id);
+        }
+    }
+
     @Override
     public NotificationChannelWrapper[] getNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -85,12 +91,5 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
         }
 
         return channelList.toArray(new NotificationChannelWrapper[channelList.size()]);
-    }
-
-    @Override
-    public void deleteNotificationChannel(String id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getNotificationManager().deleteNotificationChannel(id);
-        }
     }
 }

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Keep;
-import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -20,7 +19,6 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
             List<Intent> saved_notifications = UnityNotificationManager.LoadNotificationIntents(context);
 
             for (Intent data_intent : saved_notifications) {
-
                 long fireTime = data_intent.getLongExtra("fireTime", 0L);
                 Date currentDate = Calendar.getInstance().getTime();
                 Date fireTimeDate = new Date(fireTime);
@@ -29,7 +27,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 boolean isRepeatable = data_intent.getLongExtra("repeatInterval", 0L) > 0;
 
                 if (fireTimeDate.after(currentDate) || isRepeatable) {
-                    Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationManager.GetOpenAppActivity(context, true));
+                    Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationUtilities.GetOpenAppActivity(context, true));
 
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, id, openAppIntent, 0);
                     Intent intent = UnityNotificationManager.prepareNotificationIntent(data_intent, context, pendingIntent);
@@ -37,7 +35,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                     PendingIntent broadcast = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     UnityNotificationManager.scheduleNotificationIntentAlarm(intent, context, broadcast);
                 } else {
-                    UnityNotificationManager.deleteExpiredNotificationIntent(id, context);
+                    UnityNotificationManager.deleteExpiredNotificationIntent(Integer.toString(id), context);
                 }
             }
         }
