@@ -41,7 +41,7 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
         }
     }
 
-    public static NotificationChannelWrapper getOreoNotificationChannel(String id, Context context) {
+    protected static NotificationChannelWrapper getOreoNotificationChannel(Context context, String id) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return null;
         }

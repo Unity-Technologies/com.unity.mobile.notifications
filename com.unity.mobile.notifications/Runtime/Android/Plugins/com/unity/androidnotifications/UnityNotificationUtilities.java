@@ -13,7 +13,7 @@ import android.util.Log;
 
 @Keep
 public class UnityNotificationUtilities {
-    protected static int findResourceIdInContextByName(String name, Context context) {
+    protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
             return 0;
 
@@ -32,18 +32,18 @@ public class UnityNotificationUtilities {
         }
     }
 
-    public static String SerializeNotificationIntent(Intent intent) {
+    protected static String SerializeNotificationIntent(Intent intent) {
         Bundle bundle = intent.getExtras();
 
         Parcel parcel = Parcel.obtain();
         bundle.writeToParcel(parcel, 0);
-        byte[] byt = parcel.marshall();
+        byte[] bytes = parcel.marshall();
 
-        return Base64.encodeToString(byt, 0, byt.length, 0);
+        return Base64.encodeToString(bytes, 0, bytes.length, 0);
     }
 
-    public static Intent DeserializeNotificationIntent(String s, Context context) {
-        byte[] newByt = Base64.decode(s, 0);
+    protected static Intent DeserializeNotificationIntent(Context context, String src) {
+        byte[] newByt = Base64.decode(src, 0);
 
         Bundle newBundle = new Bundle();
         Parcel newParcel = Parcel.obtain();
@@ -57,7 +57,7 @@ public class UnityNotificationUtilities {
         return intent;
     }
 
-    public static Class<?> GetOpenAppActivity(Context context, boolean fallbackToDefault) {
+    protected static Class<?> GetOpenAppActivity(Context context, boolean fallbackToDefault) {
         ApplicationInfo ai = null;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);

@@ -13,8 +13,8 @@ public class UnityNotificationManagerNougat extends UnityNotificationManager {
         super(context, activity);
     }
 
-    public static void sendNotificationNougat(Intent intent, Context context) {
-        Notification.Builder notificationBuilder = UnityNotificationManager.buildNotification(intent, context);
+    protected static void sendNotificationNougat(Context context, Intent intent) {
+        Notification.Builder notificationBuilder = UnityNotificationManager.buildNotification(context, intent);
         int id = intent.getIntExtra("id", -1);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
