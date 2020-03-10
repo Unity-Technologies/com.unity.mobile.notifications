@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import android.os.BadParcelableException;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.Keep;
 import android.util.Log;
-import android.content.SharedPreferences;
 
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
@@ -306,7 +306,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return data_intent;
     }
 
-    // Save the notification intent to SharedPreferences if reschedule_on_restart is true.
+    // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
+    // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
     protected static void saveNotificationIntent(Context context, Intent intent) {
         String notification_id = Integer.toString(intent.getIntExtra("id", 0));
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
@@ -337,12 +338,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Load all the notification intents from SharedPreferences.
     protected static List<Intent> loadNotificationIntents(Context context) {
         SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> idsSet = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
+        Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
 
         List<Intent> intent_data_list = new ArrayList<Intent>();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
-        for (String id : idsSet) {
+        for (String id : ids) {
             SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             String serializedIntentData = prefs.getString("data", "");
 
@@ -396,7 +397,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return -1;
     }
 
-    // Check if the pending notification has been registered by id.
+    // Check if the pending notification with the given id has been registered.
     public boolean checkIfPendingNotificationIsRegistered(int id) {
         Intent intent = new Intent(mActivity, UnityNotificationManager.class);
         return (PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_NO_CREATE) != null);
@@ -460,7 +461,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    // Delete the given id from SharedPreferences.
+    // Delete the notification intent from SharedPreferences by id.
     protected static void deleteExpiredNotificationIntent(Context context, String id) {
         SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));

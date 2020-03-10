@@ -19,6 +19,8 @@ public class UnityNotificationManagerNougat extends UnityNotificationManager {
 
         // TODO: setGroup/setGroupSummary/setSortKey are introduced in API Level 20, why we check N here?
         // https://developer.android.com/reference/android/app/Notification.Builder
+        // If this is something we should move to UnityNotificationManager.buildNotification(), we probably can remove
+        // UnityNotificationManagerNougat as we don't need to do something special for Android N.
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
             String group = intent.getStringExtra("group");
             if (group != null && group.length() > 0) {
