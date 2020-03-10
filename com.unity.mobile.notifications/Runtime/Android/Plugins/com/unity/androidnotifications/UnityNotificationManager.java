@@ -119,7 +119,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // This function will only be called for devices which are low than Android O.
     public void registerNotificationChannel(
             String id,
-            String title,
+            String name,
             int importance,
             String description,
             boolean enableLights,
@@ -141,7 +141,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         SharedPreferences channelPrefs = mContext.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         editor = channelPrefs.edit();
 
-        editor.putString("title", title);
+        editor.putString("title", name); // Sadly I can't change the "title" here to "name" due to backward compatibility.
         editor.putInt("importance", importance);
         editor.putString("description", description);
         editor.putBoolean("enableLights", enableLights);

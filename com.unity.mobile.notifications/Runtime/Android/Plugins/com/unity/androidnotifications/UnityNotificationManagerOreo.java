@@ -18,7 +18,7 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
     @Override
     public void registerNotificationChannel(
             String id,
-            String title,
+            String name,
             int importance,
             String description,
             boolean enableLights,
@@ -28,7 +28,7 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
             long[] vibrationPattern,
             int lockscreenVisibility) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(id, title, importance);
+            NotificationChannel channel = new NotificationChannel(id, name, importance);
             channel.setDescription(description);
             channel.enableLights(enableLights);
             channel.enableVibration(enableVibration);

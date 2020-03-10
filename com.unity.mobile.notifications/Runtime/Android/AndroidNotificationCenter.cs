@@ -139,7 +139,7 @@ namespace Unity.Notifications.Android
 
             notificationManager.Call("registerNotificationChannel",
                 channel.id,
-                channel.title,
+                channel.name,
                 Enum.IsDefined(typeof(Importance), channel.importance) ? channel.importance : (int)Importance.Default,
                 channel.description,
                 channel.enableLights,
@@ -240,7 +240,7 @@ namespace Unity.Notifications.Android
             {
                 var ch = new AndroidNotificationChannel();
                 ch.id = channel.Get<string>("id");
-                ch.title = channel.Get<string>("name");
+                ch.name = channel.Get<string>("name");
                 ch.importance = channel.Get<int>("importance");
 
                 ch.description = channel.Get<string>("description");
