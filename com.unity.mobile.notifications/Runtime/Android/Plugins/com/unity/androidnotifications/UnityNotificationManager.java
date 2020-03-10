@@ -111,6 +111,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
+    // Called from managed code.
     public void setNotificationCallback(NotificationCallback notificationCallback) {
         UnityNotificationManager.mNotificationCallback = notificationCallback;
     }
@@ -507,48 +508,39 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Create a Notification.Builder from the intent.
     protected static Notification.Builder buildNotification(Context context, Intent intent) {
         String channelID = intent.getStringExtra("channelID");
-        String textTitle = intent.getStringExtra("textTitle");
-        String textContent = intent.getStringExtra("textContent");
-        boolean autoCancel = intent.getBooleanExtra("autoCancel", true);
-        boolean usesChronometer = intent.getBooleanExtra("usesChronometer", false);
-        int style = intent.getIntExtra("style", 0);
-        int color = intent.getIntExtra("color", 0);
-        int number = intent.getIntExtra("number", 0);
-
-        boolean showTimestamp = intent.getBooleanExtra("showTimestamp", false);
-        long timestampValue = intent.getLongExtra("timestamp", -1);
-
-        String smallIconStr = intent.getStringExtra("smallIconStr");
-        String largeIconStr = intent.getStringExtra("largeIconStr");
-
-        int smallIconId = UnityNotificationUtilities.findResourceIdInContextByName(context, smallIconStr);
-        int largeIconId = UnityNotificationUtilities.findResourceIdInContextByName(context, largeIconStr);
-
-        if (smallIconId == 0) {
-            smallIconId = context.getApplicationInfo().icon;
-        }
-
-        PendingIntent tapIntent = (PendingIntent) intent.getParcelableExtra("tapIntent");
 
         Notification.Builder notificationBuilder;
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             notificationBuilder = new Notification.Builder(context);
         } else {
             notificationBuilder = new Notification.Builder(context, channelID);
         }
 
+        String largeIconStr = intent.getStringExtra("largeIconStr");
+        int largeIconId = UnityNotificationUtilities.findResourceIdInContextByName(context, largeIconStr);
         if (largeIconId != 0) {
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), largeIconId));
         }
 
+        String smallIconStr = intent.getStringExtra("smallIconStr");
+        int smallIconId = UnityNotificationUtilities.findResourceIdInContextByName(context, smallIconStr);
+        if (smallIconId == 0) {
+            smallIconId = context.getApplicationInfo().icon;
+        }
+        notificationBuilder.setSmallIcon(smallIconId);
+
+        String textTitle = intent.getStringExtra("textTitle");
+        String textContent = intent.getStringExtra("textContent");
+        PendingIntent tapIntent = (PendingIntent) intent.getParcelableExtra("tapIntent");
+        boolean autoCancel = intent.getBooleanExtra("autoCancel", true);
+
         notificationBuilder.setContentTitle(textTitle)
                 .setContentText(textContent)
-                .setSmallIcon(smallIconId)
                 .setContentIntent(tapIntent)
                 .setAutoCancel(autoCancel);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int color = intent.getIntExtra("color", 0);
             if (color != 0) {
                 notificationBuilder.setColor(color);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -557,21 +549,28 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
+        int number = intent.getIntExtra("number", 0);
         if (number >= 0)
             notificationBuilder.setNumber(number);
 
+        int style = intent.getIntExtra("style", 0);
         if (style == 2)
             notificationBuilder.setStyle(new Notification.BigTextStyle().bigText(textContent));
 
+        long timestampValue = intent.getLongExtra("timestamp", -1);
         notificationBuilder.setWhen(timestampValue);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            boolean showTimestamp = intent.getBooleanExtra("showTimestamp", false);
             notificationBuilder.setShowWhen(showTimestamp);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            boolean usesChronometer = intent.getBooleanExtra("usesChronometer", false);
             notificationBuilder.setUsesChronometer(usesChronometer);
         }
+
+        // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(context, channelID);
 
