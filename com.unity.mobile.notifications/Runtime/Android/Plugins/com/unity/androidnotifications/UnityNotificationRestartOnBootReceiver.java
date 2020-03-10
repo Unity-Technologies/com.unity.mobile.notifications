@@ -27,7 +27,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                 boolean isRepeatable = data_intent.getLongExtra("repeatInterval", 0L) > 0;
 
                 if (fireTimeDate.after(currentDate) || isRepeatable) {
-                    Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationUtilities.GetOpenAppActivity(context, true));
+                    Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, context, UnityNotificationUtilities.getOpenAppActivity(context, true));
 
                     PendingIntent pendingIntent = PendingIntent.getActivity(context, id, openAppIntent, 0);
                     Intent intent = UnityNotificationManager.buildNotificationIntent(context, data_intent, pendingIntent);

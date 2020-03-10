@@ -32,7 +32,7 @@ public class UnityNotificationUtilities {
         }
     }
 
-    protected static String SerializeNotificationIntent(Intent intent) {
+    protected static String serializeNotificationIntent(Intent intent) {
         Bundle bundle = intent.getExtras();
 
         Parcel parcel = Parcel.obtain();
@@ -42,7 +42,7 @@ public class UnityNotificationUtilities {
         return Base64.encodeToString(bytes, 0, bytes.length, 0);
     }
 
-    protected static Intent DeserializeNotificationIntent(Context context, String src) {
+    protected static Intent deserializeNotificationIntent(Context context, String src) {
         byte[] newByt = Base64.decode(src, 0);
 
         Bundle newBundle = new Bundle();
@@ -57,7 +57,7 @@ public class UnityNotificationUtilities {
         return intent;
     }
 
-    protected static Class<?> GetOpenAppActivity(Context context, boolean fallbackToDefault) {
+    protected static Class<?> getOpenAppActivity(Context context, boolean fallbackToDefault) {
         ApplicationInfo ai = null;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);

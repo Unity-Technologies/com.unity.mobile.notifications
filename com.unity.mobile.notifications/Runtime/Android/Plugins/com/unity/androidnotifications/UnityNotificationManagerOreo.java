@@ -49,12 +49,12 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
 
         for (NotificationChannel ch : getNotificationManager(context).getNotificationChannels()) {
             if (ch.getId() == id)
-                return NotificationChannelToWrapper(ch);
+                return notificationChannelToWrapper(ch);
         }
         return null;
     }
 
-    protected static NotificationChannelWrapper NotificationChannelToWrapper(NotificationChannel channel) {
+    protected static NotificationChannelWrapper notificationChannelToWrapper(NotificationChannel channel) {
         NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -87,7 +87,7 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
         List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
 
         for (NotificationChannel ch : getNotificationManager().getNotificationChannels()) {
-            channelList.add(NotificationChannelToWrapper(ch));
+            channelList.add(notificationChannelToWrapper(ch));
         }
 
         return channelList.toArray(new NotificationChannelWrapper[channelList.size()]);

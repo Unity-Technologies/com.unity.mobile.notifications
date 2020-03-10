@@ -66,13 +66,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 PackageManager pm = context.getPackageManager();
 
                 pm.setComponentEnabledSetting(receiver,
-                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                        PackageManager.DONT_KILL_APP);
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);
             }
 
             this.mRescheduleOnRestart = rescheduleOnRestart;
 
-            mOpenActivity = UnityNotificationUtilities.GetOpenAppActivity(context, false);
+            mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(context, false);
             if (mOpenActivity == null)
                 mOpenActivity = activity.getClass();
         } catch (PackageManager.NameNotFoundException e) {
@@ -139,7 +139,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         editor.apply();
 
         // Store the channel into a SharedPreferences.
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+        SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         editor = channelPrefs.edit();
 
         editor.putString("title", name); // Sadly I can't change the "title" here to "name" due to backward compatibility.
@@ -155,7 +155,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         editor.apply();
     }
 
-    protected static String GetSharedPrefsNameByChannelId(String id)
+    protected static String getSharedPrefsNameByChannelId(String id)
     {
         return String.format("unity_notification_channel_%s", id);
     }
@@ -167,7 +167,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return UnityNotificationManagerOreo.getOreoNotificationChannel(context, id);
         }
 
-        SharedPreferences prefs = context.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         NotificationChannelWrapper channel = new NotificationChannelWrapper();
 
         channel.id = id;
@@ -219,7 +219,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         editor.apply();
 
         // Delete the notification channel SharedPreferences.
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(GetSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+        SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         channelPrefs.edit().clear().apply();
     }
 
@@ -240,8 +240,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
     public void scheduleNotificationIntent(Intent data_intent_source) {
         // TODO: why we serialize/deserialize again?
-        String temp = UnityNotificationUtilities.SerializeNotificationIntent(data_intent_source);
-        Intent data_intent = UnityNotificationUtilities.DeserializeNotificationIntent(mContext, temp);
+        String temp = UnityNotificationUtilities.serializeNotificationIntent(data_intent_source);
+        Intent data_intent = UnityNotificationUtilities.deserializeNotificationIntent(mContext, temp);
 
         int id = data_intent.getIntExtra("id", 0);
 
@@ -309,10 +309,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true.
     protected static void saveNotificationIntent(Context context, Intent intent) {
         String notification_id = Integer.toString(intent.getIntExtra("id", 0));
-        SharedPreferences prefs = context.getSharedPreferences(GetSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = prefs.edit().clear();
-        String data = UnityNotificationUtilities.SerializeNotificationIntent(intent);
+        String data = UnityNotificationUtilities.serializeNotificationIntent(intent);
         editor.putString("data", data);
         editor.apply();
 
@@ -329,7 +329,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         UnityNotificationManager.loadNotificationIntents(context);
     }
 
-    protected static String GetSharedPrefsNameByNotificationId(String id)
+    protected static String getSharedPrefsNameByNotificationId(String id)
     {
         return String.format("u_notification_data_%s", id);
     }
@@ -343,11 +343,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
         for (String id : idsSet) {
-            SharedPreferences prefs =  context.getSharedPreferences(GetSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+            SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             String serializedIntentData = prefs.getString("data", "");
 
             if (serializedIntentData.length() > 1) {
-                Intent intent = UnityNotificationUtilities.DeserializeNotificationIntent(context, serializedIntentData);
+                Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, serializedIntentData);
                 intent_data_list.add(intent);
             } else {
                 idsMarkedForRemoval.add(id);
@@ -472,7 +472,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
         editor.apply();
 
-        SharedPreferences notificationPrefs = context.getSharedPreferences(GetSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+        SharedPreferences notificationPrefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
         notificationPrefs.edit().clear().apply();
     }
 
@@ -535,9 +535,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
         boolean autoCancel = intent.getBooleanExtra("autoCancel", true);
 
         notificationBuilder.setContentTitle(textTitle)
-                .setContentText(textContent)
-                .setContentIntent(tapIntent)
-                .setAutoCancel(autoCancel);
+            .setContentText(textContent)
+            .setContentIntent(tapIntent)
+            .setAutoCancel(autoCancel);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int color = intent.getIntExtra("color", 0);
