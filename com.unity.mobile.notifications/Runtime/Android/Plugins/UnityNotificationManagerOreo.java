@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Keep
-public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat {
+public class UnityNotificationManagerOreo extends UnityNotificationManager {
     public UnityNotificationManagerOreo(Context context, Activity activity) {
         super(context, activity);
     }
