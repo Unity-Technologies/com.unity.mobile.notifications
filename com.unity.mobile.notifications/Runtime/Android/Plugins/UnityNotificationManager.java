@@ -416,13 +416,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
         // Convert the string array ids to int array ids.
-        String[] idsArrStr = ids.toArray(new String[ids.size()]);
-        int[] idsArrInt = new int[ids.size()];
-
-        for (int i = 0; i < idsArrStr.length; i++) {
-            idsArrInt[i] = Integer.valueOf(idsArrStr[i]);
+        int[] intIds = new int[ids.size()];
+        int index = 0;
+        for (String id : ids) {
+            intIds[index++] = Integer.valueOf(id);
         }
-        return idsArrInt;
+        return intIds;
     }
 
     // Cancel a pending notification by id.
