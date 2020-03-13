@@ -21,13 +21,11 @@ public class iOSNotificationPostProcess : MonoBehaviour
             var proj = new PBXProject();
             proj.ReadFromString(File.ReadAllText(projPath));
 
-
             string mainTarget;
             string unityFrameworkTarget;
 
             var unityMainTargetGuidMethod = proj.GetType().GetMethod("GetUnityMainTargetGuid");
             var unityFrameworkTargetGuidMethod = proj.GetType().GetMethod("GetUnityFrameworkTargetGuid");
-
 
             if (unityMainTargetGuidMethod != null && unityFrameworkTargetGuidMethod != null)
             {
@@ -57,15 +55,13 @@ public class iOSNotificationPostProcess : MonoBehaviour
 
             if (addPushNotificationCapability)
             {
-                var useReleaseAPSEnvSetting = settings
-                    .Find(i => i.key == "UnityUseAPSReleaseEnvironment");
+                var useReleaseAPSEnvSetting = settings.Find(i => i.key == "UnityUseAPSReleaseEnvironment");
                 var useReleaseAPSEnv = false;
 
                 if (useReleaseAPSEnvSetting != null)
                     useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.val;
 
-                var entitlementsFileName = proj.GetBuildPropertyForConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
-
+                var entitlementsFileName = proj.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
                 if (entitlementsFileName == null)
                 {
                     var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
