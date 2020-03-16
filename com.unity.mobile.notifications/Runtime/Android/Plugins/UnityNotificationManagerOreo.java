@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Keep
-public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat {
+public class UnityNotificationManagerOreo extends UnityNotificationManager {
     public UnityNotificationManagerOreo(Context context, Activity activity) {
         super(context, activity);
     }
@@ -27,24 +27,23 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
             boolean canShowBadge,
             long[] vibrationPattern,
             int lockscreenVisibility) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(id, name, importance);
-            channel.setDescription(description);
-            channel.enableLights(enableLights);
-            channel.enableVibration(enableVibration);
-            channel.setBypassDnd(canBypassDnd);
-            channel.setShowBadge(canShowBadge);
-            channel.setVibrationPattern(vibrationPattern);
-            channel.setLockscreenVisibility(lockscreenVisibility);
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
 
-            getNotificationManager().createNotificationChannel(channel);
-        }
+        NotificationChannel channel = new NotificationChannel(id, name, importance);
+        channel.setDescription(description);
+        channel.enableLights(enableLights);
+        channel.enableVibration(enableVibration);
+        channel.setBypassDnd(canBypassDnd);
+        channel.setShowBadge(canShowBadge);
+        channel.setVibrationPattern(vibrationPattern);
+        channel.setLockscreenVisibility(lockscreenVisibility);
+
+        getNotificationManager().createNotificationChannel(channel);
     }
 
     protected static NotificationChannelWrapper getOreoNotificationChannel(Context context, String id) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return null;
-        }
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+
         List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
 
         for (NotificationChannel ch : getNotificationManager(context).getNotificationChannels()) {
@@ -57,33 +56,31 @@ public class UnityNotificationManagerOreo extends UnityNotificationManagerNougat
     protected static NotificationChannelWrapper notificationChannelToWrapper(NotificationChannel channel) {
         NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            wrapper.id = channel.getId();
-            wrapper.name = channel.getName().toString();
-            wrapper.importance = channel.getImportance();
-            wrapper.description = channel.getDescription();
-            wrapper.enableLights = channel.shouldShowLights();
-            wrapper.enableVibration = channel.shouldVibrate();
-            wrapper.canBypassDnd = channel.canBypassDnd();
-            wrapper.canShowBadge = channel.canShowBadge();
-            wrapper.vibrationPattern = channel.getVibrationPattern();
-            wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
-        }
+        wrapper.id = channel.getId();
+        wrapper.name = channel.getName().toString();
+        wrapper.importance = channel.getImportance();
+        wrapper.description = channel.getDescription();
+        wrapper.enableLights = channel.shouldShowLights();
+        wrapper.enableVibration = channel.shouldVibrate();
+        wrapper.canBypassDnd = channel.canBypassDnd();
+        wrapper.canShowBadge = channel.canShowBadge();
+        wrapper.vibrationPattern = channel.getVibrationPattern();
+        wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
+
         return wrapper;
     }
 
     @Override
     public void deleteNotificationChannel(String id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getNotificationManager().deleteNotificationChannel(id);
-        }
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+
+        getNotificationManager().deleteNotificationChannel(id);
     }
 
     @Override
     public NotificationChannelWrapper[] getNotificationChannels() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return null;
-        }
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+
         List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
 
         for (NotificationChannel ch : getNotificationManager().getNotificationChannels()) {

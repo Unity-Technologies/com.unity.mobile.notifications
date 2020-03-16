@@ -93,8 +93,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mUnityNotificationManager = new UnityNotificationManagerOreo(context, activity);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mUnityNotificationManager = new UnityNotificationManagerNougat(context, activity);
         } else {
             mUnityNotificationManager = new UnityNotificationManager(context, activity);
         }
@@ -418,13 +416,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
         // Convert the string array ids to int array ids.
-        String[] idsArrStr = ids.toArray(new String[ids.size()]);
-        int[] idsArrInt = new int[ids.size()];
-
-        for (int i = 0; i < idsArrStr.length; i++) {
-            idsArrInt[i] = Integer.valueOf(idsArrStr[i]);
+        int[] intIds = new int[ids.size()];
+        int index = 0;
+        for (String id : ids) {
+            intIds[index++] = Integer.valueOf(id);
         }
-        return idsArrInt;
+        return intIds;
     }
 
     // Cancel a pending notification by id.
@@ -488,11 +485,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             if (!intent.hasExtra("channelID") || !intent.hasExtra("smallIconStr"))
                 return;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                UnityNotificationManagerNougat.sendNotificationNougat(context, intent);
-            } else {
-                UnityNotificationManager.sendNotification(context, intent);
-            }
+            UnityNotificationManager.sendNotification(context, intent);
         } catch (BadParcelableException e) {
             Log.w("UnityNotifications", e.toString());
         }
@@ -540,16 +533,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
             .setContentIntent(tapIntent)
             .setAutoCancel(autoCancel);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int color = intent.getIntExtra("color", 0);
-            if (color != 0) {
-                notificationBuilder.setColor(color);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notificationBuilder.setColorized(true);
-                }
-            }
-        }
-
         int number = intent.getIntExtra("number", 0);
         if (number >= 0)
             notificationBuilder.setNumber(number);
@@ -561,9 +544,35 @@ public class UnityNotificationManager extends BroadcastReceiver {
         long timestampValue = intent.getLongExtra("timestamp", -1);
         notificationBuilder.setWhen(timestampValue);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            String group = intent.getStringExtra("group");
+            if (group != null && group.length() > 0) {
+                notificationBuilder.setGroup(group);
+            }
+
+            boolean groupSummary = intent.getBooleanExtra("groupSummary", false);
+            if (groupSummary)
+                notificationBuilder.setGroupSummary(groupSummary);
+
+            String sortKey = intent.getStringExtra("sortKey");
+            if (sortKey != null && sortKey.length() > 0) {
+                notificationBuilder.setSortKey(sortKey);
+            }
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             boolean showTimestamp = intent.getBooleanExtra("showTimestamp", false);
             notificationBuilder.setShowWhen(showTimestamp);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int color = intent.getIntExtra("color", 0);
+            if (color != 0) {
+                notificationBuilder.setColor(color);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    notificationBuilder.setColorized(true);
+                }
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -571,8 +580,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             notificationBuilder.setUsesChronometer(usesChronometer);
         }
 
-        // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
             NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(context, channelID);
 
             if (fakeNotificationChannel.vibrationPattern != null && fakeNotificationChannel.vibrationPattern.length > 0) {
@@ -605,6 +614,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     priority = Notification.PRIORITY_DEFAULT;
             }
             notificationBuilder.setPriority(priority);
+        } else {
+            // groupAlertBehaviour is only supported for Android O and above.
+            int groupAlertBehaviour = intent.getIntExtra("groupAlertBehaviour", -1);
+            if (groupAlertBehaviour >= 0) {
+                notificationBuilder.setGroupAlertBehavior(groupAlertBehaviour);
+            }
         }
 
         return notificationBuilder;
