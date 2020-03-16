@@ -1,4 +1,5 @@
 package com.unity.androidnotifications;
+
 import android.content.Intent;
 import android.support.annotation.Keep;
 

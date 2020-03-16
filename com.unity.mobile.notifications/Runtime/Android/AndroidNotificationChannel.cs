@@ -58,10 +58,10 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create a notification channel struct with all optional fields set to default values.
         /// </summary>
-        public AndroidNotificationChannel(string id, string title, string description, Importance importance)
+        public AndroidNotificationChannel(string id, string name, string description, Importance importance)
         {
             this.id = id;
-            this.title = title;
+            this.name = name;
             this.description = description;
             this.importance = (int)importance;
 
@@ -88,8 +88,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Name
         {
-            get { return title; }
-            set { title = value; }
+            get { return name; }
+            set { name = value; }
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Unity.Notifications.Android
         }
 
         internal string id;
-        internal string title;
+        internal string name;
         internal string description;
         internal int importance;
 
