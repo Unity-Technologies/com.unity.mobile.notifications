@@ -199,17 +199,10 @@ namespace Unity.Notifications.iOS
                     data.triggerType = iOSNotificationTimeIntervalTrigger.Type;
                     data.timeTriggerInterval = trigger.timeInterval;
 
-                    if (trigger.timeInterval > 60)
-                    {
-                        data.repeats = trigger.Repeats;
-                    }
-                    else
-                    {
-                        if (trigger.Repeats)
-                        {
-                            Debug.LogWarning("Time interval must be at least 60 for repeating notifications.");
-                        }
-                    }
+                    if (trigger.Repeats && trigger.timeInterval < 60)
+                        throw new ArgumentException("Time interval must be 60 seconds or greater for repeating notifications.");
+
+                    data.repeats = trigger.Repeats;
                 }
                 else if (value is iOSNotificationCalendarTrigger)
                 {
