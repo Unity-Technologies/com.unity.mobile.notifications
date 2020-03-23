@@ -24,7 +24,7 @@ MonoBehaviour:
   number: 0
   shouldAutoCancel: 0
   usesStopWatch: 0
-  group: group_B
+  group: group_b
   groupSummary: 1
   groupAlertBehaviours: 0
   sortKey: 
