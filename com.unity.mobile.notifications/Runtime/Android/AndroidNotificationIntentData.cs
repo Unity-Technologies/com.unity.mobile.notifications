@@ -2,25 +2,32 @@ using UnityEngine;
 
 namespace Unity.Notifications.Android
 {
-    public class AndroidNotificationIntentData : MonoBehaviour
+    public class AndroidNotificationIntentData
     {
-        internal int id;
-        internal string channel;
-        internal AndroidNotification notification;
+        protected int m_Id;
+        protected string m_Channel;
+        protected AndroidNotification m_Notification;
+
+        public AndroidNotificationIntentData(int id, string channel, AndroidNotification notification)
+        {
+            m_Id = id;
+            m_Channel = channel;
+            m_Notification = notification;
+        }
 
         public int Id
         {
-            get { return id; }
+            get { return m_Id; }
         }
 
         public string Channel
         {
-            get { return channel; }
+            get { return m_Channel; }
         }
 
         public AndroidNotification Notification
         {
-            get { return notification; }
+            get { return m_Notification; }
         }
     }
 }
