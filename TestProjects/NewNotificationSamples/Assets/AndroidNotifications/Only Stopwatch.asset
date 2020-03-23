@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb7d100a40edf48f99686ea68a90ff4c, type: 3}
+  m_Name: Only Stopwatch
+  m_EditorClassIdentifier: 
+  buttonName: Empty notification + title
+  channel: default_channel
+  fireInSeconds: 5
+  title: 
+  text: 
+  smallIcon: 
+  largeIcon: 
+  notificationStyle: 0
+  color: {r: 0, g: 0, b: 0, a: 0}
+  number: 0
+  shouldAutoCancel: 0
+  usesStopWatch: 1
+  group: 
+  groupSummary: 0
+  groupAlertBehaviours: 0
+  sortKey: 
+  intentData: 
+  showTimestamp: 0
