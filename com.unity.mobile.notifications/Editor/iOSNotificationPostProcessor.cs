@@ -38,7 +38,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 unityFrameworkTarget = mainTarget;
             }
 
-            var settings = NotificationSettingsManager.Initialize().iOSNotificationEditorSettingsFlat;
+            var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
 
             var addPushNotificationCapability = (bool)settings
                 .Find(i => i.key == "UnityAddRemoteNotificationCapability").val == true;;
