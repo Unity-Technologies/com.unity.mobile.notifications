@@ -13,9 +13,9 @@ using Unity.Notifications.iOS;
 public class iOSTest : MonoBehaviour
 {
 
-public List<iOSNotificationTemplateTimeTrigger> iOSNotificationsTimeTriggered;
-public List<iOSNotificationTemplateCalendarTrigger> iOSNotificationsCalendarTriggered;
-public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTriggered;
+    public List<iOSNotificationTemplateTimeTrigger> iOSNotificationsTimeTriggered;
+    public List<iOSNotificationTemplateCalendarTrigger> iOSNotificationsCalendarTriggered;
+    public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTriggered;
 
 #if PLATFORM_IOS
 
@@ -55,11 +55,11 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
                 .Properties(notification, 1);
             iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
 
-            LOGGER
+            /* LOGGER
                 .Separator()
                 .Orange($"Rescheduling local notification to be sent in 15 seconds", 1);
             notification.Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 15) };
-            iOSNotificationCenter.ScheduleNotification(notification);
+            iOSNotificationCenter.ScheduleNotification(notification); */
         }
     }
     
@@ -98,13 +98,16 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
         InstantiateAllTestButtons();
         ClearBadge();
         RemoveAllNotifications();
-        LOGGER.Clear().White("Welcome!");
+        LOGGER
+            .Clear()
+            .White("Welcome!");
     }
 
     void OnApplicationPause(bool isPaused)
     {
-        LOGGER.Gray($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
-        LOGGER.Gray($"isPaused = {isPaused}", 1);
+        LOGGER
+            .Gray($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
+            .Gray($"isPaused = {isPaused}", 1);
         if (isPaused == false)
         {
             iOSNotification notification = iOSNotificationCenter.GetLastRespondedNotification();
@@ -113,9 +116,10 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
                 LOGGER.Green($"Notification found:", 1);
                 if (notification.Data != "IGNORE")
                 {
-                    LOGGER.Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification");
-                    LOGGER.Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1);
-                    Helpers.LogProperties(notification, LOGGER);
+                    LOGGER
+                        .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
+                        .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
+                        .Properties(notification, 1);
                     iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
                 }
             } else {
@@ -129,7 +133,9 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
         groups = new Dictionary<string, OrderedDictionary>();
 
         groups["General"] = new OrderedDictionary();
-        groups["General"]["Clear Log"] = new Action(() => { LOGGER.Clear(); });
+        groups["General"]["Clear Log"] = new Action(() => {
+            LOGGER.Clear();
+        });
         groups["General"]["Get Current Location"] = new Action(() => {
             StartCoroutine(GetCurrentLocation());
         });
@@ -142,306 +148,126 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
         groups["General"]["Show Notification Settings"] = new Action(() => {
             ShowNotificationSettings();
         });
+        groups["General"]["List Scheduled Notifications"] = new Action(() => {
+            ListScheduledNotifications();
+        });
+        groups["General"]["List Delivered Notifications"] = new Action(() => {
+            ListDeliveredNotifications();
+        });
+        groups["Other"]["Remove First Notification In Scheduled List By ID"] = new Action(() => {
+            RemoveFirstNotificationInListById();
+        });
+        groups["General"]["Clear the badge"] = new Action(() => {
+            ClearBadge();
+        });
 
-        groups["Generated"] = new OrderedDictionary();
+        groups["Schedule"] = new OrderedDictionary();
         foreach (iOSNotificationTemplateTimeTrigger template in iOSNotificationsTimeTriggered)
         {
             if (template == null) continue;
-            groups["Generated"][$"{template.buttonName}"] = new Action(() => {
+            groups["Schedule"][$"[{template.timeTriggerInterval}s] {template.buttonName}"] = new Action(() => {
                 ScheduleNotification(
                     new iOSNotification()
-                    {
-                        Identifier = template.identifier,
-                        CategoryIdentifier = template.categoryIdentifier,
-                        ThreadIdentifier = template.threadIdentifier,
-                        Title = template.title,
-                        Subtitle = template.subtitle,
-                        Body = template.body,
-                        ShowInForeground = template.showInForeground,
-                        ForegroundPresentationOption = template.presentationOptions,
-                        Badge = template.badge,
-                        Data = template.data,
-                        Trigger = new iOSNotificationTimeIntervalTrigger()
                         {
-                            TimeInterval = TimeSpan.FromSeconds(template.timeTriggerInterval),
-                            Repeats = template.repeats
+                            Identifier = template.identifier == "" ? null : template.identifier,
+                            CategoryIdentifier = template.categoryIdentifier,
+                            ThreadIdentifier = template.threadIdentifier,
+                            Title = template.title,
+                            Subtitle = template.subtitle,
+                            Body = template.body,
+                            ShowInForeground = template.showInForeground,
+                            ForegroundPresentationOption = template.presentationOptions,
+                            Badge = template.badge,
+                            Data = template.data,
+                            Trigger = new iOSNotificationTimeIntervalTrigger()
+                                {
+                                    TimeInterval = TimeSpan.FromSeconds(template.timeTriggerInterval),
+                                    Repeats = template.repeats
+                                }
                         }
-                    }
                 );
             });
         }
         foreach (iOSNotificationTemplateCalendarTrigger template in iOSNotificationsCalendarTriggered)
         {
             if (template == null) continue;
-            groups["Generated"][$"{template.buttonName}"] = new Action(() => {
+            groups["Schedule"][$"{template.buttonName}"] = new Action(() => {
+                iOSNotificationCalendarTrigger trigger;
+                if (template.offsetFromCurrentDate) {
+                    DateTime offsetDate = DateTime.Now;
+                    if (template.year > 0) offsetDate = offsetDate.AddYears(template.year);
+                    if (template.month > 0) offsetDate = offsetDate.AddMonths(template.month);
+                    if (template.day > 0) offsetDate = offsetDate.AddDays(template.day);
+                    if (template.hour > 0) offsetDate = offsetDate.AddHours(template.hour);
+                    if (template.minute > 0) offsetDate = offsetDate.AddMinutes(template.minute);
+                    if (template.second > 0) offsetDate = offsetDate.AddSeconds(template.second);
+                    trigger = new iOSNotificationCalendarTrigger()
+                        {
+                            Year = offsetDate.Year,
+                            Month = offsetDate.Month,
+                            Day = offsetDate.Day,
+                            Hour = offsetDate.Hour,
+                            Minute = offsetDate.Minute,
+                            Second = offsetDate.Second
+                        };
+                    LOGGER.Orange($"Will trigger on:\n{offsetDate.ToString("yyyy-MM-dd HH:mm:ss")}");
+                } else {
+                    trigger = new iOSNotificationCalendarTrigger()
+                        {
+                            Year = template.year,
+                            Month = template.month,
+                            Day = template.day,
+                            Hour = template.hour,
+                            Minute = template.minute,
+                            Second = template.second
+                        };
+                }
                 ScheduleNotification(
                     new iOSNotification()
-                    {
-                        Identifier = template.identifier,
-                        CategoryIdentifier = template.categoryIdentifier,
-                        ThreadIdentifier = template.threadIdentifier,
-                        Title = template.title,
-                        Subtitle = template.subtitle,
-                        Body = template.body,
-                        ShowInForeground = template.showInForeground,
-                        ForegroundPresentationOption = template.presentationOptions,
-                        Badge = template.badge,
-                        Data = template.data,
-                        Trigger = new iOSNotificationCalendarTrigger()
                         {
-                            Year = template.calendarTriggerYear,
-                            Month = template.calendarTriggerMonth,
-                            Day = template.calendarTriggerDay,
-                            Hour = template.calendarTriggerHour,
-                            Minute = template.calendarTriggerMinute,
-                            Second = template.calendarTriggerSecond
+                            Identifier = template.identifier == "" ? null : template.identifier,
+                            CategoryIdentifier = template.categoryIdentifier,
+                            ThreadIdentifier = template.threadIdentifier,
+                            Title = template.title,
+                            Subtitle = template.subtitle,
+                            Body = template.body,
+                            ShowInForeground = template.showInForeground,
+                            ForegroundPresentationOption = template.presentationOptions,
+                            Badge = template.badge,
+                            Data = template.data,
+                            Trigger = trigger
                         }
-                    }
                 );
             });
         }
         foreach (iOSNotificationTemplateLocationTrigger template in iOSNotificationsLocationTriggered)
         {
             if (template == null) continue;
-            groups["Generated"][$"{template.buttonName}"] = new Action(() => {
+            groups["Schedule"][$"{template.buttonName}"] = new Action(() => {
                 ScheduleNotification(
                     new iOSNotification()
-                    {
-                        Identifier = template.identifier,
-                        CategoryIdentifier = template.categoryIdentifier,
-                        ThreadIdentifier = template.threadIdentifier,
-                        Title = template.title,
-                        Subtitle = template.subtitle,
-                        Body = template.body,
-                        ShowInForeground = template.showInForeground,
-                        ForegroundPresentationOption = template.presentationOptions,
-                        Badge = template.badge,
-                        Data = template.data,
-                        Trigger = new iOSNotificationLocationTrigger()
                         {
-                            Center = new Vector2(template.locationTriggerCenterX, template.locationTriggerCenterY),
-                            Radius = template.locationTriggerRadius,
-                            NotifyOnEntry = template.locationTriggerNotifyOnEntry,
-                            NotifyOnExit = template.locationTriggerNotifyOnExit
+                            Identifier = template.identifier == "" ? null : template.identifier,
+                            CategoryIdentifier = template.categoryIdentifier,
+                            ThreadIdentifier = template.threadIdentifier,
+                            Title = template.title,
+                            Subtitle = template.subtitle,
+                            Body = template.body,
+                            ShowInForeground = template.showInForeground,
+                            ForegroundPresentationOption = template.presentationOptions,
+                            Badge = template.badge,
+                            Data = template.data,
+                            Trigger = new iOSNotificationLocationTrigger()
+                                {
+                                    Center = new Vector2(template.centerX, template.centerY),
+                                    Radius = template.radius,
+                                    NotifyOnEntry = template.notifyOnEntry,
+                                    NotifyOnExit = template.notifyOnExit
+                                }
                         }
-                    }
                 );
             });
         }
-
-        groups["Schedule"] = new OrderedDictionary();
-        groups["Schedule"]["List Scheduled Notifications"] = new Action(() => { ListScheduledNotifications(); });
-        groups["Schedule"]["List Delivered Notifications"] = new Action(() => { ListDeliveredNotifications(); });
-        groups["Schedule"]["Clear the badge"] = new Action(() => { ClearBadge(); });
-        groups["Schedule"]["Schedule Empty Notification"] = new Action(() => {
-            ScheduleNotification(new iOSNotification());
-        });
-        groups["Schedule"]["Schedule Notification that sets the badge to 9000"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Badge = 9000,
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Badge,
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1), Repeats = false },
-                    Data = "IGNORE" // Do this to ignore auto incrementing of the badge on delivered notification
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification in 0 seconds\n<color=#e74c3c>EXCEPTION</color>"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Example Notification",
-                    Subtitle = "You might want to know this!",
-                    Body = $"Seconds: 0",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 0), Repeats = false },
-                    Data = "Arbitrary Data"
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification in 1 seconds\n(secondary_thread, sound)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Example Notification",
-                    Subtitle = "You might want to know this!",
-                    Body = $"Seconds: 1",
-                    Badge = 10, // Should not increase counter, because it doesn't have required PresentationOption!!!
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound,
-                    ThreadIdentifier = "secondary_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1), Repeats = false },
-                    Data = "Arbitrary data, from a simple notification with sound"
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification in 3 second\n(default_thread, sound, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Example Notification: default_thread",
-                    Subtitle = "You might want to know this!",
-                    Body = $"Seconds: 3",
-                    Badge = 3, // Should not increase counter, because it doesn't have required PresentationOption!!!
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 3), Repeats = false },
-                    Data = "Arbitrary data, from a simple notification with sound and alert"
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification in 3 second\n(secondary_thread, sound, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Example Notification: secondary_thread",
-                    Subtitle = "You might want to know this!",
-                    Body = $"Seconds: 3",
-                    Badge = 3, // Should not increase counter, because it doesn't have required PresentationOption!!!
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "secondary_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 3), Repeats = false },
-                    Data = "Arbitrary data, from a simple notification with sound and alert"
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification without Title, Subtitle, Body in 1 second\n(default_thread, sound, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1), Repeats = false }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification with Title Only in 1 second\n(default_thread, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Example Notification",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1), Repeats = false }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification with Subtitle Only in 1 second\n(default_thread, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Subtitle = "You might want to know this!",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1), Repeats = false }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Notification with Body Only in 1 second\n(secondary_thread, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Body = $"Seconds: 3",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Alert,
-                    ThreadIdentifier = "secondary_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1), Repeats = false }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Repeated Notification to be sent 60 seconds\n(default_thread, sound, alert)"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Repeated Notification",
-                    Subtitle = "This could become a little bit annoying",
-                    Body = $"Clear scheduled notifications if it does, it'll do the trick",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 60), Repeats = true }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Repeated Notification to be sent 20 seconds\n(default_thread, sound, alert)\n<color=#e74c3c>EXCEPTION</color>"] = new Action(() => {
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Repeated Notification",
-                    Subtitle = "This could become a little bit annoying",
-                    Body = $"Clear scheduled notifications if it does, it'll do the trick",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 20), Repeats = true }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Calendar Notification to be sent in 1 minute\n(default_thread, sound, alert)"] = new Action(() => {
-            DateTime now = DateTime.Now.AddMinutes(1);
-            ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Calendar Notification",
-                    Subtitle = "Yep, they also exist",
-                    Body = $"Calendar notifications can be scheduled for wayyy into the future",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationCalendarTrigger()
-                    {
-                        Year = now.Year,
-                        Month = now.Month,
-                        Day = now.Day,
-                        Hour = now.Hour,
-                        Minute = now.Minute,
-                        Second = now.Second
-                    }
-                }
-            );
-        });
-        groups["Schedule"]["Schedule Location Triggered Notification\n(default_thread, sound, alert)"] = new Action(() => {
-            // First, check if user has location service enabled
-            if (!Input.location.isEnabledByUser)
-            {
-                LOGGER.Red("Cannot use Location Services");
-                return;
-            }
-            iOSNotification thisNotification = ScheduleNotification(
-                new iOSNotification()
-                {
-                    Title = "Wowzerz!",
-                    Subtitle = "A Location Triggered Notification",
-                    Body = $"Now that's interesting...",
-                    ShowInForeground = true,
-                    ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                    CategoryIdentifier = "Location",
-                    ThreadIdentifier = "default_thread",
-                    Trigger = new iOSNotificationLocationTrigger()
-                    {
-                        Center = new Vector2(22.2847f, 114.1582f),
-                        Radius = 5000f,
-                        NotifyOnEntry = true,
-                        NotifyOnExit = true,
-                    }
-                }
-            );
-            LOGGER.Orange($"Should be triggered when:", 1);
-            LOGGER.Orange($"Center: {((iOSNotificationLocationTrigger)thisNotification.Trigger).Center}", 2);
-            LOGGER.Orange($"Radius: {((iOSNotificationLocationTrigger)thisNotification.Trigger).Radius}", 2);
-        });
-        groups["Schedule"]["Schedule Notification in 3 seconds and cancel after 1 (default_thread, sound, alert)"] = new Action(() => {
-            StartCoroutine(ScheduleNotificationAndRemoveItAfterSomeTime());
-        });
 
         groups["Cancellation"] = new OrderedDictionary();
         groups["Cancellation"]["Cancel all notifications"] = new Action(() => { RemoveAllNotifications(); });
@@ -520,8 +346,9 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
         {
             while (!req.IsFinished) { yield return null; };
             if (req.Granted) {
-                LOGGER.Green($"Authorization request was granted");
-                LOGGER.Properties(req);
+                LOGGER
+                    .Green($"Authorization request was granted")
+                    .Properties(req);
                 Debug.Log(req.DeviceToken);
             } else {
                 LOGGER.Red($"Authorization request was denied");
@@ -533,7 +360,7 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
     {
         LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
         iOSNotificationSettings settings = iOSNotificationCenter.GetNotificationSettings();
-        Helpers.LogProperties(settings, LOGGER);
+        LOGGER.Properties(settings);
     }
 
     public void ListScheduledNotifications()
@@ -541,9 +368,10 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
         LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
         foreach (iOSNotification notification in iOSNotificationCenter.GetScheduledNotifications())
         {
-            LOGGER.Separator();
-            Helpers.LogProperties(notification, LOGGER);
-            LOGGER.Separator();
+            LOGGER
+                .Separator()
+                .Properties(notification)
+                .Separator();
         }
     }
 
@@ -552,9 +380,10 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
         LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
         foreach (iOSNotification notification in iOSNotificationCenter.GetDeliveredNotifications())
         {
-            LOGGER.Separator();
-            Helpers.LogProperties(notification, LOGGER);
-            LOGGER.Separator();
+            LOGGER
+                .Separator()
+                .Properties(notification)
+                .Separator();
         }
     }
 
@@ -568,32 +397,22 @@ public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTrig
     {
         if (log)
         {
-            LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
-            Helpers.LogProperties(notification, LOGGER);
+            LOGGER
+                .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
+                .Properties(notification);
         }
         iOSNotificationCenter.ScheduleNotification(notification);
         return notification;
     }
 
-    IEnumerator ScheduleNotificationAndRemoveItAfterSomeTime()
+    public void RemoveFirstNotificationInListById()
     {
-        iOSNotification thisNotification = ScheduleNotification(
-            new iOSNotification()
-            {
-                Title = "Example Notification: default_thread",
-                Subtitle = "You might want to know this!",
-                Body = $"Seconds: 3",
-                Badge = 3, // Should not increase counter, because it doesn't have required PresentationOption!!!
-                ShowInForeground = true,
-                ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-                ThreadIdentifier = "default_thread",
-                Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 3), Repeats = false },
-                Data = "Arbitrary data, from a simple notification with sound and alert"
-            }
-        );
-        LOGGER.Red("This should not be delivered as it is going to be canceled in 1 second!");
-        yield return new WaitForSeconds(1.0f);
-        iOSNotificationCenter.RemoveScheduledNotification(thisNotification.Identifier);
+        LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
+        iOSNotification[] scheduledNotifications = iOSNotificationCenter.GetScheduledNotifications();
+        if (scheduledNotifications.Length > 0)
+        {
+            iOSNotificationCenter.RemoveScheduledNotification(scheduledNotifications[0].Identifier);
+        }
     }
 
     public void RemoveAllNotifications()

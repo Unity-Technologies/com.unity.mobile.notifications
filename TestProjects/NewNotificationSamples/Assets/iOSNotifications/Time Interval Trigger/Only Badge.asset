@@ -9,22 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 287ef6c72096b4aec8a7dc44af292035, type: 3}
-  m_Name: New IOS Notification Template Location Trigger
+  m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
+  m_Name: Only Badge
   m_EditorClassIdentifier: 
-  buttonName: Send A Notification (Location Trigger)
+  buttonName: Empty notification + badge
   identifier: 
   categoryIdentifier: 
   threadIdentifier: 
   title: 
   subtitle: 
   body: 
-  showInForeground: 0
-  presentationOption: 0
-  badge: 0
+  showInForeground: 1
+  presentationOptions: 3
+  badge: 10
   data: 
-  locationTriggerCenterX: 0
-  locationTriggerCenterY: 0
-  locationTriggerRadius: 0
-  locationTriggerNotifyOnEntry: 0
-  locationTriggerNotifyOnExit: 0
+  timeTriggerInterval: 1
+  repeats: 0

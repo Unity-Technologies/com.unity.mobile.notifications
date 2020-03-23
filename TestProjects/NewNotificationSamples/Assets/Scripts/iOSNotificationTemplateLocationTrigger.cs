@@ -18,24 +18,24 @@ public class iOSNotificationTemplateLocationTrigger : ScriptableObject
     [Space(10)]
     [Header("Notification Parameters")]
     public string identifier;
-    public string categoryIdentifier;
-    public string threadIdentifier;
-    public string title;
-    public string subtitle;
+    public string categoryIdentifier = "";
+    public string threadIdentifier = "";
+    public string title = "";
+    public string subtitle = "";
     [TextArea]
     public string body;
-    public bool showInForeground;
-    public PresentationOption presentationOptions;
-    public Int32 badge;
+    public bool showInForeground = false;
+    public PresentationOption presentationOptions = PresentationOption.Alert | PresentationOption.Sound;
+    public Int32 badge = -1;
     [TextArea]
-    public string data;
+    public string data = "";
 
     [Space(10)]
     [Header("Location Trigger")]
-    public float locationTriggerCenterX;
-    public float locationTriggerCenterY;
-    public float locationTriggerRadius;
-    public bool locationTriggerNotifyOnEntry;
-    public bool locationTriggerNotifyOnExit;
+    public float centerX = 0f;
+    public float centerY = 0f;
+    public float radius = 2f;
+    public bool notifyOnEntry = true;
+    public bool notifyOnExit = false;
     #endif
 }

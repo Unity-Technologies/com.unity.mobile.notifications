@@ -18,21 +18,21 @@ public class iOSNotificationTemplateTimeTrigger : ScriptableObject
     [Space(10)]
     [Header("Notification Parameters")]
     public string identifier;
-    public string categoryIdentifier;
-    public string threadIdentifier;
-    public string title;
-    public string subtitle;
+    public string categoryIdentifier = "";
+    public string threadIdentifier = "";
+    public string title = "";
+    public string subtitle = "";
     [TextArea]
-    public string body;
-    public bool showInForeground;
-    public PresentationOption presentationOptions;
-    public Int32 badge;
+    public string body = "";
+    public bool showInForeground = false;
+    public PresentationOption presentationOptions = PresentationOption.Alert | PresentationOption.Sound;
+    public Int32 badge = -1;
     [TextArea]
-    public string data;
+    public string data = "";
 
     [Space(10)]
     [Header("Time Trigger")]
     public Int32 timeTriggerInterval;
-    public bool repeats;
+    public bool repeats = false;
     #endif
 }

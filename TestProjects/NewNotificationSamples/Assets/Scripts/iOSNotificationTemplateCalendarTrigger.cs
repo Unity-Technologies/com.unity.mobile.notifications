@@ -18,25 +18,26 @@ public class iOSNotificationTemplateCalendarTrigger : ScriptableObject
     [Space(10)]
     [Header("Notification Parameters")]
     public string identifier;
-    public string categoryIdentifier;
-    public string threadIdentifier;
-    public string title;
-    public string subtitle;
+    public string categoryIdentifier = "";
+    public string threadIdentifier = "";
+    public string title = "";
+    public string subtitle = "";
     [TextArea]
-    public string body;
-    public bool showInForeground;
-    public PresentationOption presentationOptions;
-    public Int32 badge;
+    public string body = "";
+    public bool showInForeground = false;
+    public PresentationOption presentationOptions = PresentationOption.Alert | PresentationOption.Sound;
+    public Int32 badge = -1;
     [TextArea]
-    public string data;
+    public string data = "";
 
     [Space(10)]
     [Header("Calendar Trigger")]
-    public Int32 calendarTriggerYear;
-    public Int32 calendarTriggerMonth;
-    public Int32 calendarTriggerDay;
-    public Int32 calendarTriggerHour;
-    public Int32 calendarTriggerMinute;
-    public Int32 calendarTriggerSecond;
+    public bool offsetFromCurrentDate = false;
+    public Int32 year = -1;
+    public Int32 month = -1;
+    public Int32 day = -1;
+    public Int32 hour = -1;
+    public Int32 minute = -1;
+    public Int32 second = -1;
     #endif
 }

@@ -79,11 +79,9 @@ public class Logger
     {
         foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties().Where(property => property.GetGetMethod() != null))
         {
-            string value = $"{propertyInfo.GetValue(obj, null)}";
-            if (!string.IsNullOrEmpty(value))
-            {
-                Blue($"{propertyInfo.Name}: {propertyInfo.GetValue(obj, null)}", tabs);
-            }
+            object value = propertyInfo.GetValue(obj, null);
+            if (string.IsNullOrEmpty($"{value}") || string.IsNullOrWhiteSpace($"{value}")) continue; // Skip empty values
+            Blue($"{propertyInfo.Name}: {value}", tabs);
         }
         return this;
     }

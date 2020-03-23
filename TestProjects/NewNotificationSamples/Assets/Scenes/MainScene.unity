@@ -360,6 +360,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -434,6 +435,7 @@ MonoBehaviour:
   m_Color: {r: 0.7686275, g: 0.7686275, b: 0.7686275, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -677,6 +679,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -879,6 +882,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -968,6 +972,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1042,6 +1047,7 @@ MonoBehaviour:
   m_Color: {r: 0.9411765, g: 0.9411765, b: 0.627451, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1267,6 +1273,7 @@ MonoBehaviour:
   m_Color: {r: 0, g: 0, b: 0, a: 0.392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1380,7 +1387,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iOSNotificationsTimeTriggered:
-  - {fileID: 11400000, guid: cb5e5de4a20584a4e80626d92e190d5b, type: 2}
+  - {fileID: 11400000, guid: b8695228805964611abd404c2b03cd5c, type: 2}
+  - {fileID: 11400000, guid: 92811212f822b4165a7c7d47e62ebce9, type: 2}
+  - {fileID: 11400000, guid: 0cdda8d058a894e909d9add3796ee2bc, type: 2}
+  - {fileID: 11400000, guid: c455ea39a42354e1daa00cd3ffc9c5ad, type: 2}
+  - {fileID: 11400000, guid: cf9f84d3602484a2c826fddee01a5882, type: 2}
+  - {fileID: 11400000, guid: c8da6151286964ec5bc4109b746817a4, type: 2}
+  - {fileID: 11400000, guid: 0cc2175be908c42b8a182363779a1b45, type: 2}
+  - {fileID: 11400000, guid: 0fe0fe0c9a8a0435d83f1706ee1b3744, type: 2}
+  - {fileID: 11400000, guid: a058af3001530499fbcec4463645a9a6, type: 2}
+  - {fileID: 11400000, guid: aaf2e5a75e47d4e12bb84443e9b91d1f, type: 2}
+  - {fileID: 11400000, guid: ea61b2def7c9f432891487ad0a6de606, type: 2}
+  - {fileID: 11400000, guid: cd39fbbad02214955a447b80740cc19e, type: 2}
+  - {fileID: 11400000, guid: 95f17ee16f8e4478ca284fb4dbc075bd, type: 2}
+  - {fileID: 11400000, guid: 37565e0ab2c8e47e68f1a67765f3fd4f, type: 2}
+  - {fileID: 11400000, guid: 103d4eb3e544d45a5ac65c4da63516fe, type: 2}
   iOSNotificationsCalendarTriggered:
   - {fileID: 11400000, guid: d7adbb5e831754100b3dac2a7e3320bc, type: 2}
   iOSNotificationsLocationTriggered:
@@ -1587,6 +1608,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1742,6 +1764,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1849,6 +1872,7 @@ MonoBehaviour:
   m_Color: {r: 0, g: 0, b: 0, a: 0.392}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1923,6 +1947,7 @@ MonoBehaviour:
   m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2065,6 +2090,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

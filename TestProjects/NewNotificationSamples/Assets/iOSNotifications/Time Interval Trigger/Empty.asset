@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
-  m_Name: New IOS Notification Template Time Trigger
+  m_Name: Empty
   m_EditorClassIdentifier: 
-  buttonName: Send A Notification (Time Trigger)
+  buttonName: Empty notification
   identifier: 
   categoryIdentifier: 
   threadIdentifier: 
   title: 
   subtitle: 
   body: 
-  showInForeground: 0
-  presentationOption: 0
-  badge: 0
+  showInForeground: 1
+  presentationOptions: 6
+  badge: -1
   data: 
-  timeTriggerInterval: 0
+  timeTriggerInterval: 1
   repeats: 0
