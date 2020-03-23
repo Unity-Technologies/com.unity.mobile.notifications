@@ -7,8 +7,8 @@ using Unity.Notifications.iOS;
 
 namespace Unity.Notifications
 {
-    [CustomEditor(typeof(UnityNotificationEditorManager))]
-    class UnityNotificationsEditorManagerEditor : Editor
+    [CustomEditor(typeof(NotificationSettingsManager))]
+    class NotificationSettingsManagerEditor : Editor
     {
         internal delegate void ChangedCallbackDelegate(ReorderableList list);
         internal ChangedCallbackDelegate onChangedCallback = null;
@@ -32,7 +32,7 @@ namespace Unity.Notifications
 
         private Vector2 m_ScrollViewStart;
 
-        private UnityNotificationEditorManager manager;
+        private NotificationSettingsManager manager;
 
         public string[] toolbarStrings = new string[] {"Android", "iOS"};
 
@@ -46,7 +46,7 @@ namespace Unity.Notifications
         [SettingsProvider]
         static SettingsProvider CreateMobileNotificationsSettingsProvider()
         {
-            var settingsAsset = UnityNotificationEditorManager.Initialize();
+            var settingsAsset = NotificationSettingsManager.Initialize();
 
             if (settingsAsset != null)
             {
@@ -64,7 +64,7 @@ namespace Unity.Notifications
 
         void OnEnable()
         {
-            manager = UnityNotificationEditorManager.Initialize();
+            manager = NotificationSettingsManager.Initialize();
             manager.CustomEditor = this;
 
             if (target == null)
@@ -157,7 +157,7 @@ namespace Unity.Notifications
 
         DrawableResourceData GetElementData(int index)
         {
-            var res = UnityNotificationEditorManager.Initialize().TrackedResourceAssets;
+            var res = NotificationSettingsManager.Initialize().TrackedResourceAssets;
             if (index < res.Count)
                 return res[index];
             return null;
@@ -380,7 +380,7 @@ namespace Unity.Notifications
             if (manager.toolbarInt == 0)
             {
                 var settingsPanelRect = bodyRect;
-                var settings = manager.AndroidNotificationEditorSettings;
+                var settings = manager.AndroidNotificationSettings;
                 if (settings == null)
                     return;
 
@@ -408,7 +408,7 @@ namespace Unity.Notifications
             {
                 var settingsPanelRect = bodyRect;
 
-                var settings = manager.iOSNotificationEditorSettings;
+                var settings = manager.iOSNotificationSettings;
                 if (settings == null)
                     return;
 
@@ -431,7 +431,7 @@ namespace Unity.Notifications
                 GUI.EndScrollView();
         }
 
-        private void DrawSettingsElementList(BuildTargetGroup target, List<NotificationEditorSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
+        private void DrawSettingsElementList(BuildTargetGroup target, List<NotificationSetting> settings, bool disabled, GUIStyle  styleToggle, GUIStyle  styleDropwDown, Rect rect, int layer = 0)
         {
             foreach (var setting in settings)
             {
@@ -459,16 +459,16 @@ namespace Unity.Notifications
                 else if (setting.val.GetType() == typeof(PresentationOption))
                 {
                     setting.val =
-                        (PresentationOption)EditorGUILayout.EnumFlagsField((PresentationOptionEditor)setting.val, styleDropwDown);
-                    if ((int)(PresentationOptionEditor)setting.val == 0)
-                        setting.val = (PresentationOption)PresentationOptionEditor.All;
+                        (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.val, styleDropwDown);
+                    if ((int)(iOSPresentationOption)setting.val == 0)
+                        setting.val = (PresentationOption)iOSPresentationOption.All;
                 }
                 else if (setting.val.GetType() == typeof(AuthorizationOption))
                 {
                     setting.val =
-                        (AuthorizationOption)EditorGUILayout.EnumFlagsField((AuthorizationOptionEditor)setting.val, styleDropwDown);
-                    if ((int)(AuthorizationOptionEditor)setting.val == 0)
-                        setting.val = (AuthorizationOption)AuthorizationOptionEditor.All;
+                        (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.val, styleDropwDown);
+                    if ((int)(iOSAuthorizationOption)setting.val == 0)
+                        setting.val = (AuthorizationOption)iOSAuthorizationOption.All;
                 }
 
                 EditorGUILayout.EndHorizontal();
@@ -491,7 +491,7 @@ namespace Unity.Notifications
                     {
                         foreach (var requiredSettingKey in setting.requiredSettings)
                         {
-                            var requiredSetting = manager.iOSNotificationEditorSettings.Find(s => s.key == requiredSettingKey);
+                            var requiredSetting = manager.iOSNotificationSettings.Find(s => s.key == requiredSettingKey);
                             if (requiredSetting != null)
                             {
                                 requiredSetting.val = setting.val;

@@ -11,23 +11,23 @@ using Unity.Notifications.iOS;
 namespace Unity.Notifications
 {
     [HelpURL("Packages/com.unity.mobile.notifications/documentation.html")]
-    internal class UnityNotificationEditorManager : ScriptableObject
+    internal class NotificationSettingsManager : ScriptableObject
     {
         internal const string ASSET_PATH = "Editor/com.unity.mobile.notifications/NotificationSettings.asset";
 
         [SerializeField]
         public int toolbarInt = 0;
 
-        public List<NotificationEditorSetting> iOSNotificationEditorSettings;
-        public List<NotificationEditorSetting> AndroidNotificationEditorSettings;
+        public List<NotificationSetting> iOSNotificationSettings;
+        public List<NotificationSetting> AndroidNotificationSettings;
 
         [SerializeField]
-        internal NotificationEditorSettingsCollection iOSNotificationEditorSettingsValues;
+        internal NotificationSettingsCollection iOSNotificationSettingsValues;
 
         [SerializeField]
-        internal NotificationEditorSettingsCollection AndroidNotificationEditorSettingsValues;
+        internal NotificationSettingsCollection AndroidNotificationSettingsValues;
 
-        private void SaveSetting(NotificationEditorSetting setting, NotificationEditorSettingsCollection values)
+        private void SaveSetting(NotificationSetting setting, NotificationSettingsCollection values)
         {
             if (!values.Contains(setting.key) || values[setting.key].ToString() != setting.val.ToString())
             {
@@ -42,23 +42,23 @@ namespace Unity.Notifications
             AssetDatabase.SaveAssets();
         }
 
-        public void SaveSetting(NotificationEditorSetting setting, BuildTargetGroup target)
+        public void SaveSetting(NotificationSetting setting, BuildTargetGroup target)
         {
             if (target == BuildTargetGroup.Android)
             {
-                this.SaveSetting(setting, AndroidNotificationEditorSettingsValues);
+                this.SaveSetting(setting, AndroidNotificationSettingsValues);
             }
             else
             {
-                this.SaveSetting(setting, iOSNotificationEditorSettingsValues);
+                this.SaveSetting(setting, iOSNotificationSettingsValues);
             }
         }
 
-        public T GetAndroidNotificationEditorSettingsValue<T>(string key, T defaultValue)
+        public T GetAndroidNotificationSettingsValue<T>(string key, T defaultValue)
         {
             try
             {
-                var val = AndroidNotificationEditorSettingsValues[key];
+                var val = AndroidNotificationSettingsValues[key];
                 if (val != null)
                     return (T)val;
             }
@@ -67,29 +67,29 @@ namespace Unity.Notifications
                 //Just return default value if it's a new setting that was not yet serialized.
             }
 
-            AndroidNotificationEditorSettingsValues[key] = defaultValue;
+            AndroidNotificationSettingsValues[key] = defaultValue;
             return defaultValue;
         }
 
-        public T GetiOSNotificationEditorSettingsValue<T>(string key, T defaultValue)
+        public T GetiOSNotificationSettingsValue<T>(string key, T defaultValue)
         {
             try
             {
-                var val = iOSNotificationEditorSettingsValues[key];
+                var val = iOSNotificationSettingsValues[key];
                 if (val != null)
                     return (T)val;
             }
             catch (InvalidCastException)
             {
-                Debug.LogWarning("Failed loading : " + key + " for type:" + defaultValue.GetType() + "Expe cted : " + iOSNotificationEditorSettingsValues[key].GetType());
+                Debug.LogWarning("Failed loading : " + key + " for type:" + defaultValue.GetType() + "Expected : " + iOSNotificationSettingsValues[key].GetType());
                 //Just return default value if it's a new setting that was not yet serialized.
             }
 
-            iOSNotificationEditorSettingsValues[key] = defaultValue;
+            iOSNotificationSettingsValues[key] = defaultValue;
             return defaultValue;
         }
 
-        private void FlattenList(List<NotificationEditorSetting> source, List<NotificationEditorSetting> target)
+        private void FlattenList(List<NotificationSetting> source, List<NotificationSetting> target)
         {
             foreach (var setting in source)
             {
@@ -102,22 +102,22 @@ namespace Unity.Notifications
             }
         }
 
-        public List<NotificationEditorSetting> iOSNotificationEditorSettingsFlat
+        public List<NotificationSetting> iOSNotificationSettingsFlat
         {
             get
             {
-                var target = new List<NotificationEditorSetting>();
-                FlattenList(iOSNotificationEditorSettings, target);
+                var target = new List<NotificationSetting>();
+                FlattenList(iOSNotificationSettings, target);
                 return target;
             }
         }
 
-        public List<NotificationEditorSetting> AndroidNotificationEditorSettingsFlat
+        public List<NotificationSetting> AndroidNotificationSettingsFlat
         {
             get
             {
-                var target = new List<NotificationEditorSetting>();
-                FlattenList(AndroidNotificationEditorSettings, target);
+                var target = new List<NotificationSetting>();
+                FlattenList(AndroidNotificationSettings, target);
                 return target;
             }
         }
@@ -143,15 +143,15 @@ namespace Unity.Notifications
             }
         }
 
-        internal static UnityNotificationEditorManager Initialize()
+        internal static NotificationSettingsManager Initialize()
         {
             var assetRelPath = Path.Combine("Assets", ASSET_PATH);
 
-            var notificationEditorManager =
-                (UnityNotificationEditorManager)AssetDatabase.LoadAssetAtPath(assetRelPath,
-                    typeof(UnityNotificationEditorManager));
+            var notificationSettingsManager =
+                (NotificationSettingsManager)AssetDatabase.LoadAssetAtPath(assetRelPath,
+                    typeof(NotificationSettingsManager));
 
-            if (notificationEditorManager == null)
+            if (notificationSettingsManager == null)
             {
                 var rootDir = Path.Combine(Application.dataPath, Path.GetDirectoryName(ASSET_PATH));
 
@@ -162,138 +162,138 @@ namespace Unity.Notifications
                 }
 
 
-                notificationEditorManager = CreateInstance<UnityNotificationEditorManager>();
+                notificationSettingsManager = CreateInstance<NotificationSettingsManager>();
 
                 if (File.Exists(assetRelPath))
                     AssetDatabase.ImportAsset(assetRelPath);
                 else
                 {
-                    AssetDatabase.CreateAsset(notificationEditorManager, assetRelPath);
+                    AssetDatabase.CreateAsset(notificationSettingsManager, assetRelPath);
                     AssetDatabase.SaveAssets();
                 }
             }
 
-            if (notificationEditorManager.iOSNotificationEditorSettingsValues == null)
+            if (notificationSettingsManager.iOSNotificationSettingsValues == null)
             {
-                notificationEditorManager.iOSNotificationEditorSettingsValues =
-                    new NotificationEditorSettingsCollection();
+                notificationSettingsManager.iOSNotificationSettingsValues =
+                    new NotificationSettingsCollection();
             }
 
-            if (notificationEditorManager.AndroidNotificationEditorSettingsValues == null)
+            if (notificationSettingsManager.AndroidNotificationSettingsValues == null)
             {
-                notificationEditorManager.AndroidNotificationEditorSettingsValues =
-                    new NotificationEditorSettingsCollection();
+                notificationSettingsManager.AndroidNotificationSettingsValues =
+                    new NotificationSettingsCollection();
             }
 
-            var iosSettings = new List<NotificationEditorSetting>()
+            var iosSettings = new List<NotificationSetting>()
             {
-                new NotificationEditorSetting(
+                new NotificationSetting(
                     "UnityNotificationRequestAuthorizationOnAppLaunch",
                     "Request Authorization on App Launch",
                     "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorization pop-up immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
-                    notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
                         "UnityNotificationRequestAuthorizationOnAppLaunch", true),
-                    dependentSettings: new List<NotificationEditorSetting>()
+                    dependentSettings: new List<NotificationSetting>()
                     {
-                        new NotificationEditorSetting(
+                        new NotificationSetting(
                             "UnityNotificationDefaultAuthorizationOptions",
                             "Default Notification Authorization Options",
                             "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Alternatively you can specify them when creating a `AuthorizationRequest` from a script.",
-                            notificationEditorManager.GetiOSNotificationEditorSettingsValue<AuthorizationOption>(
+                            notificationSettingsManager.GetiOSNotificationSettingsValue<AuthorizationOption>(
                                 "UnityNotificationDefaultAuthorizationOptions",
                                 (AuthorizationOption)AuthorizationOption.Alert | AuthorizationOption.Badge |
                                 AuthorizationOption.Sound)
                         ),
                     }),
 
-                new NotificationEditorSetting(
+                new NotificationSetting(
                     "UnityAddRemoteNotificationCapability",
                     "Enable Push Notifications",
                     "Enable this to add the push notification capability to you Xcode project.",
-                    notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
                         "UnityAddRemoteNotificationCapability", false),
                     false,
-                    dependentSettings: new List<NotificationEditorSetting>()
+                    dependentSettings: new List<NotificationSetting>()
                     {
-                        new NotificationEditorSetting(
+                        new NotificationSetting(
                             "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
                             "Register for Push Notifications on App Launch",
                             "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
-                            notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                            notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
                                 "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
                                 false)
                         ),
-                        new NotificationEditorSetting(
+                        new NotificationSetting(
                             "UnityRemoteNotificationForegroundPresentationOptions",
                             "Remote Notification Foreground Presentation Options",
                             "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorization to use them (the user might change it at any time). ",
-                            notificationEditorManager
-                                .GetiOSNotificationEditorSettingsValue<PresentationOption>(
+                            notificationSettingsManager
+                                .GetiOSNotificationSettingsValue<PresentationOption>(
                                 "UnityRemoteNotificationForegroundPresentationOptions",
-                                (PresentationOption)PresentationOptionEditor.All)
+                                (PresentationOption)iOSPresentationOption.All)
                         ),
-                        new NotificationEditorSetting("UnityUseAPSReleaseEnvironment",
+                        new NotificationSetting("UnityUseAPSReleaseEnvironment",
                             "Enable release environment for APS",
                             "Enable this when signing the app with a production certificate.",
-                            notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                            notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
                                 "UnityUseAPSReleaseEnvironment", false),
                             false),
                     }
                 ),
 
-                new NotificationEditorSetting("UnityUseLocationNotificationTrigger",
+                new NotificationSetting("UnityUseLocationNotificationTrigger",
                     "Include CoreLocation framework",
                     "If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.",
-                    notificationEditorManager.GetiOSNotificationEditorSettingsValue<bool>(
+                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
                         "UnityUseLocationNotificationTrigger", false),
                     false)
             };
 
 
-            if (notificationEditorManager.iOSNotificationEditorSettings == null ||
-                notificationEditorManager.iOSNotificationEditorSettings.Count != iosSettings.Count)
+            if (notificationSettingsManager.iOSNotificationSettings == null ||
+                notificationSettingsManager.iOSNotificationSettings.Count != iosSettings.Count)
             {
-                notificationEditorManager.iOSNotificationEditorSettings = iosSettings;
+                notificationSettingsManager.iOSNotificationSettings = iosSettings;
             }
 
 
-            var androidSettings = new List<NotificationEditorSetting>()
+            var androidSettings = new List<NotificationSetting>()
             {
-                new NotificationEditorSetting(
+                new NotificationSetting(
                     "UnityNotificationAndroidRescheduleOnDeviceRestart",
                     "Reschedule Notifications on Device Restart",
                     "By default AndroidSettings removes all scheduled notifications when the device is restarted. Enable this to automatically reschedule all non expired notifications when the device is turned back on.",
-                    notificationEditorManager.GetAndroidNotificationEditorSettingsValue<bool>(
+                    notificationSettingsManager.GetAndroidNotificationSettingsValue<bool>(
                         "UnityNotificationAndroidRescheduleOnDeviceRestart", false),
                     dependentSettings: null),
 
-                new NotificationEditorSetting(
+                new NotificationSetting(
                     "UnityNotificationAndroidUseCustomActivity",
                     "Use Custom AndroidActivity",
                     "Enable this if you want to override the activity which will opened when the user click on the notification. By default activity assigned to `com.unity3d.player.UnityPlayer.currentActivity` will be used.",
-                    notificationEditorManager.GetAndroidNotificationEditorSettingsValue<bool>(
+                    notificationSettingsManager.GetAndroidNotificationSettingsValue<bool>(
                         "UnityNotificationAndroidUseCustomActivity", false),
-                    dependentSettings: new List<NotificationEditorSetting>()
+                    dependentSettings: new List<NotificationSetting>()
                     {
-                        new NotificationEditorSetting(
+                        new NotificationSetting(
                             "UnityNotificationAndroidCustomActivityString",
                             "Custom Android Activity Name",
                             "The full class name of the activity that you wish to be assigned to the notification.",
-                            notificationEditorManager.GetAndroidNotificationEditorSettingsValue<string>(
+                            notificationSettingsManager.GetAndroidNotificationSettingsValue<string>(
                                 "UnityNotificationAndroidCustomActivityString",
                                 "com.unity3d.player.UnityPlayerActivity"),
                             dependentSettings: null
                         ),
                     }),
             };
-            if (notificationEditorManager.AndroidNotificationEditorSettings == null ||
-                notificationEditorManager.AndroidNotificationEditorSettings.Count != androidSettings.Count)
+            if (notificationSettingsManager.AndroidNotificationSettings == null ||
+                notificationSettingsManager.AndroidNotificationSettings.Count != androidSettings.Count)
             {
-                notificationEditorManager.AndroidNotificationEditorSettings = androidSettings;
+                notificationSettingsManager.AndroidNotificationSettings = androidSettings;
             }
 
-            EditorUtility.SetDirty(notificationEditorManager);
-            return notificationEditorManager;
+            EditorUtility.SetDirty(notificationSettingsManager);
+            return notificationSettingsManager;
         }
 
         internal void RegisterDrawableResource(string id, Texture2D image, NotificationIconType type)

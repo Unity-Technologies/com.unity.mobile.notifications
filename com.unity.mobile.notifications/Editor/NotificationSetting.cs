@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Unity.Notifications
 {
-    internal class NotificationEditorSetting
+    internal class NotificationSetting
     {
         public string key;
         public string label;
@@ -10,11 +10,11 @@ namespace Unity.Notifications
         public object val;
         public bool writeToPlist;
 
-        public List<NotificationEditorSetting> dependentSettings;
+        public List<NotificationSetting> dependentSettings;
         public List<string> requiredSettings;
 
-        public NotificationEditorSetting(string key, string label, string tooltip, object val, bool writeToPlist = true,
-                                         List<NotificationEditorSetting> dependentSettings = null, List<string> requiredSettings = null)
+        public NotificationSetting(string key, string label, string tooltip, object val, bool writeToPlist = true,
+                                   List<NotificationSetting> dependentSettings = null, List<string> requiredSettings = null)
         {
             this.key = key;
             this.label = label;

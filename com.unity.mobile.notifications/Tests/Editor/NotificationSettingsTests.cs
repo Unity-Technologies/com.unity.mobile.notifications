@@ -8,40 +8,40 @@ namespace Unity.Notifications.Tests
         [OneTimeSetUp]
         public void ResetSettings()
         {
-            UnityNotificationEditorManager.DeleteSettings();
+            NotificationSettingsManager.DeleteSettings();
         }
 
         [Test]
         public void SetAndroidNotifcationSettings_Works()
         {
-            UnityNotificationSettings.AndroidSettings.CustomActivityString = "com.test.dummy.activity";
-            UnityNotificationSettings.AndroidSettings.UseCustomActivity = true;
-            UnityNotificationSettings.AndroidSettings.RescheduleOnDeviceRestart = true;
+            NotificationSettings.AndroidSettings.CustomActivityString = "com.test.dummy.activity";
+            NotificationSettings.AndroidSettings.UseCustomActivity = true;
+            NotificationSettings.AndroidSettings.RescheduleOnDeviceRestart = true;
 
-            Assert.AreEqual("com.test.dummy.activity", UnityNotificationSettings.AndroidSettings.CustomActivityString);
-            Assert.IsTrue(UnityNotificationSettings.AndroidSettings.UseCustomActivity);
-            Assert.IsTrue(UnityNotificationSettings.AndroidSettings.RescheduleOnDeviceRestart);
+            Assert.AreEqual("com.test.dummy.activity", NotificationSettings.AndroidSettings.CustomActivityString);
+            Assert.IsTrue(NotificationSettings.AndroidSettings.UseCustomActivity);
+            Assert.IsTrue(NotificationSettings.AndroidSettings.RescheduleOnDeviceRestart);
         }
 
         [Test]
         public void SetiOSNotifcationSettings_Works()
         {
-            UnityNotificationSettings.iOSSettings.AddRemoteNotificationCapability = true;
-            UnityNotificationSettings.iOSSettings.DefaultAuthorizationOptions = PresentationOption.Alert;
-            UnityNotificationSettings.iOSSettings.UseLocationNotificationTrigger = true;
-            UnityNotificationSettings.iOSSettings.UseAPSReleaseEnvironment = true;
-            UnityNotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions = PresentationOption.Alert;
-            UnityNotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch = true;
-            UnityNotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch = true;
+            NotificationSettings.iOSSettings.AddRemoteNotificationCapability = true;
+            NotificationSettings.iOSSettings.DefaultAuthorizationOptions = PresentationOption.Alert;
+            NotificationSettings.iOSSettings.UseLocationNotificationTrigger = true;
+            NotificationSettings.iOSSettings.UseAPSReleaseEnvironment = true;
+            NotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions = PresentationOption.Alert;
+            NotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch = true;
+            NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch = true;
 
-            Assert.IsTrue(UnityNotificationSettings.iOSSettings.AddRemoteNotificationCapability);
-            Assert.IsTrue(UnityNotificationSettings.iOSSettings.UseLocationNotificationTrigger);
-            Assert.IsTrue(UnityNotificationSettings.iOSSettings.UseAPSReleaseEnvironment);
-            Assert.IsTrue(UnityNotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch);
-            Assert.IsTrue(UnityNotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch);
+            Assert.IsTrue(NotificationSettings.iOSSettings.AddRemoteNotificationCapability);
+            Assert.IsTrue(NotificationSettings.iOSSettings.UseLocationNotificationTrigger);
+            Assert.IsTrue(NotificationSettings.iOSSettings.UseAPSReleaseEnvironment);
+            Assert.IsTrue(NotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch);
+            Assert.IsTrue(NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch);
 
-            Assert.AreEqual(PresentationOption.Alert, UnityNotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions);
-            Assert.AreEqual(PresentationOption.Alert, UnityNotificationSettings.iOSSettings.DefaultAuthorizationOptions);
+            Assert.AreEqual(PresentationOption.Alert, NotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions);
+            Assert.AreEqual(PresentationOption.Alert, NotificationSettings.iOSSettings.DefaultAuthorizationOptions);
         }
     }
 }

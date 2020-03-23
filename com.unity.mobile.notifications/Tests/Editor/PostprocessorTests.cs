@@ -71,7 +71,7 @@ namespace Unity.Notifications.Tests
             xmlDoc.LoadXml(sourceXmlContent);
 
 
-            AndroidNotificationResourcesPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "reschedule_notifications_on_restart", "true");
+            AndroidNotificationPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "reschedule_notifications_on_restart", "true");
 
             XmlDocument targetXmlDoc = new XmlDocument();
             targetXmlDoc.LoadXml(targetXmlContent);
@@ -138,7 +138,7 @@ namespace Unity.Notifications.Tests
             xmlDoc.LoadXml(sourceXmlContent);
 
 
-            AndroidNotificationResourcesPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "reschedule_notifications_on_restart", "true");
+            AndroidNotificationPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "reschedule_notifications_on_restart", "true");
 
             XmlDocument targetXmlDoc = new XmlDocument();
             targetXmlDoc.LoadXml(targetXmlContent);
@@ -204,7 +204,7 @@ namespace Unity.Notifications.Tests
             xmlDoc.LoadXml(sourceXmlContent);
 
 
-            AndroidNotificationResourcesPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "reschedule_notifications_on_restart", "true");
+            AndroidNotificationPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "reschedule_notifications_on_restart", "true");
 
             XmlDocument targetXmlDoc = new XmlDocument();
             targetXmlDoc.LoadXml(targetXmlContent);
@@ -272,7 +272,7 @@ namespace Unity.Notifications.Tests
             xmlDoc.LoadXml(sourceXmlContent);
 
 
-            AndroidNotificationResourcesPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "do_something", "true");
+            AndroidNotificationPostProcessor.AppendAndroidMetadataField(null, xmlDoc, "do_something", "true");
 
             XmlDocument targetXmlDoc = new XmlDocument();
             targetXmlDoc.LoadXml(targetXmlContent);
@@ -340,7 +340,7 @@ namespace Unity.Notifications.Tests
             xmlDoc.LoadXml(sourceXmlContent);
 
 
-            AndroidNotificationResourcesPostProcessor.AppendAndroidPermissionField(null, xmlDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
+            AndroidNotificationPostProcessor.AppendAndroidPermissionField(null, xmlDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
 
             XmlDocument targetXmlDoc = new XmlDocument();
             targetXmlDoc.LoadXml(targetXmlContent);
@@ -409,7 +409,7 @@ namespace Unity.Notifications.Tests
             xmlDoc.LoadXml(sourceXmlContent);
 
 
-            AndroidNotificationResourcesPostProcessor.AppendAndroidPermissionField(null, xmlDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
+            AndroidNotificationPostProcessor.AppendAndroidPermissionField(null, xmlDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
 
             XmlDocument targetXmlDoc = new XmlDocument();
             targetXmlDoc.LoadXml(targetXmlContent);
