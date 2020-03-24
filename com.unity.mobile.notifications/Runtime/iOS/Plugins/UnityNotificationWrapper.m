@@ -99,7 +99,7 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
     NSDictionary *userInfo = @{
         @"showInForeground": @(data->showInForeground),
         @"showInForegroundPresentationOptions": [NSNumber numberWithInteger: data->showInForegroundPresentationOptions],
-        @"data": @(data->data),
+        @"data": @(data->data ? data->data : ""),
     };
 
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
