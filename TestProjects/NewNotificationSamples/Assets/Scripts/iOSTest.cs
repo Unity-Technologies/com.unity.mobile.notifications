@@ -45,52 +45,32 @@ public class iOSTest : MonoBehaviour
 
     void OnNotificationReceivedHandler(iOSNotification notification)
     {
-        // Update badge with the number of delivered notifications
-        // This probably needs a separate method - sending a notification just to update the badge is weird
-        if (notification.Data != "IGNORE")
-        {
-            LOGGER
-                .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received a local notification")
-                .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
-                .Properties(notification, 1);
-            iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
-
-            /* LOGGER
-                .Separator()
-                .Orange($"Rescheduling local notification to be sent in 15 seconds", 1);
-            notification.Trigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 15) };
-            iOSNotificationCenter.ScheduleNotification(notification); */
-        }
+        LOGGER
+            .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received a notification")
+            .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
+            .Properties(notification, 1);
+        // Update badge
+        iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
     }
     
     void OnRemoteNotificationReceivedHandler(iOSNotification notification)
     {
-        Debug.Log(notification.Title);
-        // iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
-        /* LOGGER
+        LOGGER
             .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received a remote notification")
             .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
+            .Red($"It will not show up in foreground and it will trigger OnNotificationReceived callback, that is by design")
             .Properties(notification, 1);
+        // Application still receives OnNotificationReceived callback which updates the badge
+        // iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
 
-        LOGGER
+        // If we want to show this remote notification in foreground, we have to reschedule it locally
+        /* LOGGER
             .Separator()
-            .Orange($"Rescheduling remote notification to be sent in 10 seconds", 1);
-        iOSNotificationTimeIntervalTrigger newTrigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 10) };
-        Debug.Log(notification.Title);
-        iOSNotification newNotification = new iOSNotification()
-        {
-            Title = "TITLE", // notification.Title,
-            // Body =  notification.Body,
-            // Subtitle = notification.Subtitle,
-            ShowInForeground = true,
-            ForegroundPresentationOption = PresentationOption.Sound | PresentationOption.Alert,
-            // CategoryIdentifier = notification.CategoryIdentifier,
-            // ThreadIdentifier = notification.ThreadIdentifier,
-            Trigger = newTrigger,
-            Data = "IGNORE"
-        };
-        iOSNotificationCenter.ScheduleNotification(newNotification);
-        // iOSNotificationCenter.ScheduleNotification(notification); // Crashes */
+            .Orange($"Rescheduling remote notification to be sent in 1 second", 1);
+        iOSNotificationTimeIntervalTrigger newTrigger = new iOSNotificationTimeIntervalTrigger(){ TimeInterval = new TimeSpan(0, 0, 1) };
+        notification.Trigger = newTrigger;
+        notification.ShowInForeground = true;
+        iOSNotificationCenter.ScheduleNotification(notification); */
     }
 
     void Start()
@@ -154,7 +134,7 @@ public class iOSTest : MonoBehaviour
         groups["General"]["List Delivered Notifications"] = new Action(() => {
             ListDeliveredNotifications();
         });
-        groups["Other"]["Remove First Notification In Scheduled List By ID"] = new Action(() => {
+        groups["General"]["Remove First Notification In Scheduled List By ID"] = new Action(() => {
             RemoveFirstNotificationInListById();
         });
         groups["General"]["Clear the badge"] = new Action(() => {
