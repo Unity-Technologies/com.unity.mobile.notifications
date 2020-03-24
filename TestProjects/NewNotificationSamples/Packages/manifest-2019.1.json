@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "com.unity.mobile.notifications": "file:../../../com.unity.mobile.notifications",
+    "com.unity.modules.ui": "1.0.0"
+  },
+  "testables": [
+    "com.unity.mobile.notifications"
+  ]
+}
