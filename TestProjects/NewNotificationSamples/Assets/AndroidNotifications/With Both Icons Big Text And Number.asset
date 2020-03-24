@@ -16,9 +16,8 @@ MonoBehaviour:
   channel: default_channel
   fireInSeconds: 5
   title: Example Notification
-  text: This notification was supposed to be fired in 5 seconds, it also happens
-    to have Notification Style set to "Big Text Style", which means it should be
-    expandable
+  text: This notification was supposed to be fired in 5 seconds, it also happens to
+    have Notification Style set to "Big Text Style", which means it should be expandable
   smallIcon: icon_0
   largeIcon: icon_1
   notificationStyle: 2
@@ -31,4 +30,5 @@ MonoBehaviour:
   groupAlertBehaviours: 0
   sortKey: 
   intentData: Arbitrary Data
-  showTimestamp: 1
+  showTimestamp: 0
+  customTimestamp: 1/1/1970 12:00:00 AM

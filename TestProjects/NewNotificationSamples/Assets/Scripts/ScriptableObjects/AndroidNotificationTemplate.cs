@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,22 +19,22 @@ public class AndroidNotificationTemplate : ScriptableObject
 
     [Space(10)]
     [Header("Notification Parameters")]
-    public string title;
+    public string title = "";
     [TextArea]
-    public string text;
-    public string smallIcon;
-    public string largeIcon;
-    public NotificationStyle notificationStyle;
-    public Color color;
-    public int number;
-    public bool shouldAutoCancel;
-    public bool usesStopWatch;
-    public string group;
+    public string text = "";
+    public string smallIcon = "";
+    public string largeIcon = "";
+    public NotificationStyle notificationStyle = NotificationStyle.None;
+    public Color color = Color.black;
+    public int number = -1;
+    public bool shouldAutoCancel = false;
+    public bool usesStopWatch = false;
+    public string group = "";
     public bool groupSummary;
-    public GroupAlertBehaviours groupAlertBehaviours;
-    public string sortKey;
+    public GroupAlertBehaviours groupAlertBehaviours = GroupAlertBehaviours.GroupAlertAll;
+    public string sortKey = "";
     [TextArea]
-    public string intentData;
-    public bool showTimestamp;
+    public string intentData = "";
+    public bool showTimestamp = false;
     #endif
 }

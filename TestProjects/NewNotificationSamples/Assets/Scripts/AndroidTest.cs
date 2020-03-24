@@ -89,11 +89,11 @@ public class AndroidTest : MonoBehaviour
         groups["General"] = new OrderedDictionary();
         groups["General"]["Clear Log"] = new Action(() => { LOGGER.Clear(); });
 
-        groups["Generated"] = new OrderedDictionary();
+        groups["Send"] = new OrderedDictionary();
         foreach (AndroidNotificationTemplate template in androidNotifications)
         {
             if (template == null) continue;
-            groups["Generated"][$"[{template.fireInSeconds}s] {template.buttonName}"] = new Action(() => {
+            groups["Send"][$"[{template.fireInSeconds}s] {template.buttonName}"] = new Action(() => {
                 SendNotification(
                     new AndroidNotification()
                     {
@@ -117,128 +117,6 @@ public class AndroidTest : MonoBehaviour
                 );
             });
         }
-
-        groups["Send"] = new OrderedDictionary();
-        groups["Send"]["Send Simple Notification in 1 second\n(default_channel)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Example Notification",
-                    Text = $"Seconds: 1",
-                    FireTime = System.DateTime.Now.AddSeconds(1),
-                    IntentData = "Arbitrary Intent Data",
-                    Color = Color.yellow
-                },
-                "default_channel"
-            );
-        });
-        groups["Send"]["Send Simple Notification in 5 seconds\n(secondary_channel)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Example Notification",
-                    Text = $"Seconds: 5",
-                    FireTime = System.DateTime.Now.AddSeconds(5),
-                    IntentData = "Arbitrary Intent Data",
-                    Color = Color.green
-                },
-                "secondary_channel"
-            );
-        });
-        groups["Send"]["Send Fancy Notification in 10 seconds\n(fancy_channel)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Fancy Notification",
-                    Text = $"Seconds: 10",
-                    FireTime = System.DateTime.Now.AddSeconds(10),
-                    IntentData = "Arbitrary Intent Data, But Fancy",
-                    Color = Color.red,
-                    UsesStopwatch = true,
-                    Number = 4,
-                    SmallIcon = "icon_0",
-                    LargeIcon = "icon_1"
-                },
-                "fancy_channel"
-            );
-        });
-        groups["Send"]["Send Fancy Notification in 120 seconds\n(default_channel)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Fancy Notification",
-                    Text = $"Seconds: 10",
-                    FireTime = System.DateTime.Now.AddSeconds(10),
-                    IntentData = "Arbitrary Intent Data, But Fancy",
-                    Color = Color.red,
-                    UsesStopwatch = true,
-                    Number = 4,
-                    SmallIcon = "icon_0",
-                    LargeIcon = "icon_1"
-                },
-                "fancy_channel"
-            );
-        });
-        groups["Send"]["Send Group Notification in 3 seconds\n(default_channel, group_a)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Group \"A\" Notification",
-                    Text = $"Seconds: 3",
-                    FireTime = System.DateTime.Now.AddSeconds(3),
-                    IntentData = "Arbitrary Intent Data Of A Group Notification",
-                    Color = Color.magenta,
-                    Group = "group_a",
-                    GroupSummary = false
-                },
-                "default_channel"
-            );
-        });
-        groups["Send"]["Send Group Summary Notification in 3 seconds\n(default_channel, group_a)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Group \"A\" Notification",
-                    Text = $"Seconds: 3",
-                    FireTime = System.DateTime.Now.AddSeconds(3),
-                    IntentData = "Arbitrary Intent Data Of A Group Summary Notification",
-                    Color = Color.magenta,
-                    Group = "group_a",
-                    GroupSummary = true
-                },
-                "default_channel"
-            );
-        });
-        groups["Send"]["Send Group Notification in 3 seconds\n(default_channel, group_b)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Group \"B\" Notification",
-                    Text = $"Seconds: 3",
-                    FireTime = System.DateTime.Now.AddSeconds(3),
-                    IntentData = "Arbitrary Intent Data Of A Group Notification",
-                    Color = Color.cyan,
-                    Group = "group_b",
-                    GroupSummary = false
-                },
-                "default_channel"
-            );
-        });
-        groups["Send"]["Send Group Summary Notification in 3 seconds\n(default_channel, group_b)"] = new Action(() => {
-            SendNotification(
-                new AndroidNotification()
-                {
-                    Title = "Group \"B\" Notification",
-                    Text = $"Seconds: 3",
-                    FireTime = System.DateTime.Now.AddSeconds(3),
-                    IntentData = "Arbitrary Intent Data Of A Group Summary Notification",
-                    Color = Color.cyan,
-                    Group = "group_b",
-                    GroupSummary = true
-                },
-                "default_channel"
-            );
-        });
 
         groups["Cancellation"] = new OrderedDictionary();
         groups["Cancellation"]["Cancel all notifications"] = new Action(() => { CancelAllNotifications(); });

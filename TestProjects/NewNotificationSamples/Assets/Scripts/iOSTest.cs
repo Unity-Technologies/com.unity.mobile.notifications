@@ -175,12 +175,12 @@ public class iOSTest : MonoBehaviour
                 iOSNotificationCalendarTrigger trigger;
                 if (template.offsetFromCurrentDate) {
                     DateTime offsetDate = DateTime.Now;
-                    if (template.year > 0) offsetDate = offsetDate.AddYears(template.year);
-                    if (template.month > 0) offsetDate = offsetDate.AddMonths(template.month);
-                    if (template.day > 0) offsetDate = offsetDate.AddDays(template.day);
-                    if (template.hour > 0) offsetDate = offsetDate.AddHours(template.hour);
-                    if (template.minute > 0) offsetDate = offsetDate.AddMinutes(template.minute);
-                    if (template.second > 0) offsetDate = offsetDate.AddSeconds(template.second);
+                    if (template.year >= 0) offsetDate = offsetDate.AddYears(template.year);
+                    if (template.month >= 0) offsetDate = offsetDate.AddMonths(template.month);
+                    if (template.day >= 0) offsetDate = offsetDate.AddDays(template.day);
+                    if (template.hour >= 0) offsetDate = offsetDate.AddHours(template.hour);
+                    if (template.minute >= 0) offsetDate = offsetDate.AddMinutes(template.minute);
+                    if (template.second >= 0) offsetDate = offsetDate.AddSeconds(template.second);
                     trigger = new iOSNotificationCalendarTrigger()
                         {
                             Year = offsetDate.Year,

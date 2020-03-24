@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: With Everything + Thread B
   m_EditorClassIdentifier: 
   buttonName: Every Parameter (Thread B)
-  identifier: custom_identifier
+  identifier: 
   categoryIdentifier: category_identifier
   threadIdentifier: thread_b
-  title: Example Notification Title
+  title: Example Notification Title (B)
   subtitle: This is a subtitle
   body: And this is the body of this notification
   showInForeground: 1
