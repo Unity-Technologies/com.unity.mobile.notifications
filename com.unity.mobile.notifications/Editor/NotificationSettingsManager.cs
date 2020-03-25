@@ -147,20 +147,16 @@ namespace Unity.Notifications
         {
             var assetRelPath = Path.Combine("Assets", ASSET_PATH);
 
-            var notificationSettingsManager =
-                (NotificationSettingsManager)AssetDatabase.LoadAssetAtPath(assetRelPath,
-                    typeof(NotificationSettingsManager));
+            var notificationSettingsManager = AssetDatabase.LoadAssetAtPath<NotificationSettingsManager>(assetRelPath);
 
             if (notificationSettingsManager == null)
             {
                 var rootDir = Path.Combine(Application.dataPath, Path.GetDirectoryName(ASSET_PATH));
 
-
                 if (!Directory.Exists(rootDir))
                 {
                     Directory.CreateDirectory(rootDir);
                 }
-
 
                 notificationSettingsManager = CreateInstance<NotificationSettingsManager>();
 
@@ -175,14 +171,12 @@ namespace Unity.Notifications
 
             if (notificationSettingsManager.iOSNotificationSettingsValues == null)
             {
-                notificationSettingsManager.iOSNotificationSettingsValues =
-                    new NotificationSettingsCollection();
+                notificationSettingsManager.iOSNotificationSettingsValues = new NotificationSettingsCollection();
             }
 
             if (notificationSettingsManager.AndroidNotificationSettingsValues == null)
             {
-                notificationSettingsManager.AndroidNotificationSettingsValues =
-                    new NotificationSettingsCollection();
+                notificationSettingsManager.AndroidNotificationSettingsValues = new NotificationSettingsCollection();
             }
 
             var iosSettings = new List<NotificationSetting>()
@@ -190,65 +184,53 @@ namespace Unity.Notifications
                 new NotificationSetting(
                     "UnityNotificationRequestAuthorizationOnAppLaunch",
                     "Request Authorization on App Launch",
-                    "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorization pop-up immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.",
-                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
-                        "UnityNotificationRequestAuthorizationOnAppLaunch", true),
+                    "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the authorization pop-up will show up immediately during launching. Otherwise you need to manually create an AuthorizationRequest before sending or receiving notifications.",
+                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>("UnityNotificationRequestAuthorizationOnAppLaunch", true),
                     dependentSettings: new List<NotificationSetting>()
                     {
                         new NotificationSetting(
                             "UnityNotificationDefaultAuthorizationOptions",
                             "Default Notification Authorization Options",
-                            "Configure the notification interaction types your app will include in the authorisation request  if  “Request Authorisation on App Launch” is enabled. Alternatively you can specify them when creating a `AuthorizationRequest` from a script.",
-                            notificationSettingsManager.GetiOSNotificationSettingsValue<AuthorizationOption>(
-                                "UnityNotificationDefaultAuthorizationOptions",
-                                (AuthorizationOption)AuthorizationOption.Alert | AuthorizationOption.Badge |
-                                AuthorizationOption.Sound)
+                            "Configure the notification interaction types which will be included in the authorization request if \"Request Authorization on App Launch\" is enabled.",
+                            notificationSettingsManager.GetiOSNotificationSettingsValue<AuthorizationOption>("UnityNotificationDefaultAuthorizationOptions",
+                                AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
                         ),
                     }),
 
                 new NotificationSetting(
                     "UnityAddRemoteNotificationCapability",
                     "Enable Push Notifications",
-                    "Enable this to add the push notification capability to you Xcode project.",
-                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
-                        "UnityAddRemoteNotificationCapability", false),
+                    "Enable this to add the push notification capability to the Xcode project.",
+                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>("UnityAddRemoteNotificationCapability", false),
                     false,
                     dependentSettings: new List<NotificationSetting>()
                     {
                         new NotificationSetting(
                             "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
                             "Register for Push Notifications on App Launch",
-                            "If this is enabled the app will automatically register your app with APNs after the launch which would enable it to receive remote notifications. You’ll have to manually create a AuthorizationRequest to get the device token.",
-                            notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
-                                "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                                false)
+                            "Enable this to automatically register your app with APNs after launching to receive remote notifications. You need to manually create an AuthorizationRequest to get the device token.",
+                            notificationSettingsManager.GetiOSNotificationSettingsValue<bool>("UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false)
                         ),
                         new NotificationSetting(
                             "UnityRemoteNotificationForegroundPresentationOptions",
                             "Remote Notification Foreground Presentation Options",
-                            "The default presentation options for received remote notifications. In order for the specified presentation options to be used your app must had received the authorization to use them (the user might change it at any time). ",
-                            notificationSettingsManager
-                                .GetiOSNotificationSettingsValue<PresentationOption>(
-                                "UnityRemoteNotificationForegroundPresentationOptions",
-                                (PresentationOption)iOSPresentationOption.All)
+                            "Configure the default presentation options for received remote notifications. In order to use the specified presentation options, your app must have received the authorization (the user might change it at any time).",
+                            notificationSettingsManager.GetiOSNotificationSettingsValue("UnityRemoteNotificationForegroundPresentationOptions", (PresentationOption)iOSPresentationOption.All)
                         ),
                         new NotificationSetting("UnityUseAPSReleaseEnvironment",
-                            "Enable release environment for APS",
+                            "Enable Release Environment for APS",
                             "Enable this when signing the app with a production certificate.",
-                            notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
-                                "UnityUseAPSReleaseEnvironment", false),
+                            notificationSettingsManager.GetiOSNotificationSettingsValue<bool>("UnityUseAPSReleaseEnvironment", false),
                             false),
                     }
                 ),
 
                 new NotificationSetting("UnityUseLocationNotificationTrigger",
-                    "Include CoreLocation framework",
-                    "If you intend to use the iOSNotificationLocationTrigger in your notifications you must include the CoreLocation framework in your project.",
-                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>(
-                        "UnityUseLocationNotificationTrigger", false),
+                    "Include CoreLocation Framework",
+                    "Include the CoreLocation framework to use the iOSNotificationLocationTrigger in your project.",
+                    notificationSettingsManager.GetiOSNotificationSettingsValue<bool>("UnityUseLocationNotificationTrigger", false),
                     false)
             };
-
 
             if (notificationSettingsManager.iOSNotificationSettings == null ||
                 notificationSettingsManager.iOSNotificationSettings.Count != iosSettings.Count)
@@ -256,36 +238,31 @@ namespace Unity.Notifications
                 notificationSettingsManager.iOSNotificationSettings = iosSettings;
             }
 
-
             var androidSettings = new List<NotificationSetting>()
             {
                 new NotificationSetting(
                     "UnityNotificationAndroidRescheduleOnDeviceRestart",
-                    "Reschedule Notifications on Device Restart",
-                    "By default AndroidSettings removes all scheduled notifications when the device is restarted. Enable this to automatically reschedule all non expired notifications when the device is turned back on.",
-                    notificationSettingsManager.GetAndroidNotificationSettingsValue<bool>(
-                        "UnityNotificationAndroidRescheduleOnDeviceRestart", false),
-                    dependentSettings: null),
+                    "Reschedule on Device Restart",
+                    "Enable this to automatically reschedule all non-expired notifications after device restart. By default AndroidSettings removes all scheduled notifications after restarting.",
+                    notificationSettingsManager.GetAndroidNotificationSettingsValue<bool>("UnityNotificationAndroidRescheduleOnDeviceRestart", false)
+                ),
 
                 new NotificationSetting(
                     "UnityNotificationAndroidUseCustomActivity",
-                    "Use Custom AndroidActivity",
-                    "Enable this if you want to override the activity which will opened when the user click on the notification. By default activity assigned to `com.unity3d.player.UnityPlayer.currentActivity` will be used.",
-                    notificationSettingsManager.GetAndroidNotificationSettingsValue<bool>(
-                        "UnityNotificationAndroidUseCustomActivity", false),
+                    "Use Custom Activity",
+                    "Enable this to override the activity which will be opened when the user taps the notification.",
+                    notificationSettingsManager.GetAndroidNotificationSettingsValue<bool>("UnityNotificationAndroidUseCustomActivity", false),
                     dependentSettings: new List<NotificationSetting>()
                     {
                         new NotificationSetting(
                             "UnityNotificationAndroidCustomActivityString",
-                            "Custom Android Activity Name",
-                            "The full class name of the activity that you wish to be assigned to the notification.",
-                            notificationSettingsManager.GetAndroidNotificationSettingsValue<string>(
-                                "UnityNotificationAndroidCustomActivityString",
-                                "com.unity3d.player.UnityPlayerActivity"),
-                            dependentSettings: null
-                        ),
-                    }),
+                            "Custom Activity Name",
+                            "The full class name of the activity which will be assigned to the notification.",
+                            notificationSettingsManager.GetAndroidNotificationSettingsValue<string>("UnityNotificationAndroidCustomActivityString", "com.unity3d.player.UnityPlayerActivity")
+                        )
+                    })
             };
+
             if (notificationSettingsManager.AndroidNotificationSettings == null ||
                 notificationSettingsManager.AndroidNotificationSettings.Count != androidSettings.Count)
             {
