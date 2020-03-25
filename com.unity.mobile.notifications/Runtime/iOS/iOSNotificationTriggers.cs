@@ -86,6 +86,8 @@ namespace Unity.Notifications.iOS
             set
             {
                 timeInterval = (int)value.TotalSeconds;
+                if (timeInterval <= 0)
+                    throw new ArgumentException("Time interval must be greater than 0.");
             }
         }
         public bool Repeats { get; set; }

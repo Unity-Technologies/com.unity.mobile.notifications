@@ -398,12 +398,7 @@ namespace Unity.Notifications.Android
             notification.sortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
             notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
 
-            return new AndroidNotificationIntentData
-            {
-                id = id,
-                channel = channel,
-                notification = notification,
-            };
+            return new AndroidNotificationIntentData(id, channel, notification);
         }
 
         internal static void ReceivedNotificationCallback(AndroidJavaObject intent)

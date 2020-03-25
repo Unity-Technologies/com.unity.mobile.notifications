@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using AOT;
 using UnityEngine;
 
+#pragma warning disable 162
+
 namespace Unity.Notifications.iOS
 {
     internal class iOSNotificationsWrapper : MonoBehaviour
@@ -255,3 +257,4 @@ namespace Unity.Notifications.iOS
         }
     }
 }
+#pragma warning restore 162
