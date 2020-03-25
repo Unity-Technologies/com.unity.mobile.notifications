@@ -9,7 +9,7 @@ using UnityEngine;
 using Unity.Notifications;
 using Unity.Notifications.iOS;
 
-public class iOSNotificationPostProcess : MonoBehaviour
+public class iOSNotificationPostProcessor : MonoBehaviour
 {
     [PostProcessBuild]
     public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
@@ -38,7 +38,7 @@ public class iOSNotificationPostProcess : MonoBehaviour
                 unityFrameworkTarget = mainTarget;
             }
 
-            var settings = UnityNotificationEditorManager.Initialize().iOSNotificationEditorSettingsFlat;
+            var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
 
             var addPushNotificationCapability = (bool)settings
                 .Find(i => i.key == "UnityAddRemoteNotificationCapability").val == true;;

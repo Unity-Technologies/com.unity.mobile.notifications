@@ -5,12 +5,12 @@ using UnityEngine;
 namespace Unity.Notifications
 {
     [System.Serializable]
-    internal class NotificationEditorSettingsCollection
+    internal class NotificationSettingsCollection
     {
         [SerializeField] List<string> keys;
         [SerializeField] List<string> values;
 
-        public NotificationEditorSettingsCollection()
+        public NotificationSettingsCollection()
         {
             keys = new List<string>();
             values = new List<string>();

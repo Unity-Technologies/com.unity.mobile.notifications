@@ -3,20 +3,20 @@ using UnityEditor;
 
 namespace Unity.Notifications
 {
-    public class UnityNotificationSettings
+    public class NotificationSettings
     {
-        private static NotificationEditorSetting GetSetting(BuildTargetGroup target, string key)
+        private static NotificationSetting GetSetting(BuildTargetGroup target, string key)
         {
-            var manager = UnityNotificationEditorManager.Initialize();
+            var manager = NotificationSettingsManager.Initialize();
 
-            NotificationEditorSetting setting = null;
+            NotificationSetting setting = null;
             if (target == BuildTargetGroup.Android)
             {
-                setting = manager.AndroidNotificationEditorSettingsFlat.Find(i => i.key == key);
+                setting = manager.AndroidNotificationSettingsFlat.Find(i => i.key == key);
             }
             else if (target == BuildTargetGroup.iOS)
             {
-                setting = manager.iOSNotificationEditorSettingsFlat.Find(i => i.key == key);
+                setting = manager.iOSNotificationSettingsFlat.Find(i => i.key == key);
             }
 
             return setting;
@@ -24,9 +24,9 @@ namespace Unity.Notifications
 
         private static void SetSettingValue<T>(BuildTargetGroup target, string key, T value)
         {
-            var manager = UnityNotificationEditorManager.Initialize();
+            var manager = NotificationSettingsManager.Initialize();
 
-            NotificationEditorSetting setting = GetSetting(target, key);
+            NotificationSetting setting = GetSetting(target, key);
             if (setting != null)
             {
                 setting.val = value;
