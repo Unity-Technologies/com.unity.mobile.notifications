@@ -38,7 +38,7 @@ namespace Unity.Notifications
 
         private string infoStringAndroid =
             "Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +
-            "Small icons can only be  composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels. \n" +
+            "Small icons can only be composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels. \n" +
             "Large icons can contain any colors but must be not smaller than 192x192 pixels.";
 
 
@@ -50,10 +50,8 @@ namespace Unity.Notifications
 
             if (settingsAsset != null)
             {
-                var provider =
-                    AssetSettingsProvider.CreateProviderFromObject("Project/Mobile Notification Settings",
-                        settingsAsset);
-                provider.label = "Mobile Notification Settings";
+                var provider = AssetSettingsProvider.CreateProviderFromObject("Project/Mobile Notifications", settingsAsset);
+                provider.label = "Mobile Notifications";
                 return provider;
             }
 
@@ -95,7 +93,7 @@ namespace Unity.Notifications
 
                     var labelRect = GetContentRect(paddedRect, 0f, 3f);
 
-                    GUI.Label(labelRect, "Notification icons", EditorStyles.label);
+                    GUI.Label(labelRect, "Notification Icons", EditorStyles.label);
                 }
             };
             m_ReorderableList.onAddCallback = (list) =>
