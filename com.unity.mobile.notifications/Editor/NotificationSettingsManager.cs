@@ -184,7 +184,7 @@ namespace Unity.Notifications
                 new NotificationSetting(
                     "UnityNotificationRequestAuthorizationOnAppLaunch",
                     "Request Authorization on App Launch",
-                    "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the authorization pop-up will show immediately during launching. Otherwise you need to manually create an AuthorizationRequest before sending or receiving notifications.",
+                    "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the authorization pop-up will show up immediately during launching. Otherwise you need to manually create an AuthorizationRequest before sending or receiving notifications.",
                     notificationSettingsManager.GetiOSNotificationSettingsValue<bool>("UnityNotificationRequestAuthorizationOnAppLaunch", true),
                     dependentSettings: new List<NotificationSetting>()
                     {
@@ -214,7 +214,7 @@ namespace Unity.Notifications
                         new NotificationSetting(
                             "UnityRemoteNotificationForegroundPresentationOptions",
                             "Remote Notification Foreground Presentation Options",
-                            "Configure the default presentation options for received remote notifications. In order to use the specified presentation options, your app must have received the authorization(the user might change it at any time).",
+                            "Configure the default presentation options for received remote notifications. In order to use the specified presentation options, your app must have received the authorization (the user might change it at any time).",
                             notificationSettingsManager.GetiOSNotificationSettingsValue("UnityRemoteNotificationForegroundPresentationOptions", (PresentationOption)iOSPresentationOption.All)
                         ),
                         new NotificationSetting("UnityUseAPSReleaseEnvironment",
