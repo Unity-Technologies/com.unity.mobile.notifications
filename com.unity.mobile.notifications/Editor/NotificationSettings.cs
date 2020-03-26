@@ -29,7 +29,7 @@ namespace Unity.Notifications
             NotificationSetting setting = GetSetting(target, key);
             if (setting != null)
             {
-                setting.val = value;
+                setting.value = value;
                 manager.SaveSetting(setting, target);
             }
         }
@@ -37,7 +37,7 @@ namespace Unity.Notifications
         private static T GetSettingValue<T>(BuildTargetGroup target, string key)
         {
             var setting = GetSetting(target, key);
-            return (T)setting.val;
+            return (T)setting.value;
         }
 
         public static class AndroidSettings

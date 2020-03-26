@@ -63,7 +63,6 @@ namespace Unity.Notifications
         void OnEnable()
         {
             manager = NotificationSettingsManager.Initialize();
-            manager.CustomEditor = this;
 
             if (target == null)
                 return;
@@ -367,7 +366,7 @@ namespace Unity.Notifications
                 m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
 
             var toolBaRect = new Rect(rect.x, rect.y, rect.width, kToolbarHeight);
-            manager.toolbarInt = GUI.Toolbar(toolBaRect, manager.toolbarInt, toolbarStrings);
+            manager.ToolbarIndex = GUI.Toolbar(toolBaRect, manager.ToolbarIndex, toolbarStrings);
 
             var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
             headerMsgStyle.alignment = TextAnchor.UpperCenter;
@@ -375,7 +374,7 @@ namespace Unity.Notifications
             headerMsgStyle.wordWrap = true;
 
 
-            if (manager.toolbarInt == 0)
+            if (manager.ToolbarIndex == 0)
             {
                 var settingsPanelRect = bodyRect;
                 var settings = manager.AndroidNotificationSettings;
@@ -446,35 +445,35 @@ namespace Unity.Notifications
 
                 GUILayout.Label(new GUIContent(setting.label, setting.tooltip), styleLabel);
 
-                if (setting.val.GetType() == typeof(bool))
+                if (setting.value.GetType() == typeof(bool))
                 {
-                    setting.val = (object)EditorGUILayout.Toggle((bool)setting.val, styleToggle);
+                    setting.value = (object)EditorGUILayout.Toggle((bool)setting.value, styleToggle);
                 }
-                else if (setting.val.GetType() == typeof(string))
+                else if (setting.value.GetType() == typeof(string))
                 {
-                    setting.val = (object)EditorGUILayout.TextField((string)setting.val);
+                    setting.value = (object)EditorGUILayout.TextField((string)setting.value);
                 }
-                else if (setting.val.GetType() == typeof(PresentationOption))
+                else if (setting.value.GetType() == typeof(PresentationOption))
                 {
-                    setting.val =
-                        (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.val, styleDropwDown);
-                    if ((int)(iOSPresentationOption)setting.val == 0)
-                        setting.val = (PresentationOption)iOSPresentationOption.All;
+                    setting.value =
+                        (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.value, styleDropwDown);
+                    if ((int)(iOSPresentationOption)setting.value == 0)
+                        setting.value = (PresentationOption)iOSPresentationOption.All;
                 }
-                else if (setting.val.GetType() == typeof(AuthorizationOption))
+                else if (setting.value.GetType() == typeof(AuthorizationOption))
                 {
-                    setting.val =
-                        (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.val, styleDropwDown);
-                    if ((int)(iOSAuthorizationOption)setting.val == 0)
-                        setting.val = (AuthorizationOption)iOSAuthorizationOption.All;
+                    setting.value =
+                        (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.value, styleDropwDown);
+                    if ((int)(iOSAuthorizationOption)setting.value == 0)
+                        setting.value = (AuthorizationOption)iOSAuthorizationOption.All;
                 }
 
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
 
                 bool dependentDisabled = false;
-                if (setting.val is bool)
-                    dependentDisabled = !(bool)setting.val;
+                if (setting.value is bool)
+                    dependentDisabled = !(bool)setting.value;
 
                 if (setting.dependentSettings != null)
                 {
@@ -485,14 +484,14 @@ namespace Unity.Notifications
 
                 if (setting.requiredSettings != null && !disabled)
                 {
-                    if ((bool)setting.val)
+                    if ((bool)setting.value)
                     {
                         foreach (var requiredSettingKey in setting.requiredSettings)
                         {
                             var requiredSetting = manager.iOSNotificationSettings.Find(s => s.key == requiredSettingKey);
                             if (requiredSetting != null)
                             {
-                                requiredSetting.val = setting.val;
+                                requiredSetting.value = setting.value;
                                 manager.SaveSetting(requiredSetting, target);
                             }
                         }
