@@ -117,10 +117,8 @@ namespace Unity.Notifications
                             "Default Notification Authorization Options",
                             "Configure the notification interaction types which will be included in the authorization request if \"Request Authorization on App Launch\" is enabled.",
                             settingsManager.GetiOSNotificationSettingsValue<AuthorizationOption>("UnityNotificationDefaultAuthorizationOptions",
-                                AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
-                        ),
+                                AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)),
                     }),
-
                 new NotificationSetting(
                     "UnityAddRemoteNotificationCapability",
                     "Enable Push Notifications",
@@ -133,22 +131,18 @@ namespace Unity.Notifications
                             "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
                             "Register for Push Notifications on App Launch",
                             "Enable this to automatically register your app with APNs after launching to receive remote notifications. You need to manually create an AuthorizationRequest to get the device token.",
-                            settingsManager.GetiOSNotificationSettingsValue<bool>("UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false)
-                        ),
+                            settingsManager.GetiOSNotificationSettingsValue<bool>("UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", false)),
                         new NotificationSetting(
                             "UnityRemoteNotificationForegroundPresentationOptions",
                             "Remote Notification Foreground Presentation Options",
                             "Configure the default presentation options for received remote notifications. In order to use the specified presentation options, your app must have received the authorization (the user might change it at any time).",
-                            settingsManager.GetiOSNotificationSettingsValue("UnityRemoteNotificationForegroundPresentationOptions", (PresentationOption)iOSPresentationOption.All)
-                        ),
+                            settingsManager.GetiOSNotificationSettingsValue("UnityRemoteNotificationForegroundPresentationOptions", (PresentationOption)iOSPresentationOption.All)),
                         new NotificationSetting("UnityUseAPSReleaseEnvironment",
                             "Enable Release Environment for APS",
                             "Enable this when signing the app with a production certificate.",
                             settingsManager.GetiOSNotificationSettingsValue<bool>("UnityUseAPSReleaseEnvironment", false),
                             false),
-                    }
-                ),
-
+                    }),
                 new NotificationSetting("UnityUseLocationNotificationTrigger",
                     "Include CoreLocation Framework",
                     "Include the CoreLocation framework to use the iOSNotificationLocationTrigger in your project.",
@@ -167,9 +161,7 @@ namespace Unity.Notifications
                     "UnityNotificationAndroidRescheduleOnDeviceRestart",
                     "Reschedule on Device Restart",
                     "Enable this to automatically reschedule all non-expired notifications after device restart. By default AndroidSettings removes all scheduled notifications after restarting.",
-                    settingsManager.GetAndroidNotificationSettingsValue<bool>("UnityNotificationAndroidRescheduleOnDeviceRestart", false)
-                ),
-
+                    settingsManager.GetAndroidNotificationSettingsValue<bool>("UnityNotificationAndroidRescheduleOnDeviceRestart", false)),
                 new NotificationSetting(
                     "UnityNotificationAndroidUseCustomActivity",
                     "Use Custom Activity",
@@ -181,8 +173,7 @@ namespace Unity.Notifications
                             "UnityNotificationAndroidCustomActivityString",
                             "Custom Activity Name",
                             "The full class name of the activity which will be assigned to the notification.",
-                            settingsManager.GetAndroidNotificationSettingsValue<string>("UnityNotificationAndroidCustomActivityString", "com.unity3d.player.UnityPlayerActivity")
-                        )
+                            settingsManager.GetAndroidNotificationSettingsValue<string>("UnityNotificationAndroidCustomActivityString", "com.unity3d.player.UnityPlayerActivity"))
                     })
             };
 
