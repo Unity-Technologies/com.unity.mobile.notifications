@@ -3,7 +3,7 @@ using Unity.Notifications.iOS;
 
 namespace Unity.Notifications.Tests
 {
-    public class NotificationSettingsTests
+    internal class NotificationSettingsTests
     {
         [OneTimeSetUp]
         public void ResetSettings()
