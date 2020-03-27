@@ -1,0 +1,14 @@
+{
+  "name": "com.unity.mobile-notifications-sample",
+  "displayName": "Mobile Notifications Test Sample",
+  "version": "0.1.0-preview",
+  "unity": "2018.3",
+  "description": "Internal Mobile Notifications Test Sample package",
+  "keywords": [
+    "Android",
+    "iOS",
+    "Notifications",
+    "Mobile"
+  ],
+  "dependencies": {}
+}
