@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine.UI;
@@ -17,7 +17,7 @@ public class Logger
         public const string Red = "#e74c3c";
     }
 
-    public Logger (Text textComponent)
+    public Logger(Text textComponent)
     {
         logsText = textComponent;
     }
@@ -85,5 +85,4 @@ public class Logger
         }
         return this;
     }
-
 }

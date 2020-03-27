@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +12,6 @@ using Unity.Notifications.iOS;
 
 public class iOSTest : MonoBehaviour
 {
-
     public List<iOSNotificationTemplateTimeTrigger> iOSNotificationsTimeTriggered;
     public List<iOSNotificationTemplateCalendarTrigger> iOSNotificationsCalendarTriggered;
     public List<iOSNotificationTemplateLocationTrigger> iOSNotificationsLocationTriggered;
@@ -52,7 +51,7 @@ public class iOSTest : MonoBehaviour
         // Update badge
         iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
     }
-    
+
     void OnRemoteNotificationReceivedHandler(iOSNotification notification)
     {
         LOGGER
@@ -102,7 +101,9 @@ public class iOSTest : MonoBehaviour
                         .Properties(notification, 1);
                     iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
                 }
-            } else {
+            }
+            else
+            {
                 LOGGER.Red("Notification not found!", 1);
             }
         }
@@ -148,23 +149,23 @@ public class iOSTest : MonoBehaviour
             groups["Schedule"][$"[{template.timeTriggerInterval}s] {template.buttonName}"] = new Action(() => {
                 ScheduleNotification(
                     new iOSNotification()
+                    {
+                        Identifier = template.identifier == "" ? null : template.identifier,
+                        CategoryIdentifier = template.categoryIdentifier,
+                        ThreadIdentifier = template.threadIdentifier,
+                        Title = template.title,
+                        Subtitle = template.subtitle,
+                        Body = template.body,
+                        ShowInForeground = template.showInForeground,
+                        ForegroundPresentationOption = template.presentationOptions,
+                        Badge = template.badge,
+                        Data = template.data,
+                        Trigger = new iOSNotificationTimeIntervalTrigger()
                         {
-                            Identifier = template.identifier == "" ? null : template.identifier,
-                            CategoryIdentifier = template.categoryIdentifier,
-                            ThreadIdentifier = template.threadIdentifier,
-                            Title = template.title,
-                            Subtitle = template.subtitle,
-                            Body = template.body,
-                            ShowInForeground = template.showInForeground,
-                            ForegroundPresentationOption = template.presentationOptions,
-                            Badge = template.badge,
-                            Data = template.data,
-                            Trigger = new iOSNotificationTimeIntervalTrigger()
-                                {
-                                    TimeInterval = TimeSpan.FromSeconds(template.timeTriggerInterval),
-                                    Repeats = template.repeats
-                                }
+                            TimeInterval = TimeSpan.FromSeconds(template.timeTriggerInterval),
+                            Repeats = template.repeats
                         }
+                    }
                 );
             });
         }
@@ -173,7 +174,8 @@ public class iOSTest : MonoBehaviour
             if (template == null) continue;
             groups["Schedule"][$"{template.buttonName}"] = new Action(() => {
                 iOSNotificationCalendarTrigger trigger;
-                if (template.offsetFromCurrentDate) {
+                if (template.offsetFromCurrentDate)
+                {
                     DateTime offsetDate = DateTime.Now;
                     if (template.year >= 0) offsetDate = offsetDate.AddYears(template.year);
                     if (template.month >= 0) offsetDate = offsetDate.AddMonths(template.month);
@@ -182,41 +184,43 @@ public class iOSTest : MonoBehaviour
                     if (template.minute >= 0) offsetDate = offsetDate.AddMinutes(template.minute);
                     if (template.second >= 0) offsetDate = offsetDate.AddSeconds(template.second);
                     trigger = new iOSNotificationCalendarTrigger()
-                        {
-                            Year = offsetDate.Year,
-                            Month = offsetDate.Month,
-                            Day = offsetDate.Day,
-                            Hour = offsetDate.Hour,
-                            Minute = offsetDate.Minute,
-                            Second = offsetDate.Second
-                        };
+                    {
+                        Year = offsetDate.Year,
+                        Month = offsetDate.Month,
+                        Day = offsetDate.Day,
+                        Hour = offsetDate.Hour,
+                        Minute = offsetDate.Minute,
+                        Second = offsetDate.Second
+                    };
                     LOGGER.Orange($"Will trigger on:\n{offsetDate.ToString("yyyy-MM-dd HH:mm:ss")}");
-                } else {
+                }
+                else
+                {
                     trigger = new iOSNotificationCalendarTrigger()
-                        {
-                            Year = template.year,
-                            Month = template.month,
-                            Day = template.day,
-                            Hour = template.hour,
-                            Minute = template.minute,
-                            Second = template.second
-                        };
+                    {
+                        Year = template.year,
+                        Month = template.month,
+                        Day = template.day,
+                        Hour = template.hour,
+                        Minute = template.minute,
+                        Second = template.second
+                    };
                 }
                 ScheduleNotification(
                     new iOSNotification()
-                        {
-                            Identifier = template.identifier == "" ? null : template.identifier,
-                            CategoryIdentifier = template.categoryIdentifier,
-                            ThreadIdentifier = template.threadIdentifier,
-                            Title = template.title,
-                            Subtitle = template.subtitle,
-                            Body = template.body,
-                            ShowInForeground = template.showInForeground,
-                            ForegroundPresentationOption = template.presentationOptions,
-                            Badge = template.badge,
-                            Data = template.data,
-                            Trigger = trigger
-                        }
+                    {
+                        Identifier = template.identifier == "" ? null : template.identifier,
+                        CategoryIdentifier = template.categoryIdentifier,
+                        ThreadIdentifier = template.threadIdentifier,
+                        Title = template.title,
+                        Subtitle = template.subtitle,
+                        Body = template.body,
+                        ShowInForeground = template.showInForeground,
+                        ForegroundPresentationOption = template.presentationOptions,
+                        Badge = template.badge,
+                        Data = template.data,
+                        Trigger = trigger
+                    }
                 );
             });
         }
@@ -226,25 +230,25 @@ public class iOSTest : MonoBehaviour
             groups["Schedule"][$"{template.buttonName}"] = new Action(() => {
                 ScheduleNotification(
                     new iOSNotification()
+                    {
+                        Identifier = template.identifier == "" ? null : template.identifier,
+                        CategoryIdentifier = template.categoryIdentifier,
+                        ThreadIdentifier = template.threadIdentifier,
+                        Title = template.title,
+                        Subtitle = template.subtitle,
+                        Body = template.body,
+                        ShowInForeground = template.showInForeground,
+                        ForegroundPresentationOption = template.presentationOptions,
+                        Badge = template.badge,
+                        Data = template.data,
+                        Trigger = new iOSNotificationLocationTrigger()
                         {
-                            Identifier = template.identifier == "" ? null : template.identifier,
-                            CategoryIdentifier = template.categoryIdentifier,
-                            ThreadIdentifier = template.threadIdentifier,
-                            Title = template.title,
-                            Subtitle = template.subtitle,
-                            Body = template.body,
-                            ShowInForeground = template.showInForeground,
-                            ForegroundPresentationOption = template.presentationOptions,
-                            Badge = template.badge,
-                            Data = template.data,
-                            Trigger = new iOSNotificationLocationTrigger()
-                                {
-                                    Center = new Vector2(template.centerX, template.centerY),
-                                    Radius = template.radius,
-                                    NotifyOnEntry = template.notifyOnEntry,
-                                    NotifyOnExit = template.notifyOnExit
-                                }
+                            Center = new Vector2(template.centerX, template.centerY),
+                            Radius = template.radius,
+                            NotifyOnEntry = template.notifyOnEntry,
+                            NotifyOnExit = template.notifyOnExit
                         }
+                    }
                 );
             });
         }
@@ -268,9 +272,12 @@ public class iOSTest : MonoBehaviour
                 Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
                 button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                 button.GetComponent<Button>().onClick.AddListener(delegate {
-                    try {
+                    try
+                    {
                         ((Action)test.Value).Invoke();
-                    } catch (Exception exception) {
+                    }
+                    catch (Exception exception)
+                    {
                         LOGGER.Red(exception.Message);
                     }
                 });
@@ -315,7 +322,6 @@ public class iOSTest : MonoBehaviour
         }
     }
 
-
     //Request authorization if it is not enabled in Editor UI
     IEnumerator RequestAuthorization(AuthorizationOption options = AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
     {
@@ -325,12 +331,15 @@ public class iOSTest : MonoBehaviour
         using (AuthorizationRequest req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
         {
             while (!req.IsFinished) { yield return null; };
-            if (req.Granted) {
+            if (req.Granted)
+            {
                 LOGGER
                     .Green($"Authorization request was granted")
                     .Properties(req);
                 Debug.Log(req.DeviceToken);
-            } else {
+            }
+            else
+            {
                 LOGGER.Red($"Authorization request was denied");
             }
         }
