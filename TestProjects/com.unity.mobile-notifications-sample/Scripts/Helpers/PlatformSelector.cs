@@ -2,15 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformSelector : MonoBehaviour
+namespace Unity.Notifications.Tests.Sample
 {
-    void Awake()
+    public class PlatformSelector : MonoBehaviour
     {
-        #if PLATFORM_ANDROID
-        gameObject.GetComponent<AndroidTest>().enabled = true;
+        void Awake()
+        {
+#if PLATFORM_ANDROID
+            gameObject.GetComponent<AndroidTest>().enabled = true;
         #endif
-        #if PLATFORM_IOS
-        gameObject.GetComponent<iOSTest>().enabled = true;
+#if PLATFORM_IOS
+            gameObject.GetComponent<iOSTest>().enabled = true;
         #endif
+        }
     }
 }
