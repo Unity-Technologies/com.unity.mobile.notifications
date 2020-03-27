@@ -63,7 +63,7 @@ namespace Unity.Notifications
                     values.Add(strValue);
                 }
                 else
-                    values[index] = strValue.ToString();
+                    values[index] = strValue;
             }
         }
     }
