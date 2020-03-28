@@ -241,7 +241,7 @@ namespace Unity.Notifications
             if (trackedAssets.Count <= 0)
                 return true;
 
-            return !trackedAssets.Any(i => i.Initialized() == false);
+            return trackedAssets.All(asset => asset.Initialized());
         }
 
         public override void OnInspectorGUI()
@@ -278,27 +278,21 @@ namespace Unity.Notifications
                 k_Padding
             );
 
-            var viewRect = GetContentRect(
-                new Rect(rect.x, rect.y, rect.width,
-                    headerRect.height + m_ReorderableList.GetHeight() + k_SlotSize),
-                -k_Padding,
-                k_Padding
-            );
-
             if (drawInInspector)
+            {
+                var viewRect = GetContentRect(
+                    new Rect(rect.x, rect.y, rect.width, headerRect.height + m_ReorderableList.GetHeight() + k_SlotSize),
+                    -k_Padding,
+                    k_Padding
+                );
                 m_ScrollViewStart = GUI.BeginScrollView(rect, m_ScrollViewStart, viewRect, false, false);
+            }
 
             var toolBaRect = new Rect(rect.x, rect.y, rect.width, k_ToolbarHeight);
             m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBaRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
 
-            var headerMsgStyle = GUI.skin.GetStyle("HelpBox");
-            headerMsgStyle.alignment = TextAnchor.UpperCenter;
-            headerMsgStyle.fontSize = 10;
-            headerMsgStyle.wordWrap = true;
-
             if (m_SettingsManager.ToolbarIndex == 0)
             {
-                var settingsPanelRect = bodyRect;
                 var settings = m_SettingsManager.AndroidNotificationSettings;
                 if (settings == null)
                     return;
@@ -309,16 +303,22 @@ namespace Unity.Notifications
                 var styleDropwDown = new GUIStyle(GUI.skin.GetStyle("Button"));
                 styleDropwDown.fixedWidth = k_SlotSize * 2.5f;
 
+                var settingsPanelRect = bodyRect;
                 GUI.BeginGroup(settingsPanelRect);
                 DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, styleToggle, styleDropwDown);
                 GUI.EndGroup();
+
+                var headerMsgStyle = new GUIStyle(GUI.skin.GetStyle("HelpBox"));
+                headerMsgStyle.alignment = TextAnchor.UpperCenter;
+                headerMsgStyle.fontSize = 10;
+                headerMsgStyle.wordWrap = true;
 
                 var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 85f, bodyRect.width, 55f);
                 EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, headerMsgStyle);
 
                 var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 95f, iconListRectHeader.width, iconListRectHeader.height - 55f);
-
                 m_ReorderableList.DoList(iconListRectBody);
+
                 if (!drawInInspector)
                     EditorGUILayout.GetControlRect(true, iconListRectHeader.height + m_ReorderableList.GetHeight() + k_SlotSize);
             }
