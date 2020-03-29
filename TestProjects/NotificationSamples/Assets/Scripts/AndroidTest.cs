@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +75,9 @@ public class AndroidTest : MonoBehaviour
                 .Orange($"Id: {notificationIntentData.Id}", 1)
                 .Orange($"Channel: {notificationIntentData.Channel}", 1)
                 .Properties(notificationIntentData.Notification, 1);
-        } else {
+        }
+        else
+        {
             m_LOGGER.Red("Notification not found!", 1);
         }
     }
@@ -178,9 +180,12 @@ public class AndroidTest : MonoBehaviour
                 Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
                 button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                 button.GetComponent<Button>().onClick.AddListener(delegate {
-                    try {
+                    try
+                    {
                         ((Action)test.Value).Invoke();
-                    } catch (Exception exception) {
+                    }
+                    catch (Exception exception)
+                    {
                         m_LOGGER.Red(exception.Message);
                     }
                 });

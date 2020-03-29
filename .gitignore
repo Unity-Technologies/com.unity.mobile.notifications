@@ -17,3 +17,4 @@ android-sdk/*
 *.suo
 *.sublime-project
 *.sublime-workspace
+*.preformat.bak
