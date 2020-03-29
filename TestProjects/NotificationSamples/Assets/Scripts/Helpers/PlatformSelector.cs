@@ -6,11 +6,16 @@ public class PlatformSelector : MonoBehaviour
 {
     void Awake()
     {
-        #if PLATFORM_ANDROID
-            gameObject.GetComponent<AndroidTest>().enabled = true;
-        #endif
-        #if PLATFORM_IOS
-            gameObject.GetComponent<iOSTest>().enabled = true;
-        #endif
+        switch (Application.platform)
+        {
+            case RuntimePlatform.Android:
+                gameObject.GetComponent<AndroidTest>().enabled = true;
+                break;
+            case RuntimePlatform.IPhonePlayer:
+                gameObject.GetComponent<iOSTest>().enabled = true;
+                break;
+            default:
+                break;
+        }
     }
 }

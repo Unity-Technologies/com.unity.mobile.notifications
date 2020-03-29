@@ -3,38 +3,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if PLATFORM_ANDROID
 using Unity.Notifications.Android;
-#endif
 
 [CreateAssetMenu(menuName = "Mobile Notifications/Android Notification Template")]
 public class AndroidNotificationTemplate : ScriptableObject
 {
-    #if PLATFORM_ANDROID
     [Space(10)]
     [Header("General")]
-    public string buttonName = "Send A Notifiation";
-    public string channel = "default_channel";
-    public int fireInSeconds;
+    public string ButtonName = "Send A Notifiation";
+    public string Channel = "default_channel";
+    public int FireInSeconds;
 
     [Space(10)]
     [Header("Notification Parameters")]
-    public string title = "";
+    public string Title = "";
     [TextArea]
-    public string text = "";
-    public string smallIcon = "";
-    public string largeIcon = "";
-    public NotificationStyle notificationStyle = NotificationStyle.None;
-    public Color color = Color.black;
-    public int number = -1;
-    public bool shouldAutoCancel = false;
-    public bool usesStopWatch = false;
-    public string group = "";
-    public bool groupSummary;
-    public GroupAlertBehaviours groupAlertBehaviours = GroupAlertBehaviours.GroupAlertAll;
-    public string sortKey = "";
+    public string Text = "";
+    public string SmallIcon = "";
+    public string LargeIcon = "";
+    public NotificationStyle NotificationStyle = NotificationStyle.None;
+    public Color Color = Color.black;
+    public int Number = -1;
+    public bool ShouldAutoCancel = false;
+    public bool UsesStopWatch = false;
+    public string Group = "";
+    public bool GroupSummary;
+    public GroupAlertBehaviours GroupAlertBehaviours = GroupAlertBehaviours.GroupAlertAll;
+    public string SortKey = "";
     [TextArea]
-    public string intentData = "";
-    public bool showTimestamp = false;
-    #endif
+    public string IntentData = "";
+    public bool ShowTimestamp = false;
 }

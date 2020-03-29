@@ -3,39 +3,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if PLATFORM_IOS
+#if UNITY_IOS || UNITY_EDITOR
 using Unity.Notifications.iOS;
 #endif
 
 [CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Location Trigger)")]
 public class iOSNotificationTemplateLocationTrigger : ScriptableObject
 {
-    #if PLATFORM_IOS
+    #if UNITY_IOS || UNITY_EDITOR
     [Space(10)]
     [Header("General")]
-    public string buttonName = "Send A Notification (Location Trigger)";
+    public string ButtonName = "Send A Notification (Location Trigger)";
 
     [Space(10)]
     [Header("Notification Parameters")]
-    public string identifier;
-    public string categoryIdentifier = "";
-    public string threadIdentifier = "";
-    public string title = "";
-    public string subtitle = "";
+    public string Identifier;
+    public string CategoryIdentifier = "";
+    public string ThreadIdentifier = "";
+    public string Title = "";
+    public string Subtitle = "";
     [TextArea]
-    public string body;
-    public bool showInForeground = false;
-    public PresentationOption presentationOptions = PresentationOption.Alert | PresentationOption.Sound;
-    public Int32 badge = -1;
+    public string Body = "";
+    public bool ShowInForeground = false;
+    public PresentationOption PresentationOptions = PresentationOption.Alert | PresentationOption.Sound;
+    public Int32 Badge = -1;
     [TextArea]
-    public string data = "";
+    public string Data = "";
 
     [Space(10)]
     [Header("Location Trigger")]
-    public float centerX = 0f;
-    public float centerY = 0f;
-    public float radius = 2f;
-    public bool notifyOnEntry = true;
-    public bool notifyOnExit = false;
+    public float CenterX = 0f;
+    public float CenterY = 0f;
+    public float Radius = 2f;
+    public bool NotifyOnEntry = true;
+    public bool NotifyOnExit = false;
     #endif
 }

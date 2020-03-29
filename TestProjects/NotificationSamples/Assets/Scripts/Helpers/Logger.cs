@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Logger
 {
-    public Text logsText;
+    public Text LogsText;
 
     public static class Colors
     {
@@ -19,7 +19,7 @@ public class Logger
 
     public Logger (Text textComponent)
     {
-        logsText = textComponent;
+        LogsText = textComponent;
     }
 
     private string ProcessText(string text, int tabs = 0)
@@ -29,49 +29,49 @@ public class Logger
 
     public Logger Clear()
     {
-        logsText.text = "";
+        LogsText.text = "";
         return this;
     }
 
     public Logger Separator()
     {
-        logsText.text += $"\n";
+        LogsText.text += $"\n";
         return this;
     }
 
     public Logger White(string text, int tabs = 0)
     {
-        logsText.text += $"<color={Colors.White}>{ProcessText(text, tabs)}</color>";
+        LogsText.text += $"<color={Colors.White}>{ProcessText(text, tabs)}</color>";
         return this;
     }
 
     public Logger Gray(string text, int tabs = 0)
     {
-        logsText.text += $"<color={Colors.Gray}>{ProcessText(text, tabs)}</color>";
+        LogsText.text += $"<color={Colors.Gray}>{ProcessText(text, tabs)}</color>";
         return this;
     }
 
     public Logger Blue(string text, int tabs = 0)
     {
-        logsText.text += $"<color={Colors.Blue}>{ProcessText(text, tabs)}</color>";
+        LogsText.text += $"<color={Colors.Blue}>{ProcessText(text, tabs)}</color>";
         return this;
     }
 
     public Logger Green(string text, int tabs = 0)
     {
-        logsText.text += $"<color={Colors.Green}>{ProcessText(text, tabs)}</color>";
+        LogsText.text += $"<color={Colors.Green}>{ProcessText(text, tabs)}</color>";
         return this;
     }
 
     public Logger Orange(string text, int tabs = 0)
     {
-        logsText.text += $"<color={Colors.Orange}>{ProcessText(text, tabs)}</color>";
+        LogsText.text += $"<color={Colors.Orange}>{ProcessText(text, tabs)}</color>";
         return this;
     }
 
     public Logger Red(string text, int tabs = 0)
     {
-        logsText.text += $"<color={Colors.Red}>{ProcessText(text, tabs)}</color>";
+        LogsText.text += $"<color={Colors.Red}>{ProcessText(text, tabs)}</color>";
         return this;
     }
 
