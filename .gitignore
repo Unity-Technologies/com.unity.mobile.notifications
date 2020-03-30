@@ -18,3 +18,4 @@ android-sdk/*
 *.sublime-project
 *.sublime-workspace
 *.preformat.bak
+*.preformat.bak.meta
