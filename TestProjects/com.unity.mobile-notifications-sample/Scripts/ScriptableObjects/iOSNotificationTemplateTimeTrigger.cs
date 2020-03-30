@@ -7,10 +7,12 @@ using UnityEngine;
 using Unity.Notifications.iOS;
 #endif
 
-[CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Time Trigger)")]
-public class iOSNotificationTemplateTimeTrigger : ScriptableObject
+namespace Unity.Notifications.Tests.Sample
 {
-    #if UNITY_IOS || UNITY_EDITOR
+    [CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Time Trigger)")]
+    public class iOSNotificationTemplateTimeTrigger : ScriptableObject
+    {
+#if UNITY_IOS || UNITY_EDITOR
     [Space(10)]
     [Header("General")]
     public string ButtonName = "Send A Notification (Time Trigger)";
@@ -34,5 +36,6 @@ public class iOSNotificationTemplateTimeTrigger : ScriptableObject
     [Header("Time Trigger")]
     public Int32 TimeTriggerInterval;
     public bool Repeats = false;
-    #endif
+#endif
+    }
 }

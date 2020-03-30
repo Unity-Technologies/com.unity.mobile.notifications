@@ -10,9 +10,11 @@ using UnityEngine.UI;
 using Unity.Notifications.Android;
 #endif
 
-public class AndroidTest : MonoBehaviour
+namespace Unity.Notifications.Tests.Sample
 {
-    #if UNITY_ANDROID || UNITY_EDITOR
+    public class AndroidTest : MonoBehaviour
+    {
+#if UNITY_ANDROID || UNITY_EDITOR
 
     private GameObjectReferences m_gameObjectReferences;
     private Dictionary<string, OrderedDictionary> m_groups;
@@ -121,7 +123,8 @@ public class AndroidTest : MonoBehaviour
         m_groups["Cancellation"] = new OrderedDictionary();
         m_groups["Cancellation"]["Cancel all notifications"] = new Action(() => { CancelAllNotifications(); });
         m_groups["Cancellation"]["Cancel pending notifications"] = new Action(() => { CancelPendingNotifications(); });
-        m_groups["Cancellation"]["Cancel displayed notifications"] = new Action(() => { CancelDisplayedNotifications(); });
+        m_groups["Cancellation"]["Cancel displayed notifications"] =
+ new Action(() => { CancelDisplayedNotifications(); });
 
         m_groups["Channels"] = new OrderedDictionary();
         m_groups["Channels"]["List All Channels"] = new Action(() => { ListAllChannels(); });
@@ -169,7 +172,8 @@ public class AndroidTest : MonoBehaviour
         foreach (KeyValuePair<string, OrderedDictionary> group in m_groups)
         {
             // Instantiate group
-            Transform buttonGroup = GameObject.Instantiate(m_gameObjectReferences.ButtonGroupTemplate, m_gameObjectReferences.ButtonScrollViewContent);
+            Transform buttonGroup =
+ GameObject.Instantiate(m_gameObjectReferences.ButtonGroupTemplate, m_gameObjectReferences.ButtonScrollViewContent);
             Transform buttonGroupName = buttonGroup.GetChild(0).transform;
             Transform buttonGameObject = buttonGroup.GetChild(1).transform;
             // Set group name
@@ -261,5 +265,7 @@ public class AndroidTest : MonoBehaviour
         m_gameObjectReferences.LogsScrollRect.verticalNormalizedPosition = 0f;
     }
 
-    #endif
+#endif
+    }
 }
+

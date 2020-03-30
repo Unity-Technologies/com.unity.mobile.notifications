@@ -7,10 +7,12 @@ using UnityEngine;
 using Unity.Notifications.iOS;
 #endif
 
-[CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Calendar Trigger)")]
-public class iOSNotificationTemplateCalendarTrigger : ScriptableObject
+namespace Unity.Notifications.Tests.Sample
 {
-    #if UNITY_IOS || UNITY_EDITOR
+    [CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Calendar Trigger)")]
+    public class iOSNotificationTemplateCalendarTrigger : ScriptableObject
+    {
+#if UNITY_IOS || UNITY_EDITOR
     [Space(10)]
     [Header("General")]
     public string ButtonName = "Send A Notification (Calendar Trigger)";
@@ -39,5 +41,6 @@ public class iOSNotificationTemplateCalendarTrigger : ScriptableObject
     public Int32 Hour = -1;
     public Int32 Minute = -1;
     public Int32 Second = -1;
-    #endif
+#endif
+    }
 }

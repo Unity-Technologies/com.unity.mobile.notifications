@@ -10,9 +10,11 @@ using UnityEngine.UI;
 using Unity.Notifications.iOS;
 #endif
 
-public class iOSTest : MonoBehaviour
+namespace Unity.Notifications.Tests.Sample
 {
-    #if UNITY_IOS || UNITY_EDITOR
+    public class iOSTest : MonoBehaviour
+    {
+#if UNITY_IOS || UNITY_EDITOR
 
     private GameObjectReferences m_gameObjectReferences;
     private Dictionary<string, OrderedDictionary> m_groups;
@@ -95,7 +97,8 @@ public class iOSTest : MonoBehaviour
                         .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
                         .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
                         .Properties(notification, 1);
-                    iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
+                    iOSNotificationCenter.ApplicationBadge =
+ iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
                 }
             }
             else
@@ -263,13 +266,16 @@ public class iOSTest : MonoBehaviour
 
         m_groups["Cancellation"] = new OrderedDictionary();
         m_groups["Cancellation"]["Cancel all notifications"] = new Action(() => { RemoveAllNotifications(); });
-        m_groups["Cancellation"]["Cancel scheduled notifications"] = new Action(() => { RemoveScheduledNotifications(); });
-        m_groups["Cancellation"]["Cancel delivered notifications"] = new Action(() => { RemoveDeliveredNotifications(); });
+        m_groups["Cancellation"]["Cancel scheduled notifications"] =
+ new Action(() => { RemoveScheduledNotifications(); });
+        m_groups["Cancellation"]["Cancel delivered notifications"] =
+ new Action(() => { RemoveDeliveredNotifications(); });
 
         foreach (KeyValuePair<string, OrderedDictionary> group in m_groups)
         {
             // Instantiate group
-            Transform buttonGroup = GameObject.Instantiate(m_gameObjectReferences.ButtonGroupTemplate, m_gameObjectReferences.ButtonScrollViewContent);
+            Transform buttonGroup =
+ GameObject.Instantiate(m_gameObjectReferences.ButtonGroupTemplate, m_gameObjectReferences.ButtonScrollViewContent);
             Transform buttonGroupName = buttonGroup.GetChild(0).transform;
             Transform buttonGameObject = buttonGroup.GetChild(1).transform;
             // Set group name
@@ -332,12 +338,14 @@ public class iOSTest : MonoBehaviour
     }
 
     //Request authorization if it is not enabled in Editor UI
-    IEnumerator RequestAuthorization(AuthorizationOption options = AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
+    IEnumerator RequestAuthorization(AuthorizationOption options =
+ AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
     {
         m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
         AuthorizationRequest request = new AuthorizationRequest(options, true);
         yield return request;
-        using (AuthorizationRequest req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
+        using (AuthorizationRequest req =
+ new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
         {
             while (!req.IsFinished) { yield return null; };
             if (req.Granted)
@@ -438,5 +446,6 @@ public class iOSTest : MonoBehaviour
         m_gameObjectReferences.LogsScrollRect.verticalNormalizedPosition = 0f;
     }
 
-    #endif
+#endif
+    }
 }

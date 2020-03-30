@@ -7,10 +7,12 @@ using UnityEngine;
 using Unity.Notifications.iOS;
 #endif
 
-[CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Location Trigger)")]
-public class iOSNotificationTemplateLocationTrigger : ScriptableObject
+namespace Unity.Notifications.Tests.Sample
 {
-    #if UNITY_IOS || UNITY_EDITOR
+    [CreateAssetMenu(menuName = "Mobile Notifications/iOS Notification Template (Location Trigger)")]
+    public class iOSNotificationTemplateLocationTrigger : ScriptableObject
+    {
+#if UNITY_IOS || UNITY_EDITOR
     [Space(10)]
     [Header("General")]
     public string ButtonName = "Send A Notification (Location Trigger)";
@@ -37,5 +39,6 @@ public class iOSNotificationTemplateLocationTrigger : ScriptableObject
     public float Radius = 2f;
     public bool NotifyOnEntry = true;
     public bool NotifyOnExit = false;
-    #endif
+#endif
+    }
 }

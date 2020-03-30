@@ -2,20 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformSelector : MonoBehaviour
+namespace Unity.Notifications.Tests.Sample
 {
-    void Awake()
+    public class PlatformSelector : MonoBehaviour
     {
-        switch (Application.platform)
+        void Awake()
         {
-            case RuntimePlatform.Android:
-                gameObject.GetComponent<AndroidTest>().enabled = true;
-                break;
-            case RuntimePlatform.IPhonePlayer:
-                gameObject.GetComponent<iOSTest>().enabled = true;
-                break;
-            default:
-                break;
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                    gameObject.GetComponent<AndroidTest>().enabled = true;
+                    break;
+                case RuntimePlatform.IPhonePlayer:
+                    gameObject.GetComponent<iOSTest>().enabled = true;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameObjectReferences : MonoBehaviour
+namespace Unity.Notifications.Tests.Sample
 {
-    public Text LogsText;
-    public Transform ButtonScrollViewContent;
-    public Transform ButtonGroupTemplate;
-    public ScrollRect LogsScrollRect;
+    public class GameObjectReferences : MonoBehaviour
+    {
+        public Text LogsText;
+        public Transform ButtonScrollViewContent;
+        public Transform ButtonGroupTemplate;
+        public ScrollRect LogsScrollRect;
+    }
 }
