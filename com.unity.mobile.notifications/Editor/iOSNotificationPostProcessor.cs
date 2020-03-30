@@ -40,11 +40,9 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
             var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
 
-            var addPushNotificationCapability = (bool)settings
-                .Find(i => i.key == "UnityAddRemoteNotificationCapability").val == true;;
+            var addPushNotificationCapability = (bool)settings.Find(i => i.Key == "UnityAddRemoteNotificationCapability").Value;
 
-            var needLocationFramework = (bool)settings
-                .Find(i => i.key == "UnityUseLocationNotificationTrigger").val == true;;
+            var needLocationFramework = (bool)settings.Find(i => i.Key == "UnityUseLocationNotificationTrigger").Value;
 
             proj.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
 
@@ -55,11 +53,11 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
             if (addPushNotificationCapability)
             {
-                var useReleaseAPSEnvSetting = settings.Find(i => i.key == "UnityUseAPSReleaseEnvironment");
+                var useReleaseAPSEnvSetting = settings.Find(i => i.Key == "UnityUseAPSReleaseEnvironment");
                 var useReleaseAPSEnv = false;
 
                 if (useReleaseAPSEnvSetting != null)
-                    useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.val;
+                    useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.Value;
 
                 var entitlementsFileName = proj.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
                 if (entitlementsFileName == null)
@@ -101,10 +99,10 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
             foreach (var setting in settings)
             {
-                if (setting.val.GetType() == typeof(bool))
-                    rootDict.SetBoolean(setting.key, (bool)setting.val);
-                else if (setting.val.GetType() == typeof(PresentationOption) || setting.val.GetType() == typeof(AuthorizationOption))
-                    rootDict.SetInteger(setting.key, (int)setting.val);
+                if (setting.Value.GetType() == typeof(bool))
+                    rootDict.SetBoolean(setting.Key, (bool)setting.Value);
+                else if (setting.Value.GetType() == typeof(PresentationOption) || setting.Value.GetType() == typeof(AuthorizationOption))
+                    rootDict.SetInteger(setting.Key, (int)setting.Value);
             }
 
             if (addPushNotificationCapability)
