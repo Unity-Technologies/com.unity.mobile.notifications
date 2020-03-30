@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_ANDROID || UNITY_EDITOR
 using Unity.Notifications.Android;
+#endif
 
 namespace Unity.Notifications.Tests.Sample
 {
     [CreateAssetMenu(menuName = "Mobile Notifications/Android Notification Template")]
     public class AndroidNotificationTemplate : ScriptableObject
     {
+#if UNITY_ANDROID || UNITY_EDITOR
         [Space(10)][Header("General")] public string ButtonName = "Send A Notifiation";
         public string Channel = "default_channel";
         public int FireInSeconds;
@@ -31,5 +34,6 @@ namespace Unity.Notifications.Tests.Sample
         public string SortKey = "";
         [TextArea] public string IntentData = "";
         public bool ShowTimestamp = false;
+#endif
     }
 }
