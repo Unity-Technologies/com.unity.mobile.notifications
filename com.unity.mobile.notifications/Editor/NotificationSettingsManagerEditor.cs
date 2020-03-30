@@ -348,7 +348,7 @@ namespace Unity.Notifications
                 GUI.EndScrollView();
         }
 
-        private void DrawSettingsElementList(Rect rect, BuildTargetGroup target, List<NotificationSetting> settings, bool disabled, GUIStyle styleToggle, GUIStyle styleDropwDown, int layer = 0)
+        private void DrawSettingsElementList(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, GUIStyle styleToggle, GUIStyle styleDropwDown, int layer = 0)
         {
             foreach (var setting in settings)
             {
@@ -362,42 +362,41 @@ namespace Unity.Notifications
                 styleLabel.fixedWidth = width;
                 styleLabel.wordWrap = true;
 
-                GUILayout.Label(new GUIContent(setting.label, setting.tooltip), styleLabel);
+                GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), styleLabel);
 
-                if (setting.value.GetType() == typeof(bool))
+                bool dependenciesDisabled = false;
+
+                if (setting.Value.GetType() == typeof(bool))
                 {
-                    setting.value = EditorGUILayout.Toggle((bool)setting.value, styleToggle);
+                    setting.Value = EditorGUILayout.Toggle((bool)setting.Value, styleToggle);
+                    dependenciesDisabled = !(bool)setting.Value;
                 }
-                else if (setting.value.GetType() == typeof(string))
+                else if (setting.Value.GetType() == typeof(string))
                 {
-                    setting.value = EditorGUILayout.TextField((string)setting.value);
+                    setting.Value = EditorGUILayout.TextField((string)setting.Value);
                 }
-                else if (setting.value.GetType() == typeof(PresentationOption))
+                else if (setting.Value.GetType() == typeof(PresentationOption))
                 {
-                    setting.value = (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.value, styleDropwDown);
-                    if ((iOSPresentationOption)setting.value == 0)
-                        setting.value = (PresentationOption)iOSPresentationOption.All;
+                    setting.Value = (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.Value, styleDropwDown);
+                    if ((iOSPresentationOption)setting.Value == 0)
+                        setting.Value = (PresentationOption)iOSPresentationOption.All;
                 }
-                else if (setting.value.GetType() == typeof(AuthorizationOption))
+                else if (setting.Value.GetType() == typeof(AuthorizationOption))
                 {
-                    setting.value = (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.value, styleDropwDown);
-                    if ((iOSAuthorizationOption)setting.value == 0)
-                        setting.value = (AuthorizationOption)iOSAuthorizationOption.All;
+                    setting.Value = (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.Value, styleDropwDown);
+                    if ((iOSAuthorizationOption)setting.Value == 0)
+                        setting.Value = (AuthorizationOption)iOSAuthorizationOption.All;
                 }
 
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
 
-                bool dependentDisabled = false;
-                if (setting.value is bool)
-                    dependentDisabled = !(bool)setting.value;
-
-                if (setting.dependentSettings != null)
+                if (setting.Dependencies != null)
                 {
-                    DrawSettingsElementList(rect, target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, layer + 1);
+                    DrawSettingsElementList(rect, buildTarget, setting.Dependencies, dependenciesDisabled, styleToggle, styleDropwDown, layer + 1);
                 }
 
-                m_SettingsManager.SaveSetting(setting, target);
+                m_SettingsManager.SaveSetting(setting, buildTarget);
             }
         }
 

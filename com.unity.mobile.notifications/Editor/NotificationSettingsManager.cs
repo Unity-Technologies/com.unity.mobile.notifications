@@ -54,9 +54,9 @@ namespace Unity.Notifications
             {
                 target.Add(setting);
 
-                if (setting.dependentSettings != null)
+                if (setting.Dependencies != null)
                 {
-                    FlattenList(setting.dependentSettings, target);
+                    FlattenList(setting.Dependencies, target);
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace Unity.Notifications
                     "Request Authorization on App Launch",
                     "It's recommended to make the authorization request during the app's launch cycle. If this is enabled the authorization pop-up will show up immediately during launching. Otherwise you need to manually create an AuthorizationRequest before sending or receiving notifications.",
                     settingsManager.GetNotificationSettingValue("UnityNotificationRequestAuthorizationOnAppLaunch", true, false),
-                    dependentSettings: new List<NotificationSetting>()
+                    dependencies: new List<NotificationSetting>()
                     {
                         new NotificationSetting(
                             "UnityNotificationDefaultAuthorizationOptions",
@@ -151,7 +151,7 @@ namespace Unity.Notifications
                     "Use Custom Activity",
                     "Enable this to override the activity which will be opened when the user taps the notification.",
                     settingsManager.GetNotificationSettingValue("UnityNotificationAndroidUseCustomActivity", false, true),
-                    dependentSettings: new List<NotificationSetting>()
+                    dependencies: new List<NotificationSetting>()
                     {
                         new NotificationSetting(
                             "UnityNotificationAndroidCustomActivityString",
@@ -213,9 +213,9 @@ namespace Unity.Notifications
         {
             var collection = (target == BuildTargetGroup.Android) ? m_AndroidNotificationSettingsValues : m_iOSNotificationSettingsValues;
 
-            if (!collection.Contains(setting.key) || collection[setting.key].ToString() != setting.value.ToString())
+            if (!collection.Contains(setting.Key) || collection[setting.Key].ToString() != setting.Value.ToString())
             {
-                collection[setting.key] = setting.value;
+                collection[setting.Key] = setting.Value;
                 SaveSettings();
             }
         }

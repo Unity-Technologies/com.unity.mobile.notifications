@@ -4,23 +4,23 @@ namespace Unity.Notifications
 {
     internal class NotificationSetting
     {
-        public string key;
-        public string label;
-        public string tooltip;
-        public object value;
-        public bool writeToPlist;
+        public string Key;
+        public string Label;
+        public string Tooltip;
+        public object Value;
+        public bool WriteToPlist;
 
-        public List<NotificationSetting> dependentSettings;
+        public List<NotificationSetting> Dependencies;
 
         public NotificationSetting(string key, string label, string tooltip, object value, bool writeToPlist = true,
-                                   List<NotificationSetting> dependentSettings = null)
+                                   List<NotificationSetting> dependencies = null)
         {
-            this.key = key;
-            this.label = label;
-            this.tooltip = tooltip;
-            this.value = value;
-            this.writeToPlist = writeToPlist;
-            this.dependentSettings = dependentSettings;
+            this.Key = key;
+            this.Label = label;
+            this.Tooltip = tooltip;
+            this.Value = value;
+            this.WriteToPlist = writeToPlist;
+            this.Dependencies = dependencies;
         }
     }
 }

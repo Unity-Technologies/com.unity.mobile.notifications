@@ -12,11 +12,11 @@ namespace Unity.Notifications
             NotificationSetting setting = null;
             if (target == BuildTargetGroup.Android)
             {
-                setting = manager.AndroidNotificationSettingsFlat.Find(i => i.key == key);
+                setting = manager.AndroidNotificationSettingsFlat.Find(i => i.Key == key);
             }
             else if (target == BuildTargetGroup.iOS)
             {
-                setting = manager.iOSNotificationSettingsFlat.Find(i => i.key == key);
+                setting = manager.iOSNotificationSettingsFlat.Find(i => i.Key == key);
             }
 
             return setting;
@@ -29,7 +29,7 @@ namespace Unity.Notifications
             NotificationSetting setting = GetSetting(target, key);
             if (setting != null)
             {
-                setting.value = value;
+                setting.Value = value;
                 manager.SaveSetting(setting, target);
             }
         }
@@ -37,7 +37,7 @@ namespace Unity.Notifications
         private static T GetSettingValue<T>(BuildTargetGroup target, string key)
         {
             var setting = GetSetting(target, key);
-            return (T)setting.value;
+            return (T)setting.Value;
         }
 
         public static class AndroidSettings
