@@ -13,7 +13,7 @@ namespace Unity.Notifications
     [HelpURL("Packages/com.unity.mobile.notifications/documentation.html")]
     internal class NotificationSettingsManager : ScriptableObject
     {
-        private const string k_LegacyAssetPath = "Editor/com.unity.mobile.notifications/NotificationSettings.asset";
+        private const string k_SettingsPath = "ProjectSettings/MobileNotificationSettings.asset";
 
         public int ToolbarIndex = 0;
 
@@ -69,38 +69,19 @@ namespace Unity.Notifications
 
         public static NotificationSettingsManager Initialize()
         {
-            var assetRelPath = Path.Combine("Assets", k_LegacyAssetPath);
+            var settingsManager = LoadNotificationSettingsManager();
 
-            var settingsManager = AssetDatabase.LoadAssetAtPath<NotificationSettingsManager>(assetRelPath);
-
-            if (settingsManager == null)
-            {
-                var rootDir = Path.Combine(Application.dataPath, Path.GetDirectoryName(k_LegacyAssetPath));
-
-                if (!Directory.Exists(rootDir))
-                {
-                    Directory.CreateDirectory(rootDir);
-                }
-
-                settingsManager = CreateInstance<NotificationSettingsManager>();
-
-                if (File.Exists(assetRelPath))
-                    AssetDatabase.ImportAsset(assetRelPath);
-                else
-                {
-                    AssetDatabase.CreateAsset(settingsManager, assetRelPath);
-                    AssetDatabase.SaveAssets();
-                }
-            }
-
+            bool dirty = false;
             if (settingsManager.m_iOSNotificationSettingsValues == null)
             {
                 settingsManager.m_iOSNotificationSettingsValues = new NotificationSettingsCollection();
+                dirty = true;
             }
 
             if (settingsManager.m_AndroidNotificationSettingsValues == null)
             {
                 settingsManager.m_AndroidNotificationSettingsValues = new NotificationSettingsCollection();
+                dirty = true;
             }
 
             // Create the default settings for iOS.
@@ -154,6 +135,7 @@ namespace Unity.Notifications
             if (settingsManager.iOSNotificationSettings == null || settingsManager.iOSNotificationSettings.Count != iOSSettings.Count)
             {
                 settingsManager.iOSNotificationSettings = iOSSettings;
+                dirty = true;
             }
 
             // Create the default settings for Android.
@@ -182,9 +164,28 @@ namespace Unity.Notifications
             if (settingsManager.AndroidNotificationSettings == null || settingsManager.AndroidNotificationSettings.Count != androidSettings.Count)
             {
                 settingsManager.AndroidNotificationSettings = androidSettings;
+                dirty = true;
             }
 
-            EditorUtility.SetDirty(settingsManager);
+            settingsManager.SaveSettings(dirty);
+
+            return settingsManager;
+        }
+
+        private static NotificationSettingsManager LoadNotificationSettingsManager()
+        {
+            // TODO: Migrate legacy settings.
+            //const string k_LegacyAssetPath = "Editor/com.unity.mobile.notifications/NotificationSettings.asset";
+            //var assetRelPath = Path.Combine("Assets", k_LegacyAssetPath);
+            //var settingsManager = AssetDatabase.LoadAssetAtPath<NotificationSettingsManager>(assetRelPath);
+
+            NotificationSettingsManager settingsManager = ScriptableObject.CreateInstance<NotificationSettingsManager>();
+            if (File.Exists(k_SettingsPath))
+            {
+                var settingsJson = File.ReadAllText(k_SettingsPath);
+                EditorJsonUtility.FromJsonOverwrite(settingsJson, settingsManager);
+            }
+
             return settingsManager;
         }
 
@@ -215,17 +216,23 @@ namespace Unity.Notifications
             if (!collection.Contains(setting.key) || collection[setting.key].ToString() != setting.value.ToString())
             {
                 collection[setting.key] = setting.value;
-                EditorUtility.SetDirty(this);
+                SaveSettings();
             }
+        }
+
+        public void SaveSettings(bool forceSave = false)
+        {
+            if (!forceSave || File.Exists(k_SettingsPath))
+                return;
+
+            File.WriteAllText(k_SettingsPath, EditorJsonUtility.ToJson(this, true));
         }
 
         internal static void DeleteSettings()
         {
-            var assetRelPath = Path.Combine("Assets", k_LegacyAssetPath);
-
-            if (File.Exists(assetRelPath))
+            if (File.Exists(k_SettingsPath))
             {
-                File.Delete(assetRelPath);
+                File.Delete(k_SettingsPath);
             }
         }
 
@@ -237,19 +244,13 @@ namespace Unity.Notifications
             drawableResource.Asset = image;
 
             TrackedResourceAssets.Add(drawableResource);
-            SerializeData();
+            SaveSettings();
         }
 
         public void RemoveDrawableResource(int index)
         {
             TrackedResourceAssets.RemoveAt(index);
-            SerializeData();
-        }
-
-        public void SerializeData()
-        {
-            EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
+            SaveSettings();
         }
 
         public Dictionary<string, byte[]> GenerateDrawableResourcesForExport()

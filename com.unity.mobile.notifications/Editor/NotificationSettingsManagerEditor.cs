@@ -176,7 +176,7 @@ namespace Unity.Notifications
                 elementData.Asset = newAsset;
                 elementData.Clean();
                 elementData.Verify();
-                m_SettingsManager.SerializeData();
+                m_SettingsManager.SaveSettings();
             }
 
             if (elementData.Asset != null && !elementData.Verify())
