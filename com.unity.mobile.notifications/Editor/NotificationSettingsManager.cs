@@ -220,9 +220,9 @@ namespace Unity.Notifications
             }
         }
 
-        public void SaveSettings(bool forceSave = false)
+        public void SaveSettings(bool forceSave = true)
         {
-            if (!forceSave || File.Exists(k_SettingsPath))
+            if (!forceSave && File.Exists(k_SettingsPath))
                 return;
 
             File.WriteAllText(k_SettingsPath, EditorJsonUtility.ToJson(this, true));

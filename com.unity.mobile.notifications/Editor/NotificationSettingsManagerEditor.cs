@@ -364,6 +364,8 @@ namespace Unity.Notifications
 
                 GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), styleLabel);
 
+                EditorGUI.BeginChangeCheck();
+
                 bool dependenciesDisabled = false;
 
                 if (setting.Value.GetType() == typeof(bool))
@@ -388,6 +390,11 @@ namespace Unity.Notifications
                         setting.Value = (AuthorizationOption)iOSAuthorizationOption.All;
                 }
 
+                if (EditorGUI.EndChangeCheck())
+                {
+                    m_SettingsManager.SaveSetting(setting, buildTarget);
+                }
+
                 EditorGUILayout.EndHorizontal();
                 EditorGUI.EndDisabledGroup();
 
@@ -395,8 +402,6 @@ namespace Unity.Notifications
                 {
                     DrawSettingsElementList(rect, buildTarget, setting.Dependencies, dependenciesDisabled, styleToggle, styleDropwDown, layer + 1);
                 }
-
-                m_SettingsManager.SaveSetting(setting, buildTarget);
             }
         }
 
