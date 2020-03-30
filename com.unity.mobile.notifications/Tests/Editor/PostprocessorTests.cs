@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Unity.Notifications.Tests
 {
-    public class PostprocessorTests
+    internal class PostprocessorTests
     {
         [Test]
         public void DummmyTest()
