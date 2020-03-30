@@ -397,19 +397,6 @@ namespace Unity.Notifications
                     DrawSettingsElementList(rect, target, setting.dependentSettings, dependentDisabled, styleToggle, styleDropwDown, layer + 1);
                 }
 
-                if (setting.requiredSettings != null && !disabled && (bool)setting.value)
-                {
-                    foreach (var requiredSettingKey in setting.requiredSettings)
-                    {
-                        var requiredSetting = m_SettingsManager.iOSNotificationSettings.Find(s => s.key == requiredSettingKey);
-                        if (requiredSetting != null)
-                        {
-                            requiredSetting.value = setting.value;
-                            m_SettingsManager.SaveSetting(requiredSetting, target);
-                        }
-                    }
-                }
-
                 m_SettingsManager.SaveSetting(setting, target);
             }
         }

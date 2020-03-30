@@ -11,10 +11,9 @@ namespace Unity.Notifications
         public bool writeToPlist;
 
         public List<NotificationSetting> dependentSettings;
-        public List<string> requiredSettings;
 
         public NotificationSetting(string key, string label, string tooltip, object value, bool writeToPlist = true,
-                                   List<NotificationSetting> dependentSettings = null, List<string> requiredSettings = null)
+                                   List<NotificationSetting> dependentSettings = null)
         {
             this.key = key;
             this.label = label;
@@ -22,7 +21,6 @@ namespace Unity.Notifications
             this.value = value;
             this.writeToPlist = writeToPlist;
             this.dependentSettings = dependentSettings;
-            this.requiredSettings = requiredSettings;
         }
     }
 }
