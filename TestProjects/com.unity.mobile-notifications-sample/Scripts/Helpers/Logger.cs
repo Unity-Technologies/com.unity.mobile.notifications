@@ -80,7 +80,7 @@ namespace Unity.Notifications.Tests.Sample
         public Logger Properties(object obj, int tabs = 0)
         {
             foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties()
-                .Where(property => property.GetGetMethod() != null))
+                     .Where(property => property.GetGetMethod() != null))
             {
                 object value = propertyInfo.GetValue(obj, null);
                 if (string.IsNullOrEmpty($"{value}") || string.IsNullOrWhiteSpace($"{value}"))

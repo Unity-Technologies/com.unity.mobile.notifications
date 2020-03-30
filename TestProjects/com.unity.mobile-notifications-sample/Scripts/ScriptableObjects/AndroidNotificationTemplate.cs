@@ -10,11 +10,11 @@ namespace Unity.Notifications.Tests.Sample
     [CreateAssetMenu(menuName = "Mobile Notifications/Android Notification Template")]
     public class AndroidNotificationTemplate : ScriptableObject
     {
-        [Space(10)] [Header("General")] public string ButtonName = "Send A Notifiation";
+        [Space(10)][Header("General")] public string ButtonName = "Send A Notifiation";
         public string Channel = "default_channel";
         public int FireInSeconds;
 
-        [Space(10)] [Header("Notification Parameters")]
+        [Space(10)][Header("Notification Parameters")]
         public string Title = "";
 
         [TextArea] public string Text = "";
