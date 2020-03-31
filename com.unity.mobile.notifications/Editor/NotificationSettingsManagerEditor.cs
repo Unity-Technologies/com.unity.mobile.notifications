@@ -40,7 +40,6 @@ namespace Unity.Notifications
         [SettingsProvider]
         static SettingsProvider CreateMobileNotificationsSettingsProvider()
         {
-            Debug.Log("CreateMobileNotificationsSettingsProvider");
             var provider = new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
             provider.label = "Mobile Notifications";
             return provider;
@@ -71,16 +70,16 @@ namespace Unity.Notifications
             // Register all the necessary callbacks on ReorderableList.
             m_ReorderableList.drawHeaderCallback = (rect) =>
             {
-                if (Event.current.type == EventType.Repaint)
-                {
-                    var paddedRect = GetContentRect(rect, 1f, -(ReorderableList.Defaults.padding + 2f));
+                if (Event.current.type != EventType.Repaint)
+                    return;
 
-                    var headerBackground = new GUIStyle("RL Header");
-                    headerBackground.Draw(paddedRect, false, false, false, false);
+                var paddedRect = GetContentRect(rect, 1f, -(ReorderableList.Defaults.padding + 2f));
 
-                    var labelRect = GetContentRect(paddedRect, 0f, 3f);
-                    GUI.Label(labelRect, "Notification Icons", EditorStyles.label);
-                }
+                var headerBackground = new GUIStyle("RL Header");
+                headerBackground.Draw(paddedRect, false, false, false, false);
+
+                var labelRect = GetContentRect(paddedRect, 0f, 3f);
+                GUI.Label(labelRect, "Notification Icons", EditorStyles.label);
             };
 
             m_ReorderableList.onAddCallback = (list) =>
@@ -127,15 +126,6 @@ namespace Unity.Notifications
 
                 return m_ReorderableList.elementHeight + (data.Asset != null && !data.IsValid ? k_SlotSize : 0);
             };
-        }
-
-        private DrawableResourceData GetDrawableResource(int index)
-        {
-            var resourceAssets = m_SettingsManager.DrawableResources;
-            if (index < resourceAssets.Count)
-                return resourceAssets[index];
-
-            return null;
         }
 
         private void DrawIconDataElement(Rect rect, int index, bool active, bool focused)
@@ -228,12 +218,22 @@ namespace Unity.Notifications
             }
         }
 
+        private DrawableResourceData GetDrawableResource(int index)
+        {
+            var resourceAssets = m_SettingsManager.DrawableResources;
+            if (index < resourceAssets.Count)
+                return resourceAssets[index];
+
+            return null;
+        }
+
         public override void OnGUI(string searchContext)
         {
             // This has to be called to sync all the changes on m_SettingsManager to m_SettingsObject.
             m_SettingsObject.Update();
 
-            var width = EditorGUIUtility.currentViewWidth - 300f;
+            var noHeightRect = GUILayoutUtility.GetRect(GUIContent.none, EditorStyles.label, GUILayout.ExpandWidth(true), GUILayout.Height(0));
+            var width = noHeightRect.width;
             if (width < k_SlotSize * 10)
                 width = k_SlotSize * 10;
 
