@@ -13,20 +13,20 @@ namespace Unity.Notifications
     [HelpURL("Packages/com.unity.mobile.notifications/documentation.html")]
     internal class NotificationSettingsManager : ScriptableObject
     {
-        private const string k_SettingsPath = "ProjectSettings/MobileNotificationSettings.asset";
+        internal static readonly string k_SettingsPath = "ProjectSettings/MobileNotificationsSettings.asset";
 
         public int ToolbarIndex = 0;
 
         public List<NotificationSetting> iOSNotificationSettings;
         public List<NotificationSetting> AndroidNotificationSettings;
 
-        public List<DrawableResourceData> TrackedResourceAssets = new List<DrawableResourceData>();
-
         [SerializeField]
         private NotificationSettingsCollection m_iOSNotificationSettingsValues;
 
         [SerializeField]
         private NotificationSettingsCollection m_AndroidNotificationSettingsValues;
+
+        public List<DrawableResourceData> DrawableResources = new List<DrawableResourceData>();
 
         public List<NotificationSetting> iOSNotificationSettingsFlat
         {
@@ -59,12 +59,6 @@ namespace Unity.Notifications
                     FlattenList(setting.Dependencies, target);
                 }
             }
-        }
-
-        [InitializeOnLoadMethod]
-        internal static void OnProjectLoaded()
-        {
-            Initialize();
         }
 
         public static NotificationSettingsManager Initialize()
@@ -179,7 +173,7 @@ namespace Unity.Notifications
             //var assetRelPath = Path.Combine("Assets", k_LegacyAssetPath);
             //var settingsManager = AssetDatabase.LoadAssetAtPath<NotificationSettingsManager>(assetRelPath);
 
-            NotificationSettingsManager settingsManager = ScriptableObject.CreateInstance<NotificationSettingsManager>();
+            var settingsManager = CreateInstance<NotificationSettingsManager>();
             if (File.Exists(k_SettingsPath))
             {
                 var settingsJson = File.ReadAllText(k_SettingsPath);
@@ -228,61 +222,53 @@ namespace Unity.Notifications
             File.WriteAllText(k_SettingsPath, EditorJsonUtility.ToJson(this, true));
         }
 
-        internal static void DeleteSettings()
-        {
-            if (File.Exists(k_SettingsPath))
-            {
-                File.Delete(k_SettingsPath);
-            }
-        }
-
-        public void RegisterDrawableResource(string id, Texture2D image, NotificationIconType type)
+        public void AddDrawableResource(string id, Texture2D image, NotificationIconType type)
         {
             var drawableResource = new DrawableResourceData();
             drawableResource.Id = id;
             drawableResource.Type = type;
             drawableResource.Asset = image;
 
-            TrackedResourceAssets.Add(drawableResource);
+            DrawableResources.Add(drawableResource);
             SaveSettings();
         }
 
         public void RemoveDrawableResource(int index)
         {
-            TrackedResourceAssets.RemoveAt(index);
+            DrawableResources.RemoveAt(index);
             SaveSettings();
         }
 
         public Dictionary<string, byte[]> GenerateDrawableResourcesForExport()
         {
             var icons = new Dictionary<string, byte[]>();
-            foreach (var res in TrackedResourceAssets)
+            foreach (var drawableResource in DrawableResources)
             {
-                if (!res.Verify())
+                if (!drawableResource.Verify())
                 {
-                    Debug.LogWarning(string.Format("Failed exporting: '{0}' AndroidSettings notification icon because:\n {1} ", res.Id,
-                        DrawableResourceData.GenerateErrorString(res.Errors)));
+                    Debug.LogWarning(string.Format("Failed exporting: '{0}' AndroidSettings notification icon because:\n {1} ", drawableResource.Id,
+                        DrawableResourceData.GenerateErrorString(drawableResource.Errors)));
                     continue;
                 }
 
-                var texture = TextureAssetUtils.ProcessTextureForType(res.Asset, res.Type);
+                var texture = TextureAssetUtils.ProcessTextureForType(drawableResource.Asset, drawableResource.Type);
 
-                var scale = res.Type == NotificationIconType.SmallIcon ? 0.375f : 1;
+                var scale = drawableResource.Type == NotificationIconType.Small ? 0.375f : 1;
 
                 var textXhdpi = TextureAssetUtils.ScaleTexture(texture, (int)(128 * scale), (int)(128 * scale));
                 var textHdpi  = TextureAssetUtils.ScaleTexture(texture, (int)(96 * scale), (int)(96 * scale));
                 var textMdpi  = TextureAssetUtils.ScaleTexture(texture, (int)(64 * scale), (int)(64 * scale));
                 var textLdpi  = TextureAssetUtils.ScaleTexture(texture, (int)(48 * scale), (int)(48 * scale));
 
-                icons[string.Format("drawable-xhdpi-v11/{0}.png", res.Id)] = textXhdpi.EncodeToPNG();
-                icons[string.Format("drawable-hdpi-v11/{0}.png", res.Id)] = textHdpi.EncodeToPNG();
-                icons[string.Format("drawable-mdpi-v11/{0}.png", res.Id)] = textMdpi.EncodeToPNG();
-                icons[string.Format("drawable-ldpi-v11/{0}.png", res.Id)] = textLdpi.EncodeToPNG();
+                icons[string.Format("drawable-xhdpi-v11/{0}.png", drawableResource.Id)] = textXhdpi.EncodeToPNG();
+                icons[string.Format("drawable-hdpi-v11/{0}.png", drawableResource.Id)] = textHdpi.EncodeToPNG();
+                icons[string.Format("drawable-mdpi-v11/{0}.png", drawableResource.Id)] = textMdpi.EncodeToPNG();
+                icons[string.Format("drawable-ldpi-v11/{0}.png", drawableResource.Id)] = textLdpi.EncodeToPNG();
 
-                if (res.Type == NotificationIconType.LargeIcon)
+                if (drawableResource.Type == NotificationIconType.Large)
                 {
                     var textXxhdpi = TextureAssetUtils.ScaleTexture(texture, (int)(192 * scale), (int)(192 * scale));
-                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", res.Id)] = textXxhdpi.EncodeToPNG();
+                    icons[string.Format("drawable-xxhdpi-v11/{0}.png", drawableResource.Id)] = textXxhdpi.EncodeToPNG();
                 }
             }
 
