@@ -9,7 +9,7 @@ namespace Unity.Notifications
 {
     internal class NotificationSettingsProvider : SettingsProvider
     {
-        private const int k_SlotSize = 64;
+        internal const int k_SlotSize = 64;
         private const int k_MaxPreviewSize = 64;
         private const int k_IconSpacing = 8;
         private const float k_Padding = 12f;
@@ -24,19 +24,10 @@ namespace Unity.Notifications
             "Small icons can only be composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels.\n" +
             "Large icons can contain any colors but must be not smaller than 192x192 pixels.";
 
-        private static readonly GUIStyle k_EvenRow = new GUIStyle("CN EntryBackEven");
-        private static readonly GUIStyle k_OddRow = new GUIStyle("CN EntryBackOdd");
-        private static readonly GUIStyle k_HelpBoxMessageTextStyle = new GUIStyle(GUI.skin.label) { fontSize = 8, wordWrap = true, alignment = TextAnchor.MiddleCenter };
-        private static readonly GUIStyle k_PreviewLabelTextStyle = new GUIStyle(GUI.skin.label) { fontSize = 8, wordWrap = true, alignment = TextAnchor.UpperCenter };
-        private static readonly GUIStyle k_HeaderMsgStyle = new GUIStyle(GUI.skin.GetStyle("HelpBox")) { fontSize = 10, wordWrap = true, alignment = TextAnchor.UpperLeft };
-        private static readonly GUIStyle k_ToggleStyle = new GUIStyle(GUI.skin.GetStyle("Toggle")) { alignment = TextAnchor.MiddleRight };
-        private static readonly GUIStyle k_DropwDownStyle = new GUIStyle(GUI.skin.GetStyle("Button")) { fixedWidth = k_SlotSize * 2.5f };
-        private static GUIStyle s_LabelStyle = new GUIStyle(GUI.skin.GetStyle("Label")) { wordWrap = true };
-
         private NotificationSettingsManager m_SettingsManager;
 
-        private SerializedObject m_SettingsObject;
-        private SerializedProperty m_ResourceAssets;
+        private SerializedObject m_SettingsManagerObject;
+        private SerializedProperty m_DrawableResources;
 
         private Vector2 m_ScrollViewStart;
         private ReorderableList m_ReorderableList;
@@ -59,22 +50,24 @@ namespace Unity.Notifications
         {
             label = "Mobile Notifications";
             m_SettingsManager = NotificationSettingsManager.Initialize();
-            m_SettingsObject = new SerializedObject(m_SettingsManager);
-            m_ResourceAssets = m_SettingsObject.FindProperty("DrawableResources");
+
+            // These two are for ReorderableList.
+            m_SettingsManagerObject = new SerializedObject(m_SettingsManager);
+            m_DrawableResources = m_SettingsManagerObject.FindProperty("DrawableResources");
 
             // ReorderableList is only used to draw the drawable resources for Android settings.
             InitReorderableList();
 
             Undo.undoRedoPerformed += () =>
             {
-                m_SettingsObject.UpdateIfRequiredOrScript();
+                m_SettingsManagerObject.UpdateIfRequiredOrScript();
                 Repaint();
             };
         }
 
         private void InitReorderableList()
         {
-            m_ReorderableList = new ReorderableList(m_SettingsObject, m_ResourceAssets, false, true, true, true);
+            m_ReorderableList = new ReorderableList(m_SettingsManagerObject, m_DrawableResources, false, true, true, true);
             m_ReorderableList.elementHeight = k_SlotSize + k_IconSpacing;
             m_ReorderableList.showDefaultBackground = false;
 
@@ -120,7 +113,7 @@ namespace Unity.Notifications
                 if (Event.current.type != EventType.Repaint)
                     return;
 
-                var background = index % 2 == 0 ? k_EvenRow : k_OddRow;
+                var background = index % 2 == 0 ? NotificationStyles.k_EvenRow : NotificationStyles.k_OddRow;
                 background.Draw(rect, false, false, false, false);
 
                 ReorderableList.defaultBehaviours.DrawElementBackground(rect, index, active, focused, true);
@@ -196,7 +189,7 @@ namespace Unity.Notifications
 
                 if (drawableResource.Type == NotificationIconType.Small)
                 {
-                    GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", k_HelpBoxMessageTextStyle);
+                    GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", NotificationStyles.k_HelpBoxMessageTextStyle);
                 }
             }
             else
@@ -204,7 +197,7 @@ namespace Unity.Notifications
                 Texture2D previewTexture = drawableResource.GetPreviewTexture(updatePreviewTexture);
                 if (previewTexture != null)
                 {
-                    EditorGUI.LabelField(previewTextureRect, "Preview", k_PreviewLabelTextStyle);
+                    EditorGUI.LabelField(previewTextureRect, "Preview", NotificationStyles.k_PreviewLabelTextStyle);
 
                     Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
                     previewTextureRectPadded.y += 8;
@@ -226,8 +219,8 @@ namespace Unity.Notifications
 
         public override void OnGUI(string searchContext)
         {
-            // This has to be called to sync all the changes between m_SettingsManager and m_SettingsObject.
-            m_SettingsObject.Update();
+            // This has to be called to sync all the changes between m_SettingsManager and m_SettingsManagerObject.
+            m_SettingsManagerObject.Update();
 
             var noHeightRect = GUILayoutUtility.GetRect(GUIContent.none, EditorStyles.label, GUILayout.ExpandWidth(true), GUILayout.Height(0));
             var width = noHeightRect.width;
@@ -261,11 +254,11 @@ namespace Unity.Notifications
 
                 var settingsPanelRect = bodyRect;
                 GUI.BeginGroup(settingsPanelRect);
-                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, k_ToggleStyle, k_DropwDownStyle);
+                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, NotificationStyles.k_ToggleStyle, NotificationStyles.k_DropwDownStyle);
                 GUI.EndGroup();
 
                 var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 85f, bodyRect.width, 55f);
-                EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, k_HeaderMsgStyle);
+                EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
 
                 var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 95f, iconListRectHeader.width, iconListRectHeader.height - 55f);
                 m_ReorderableList.DoList(iconListRectBody);
@@ -280,7 +273,7 @@ namespace Unity.Notifications
 
                 var settingsPanelRect = bodyRect;
                 GUI.BeginGroup(settingsPanelRect);
-                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.iOS, settings, false, k_ToggleStyle, k_DropwDownStyle);
+                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.iOS, settings, false, NotificationStyles.k_ToggleStyle, NotificationStyles.k_DropwDownStyle);
                 GUI.EndGroup();
 
                 EditorGUILayout.GetControlRect(true, 4 * k_SlotSize);
@@ -295,10 +288,11 @@ namespace Unity.Notifications
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(layer * 13);
 
+                var labelStyle = NotificationStyles.s_LabelStyle;
                 var width = rect.width - k_SlotSize * 4.5f - layer * 13;
-                s_LabelStyle.fixedWidth = width;
+                labelStyle.fixedWidth = width;
 
-                GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), s_LabelStyle);
+                GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), labelStyle);
 
                 EditorGUI.BeginChangeCheck();
 
