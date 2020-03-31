@@ -24,6 +24,15 @@ namespace Unity.Notifications
             "Small icons can only be composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels.\n" +
             "Large icons can contain any colors but must be not smaller than 192x192 pixels.";
 
+        private static readonly GUIStyle k_EvenRow = new GUIStyle("CN EntryBackEven");
+        private static readonly GUIStyle k_OddRow = new GUIStyle("CN EntryBackOdd");
+        private static readonly GUIStyle k_HelpBoxMessageTextStyle = new GUIStyle(GUI.skin.label) { fontSize = 8, wordWrap = true, alignment = TextAnchor.MiddleCenter };
+        private static readonly GUIStyle k_PreviewLabelTextStyle = new GUIStyle(GUI.skin.label) { fontSize = 8, wordWrap = true, alignment = TextAnchor.UpperCenter };
+        private static readonly GUIStyle k_HeaderMsgStyle = new GUIStyle(GUI.skin.GetStyle("HelpBox")) { fontSize = 10, wordWrap = true, alignment = TextAnchor.UpperLeft };
+        private static readonly GUIStyle k_ToggleStyle = new GUIStyle(GUI.skin.GetStyle("Toggle")) { alignment = TextAnchor.MiddleRight };
+        private static readonly GUIStyle k_DropwDownStyle = new GUIStyle(GUI.skin.GetStyle("Button")) { fixedWidth = k_SlotSize * 2.5f };
+        private static GUIStyle s_LabelStyle = new GUIStyle(GUI.skin.GetStyle("Label")) { wordWrap = true };
+
         private NotificationSettingsManager m_SettingsManager;
 
         private SerializedObject m_SettingsObject;
@@ -111,10 +120,7 @@ namespace Unity.Notifications
                 if (Event.current.type != EventType.Repaint)
                     return;
 
-                var evenRow = new GUIStyle("CN EntryBackEven");
-                var oddRow = new GUIStyle("CN EntryBackOdd");
-
-                var background = index % 2 == 0 ? evenRow : oddRow;
+                var background = index % 2 == 0 ? k_EvenRow : k_OddRow;
                 background.Draw(rect, false, false, false, false);
 
                 ReorderableList.defaultBehaviours.DrawElementBackground(rect, index, active, focused, true);
@@ -190,11 +196,7 @@ namespace Unity.Notifications
 
                 if (drawableResource.Type == NotificationIconType.Small)
                 {
-                    GUIStyle helpBoxMessageTextStyle = new GUIStyle(GUI.skin.label);
-                    helpBoxMessageTextStyle.fontSize = 8;
-                    helpBoxMessageTextStyle.wordWrap = true;
-                    helpBoxMessageTextStyle.alignment = TextAnchor.MiddleCenter;
-                    GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", helpBoxMessageTextStyle);
+                    GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", k_HelpBoxMessageTextStyle);
                 }
             }
             else
@@ -202,12 +204,7 @@ namespace Unity.Notifications
                 Texture2D previewTexture = drawableResource.GetPreviewTexture(updatePreviewTexture);
                 if (previewTexture != null)
                 {
-                    GUIStyle previewLabelTextStyle = new GUIStyle(GUI.skin.label);
-                    previewLabelTextStyle.fontSize = 8;
-                    previewLabelTextStyle.wordWrap = true;
-                    previewLabelTextStyle.alignment = TextAnchor.UpperCenter;
-
-                    EditorGUI.LabelField(previewTextureRect, "Preview", previewLabelTextStyle);
+                    EditorGUI.LabelField(previewTextureRect, "Preview", k_PreviewLabelTextStyle);
 
                     Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
                     previewTextureRectPadded.y += 8;
@@ -229,7 +226,7 @@ namespace Unity.Notifications
 
         public override void OnGUI(string searchContext)
         {
-            // This has to be called to sync all the changes on m_SettingsManager to m_SettingsObject.
+            // This has to be called to sync all the changes between m_SettingsManager and m_SettingsObject.
             m_SettingsObject.Update();
 
             var noHeightRect = GUILayoutUtility.GetRect(GUIContent.none, EditorStyles.label, GUILayout.ExpandWidth(true), GUILayout.Height(0));
@@ -262,24 +259,13 @@ namespace Unity.Notifications
                 if (settings == null)
                     return;
 
-                var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
-                styleToggle.alignment = TextAnchor.MiddleRight;
-
-                var styleDropwDown = new GUIStyle(GUI.skin.GetStyle("Button"));
-                styleDropwDown.fixedWidth = k_SlotSize * 2.5f;
-
                 var settingsPanelRect = bodyRect;
                 GUI.BeginGroup(settingsPanelRect);
-                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, styleToggle, styleDropwDown);
+                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, k_ToggleStyle, k_DropwDownStyle);
                 GUI.EndGroup();
 
-                var headerMsgStyle = new GUIStyle(GUI.skin.GetStyle("HelpBox"));
-                headerMsgStyle.alignment = TextAnchor.UpperLeft;
-                headerMsgStyle.fontSize = 10;
-                headerMsgStyle.wordWrap = true;
-
                 var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 85f, bodyRect.width, 55f);
-                EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, headerMsgStyle);
+                EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, k_HeaderMsgStyle);
 
                 var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 95f, iconListRectHeader.width, iconListRectHeader.height - 55f);
                 m_ReorderableList.DoList(iconListRectBody);
@@ -292,15 +278,9 @@ namespace Unity.Notifications
                 if (settings == null)
                     return;
 
-                var styleToggle = new GUIStyle(GUI.skin.GetStyle("Toggle"));
-                styleToggle.alignment = TextAnchor.MiddleRight;
-
-                var styleDropwDown = new GUIStyle(GUI.skin.GetStyle("Button"));
-                styleDropwDown.fixedWidth = k_SlotSize * 2.5f;
-
                 var settingsPanelRect = bodyRect;
                 GUI.BeginGroup(settingsPanelRect);
-                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.iOS, settings, false, styleToggle, styleDropwDown);
+                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.iOS, settings, false, k_ToggleStyle, k_DropwDownStyle);
                 GUI.EndGroup();
 
                 EditorGUILayout.GetControlRect(true, 4 * k_SlotSize);
@@ -315,13 +295,10 @@ namespace Unity.Notifications
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(layer * 13);
 
-                var styleLabel = new GUIStyle(GUI.skin.GetStyle("Label"));
                 var width = rect.width - k_SlotSize * 4.5f - layer * 13;
+                s_LabelStyle.fixedWidth = width;
 
-                styleLabel.fixedWidth = width;
-                styleLabel.wordWrap = true;
-
-                GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), styleLabel);
+                GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), s_LabelStyle);
 
                 EditorGUI.BeginChangeCheck();
 
