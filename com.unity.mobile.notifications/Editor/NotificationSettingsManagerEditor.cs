@@ -20,8 +20,8 @@ namespace Unity.Notifications
 
         private readonly string[] k_ToolbarStrings = {"Android", "iOS"};
         private const string k_InfoStringAndroid =
-            "Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n " +
-            "Small icons can only be composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels. \n" +
+            "Only icons added to this list or manually added to the `res/drawable` folder can be used by notifications.\n" +
+            "Small icons can only be composed simply of white pixels on a transparent backdrop and must be at least 48x48 pixels.\n" +
             "Large icons can contain any colors but must be not smaller than 192x192 pixels.";
 
         private NotificationSettingsManager m_SettingsManager;
@@ -41,12 +41,14 @@ namespace Unity.Notifications
         static SettingsProvider CreateMobileNotificationsSettingsProvider()
         {
             var provider = new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
-            provider.label = "Mobile Notifications";
+            provider.Initialize();
+
             return provider;
         }
 
-        public override void OnActivate(string searchContext, UnityEngine.UIElements.VisualElement rootElement)
+        private void Initialize()
         {
+            label = "Mobile Notifications";
             m_SettingsManager = NotificationSettingsManager.Initialize();
             m_SettingsObject = new SerializedObject(m_SettingsManager);
             m_ResourceAssets = m_SettingsObject.FindProperty("DrawableResources");
@@ -130,8 +132,8 @@ namespace Unity.Notifications
 
         private void DrawIconDataElement(Rect rect, int index, bool active, bool focused)
         {
-            var drawableResourceDataRef = m_ResourceAssets.GetArrayElementAtIndex(index);
-            if (drawableResourceDataRef == null)
+            var drawableResource = GetDrawableResource(index);
+            if (drawableResource == null)
                 return;
 
             var elementRect = rect;
@@ -157,8 +159,6 @@ namespace Unity.Notifications
             EditorGUI.LabelField(new Rect(elementContentRect.x, elementContentRect.y, idPropWidth, 20), k_IdentifierLabelText);
 
             EditorGUI.LabelField(new Rect(elementContentRect.x, elementContentRect.y + 25, idPropWidth, 20), k_TypeLabelText);
-
-            var drawableResource = GetDrawableResource(index);
 
             var newId = EditorGUI.TextField(new Rect(elementContentRect.x + k_SlotSize, elementContentRect.y, idPropWidth, 20), drawableResource.Id);
 
@@ -274,7 +274,7 @@ namespace Unity.Notifications
                 GUI.EndGroup();
 
                 var headerMsgStyle = new GUIStyle(GUI.skin.GetStyle("HelpBox"));
-                headerMsgStyle.alignment = TextAnchor.UpperCenter;
+                headerMsgStyle.alignment = TextAnchor.UpperLeft;
                 headerMsgStyle.fontSize = 10;
                 headerMsgStyle.wordWrap = true;
 
