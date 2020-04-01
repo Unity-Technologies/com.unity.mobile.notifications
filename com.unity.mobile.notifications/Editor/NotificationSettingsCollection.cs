@@ -1,46 +1,50 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Unity.Notifications
 {
-    [System.Serializable]
+    [Serializable]
     internal class NotificationSettingsCollection
     {
-        [SerializeField] List<string> keys;
-        [SerializeField] List<string> values;
+        [SerializeField]
+        [FormerlySerializedAs("keys")]
+        List<string> m_Keys;
+
+        [SerializeField]
+        [FormerlySerializedAs("values")]
+        List<string> m_Values;
 
         public NotificationSettingsCollection()
         {
-            keys = new List<string>();
-            values = new List<string>();
+            m_Keys = new List<string>();
+            m_Values = new List<string>();
         }
 
         public bool Contains(string key)
         {
-            return keys.Contains(key);
+            return m_Keys.Contains(key);
         }
 
         public object this[string key]
         {
             get
             {
-                var index = keys.IndexOf(key);
-                if (index == -1 || values.Count <= index)
+                var index = m_Keys.IndexOf(key);
+                if (index == -1 || m_Values.Count <= index)
                     return null;
 
-                var intValue = 0;
-                var boolValue = false;
-                if (int.TryParse(values[index], out intValue))
+                if (int.TryParse(m_Values[index], out var intValue))
                 {
                     return intValue;
                 }
-                else if (bool.TryParse(values[index], out boolValue))
+                if (bool.TryParse(m_Values[index], out var boolValue))
                 {
                     return boolValue;
                 }
 
-                return values[index];
+                return m_Values[index];
             }
             set
             {
@@ -55,15 +59,16 @@ namespace Unity.Notifications
                     strValue = value.ToString();
                 }
 
-
-                var index = keys.IndexOf(key);
+                var index = m_Keys.IndexOf(key);
                 if (index == -1)
                 {
-                    keys.Add(key);
-                    values.Add(strValue);
+                    m_Keys.Add(key);
+                    m_Values.Add(strValue);
                 }
                 else
-                    values[index] = strValue;
+                {
+                    m_Values[index] = strValue;
+                }
             }
         }
     }
