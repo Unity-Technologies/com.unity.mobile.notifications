@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
 using Unity.Notifications.iOS;
 using UnityEngine.Serialization;
 
-[assembly: InternalsVisibleTo("Unity.Notifications.Tests")]
 namespace Unity.Notifications
 {
     [HelpURL("Packages/com.unity.mobile.notifications/documentation.html")]
