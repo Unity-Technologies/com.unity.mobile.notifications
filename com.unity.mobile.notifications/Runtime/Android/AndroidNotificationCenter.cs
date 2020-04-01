@@ -130,11 +130,11 @@ namespace Unity.Notifications.Android
             }
             else if (string.IsNullOrEmpty(channel.id))
             {
-                throw new Exception(string.Format("Cannot register notification channel: {} , the channel Name is not set.", channel.id));
+                throw new Exception(string.Format("Cannot register notification channel: {0} , the channel Name is not set.", channel.id));
             }
             else if (string.IsNullOrEmpty(channel.description))
             {
-                throw new Exception(string.Format("Cannot register notification channel: {} , the channel Description is not set.", channel.id));
+                throw new Exception(string.Format("Cannot register notification channel: {0} , the channel Description is not set.", channel.id));
             }
 
             notificationManager.Call("registerNotificationChannel",
