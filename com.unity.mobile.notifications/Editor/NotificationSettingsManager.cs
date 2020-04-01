@@ -16,6 +16,8 @@ namespace Unity.Notifications
     {
         internal static readonly string k_SettingsPath = "ProjectSettings/NotificationsSettings.asset";
 
+        private static NotificationSettingsManager s_SettingsManager;
+
         [FormerlySerializedAs("toolbarInt")]
         public int ToolbarIndex = 0;
 
@@ -68,9 +70,12 @@ namespace Unity.Notifications
 
         public static NotificationSettingsManager Initialize()
         {
-            var settingsManager = CreateInstance<NotificationSettingsManager>();
+            if (s_SettingsManager != null)
+                return s_SettingsManager;
 
+            var settingsManager = CreateInstance<NotificationSettingsManager>();
             bool dirty = false;
+
             if (File.Exists(k_SettingsPath))
             {
                 var settingsJson = File.ReadAllText(k_SettingsPath);
@@ -143,7 +148,7 @@ namespace Unity.Notifications
                     false)
             };
 
-            // Create the default settings for Android.
+            // Create the settings for Android.
             settingsManager.AndroidNotificationSettings = new List<NotificationSetting>()
             {
                 new NotificationSetting(
@@ -167,7 +172,9 @@ namespace Unity.Notifications
             };
 
             settingsManager.SaveSettings(dirty);
-            return settingsManager;
+
+            s_SettingsManager = settingsManager;
+            return s_SettingsManager;
         }
 
         private static bool MigrateFromLegacySettings(NotificationSettingsManager settingsManager)
@@ -212,7 +219,7 @@ namespace Unity.Notifications
             }
             catch (InvalidCastException)
             {
-                Debug.LogWarning("Failed loading : " + key + " for type:" + defaultValue.GetType() + "Expected : " + collection[key].GetType());
+                Debug.LogWarning("Failed loading : " + key + " for type:" + defaultValue.GetType() + " Expected : " + collection[key].GetType());
                 //Just return default value if it's a new setting that was not yet serialized.
             }
 
