@@ -125,14 +125,14 @@ namespace Unity.Notifications.Android
             s_NotificationManager.Call("registerNotificationChannel",
                 channel.Id,
                 channel.Name,
-                Enum.IsDefined(typeof(Importance), channel.importance) ? channel.importance : (int)Importance.Default,
+                (int)channel.Importance,
                 channel.Description,
                 channel.EnableLights,
                 channel.EnableVibration,
                 channel.CanBypassDnd,
                 channel.CanShowBadge,
                 channel.VibrationPattern,
-                Enum.IsDefined(typeof(LockScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
+                (int)channel.LockScreenVisibility
             );
         }
 
@@ -221,7 +221,7 @@ namespace Unity.Notifications.Android
                 var ch = new AndroidNotificationChannel();
                 ch.Id = channel.Get<string>("id");
                 ch.Name = channel.Get<string>("name");
-                ch.importance = channel.Get<int>("importance");
+                ch.Importance = channel.Get<int>("importance").ToImportance();
                 ch.Description = channel.Get<string>("description");
 
                 ch.EnableLights = channel.Get<bool>("enableLights");
@@ -233,7 +233,7 @@ namespace Unity.Notifications.Android
                 var vibrationPattern = channel.Get<long[]>("vibrationPattern");
                 if (vibrationPattern != null)
                     ch.vibrationPattern = vibrationPattern.Select(i => (int)i).ToArray();
-                ch.lockscreenVisibility = channel.Get<int>("lockscreenVisibility");
+                ch.LockScreenVisibility = channel.Get<int>("lockscreenVisibility").ToLockScreenVisibility();
 
                 channels.Add(ch);
             }

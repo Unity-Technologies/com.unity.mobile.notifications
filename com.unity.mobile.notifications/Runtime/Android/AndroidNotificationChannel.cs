@@ -1,10 +1,12 @@
+using System;
 using System.Linq;
 
 namespace Unity.Notifications.Android
 {
     /// <summary>
     /// The level of interruption of this notification channel.
-    /// The importance of a notification is used to determine how much the notification should interrupt the user (visually and audibly). The higher the importance of a notification, the more interruptive the notification will be.
+    /// The importance of a notification is used to determine how much the notification should interrupt the user (visually and audibly).
+    /// The higher the importance of a notification, the more interruptive the notification will be.
     /// </summary>
     /// <remarks>
     /// The exact behaviour of each importance level might vary depending on the device and OS version on devices running Android 7.1 or older.
@@ -53,6 +55,25 @@ namespace Unity.Notifications.Android
         Public = 1,
     }
 
+    internal static class NotificationEnumsExtension
+    {
+        public static Importance ToImportance(this int importance)
+        {
+            if (Enum.IsDefined(typeof(Importance), importance))
+                return (Importance)importance;
+
+            return Importance.Default;
+        }
+
+        public static LockScreenVisibility ToLockScreenVisibility(this int lockscreenVisibility)
+        {
+            if (Enum.IsDefined(typeof(LockScreenVisibility), lockscreenVisibility))
+                return (LockScreenVisibility)lockscreenVisibility;
+
+            return LockScreenVisibility.Public;
+        }
+    }
+
     public struct AndroidNotificationChannel
     {
         /// <summary>
@@ -71,7 +92,6 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string Description { get; set; }
 
-        internal int importance;
         /// <summary>
         /// Importance level which is applied to all notifications sent to the channel.
         /// This can be changed by users in the settings app. Android uses importance to determine how much the notification should interrupt the user (visually and audibly).
@@ -82,11 +102,7 @@ namespace Unity.Notifications.Android
         ///    Low: No sound.
         ///    None: No sound and does not appear in the status bar.
         /// </summary>
-        public Importance Importance
-        {
-            get { return (Importance)importance; }
-            set { importance = (int)value; }
-        }
+        public Importance Importance { get; set; }
 
         /// <summary>
         /// Whether or not notifications posted to this channel can bypass the Do Not Disturb.
@@ -111,16 +127,11 @@ namespace Unity.Notifications.Android
         /// </summary>
         public bool EnableVibration { get; set; }
 
-        internal int lockscreenVisibility;
         /// <summary>
         /// Sets whether or not notifications posted to this channel are shown on the lockscreen in full or redacted form.
         /// This can be changed by users in the settings app.
         /// </summary>
-        public LockScreenVisibility LockScreenVisibility
-        {
-            get { return (LockScreenVisibility)lockscreenVisibility; }
-            set { lockscreenVisibility = (int)value; }
-        }
+        public LockScreenVisibility LockScreenVisibility { get; set; }
 
         internal int[] vibrationPattern;
         /// <summary>
@@ -158,13 +169,13 @@ namespace Unity.Notifications.Android
             Id = id;
             Name = name;
             Description = description;
-            this.importance = (int)importance;
+            this.Importance = importance;
 
             CanBypassDnd = false;
             CanShowBadge = true;
             EnableLights = false;
             EnableVibration = true;
-            lockscreenVisibility = (int)LockScreenVisibility.Public;
+            this.LockScreenVisibility = LockScreenVisibility.Public;
             vibrationPattern = null;
         }
     }
