@@ -43,22 +43,12 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static event NotificationReceivedCallback OnNotificationReceived = delegate {};
 
-        const int ANDROID_OREO = 26;
-        const int ANDROID_M = 23;
-
-        const string DEFAULT_APP_ICON_ADAPTIVE = "ic_launcher_foreground";
-        const string DEFAULT_APP_ICON_LEGACY = "app_icon";
-
-        static AndroidJavaObject notificationManager;
-        static int AndroidSDK;
-
-        static bool initialized;
-
-        private GameObject receivedNotificationDispatcher;
+        private static AndroidJavaObject s_NotificationManager;
+        private static bool s_Initialized;
 
         public static bool Initialize()
         {
-            if (initialized)
+            if (s_Initialized)
                 return true;
 
             if (AndroidReceivedNotificationMainThreadDispatcher.GetInstance() == null)
@@ -68,26 +58,21 @@ namespace Unity.Notifications.Android
             }
 
 #if UNITY_EDITOR || !UNITY_ANDROID
-            notificationManager = null;
-            initialized = false;
+            s_NotificationManager = null;
+            s_Initialized = false;
 #elif UNITY_ANDROID
             AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
 
-            AndroidJavaClass managerClass =
-                new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+            AndroidJavaClass managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
 
-            notificationManager =
-                managerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, activity);
-            notificationManager.Call("setNotificationCallback", new NotificationCallback());
+            s_NotificationManager = managerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, activity);
+            s_NotificationManager.Call("setNotificationCallback", new NotificationCallback());
 
-            AndroidJavaClass buildVersion = new AndroidJavaClass("android.os.Build$VERSION");
-            AndroidSDK = buildVersion.GetStatic<int>("SDK_INT");
-
-            initialized = true;
+            s_Initialized = true;
 #endif
-            return initialized;
+            return s_Initialized;
         }
 
         /// <summary>
@@ -101,8 +86,8 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return null;
 
-            AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 
             AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
 
@@ -124,28 +109,28 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            if (string.IsNullOrEmpty(channel.id))
+            if (string.IsNullOrEmpty(channel.Id))
             {
                 throw new Exception("Cannot register notification channel, the channel ID is not specified.");
             }
-            else if (string.IsNullOrEmpty(channel.id))
+            if (string.IsNullOrEmpty(channel.Name))
             {
-                throw new Exception(string.Format("Cannot register notification channel: {0} , the channel Name is not set.", channel.id));
+                throw new Exception(string.Format("Cannot register notification channel: {0} , the channel Name is not set.", channel.Id));
             }
-            else if (string.IsNullOrEmpty(channel.description))
+            if (string.IsNullOrEmpty(channel.Description))
             {
-                throw new Exception(string.Format("Cannot register notification channel: {0} , the channel Description is not set.", channel.id));
+                throw new Exception(string.Format("Cannot register notification channel: {0} , the channel Description is not set.", channel.Id));
             }
 
-            notificationManager.Call("registerNotificationChannel",
-                channel.id,
-                channel.name,
+            s_NotificationManager.Call("registerNotificationChannel",
+                channel.Id,
+                channel.Name,
                 Enum.IsDefined(typeof(Importance), channel.importance) ? channel.importance : (int)Importance.Default,
-                channel.description,
-                channel.enableLights,
-                channel.enableVibration,
-                channel.canBypassDnd,
-                channel.canShowBadge,
+                channel.Description,
+                channel.EnableLights,
+                channel.EnableVibration,
+                channel.CanBypassDnd,
+                channel.CanShowBadge,
                 channel.VibrationPattern,
                 Enum.IsDefined(typeof(LockScreenVisibility), channel.lockscreenVisibility) ? channel.lockscreenVisibility : (int)LockScreenVisibility.Public
             );
@@ -173,7 +158,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            notificationManager.Call("cancelPendingNotificationIntent", id);
+            s_NotificationManager.Call("cancelPendingNotificationIntent", id);
         }
 
         /// <summary>
@@ -185,8 +170,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            AndroidJavaObject androidNotificationManager =
-                notificationManager.Call<AndroidJavaObject>("getNotificationManager");
+            AndroidJavaObject androidNotificationManager = s_NotificationManager.Call<AndroidJavaObject>("getNotificationManager");
             androidNotificationManager.Call("cancel", id);
         }
 
@@ -206,10 +190,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static void CancelAllScheduledNotifications()
         {
-            if (!Initialize())
-                return;
-
-            notificationManager.Call("cancelAllPendingNotificationIntents");
+            if (Initialize())
+                s_NotificationManager.Call("cancelAllPendingNotificationIntents");
         }
 
         /// <summary>
@@ -218,10 +200,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static void CancelAllDisplayedNotifications()
         {
-            if (!Initialize())
-                return;
-
-            notificationManager.Call("cancelAllNotifications");
+            if (Initialize())
+                s_NotificationManager.Call("cancelAllNotifications");
         }
 
         /// <summary>
@@ -234,21 +214,21 @@ namespace Unity.Notifications.Android
 
             List<AndroidNotificationChannel> channels = new List<AndroidNotificationChannel>();
 
-            var androidChannels = notificationManager.Call<AndroidJavaObject[]>("getNotificationChannels");
+            var androidChannels = s_NotificationManager.Call<AndroidJavaObject[]>("getNotificationChannels");
 
             foreach (var channel in androidChannels)
             {
                 var ch = new AndroidNotificationChannel();
-                ch.id = channel.Get<string>("id");
-                ch.name = channel.Get<string>("name");
+                ch.Id = channel.Get<string>("id");
+                ch.Name = channel.Get<string>("name");
                 ch.importance = channel.Get<int>("importance");
+                ch.Description = channel.Get<string>("description");
 
-                ch.description = channel.Get<string>("description");
+                ch.EnableLights = channel.Get<bool>("enableLights");
+                ch.EnableVibration = channel.Get<bool>("enableVibration");
+                ch.CanBypassDnd = channel.Get<bool>("canBypassDnd");
+                ch.CanShowBadge = channel.Get<bool>("canShowBadge");
 
-                ch.enableLights = channel.Get<bool>("enableLights");
-                ch.enableVibration = channel.Get<bool>("enableVibration");
-                ch.canBypassDnd = channel.Get<bool>("canBypassDnd");
-                ch.canShowBadge = channel.Get<bool>("canShowBadge");
                 // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
                 var vibrationPattern = channel.Get<long[]>("vibrationPattern");
                 if (vibrationPattern != null)
@@ -266,7 +246,7 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static AndroidNotificationChannel GetNotificationChannel(string id)
         {
-            return GetNotificationChannels().SingleOrDefault(c => c.Id == id);
+            return GetNotificationChannels().SingleOrDefault(channel => channel.Id == id);
         }
 
         /// <summary>
@@ -278,7 +258,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            if (notificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
+            if (s_NotificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
                 SendNotification(id, notification, channel);
         }
 
@@ -288,10 +268,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static void SendNotificationWithExplicitID(AndroidNotification notification, string channel, int id)
         {
-            if (!Initialize())
-                return;
-
-            SendNotification(id, notification, channel);
+            if (Initialize())
+                SendNotification(id, notification, channel);
         }
 
         /// <summary>
@@ -315,7 +293,7 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static NotificationStatus CheckScheduledNotificationStatus(int id)
         {
-            var status = notificationManager.Call<int>("checkNotificationStatus", id);
+            var status = s_NotificationManager.Call<int>("checkNotificationStatus", id);
             return (NotificationStatus)status;
         }
 
@@ -328,10 +306,9 @@ namespace Unity.Notifications.Android
 
             AndroidJavaClass managerClass =
                 new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-            AndroidJavaObject context = notificationManager.Get<AndroidJavaObject>("mContext");
+            AndroidJavaObject context = s_NotificationManager.Get<AndroidJavaObject>("mContext");
 
-            AndroidJavaObject notificationIntent =
-                new AndroidJavaObject("android.content.Intent", context, managerClass);
+            AndroidJavaObject notificationIntent = new AndroidJavaObject("android.content.Intent", context, managerClass);
 
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channel);
@@ -353,12 +330,10 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", notification.groupAlertBehaviour);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.showTimestamp);
 
-            long timestampValue =
-                notification.showCustomTimestamp ? notification.customTimestamp : notification.fireTime;
-
+            long timestampValue = notification.showCustomTimestamp ? notification.customTimestamp : notification.fireTime;
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
 
-            notificationManager.Call("scheduleNotificationIntent", notificationIntent);
+            s_NotificationManager.Call("scheduleNotificationIntent", notificationIntent);
         }
 
         /// <summary>
@@ -366,27 +341,23 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static void DeleteNotificationChannel(string id)
         {
-            if (!Initialize())
-                return;
-
-            notificationManager.Call("deleteNotificationChannel", id);
+            if (Initialize())
+                s_NotificationManager.Call("deleteNotificationChannel", id);
         }
 
         internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
         {
             var id = notificationIntent.Call<int>("getIntExtra", "id", -1);
-            var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
-
             if (id == -1)
                 return null;
 
-            var notification = new AndroidNotification();
+            var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
 
+            var notification = new AndroidNotification();
             notification.title = notificationIntent.Call<string>("getStringExtra", "textTitle");
             notification.text = notificationIntent.Call<string>("getStringExtra", "textContent");
             notification.shouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
-            notification.usesStopwatch =
-                notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
+            notification.usesStopwatch = notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
             notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
             notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
             notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
