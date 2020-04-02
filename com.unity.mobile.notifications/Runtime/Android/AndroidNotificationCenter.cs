@@ -79,7 +79,7 @@ namespace Unity.Notifications.Android
         /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
         /// </summary>
         /// <returns>
-        /// Returns the AndroidNotification used to open the app, returns ‘null ‘ if the app was not opened with a notification.
+        /// Returns the AndroidNotification used to open the app, returns null if the app was not opened with a notification.
         /// </returns>
         public static AndroidNotificationIntentData GetLastNotificationIntent()
         {
@@ -240,45 +240,45 @@ namespace Unity.Notifications.Android
         /// Returns the notification channel with the specified id.
         /// The notification channel struct fields might not be identical to the channel struct used to initially register the channel if they were changed by the user.
         /// </summary>
-        public static AndroidNotificationChannel GetNotificationChannel(string id)
+        public static AndroidNotificationChannel GetNotificationChannel(string channelId)
         {
-            return GetNotificationChannels().SingleOrDefault(channel => channel.Id == id);
+            return GetNotificationChannels().SingleOrDefault(channel => channel.Id == channelId);
         }
 
         /// <summary>
         /// Update an already scheduled notification.
         /// If a notification with the specified id was already scheduled it will be overridden with the information from the passed notification struct.
         /// </summary>
-        public static void UpdateScheduledNotification(int id, AndroidNotification notification, string channel)
+        public static void UpdateScheduledNotification(int id, AndroidNotification notification, string channelId)
         {
             if (!Initialize())
                 return;
 
             if (s_NotificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
-                SendNotification(id, notification, channel);
+                SendNotification(id, notification, channelId);
         }
 
         /// <summary>
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The specified id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
         /// </summary>
-        public static void SendNotificationWithExplicitID(AndroidNotification notification, string channel, int id)
+        public static void SendNotificationWithExplicitID(AndroidNotification notification, string channelId, int id)
         {
             if (Initialize())
-                SendNotification(id, notification, channel);
+                SendNotification(id, notification, channelId);
         }
 
         /// <summary>
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The returned id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
         /// </summary>
-        public static int SendNotification(AndroidNotification notification, string channel)
+        public static int SendNotification(AndroidNotification notification, string channelId)
         {
             if (!Initialize())
                 return -1;
 
             int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
-            SendNotification(id, notification, channel);
+            SendNotification(id, notification, channelId);
 
             return id;
         }
@@ -293,7 +293,7 @@ namespace Unity.Notifications.Android
             return (NotificationStatus)status;
         }
 
-        internal static void SendNotification(int id, AndroidNotification notification, string channel)
+        internal static void SendNotification(int id, AndroidNotification notification, string channelId)
         {
             if (notification.fireTime < 0L)
             {
@@ -307,7 +307,7 @@ namespace Unity.Notifications.Android
             AndroidJavaObject notificationIntent = new AndroidJavaObject("android.content.Intent", context, managerClass);
 
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channel);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channelId);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.title);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.text);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", notification.smallIcon);
@@ -335,10 +335,10 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Delete the specified notification channel.
         /// </summary>
-        public static void DeleteNotificationChannel(string id)
+        public static void DeleteNotificationChannel(string channelId)
         {
             if (Initialize())
-                s_NotificationManager.Call("deleteNotificationChannel", id);
+                s_NotificationManager.Call("deleteNotificationChannel", channelId);
         }
 
         internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
