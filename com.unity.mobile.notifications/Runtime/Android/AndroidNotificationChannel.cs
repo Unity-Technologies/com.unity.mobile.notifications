@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 namespace Unity.Notifications.Android
 {
@@ -128,30 +127,15 @@ namespace Unity.Notifications.Android
         public bool EnableVibration { get; set; }
 
         /// <summary>
+        /// Sets the vibration pattern for notifications posted to this channel.
+        /// </summary>
+        public long[] VibrationPattern { get; set; }
+
+        /// <summary>
         /// Sets whether or not notifications posted to this channel are shown on the lockscreen in full or redacted form.
         /// This can be changed by users in the settings app.
         /// </summary>
         public LockScreenVisibility LockScreenVisibility { get; set; }
-
-        internal int[] vibrationPattern;
-        /// <summary>
-        /// Sets the vibration pattern for notifications posted to this channel.
-        /// </summary>
-        public long[] VibrationPattern
-        {
-            // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
-            get
-            {
-                if (vibrationPattern == null)
-                    return null;
-                return vibrationPattern.Select(i => (long)i).ToArray();
-            }
-            set
-            {
-                if (value != null)
-                    vibrationPattern = value.Select(i => (int)i).ToArray();
-            }
-        }
 
         /// <summary>
         /// Returns false if the user has blocked this notification in the settings app. Channels can be manually blocked by settings it's Importance to None.
@@ -175,8 +159,9 @@ namespace Unity.Notifications.Android
             CanShowBadge = true;
             EnableLights = false;
             EnableVibration = true;
+            VibrationPattern = null;
+
             this.LockScreenVisibility = LockScreenVisibility.Public;
-            vibrationPattern = null;
         }
     }
 }

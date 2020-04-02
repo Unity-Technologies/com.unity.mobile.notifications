@@ -228,11 +228,7 @@ namespace Unity.Notifications.Android
                 ch.EnableVibration = channel.Get<bool>("enableVibration");
                 ch.CanBypassDnd = channel.Get<bool>("canBypassDnd");
                 ch.CanShowBadge = channel.Get<bool>("canShowBadge");
-
-                // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
-                var vibrationPattern = channel.Get<long[]>("vibrationPattern");
-                if (vibrationPattern != null)
-                    ch.vibrationPattern = vibrationPattern.Select(i => (int)i).ToArray();
+                ch.VibrationPattern = channel.Get<long[]>("vibrationPattern");
                 ch.LockScreenVisibility = channel.Get<int>("lockscreenVisibility").ToLockScreenVisibility();
 
                 channels.Add(ch);
