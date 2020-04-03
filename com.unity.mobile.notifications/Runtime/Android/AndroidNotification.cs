@@ -57,32 +57,20 @@ namespace Unity.Notifications.Android
         /// Notification title.
         /// Set the first line of text in the notification.
         /// </summary>
-        public string Title
-        {
-            get { return title; }
-            set { title = value; }
-        }
+        public string Title { get; set; }
 
         /// <summary>
         /// Notification body.
         /// Set the second line of text in the notification.
         /// </summary>
-        public string Text
-        {
-            get { return text; }
-            set { text = value; }
-        }
+        public string Text { get; set; }
 
         /// <summary>
         /// Notification small icon.
         /// It will be used to represent the notification in the status bar and content view (unless overridden there by a large icon)
         /// The icon PNG file has to be placed in the `/Assets/Plugins/Android/res/drawable` folder and it's name has to be specified without the extension.
         /// </summary>
-        public string SmallIcon
-        {
-            get { return smallIcon; }
-            set { smallIcon = value; }
-        }
+        public string SmallIcon { get; set; }
 
         private static long DatetimeToLong(DateTime value)
         {
@@ -128,11 +116,7 @@ namespace Unity.Notifications.Android
         /// Add a large icon to the notification content view. This image will be shown on the left of the notification view in place of the small icon (which will be placed in a small badge atop the large icon).
         /// The icon PNG file has to be placed in the `/Assets/Plugins/Android/res/drawable folder` and it's name has to be specified without the extension.
         /// </summary>
-        public string LargeIcon
-        {
-            get { return largeIcon; }
-            set { largeIcon = value; }
-        }
+        public string LargeIcon { get; set; }
 
         /// <summary>
         /// Apply a custom style to the notification.
@@ -179,52 +163,32 @@ namespace Unity.Notifications.Android
         /// Sets the number of items this notification represents.
         /// Is displayed as a badge count on the notification icon if the launcher supports this behavior.
         /// </summary>
-        public int Number
-        {
-            get { return number; }
-            set { number = value; }
-        }
+        public int Number { get; set; }
 
         /// <summary>
         /// This notification will automatically be dismissed when the user touches it.
         /// By default this behavior is turned off.
         /// </summary>
-        public bool ShouldAutoCancel
-        {
-            get { return shouldAutoCancel; }
-            set { shouldAutoCancel = value; }
-        }
+        public bool ShouldAutoCancel { get; set; }
 
         /// <summary>
         /// Show the notification time field as a stopwatch instead of a timestamp.
         /// </summary>
-        public bool UsesStopwatch
-        {
-            get { return usesStopwatch; }
-            set { usesStopwatch = value; }
-        }
+        public bool UsesStopwatch { get; set; }
 
         /// <summary>
         ///Set this property for the notification to be made part of a group of notifications sharing the same key.
         /// Grouped notifications may display in a cluster or stack on devices which support such rendering.
         /// Only available on Android 7.0 (API level 24) and above.
         /// </summary>
-        public string Group
-        {
-            get { return group; }
-            set { group = value; }
-        }
+        public string Group { get; set; }
 
         /// <summary>
         /// Set this notification to be the group summary for a group of notifications. Requires the 'Group' property to also be set.
         /// Grouped notifications may display in a cluster or stack on devices which support such rendering.
         /// Only available on Android 7.0 (API level 24) and above.
         /// </summary>
-        public bool GroupSummary
-        {
-            get { return groupSummary; }
-            set { groupSummary = value; }
-        }
+        public bool GroupSummary { get; set; }
 
         /// <summary>
         /// Sets the group alert behavior for this notification. Set this property to mute this notification if alerts for this notification's group should be handled by a different notification.
@@ -241,29 +205,17 @@ namespace Unity.Notifications.Android
         /// The sort key will be used to order this notification among other notifications from the same package.
         /// Notifications will be sorted lexicographically using this value.
         /// </summary>
-        public string SortKey
-        {
-            get { return sortKey; }
-            set { sortKey = value; }
-        }
+        public string SortKey { get; set; }
 
         /// <summary>
         /// Use this to save arbitrary string data related to the notification.
         /// </summary>
-        public string IntentData
-        {
-            get { return intentData; }
-            set { intentData = value; }
-        }
+        public string IntentData { get; set; }
 
         /// <summary>
         /// Enable it to show a timestamp on the notification when it's delivered, unless the "CustomTimestamp" property is set "FireTime" will be shown.
         /// </summary>
-        public bool ShowTimestamp
-        {
-            get { return showTimestamp; }
-            set { showTimestamp = value; }
-        }
+        public bool ShowTimestamp { get; set; }
 
         /// <summary>
         /// Set this to show custom date instead of the notification's "FireTime" as the notification's timestamp'.
@@ -273,66 +225,59 @@ namespace Unity.Notifications.Android
             get { return LongToDatetime(customTimestamp); }
             set
             {
-                showCustomTimestamp = true;
+                ShowCustomTimestamp = true;
                 customTimestamp = DatetimeToLong(value);
             }
         }
 
-        internal string title;
-        internal string text;
+        internal bool ShowCustomTimestamp { get; set; }
 
-        internal string smallIcon;
         internal long fireTime;
-        internal bool shouldAutoCancel;
-
-        internal string largeIcon;
 
         internal int style;
         internal int color;
 
-        internal int number;
-        internal bool usesStopwatch;
         internal long repeatInterval;
 
-        internal string intentData;
-
-        internal string group;
-        internal bool groupSummary;
-
-        internal string sortKey;
         internal int groupAlertBehaviour;
 
-        internal bool showTimestamp;
         internal long customTimestamp;
-
-        internal bool showCustomTimestamp;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
         /// </summary>
-        public AndroidNotification(String title, String text, DateTime fireTime)
+        public AndroidNotification(string title, string text, DateTime fireTime)
         {
-            this.title = title;
-            this.text = text;
+            Title = title;
+            Text = text;
+
+            SmallIcon = string.Empty;
+            LargeIcon = string.Empty;
+
+            Number = -1;
+
+            ShouldAutoCancel = false;
+            UsesStopwatch = false;
+
+            Group = string.Empty;
+            GroupSummary = false;
+
+            SortKey = string.Empty;
+            IntentData = string.Empty;
+
+            ShowTimestamp = false;
+            ShowCustomTimestamp = false;
 
             repeatInterval = -1;
-            smallIcon = "";
-            shouldAutoCancel = false;
-            largeIcon = "";
+
             style = (int)NotificationStyle.None;
             color = 0;
-            number = -1;
-            usesStopwatch = false;
-            intentData = "";
+
             this.fireTime = -1;
-            group = "";
-            this.groupSummary = false;
-            this.sortKey = "";
+
             this.groupAlertBehaviour = -1;
 
             customTimestamp = -1;
-            showTimestamp = false;
-            showCustomTimestamp = false;
 
             this.FireTime = fireTime;
         }
@@ -343,13 +288,13 @@ namespace Unity.Notifications.Android
         /// <remarks>
         /// There is a minimum period of 1 minute for repeating notifications.
         /// </remarks>
-        public AndroidNotification(String title, String text, DateTime fireTime, TimeSpan repeatInterval)
+        public AndroidNotification(string title, string text, DateTime fireTime, TimeSpan repeatInterval)
             : this(title, text, fireTime)
         {
             this.RepeatInterval = repeatInterval;
         }
 
-        public AndroidNotification(String title, String text, DateTime fireTime, TimeSpan repeatInterval, String smallIcon)
+        public AndroidNotification(string title, string text, DateTime fireTime, TimeSpan repeatInterval, string smallIcon)
             : this(title, text, fireTime, repeatInterval)
         {
             this.SmallIcon = smallIcon;

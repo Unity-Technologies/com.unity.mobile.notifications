@@ -308,25 +308,25 @@ namespace Unity.Notifications.Android
 
             notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channelId);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.title);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.text);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", notification.smallIcon);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.shouldAutoCancel);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.usesStopwatch);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.Title);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.Text);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", notification.SmallIcon);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.ShouldAutoCancel);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.UsesStopwatch);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", notification.fireTime);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.repeatInterval);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIconStr", notification.largeIcon);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIconStr", notification.LargeIcon);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.number);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.intentData);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "group", notification.group);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", notification.groupSummary);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.sortKey);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.Number);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.IntentData);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "group", notification.Group);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", notification.GroupSummary);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.SortKey);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", notification.groupAlertBehaviour);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.showTimestamp);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.ShowTimestamp);
 
-            long timestampValue = notification.showCustomTimestamp ? notification.customTimestamp : notification.fireTime;
+            long timestampValue = notification.ShowCustomTimestamp ? notification.customTimestamp : notification.fireTime;
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
 
             s_NotificationManager.Call("scheduleNotificationIntent", notificationIntent);
@@ -350,19 +350,19 @@ namespace Unity.Notifications.Android
             var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
 
             var notification = new AndroidNotification();
-            notification.title = notificationIntent.Call<string>("getStringExtra", "textTitle");
-            notification.text = notificationIntent.Call<string>("getStringExtra", "textContent");
-            notification.shouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
-            notification.usesStopwatch = notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
+            notification.Title = notificationIntent.Call<string>("getStringExtra", "textTitle");
+            notification.Text = notificationIntent.Call<string>("getStringExtra", "textContent");
+            notification.ShouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
+            notification.UsesStopwatch = notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
             notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
             notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
             notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
             notification.color = notificationIntent.Call<int>("getIntExtra", "color", 0);
-            notification.number = notificationIntent.Call<int>("getIntExtra", "number", -1);
-            notification.intentData = notificationIntent.Call<string>("getStringExtra", "data");
-            notification.group = notificationIntent.Call<string>("getStringExtra", "group");
-            notification.groupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
-            notification.sortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
+            notification.Number = notificationIntent.Call<int>("getIntExtra", "number", -1);
+            notification.IntentData = notificationIntent.Call<string>("getStringExtra", "data");
+            notification.Group = notificationIntent.Call<string>("getStringExtra", "group");
+            notification.GroupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
+            notification.SortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
             notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
 
             return new AndroidNotificationIntentData(id, channel, notification);
