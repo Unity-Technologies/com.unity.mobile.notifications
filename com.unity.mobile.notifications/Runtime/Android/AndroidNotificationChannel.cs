@@ -54,25 +54,6 @@ namespace Unity.Notifications.Android
         Public = 1,
     }
 
-    internal static partial class AndroidNotificationExtension
-    {
-        public static Importance ToImportance(this int importance)
-        {
-            if (Enum.IsDefined(typeof(Importance), importance))
-                return (Importance)importance;
-
-            return Importance.Default;
-        }
-
-        public static LockScreenVisibility ToLockScreenVisibility(this int lockscreenVisibility)
-        {
-            if (Enum.IsDefined(typeof(LockScreenVisibility), lockscreenVisibility))
-                return (LockScreenVisibility)lockscreenVisibility;
-
-            return LockScreenVisibility.Public;
-        }
-    }
-
     public struct AndroidNotificationChannel
     {
         /// <summary>
