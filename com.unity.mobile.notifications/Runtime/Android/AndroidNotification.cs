@@ -48,6 +48,17 @@ namespace Unity.Notifications.Android
         GroupAlertChildren = 2,
     }
 
+    internal static partial class AndroidNotificationExtension
+    {
+        public static GroupAlertBehaviours ToGroupAlertBehaviours(this int groupAlertBehaviour)
+        {
+            if (Enum.IsDefined(typeof(GroupAlertBehaviours), groupAlertBehaviour))
+                return (GroupAlertBehaviours)groupAlertBehaviour;
+
+            return GroupAlertBehaviours.GroupAlertAll;
+        }
+    }
+
     /// <summary>
     /// The AndroidNotification is used schedule a local notification, which includes the content of the notification.
     /// </summary>
@@ -195,11 +206,7 @@ namespace Unity.Notifications.Android
         /// This is only applicable for notifications that belong to a group. This must be set on all notifications you want to mute.
         /// Only available on Android 8.0 (API level 26) and above.
         /// </summary>
-        public GroupAlertBehaviours GroupAlertBehaviour
-        {
-            get { return (GroupAlertBehaviours)groupAlertBehaviour; }
-            set { groupAlertBehaviour = (int)value; }
-        }
+        public GroupAlertBehaviours GroupAlertBehaviour { get; set; }
 
         /// <summary>
         /// The sort key will be used to order this notification among other notifications from the same package.
@@ -239,8 +246,6 @@ namespace Unity.Notifications.Android
 
         internal long repeatInterval;
 
-        internal int groupAlertBehaviour;
-
         internal long customTimestamp;
 
         /// <summary>
@@ -275,7 +280,7 @@ namespace Unity.Notifications.Android
 
             this.fireTime = -1;
 
-            this.groupAlertBehaviour = -1;
+            GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
 
             customTimestamp = -1;
 

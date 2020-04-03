@@ -616,10 +616,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             notificationBuilder.setPriority(priority);
         } else {
             // groupAlertBehaviour is only supported for Android O and above.
-            int groupAlertBehaviour = intent.getIntExtra("groupAlertBehaviour", -1);
-            if (groupAlertBehaviour >= 0) {
-                notificationBuilder.setGroupAlertBehavior(groupAlertBehaviour);
-            }
+            int groupAlertBehaviour = intent.getIntExtra("groupAlertBehaviour", 0);
+            notificationBuilder.setGroupAlertBehavior(groupAlertBehaviour);
         }
 
         return notificationBuilder;

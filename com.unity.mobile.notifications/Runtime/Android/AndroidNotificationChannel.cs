@@ -54,7 +54,7 @@ namespace Unity.Notifications.Android
         Public = 1,
     }
 
-    internal static class NotificationEnumsExtension
+    internal static partial class AndroidNotificationExtension
     {
         public static Importance ToImportance(this int importance)
         {

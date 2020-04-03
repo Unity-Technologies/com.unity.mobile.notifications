@@ -323,7 +323,7 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "group", notification.Group);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", notification.GroupSummary);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.SortKey);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", notification.groupAlertBehaviour);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", (int)notification.GroupAlertBehaviour);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.ShowTimestamp);
 
             long timestampValue = notification.ShowCustomTimestamp ? notification.customTimestamp : notification.fireTime;
@@ -363,7 +363,7 @@ namespace Unity.Notifications.Android
             notification.Group = notificationIntent.Call<string>("getStringExtra", "group");
             notification.GroupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
             notification.SortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
-            notification.groupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", -1);
+            notification.GroupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", 0).ToGroupAlertBehaviours();
 
             return new AndroidNotificationIntentData(id, channel, notification);
         }
