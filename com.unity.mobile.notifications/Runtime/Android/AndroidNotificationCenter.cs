@@ -295,7 +295,8 @@ namespace Unity.Notifications.Android
 
         internal static void SendNotification(int id, AndroidNotification notification, string channelId)
         {
-            if (notification.fireTime < 0L)
+            long fireTime = notification.FireTime.ToLong();
+            if (fireTime < 0L)
             {
                 Debug.LogError("Failed to schedule notification, it did not contain a valid FireTime");
             }
@@ -313,11 +314,11 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", notification.SmallIcon);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.ShouldAutoCancel);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.UsesStopwatch);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", notification.fireTime);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.repeatInterval);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", fireTime);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.RepeatInterval.ToLong());
             notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIconStr", notification.LargeIcon);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "style", notification.style);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.color);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "style", (int)notification.Style);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.Color.ToInt());
             notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.Number);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.IntentData);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "group", notification.Group);
@@ -326,7 +327,7 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", (int)notification.GroupAlertBehaviour);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.ShowTimestamp);
 
-            long timestampValue = notification.ShowCustomTimestamp ? notification.customTimestamp : notification.fireTime;
+            long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
 
             s_NotificationManager.Call("scheduleNotificationIntent", notificationIntent);
@@ -347,17 +348,17 @@ namespace Unity.Notifications.Android
             if (id == -1)
                 return null;
 
-            var channel = notificationIntent.Call<string>("getStringExtra", "channelID");
+            var channelId = notificationIntent.Call<string>("getStringExtra", "channelID");
 
             var notification = new AndroidNotification();
             notification.Title = notificationIntent.Call<string>("getStringExtra", "textTitle");
             notification.Text = notificationIntent.Call<string>("getStringExtra", "textContent");
             notification.ShouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
             notification.UsesStopwatch = notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
-            notification.fireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L);
-            notification.repeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L);
-            notification.style = notificationIntent.Call<int>("getIntExtra", "style", -1);
-            notification.color = notificationIntent.Call<int>("getIntExtra", "color", 0);
+            notification.FireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L).ToDatetime();
+            notification.RepeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L).ToTimeSpan();
+            notification.Style = notificationIntent.Call<int>("getIntExtra", "style", 0).ToNotificationStyle();
+            notification.Color = notificationIntent.Call<int>("getIntExtra", "color", 0).ToColor();
             notification.Number = notificationIntent.Call<int>("getIntExtra", "number", -1);
             notification.IntentData = notificationIntent.Call<string>("getStringExtra", "data");
             notification.Group = notificationIntent.Call<string>("getStringExtra", "group");
@@ -365,7 +366,7 @@ namespace Unity.Notifications.Android
             notification.SortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
             notification.GroupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", 0).ToGroupAlertBehaviours();
 
-            return new AndroidNotificationIntentData(id, channel, notification);
+            return new AndroidNotificationIntentData(id, channelId, notification);
         }
 
         internal static void ReceivedNotificationCallback(AndroidJavaObject intent)

@@ -50,12 +50,63 @@ namespace Unity.Notifications.Android
 
     internal static partial class AndroidNotificationExtension
     {
+        public static NotificationStyle ToNotificationStyle(this int notificationStyle)
+        {
+            if (Enum.IsDefined(typeof(NotificationStyle), notificationStyle))
+                return (NotificationStyle)notificationStyle;
+
+            return NotificationStyle.None;
+        }
+
         public static GroupAlertBehaviours ToGroupAlertBehaviours(this int groupAlertBehaviour)
         {
             if (Enum.IsDefined(typeof(GroupAlertBehaviours), groupAlertBehaviour))
                 return (GroupAlertBehaviours)groupAlertBehaviour;
 
             return GroupAlertBehaviours.GroupAlertAll;
+        }
+
+        public static Color ToColor(this int color)
+        {
+            int a = (color >> 24) & 0xff;
+            int r = (color >> 16) & 0xff;
+            int g = (color >> 8) & 0xff;
+            int b = (color) & 0xff;
+
+            return new Color(a, r, g, b);
+        }
+
+        public static int ToInt(this Color? color)
+        {
+            if (color.HasValue)
+                return 0;
+
+            var color32 = (Color32)color;
+            return (color32.a & 0xff) << 24 | (color32.r & 0xff) << 16 | (color32.g & 0xff) << 8 | (color32.b & 0xff);
+        }
+
+        public static long ToLong(this DateTime dateTime)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan diff = dateTime.ToUniversalTime() - origin;
+
+            return (long)Math.Floor(diff.TotalMilliseconds);
+        }
+
+        public static DateTime ToDatetime(this long dateTime)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return origin.AddMilliseconds(dateTime).ToLocalTime();
+        }
+
+        public static long ToLong(this TimeSpan? timeSpan)
+        {
+            return timeSpan.HasValue ? (long)timeSpan.Value.TotalMilliseconds : -1L;
+        }
+
+        public static TimeSpan ToTimeSpan(this long timeSpan)
+        {
+            return TimeSpan.FromMilliseconds(timeSpan);
         }
     }
 
@@ -83,28 +134,10 @@ namespace Unity.Notifications.Android
         /// </summary>
         public string SmallIcon { get; set; }
 
-        private static long DatetimeToLong(DateTime value)
-        {
-            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            TimeSpan diff = value.ToUniversalTime() - origin;
-
-            return (long)Math.Floor(diff.TotalMilliseconds);
-        }
-
-        private static DateTime LongToDatetime(long value)
-        {
-            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            return origin.AddMilliseconds(value).ToLocalTime();
-        }
-
         /// <summary>
         /// The date and time when the notification should be delivered.
         /// </summary>
-        public DateTime FireTime
-        {
-            get { return LongToDatetime(fireTime); }
-            set { fireTime = DatetimeToLong(value); }
-        }
+        public DateTime FireTime { get; set; }
 
         /// <summary>
         /// The notification will be be repeated on every specified time interval.
@@ -112,14 +145,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public TimeSpan? RepeatInterval
         {
-            get { return TimeSpan.FromMilliseconds(repeatInterval); }
-            set
-            {
-                if (value != null)
-                    repeatInterval = (long)value.Value.TotalMilliseconds;
-                else
-                    repeatInterval = -1L;
-            }
+            get { return m_RepeatInterval; }
+            set { m_RepeatInterval = value.HasValue ? value.Value : (-1L).ToTimeSpan(); }
         }
 
         /// <summary>
@@ -133,11 +160,7 @@ namespace Unity.Notifications.Android
         /// Apply a custom style to the notification.
         /// Currently only BigPicture and BigText styles are supported.
         /// </summary>
-        public NotificationStyle Style
-        {
-            get { return (NotificationStyle)style; }
-            set { style = (int)value; }
-        }
+        public NotificationStyle Style { get; set; }
 
         /// <summary>
         /// Accent color to be applied by the standard style templates when presenting this notification.
@@ -145,29 +168,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public Color? Color
         {
-            get
-            {
-                if (color == 0)
-                    return null;
-
-                int a = (color >> 24) & 0xff;
-                int r = (color >> 16) & 0xff;
-                int g = (color >> 8) & 0xff;
-                int b = (color) & 0xff;
-
-                return new Color32((byte)a, (byte)r, (byte)g, (byte)b);
-            }
-            set
-            {
-                if (value == null)
-                    color = 0;
-                else
-                {
-                    var color32 = (Color32)value.Value;
-                    color = (color32.a & 0xff) << 24 | (color32.r & 0xff) << 16 | (color32.g & 0xff) << 8 |
-                        (color32.b & 0xff);
-                }
-            }
+            get { return m_Color; }
+            set { m_Color = value.HasValue ? value.Value : new Color(0, 0, 0, 0); }
         }
 
         /// <summary>
@@ -229,24 +231,19 @@ namespace Unity.Notifications.Android
         /// </summary>
         public DateTime CustomTimestamp
         {
-            get { return LongToDatetime(customTimestamp); }
+            get { return m_CustomTimestamp; }
             set
             {
                 ShowCustomTimestamp = true;
-                customTimestamp = DatetimeToLong(value);
+                m_CustomTimestamp = value;
             }
         }
 
         internal bool ShowCustomTimestamp { get; set; }
 
-        internal long fireTime;
-
-        internal int style;
-        internal int color;
-
-        internal long repeatInterval;
-
-        internal long customTimestamp;
+        private Color m_Color;
+        private TimeSpan m_RepeatInterval;
+        private DateTime m_CustomTimestamp;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
@@ -255,36 +252,25 @@ namespace Unity.Notifications.Android
         {
             Title = title;
             Text = text;
+            FireTime = fireTime;
 
             SmallIcon = string.Empty;
-            LargeIcon = string.Empty;
-
-            Number = -1;
-
             ShouldAutoCancel = false;
+            LargeIcon = string.Empty;
+            Style = NotificationStyle.None;
+            Number = -1;
             UsesStopwatch = false;
-
+            IntentData = string.Empty;
             Group = string.Empty;
             GroupSummary = false;
-
             SortKey = string.Empty;
-            IntentData = string.Empty;
-
+            GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
             ShowTimestamp = false;
             ShowCustomTimestamp = false;
 
-            repeatInterval = -1;
-
-            style = (int)NotificationStyle.None;
-            color = 0;
-
-            this.fireTime = -1;
-
-            GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
-
-            customTimestamp = -1;
-
-            this.FireTime = fireTime;
+            m_RepeatInterval = (-1L).ToTimeSpan();
+            m_Color = new Color(0, 0, 0, 0);
+            m_CustomTimestamp = (-1L).ToDatetime();
         }
 
         /// <summary>
@@ -296,13 +282,13 @@ namespace Unity.Notifications.Android
         public AndroidNotification(string title, string text, DateTime fireTime, TimeSpan repeatInterval)
             : this(title, text, fireTime)
         {
-            this.RepeatInterval = repeatInterval;
+            RepeatInterval = repeatInterval;
         }
 
         public AndroidNotification(string title, string text, DateTime fireTime, TimeSpan repeatInterval, string smallIcon)
             : this(title, text, fireTime, repeatInterval)
         {
-            this.SmallIcon = smallIcon;
+            SmallIcon = smallIcon;
         }
     }
 }

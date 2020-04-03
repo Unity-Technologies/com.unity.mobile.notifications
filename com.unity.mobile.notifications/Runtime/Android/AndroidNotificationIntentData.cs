@@ -10,10 +10,10 @@ namespace Unity.Notifications.Android
 
         public AndroidNotification Notification { get; }
 
-        public AndroidNotificationIntentData(int id, string channel, AndroidNotification notification)
+        public AndroidNotificationIntentData(int id, string channelId, AndroidNotification notification)
         {
             Id = id;
-            Channel = channel;
+            Channel = channelId;
             Notification = notification;
         }
     }
