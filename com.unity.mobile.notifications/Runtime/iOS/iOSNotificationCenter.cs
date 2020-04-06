@@ -64,13 +64,7 @@ namespace Unity.Notifications.iOS
         private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate {};
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
-
-        internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted
-        {
-            add { s_OnAuthorizationRequestCompleted += value; }
-            remove { s_OnAuthorizationRequestCompleted -= value; }
-        }
-        private static event AuthorizationRequestCompletedCallback s_OnAuthorizationRequestCompleted = delegate {};
+        internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted = delegate {};
 
         static bool Initialize()
         {
@@ -216,7 +210,7 @@ namespace Unity.Notifications.iOS
 
         internal static void OnFinishedAuthorizationRequest(iOSAuthorizationRequestData data)
         {
-            s_OnAuthorizationRequestCompleted(data);
+            OnAuthorizationRequestCompleted(data);
         }
     }
 }
