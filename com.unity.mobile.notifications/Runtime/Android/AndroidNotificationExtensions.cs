@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Unity.Notifications.Android
 {
-    internal static class AndroidNotificationExtension
+    internal static class AndroidNotificationExtensions
     {
         public static Importance ToImportance(this int importance)
         {
