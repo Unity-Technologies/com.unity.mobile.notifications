@@ -1,3 +1,4 @@
+using System.IO;
 using NUnit.Framework;
 using Unity.Notifications.iOS;
 
@@ -8,7 +9,10 @@ namespace Unity.Notifications.Tests
         [OneTimeSetUp]
         public void ResetSettings()
         {
-            NotificationSettingsManager.DeleteSettings();
+            if (File.Exists(NotificationSettingsManager.k_SettingsPath))
+            {
+                File.Delete(NotificationSettingsManager.k_SettingsPath);
+            }
         }
 
         [Test]
