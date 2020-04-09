@@ -237,7 +237,7 @@ namespace Unity.Notifications
 
                 // Draw the help message for setting the icons.
                 var iconListMessageRect = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 105f, notificationsPanelRect.width, 55f);
-                EditorGUI.TextArea(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
+                EditorGUI.SelectableLabel(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
 
                 // Draw the reorderable list for the icon list.
                 var iconListRect = new Rect(iconListMessageRect.x, iconListMessageRect.y + 58f, notificationsPanelRect.width, notificationsPanelRect.height - 55f);
