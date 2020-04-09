@@ -4,30 +4,17 @@ namespace Unity.Notifications.Android
 {
     public class AndroidNotificationIntentData
     {
-        protected int m_Id;
-        protected string m_Channel;
-        protected AndroidNotification m_Notification;
+        public int Id { get; }
 
-        public AndroidNotificationIntentData(int id, string channel, AndroidNotification notification)
-        {
-            m_Id = id;
-            m_Channel = channel;
-            m_Notification = notification;
-        }
+        public string Channel { get; }
 
-        public int Id
-        {
-            get { return m_Id; }
-        }
+        public AndroidNotification Notification { get; }
 
-        public string Channel
+        public AndroidNotificationIntentData(int id, string channelId, AndroidNotification notification)
         {
-            get { return m_Channel; }
-        }
-
-        public AndroidNotification Notification
-        {
-            get { return m_Notification; }
+            Id = id;
+            Channel = channelId;
+            Notification = notification;
         }
     }
 }

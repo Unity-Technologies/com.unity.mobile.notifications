@@ -1,10 +1,11 @@
-using System.Linq;
+using System;
 
 namespace Unity.Notifications.Android
 {
     /// <summary>
     /// The level of interruption of this notification channel.
-    /// The importance of a notification is used to determine how much the notification should interrupt the user (visually and audibly). The higher the importance of a notification, the more interruptive the notification will be.
+    /// The importance of a notification is used to determine how much the notification should interrupt the user (visually and audibly).
+    /// The higher the importance of a notification, the more interruptive the notification will be.
     /// </summary>
     /// <remarks>
     /// The exact behaviour of each importance level might vary depending on the device and OS version on devices running Android 7.1 or older.
@@ -56,50 +57,20 @@ namespace Unity.Notifications.Android
     public struct AndroidNotificationChannel
     {
         /// <summary>
-        /// Create a notification channel struct with all optional fields set to default values.
-        /// </summary>
-        public AndroidNotificationChannel(string id, string name, string description, Importance importance)
-        {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.importance = (int)importance;
-
-            canBypassDnd = false;
-            canShowBadge = true;
-            enableLights = false;
-            enableVibration = true;
-            lockscreenVisibility = (int)LockScreenVisibility.Public;
-            vibrationPattern = null;
-        }
-
-        /// <summary>
         /// Notification channel identifier.
         /// Must be specified when scheduling notifications.
         /// </summary>
-        public string Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
+        public string Id { get; set; }
 
         /// <summary>
         /// Notification channel name which is visible to users.
         /// </summary>
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// User visible description of the notification channel.
         /// </summary>
-        public string Description
-        {
-            get { return description; }
-            set { description = value; }
-        }
+        public string Description { get; set; }
 
         /// <summary>
         /// Importance level which is applied to all notifications sent to the channel.
@@ -111,79 +82,41 @@ namespace Unity.Notifications.Android
         ///    Low: No sound.
         ///    None: No sound and does not appear in the status bar.
         /// </summary>
-        public Importance Importance
-        {
-            get { return (Importance)importance; }
-            set { importance = (int)value; }
-        }
+        public Importance Importance { get; set; }
 
         /// <summary>
         /// Whether or not notifications posted to this channel can bypass the Do Not Disturb.
         /// This can be changed by users in the settings app.
         /// </summary>
-        public bool CanBypassDnd
-        {
-            get { return canBypassDnd; }
-            set { canBypassDnd = value; }
-        }
+        public bool CanBypassDnd { get; set; }
 
         /// <summary>
         /// Whether notifications posted to this channel can appear as badges in a Launcher application.
         /// </summary>
-        public bool CanShowBadge
-        {
-            get { return canShowBadge; }
-            set { canShowBadge = value; }
-        }
+        public bool CanShowBadge { get; set; }
 
         /// <summary>
         /// Sets whether notifications posted to this channel should display notification lights, on devices that support that feature.
         /// This can be changed by users in the settings app.
         /// </summary>/
-        public bool EnableLights
-        {
-            get { return enableLights; }
-            set { enableLights = value; }
-        }
+        public bool EnableLights { get; set; }
 
         /// <summary>
         /// Sets whether notification posted to this channel should vibrate.
         /// This can be changed by users in the settings app.
         /// </summary>
-        public bool EnableVibration
-        {
-            get { return enableVibration; }
-            set { enableVibration = value; }
-        }
+        public bool EnableVibration { get; set; }
+
+        /// <summary>
+        /// Sets the vibration pattern for notifications posted to this channel.
+        /// </summary>
+        public long[] VibrationPattern { get; set; }
 
         /// <summary>
         /// Sets whether or not notifications posted to this channel are shown on the lockscreen in full or redacted form.
         /// This can be changed by users in the settings app.
         /// </summary>
-        public LockScreenVisibility LockScreenVisibility
-        {
-            get { return (LockScreenVisibility)lockscreenVisibility; }
-            set { lockscreenVisibility = (int)value; }
-        }
-
-        /// <summary>
-        /// Sets the vibration pattern for notifications posted to this channel.
-        /// </summary>
-        public long[] VibrationPattern
-        {
-            // There is an issue with IL2CPP failing to compile a struct which contains an array of long on Unity 2019.2+ (see case 1173310).
-            get
-            {
-                if (vibrationPattern == null)
-                    return null;
-                return vibrationPattern.Select(i => (long)i).ToArray();
-            }
-            set
-            {
-                if (value != null)
-                    vibrationPattern = value.Select(i => (int)i).ToArray();
-            }
-        }
+        public LockScreenVisibility LockScreenVisibility { get; set; }
 
         /// <summary>
         /// Returns false if the user has blocked this notification in the settings app. Channels can be manually blocked by settings it's Importance to None.
@@ -193,16 +126,23 @@ namespace Unity.Notifications.Android
             get { return Importance != Importance.None; }
         }
 
-        internal string id;
-        internal string name;
-        internal string description;
-        internal int importance;
+        /// <summary>
+        /// Create a notification channel struct with all optional fields set to default values.
+        /// </summary>
+        public AndroidNotificationChannel(string id, string name, string description, Importance importance)
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            this.Importance = importance;
 
-        internal bool canBypassDnd;
-        internal bool canShowBadge;
-        internal bool enableLights;
-        internal bool enableVibration;
-        internal int lockscreenVisibility;
-        internal int[] vibrationPattern;
+            CanBypassDnd = false;
+            CanShowBadge = true;
+            EnableLights = false;
+            EnableVibration = true;
+            VibrationPattern = null;
+
+            this.LockScreenVisibility = LockScreenVisibility.Public;
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace Unity.Notifications.iOS
     /// </summary>
     public class iOSNotificationCenter
     {
-        private static bool initialized;
+        private static bool s_Initialized;
 
         public delegate void NotificationReceivedCallback(iOSNotification notification);
 
@@ -18,22 +18,22 @@ namespace Unity.Notifications.iOS
         {
             add
             {
-                if (!onNotificationReceivedCallbackSet)
+                if (!s_OnNotificationReceivedCallbackSet)
                 {
                     iOSNotificationsWrapper.RegisterOnReceivedCallback();
-                    onNotificationReceivedCallbackSet = true;
+                    s_OnNotificationReceivedCallbackSet = true;
                 }
 
-                onNotificationReceived += value;
+                s_OnNotificationReceived += value;
             }
             remove
             {
-                onNotificationReceived -= value;
+                s_OnNotificationReceived -= value;
             }
         }
 
-        private static bool onNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback onNotificationReceived = delegate(iOSNotification notification) {};
+        private static bool s_OnNotificationReceivedCallbackSet;
+        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate {};
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
@@ -46,27 +46,25 @@ namespace Unity.Notifications.iOS
         {
             add
             {
-                if (!onRemoteNotificationReceivedCallbackSet)
+                if (!s_OnRemoteNotificationReceivedCallbackSet)
                 {
                     iOSNotificationsWrapper.RegisterOnReceivedRemoteNotificationCallback();
-                    onRemoteNotificationReceivedCallbackSet = true;
+                    s_OnRemoteNotificationReceivedCallbackSet = true;
                 }
 
-                onRemoteNotificationReceived += value;
+                s_OnRemoteNotificationReceived += value;
             }
             remove
             {
-                onRemoteNotificationReceived -= value;
+                s_OnRemoteNotificationReceived -= value;
             }
         }
 
-        private static bool onRemoteNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback onRemoteNotificationReceived = delegate(iOSNotification notification) {};
-
+        private static bool s_OnRemoteNotificationReceivedCallbackSet;
+        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate {};
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
         internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted = delegate {};
-
 
         static bool Initialize()
         {
@@ -74,11 +72,11 @@ namespace Unity.Notifications.iOS
             return false;
 #elif UNITY_IOS
 
-            if (initialized)
+            if (s_Initialized)
                 return true;
 
             iOSNotificationsWrapper.RegisterOnReceivedCallback();
-            return initialized = true;
+            return s_Initialized = true;
 #endif
         }
 
@@ -111,14 +109,12 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Un-schedule the specified notification.
+        /// Unschedules the specified notification.
         /// </summary>
         public static void RemoveScheduledNotification(string identifier)
         {
-            if (!Initialize())
-                return;
-
-            iOSNotificationsWrapper._RemoveScheduledNotification(identifier);
+            if (Initialize())
+                iOSNotificationsWrapper._RemoveScheduledNotification(identifier);
         }
 
         /// <summary>
@@ -126,9 +122,8 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public static void RemoveDeliveredNotification(string identifier)
         {
-            if (!Initialize())
-                return;
-            iOSNotificationsWrapper._RemoveDeliveredNotification(identifier);
+            if (Initialize())
+                iOSNotificationsWrapper._RemoveDeliveredNotification(identifier);
         }
 
         /// <summary>
@@ -136,9 +131,8 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public static void RemoveAllScheduledNotifications()
         {
-            if (!Initialize())
-                return;
-            iOSNotificationsWrapper._RemoveAllScheduledNotifications();
+            if (Initialize())
+                iOSNotificationsWrapper._RemoveAllScheduledNotifications();
         }
 
         /// <summary>
@@ -146,9 +140,8 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public static void RemoveAllDeliveredNotifications()
         {
-            if (!Initialize())
-                return;
-            iOSNotificationsWrapper._RemoveAllDeliveredNotifications();
+            if (Initialize())
+                iOSNotificationsWrapper._RemoveAllDeliveredNotifications();
         }
 
         /// <summary>
@@ -201,21 +194,21 @@ namespace Unity.Notifications.iOS
             iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
         }
 
-        internal static void onReceivedRemoteNotification(iOSNotificationData data)
+        internal static void OnReceivedRemoteNotification(iOSNotificationData data)
         {
             var notification = new iOSNotification(data.identifier);
             notification.data = data;
-            onRemoteNotificationReceived(notification);
+            s_OnRemoteNotificationReceived(notification);
         }
 
-        internal static void onSentNotification(iOSNotificationData data)
+        internal static void OnSentNotification(iOSNotificationData data)
         {
             var notification = new iOSNotification(data.identifier);
             notification.data = data;
-            onNotificationReceived(notification);
+            s_OnNotificationReceived(notification);
         }
 
-        internal static void onFinishedAuthorizationRequest(iOSAuthorizationRequestData data)
+        internal static void OnFinishedAuthorizationRequest(iOSAuthorizationRequestData data)
         {
             OnAuthorizationRequestCompleted(data);
         }
