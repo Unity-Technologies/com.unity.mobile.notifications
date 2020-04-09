@@ -89,8 +89,6 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string DeviceToken { get; private set; }
 
-        internal delegate void AuthorizationRequestCallback(iOSAuthorizationRequestData notification);
-
         /// <summary>
         /// Initiate an authorization request.
         /// </summary>
@@ -104,25 +102,15 @@ namespace Unity.Notifications.iOS
 
             iOSNotificationCenter.OnAuthorizationRequestCompleted += data =>
             {
-                Debug.Log("            iOSNotificationsWrapper.onAuthenticationRequestFinished += data => ");
                 IsFinished = data.finished;
                 Granted = data.granted;
                 Error = data.error;
                 DeviceToken = data.deviceToken;
-            }
-            ;
-        }
-
-        internal void OnCompletion(iOSAuthorizationRequestData data)
-        {
-            IsFinished = data.finished;
-            Granted = data.granted;
-            Error = data.error;
+            };
         }
 
         public void Dispose()
         {
-            ;// TODO
         }
     }
 }

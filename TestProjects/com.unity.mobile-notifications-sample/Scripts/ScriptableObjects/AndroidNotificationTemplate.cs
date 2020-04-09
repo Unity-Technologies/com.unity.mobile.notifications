@@ -34,6 +34,7 @@ namespace Unity.Notifications.Tests.Sample
         public string SortKey = "";
         [TextArea] public string IntentData = "";
         public bool ShowTimestamp = false;
+        public long RepeatInterval;
 #endif
     }
 }

@@ -50,13 +50,13 @@ namespace Unity.Notifications.iOS
         internal static extern void _RemoveDeliveredNotification(string identifier);
 
         [DllImport("__Internal")]
-        internal static extern void _SetApplicationBadge(Int32 badge);
+        private static extern void _SetApplicationBadge(Int32 badge);
 
         [DllImport("__Internal")]
-        internal static extern Int32 _GetApplicationBadge();
+        private static extern Int32 _GetApplicationBadge();
 
         [DllImport("__Internal")]
-        internal static extern bool _GetAppOpenedUsingNotification();
+        private static extern bool _GetAppOpenedUsingNotification();
 
         [DllImport("__Internal")]
         internal static extern void _RemoveAllDeliveredNotifications();
@@ -64,41 +64,39 @@ namespace Unity.Notifications.iOS
         [DllImport("__Internal")]
         private static extern IntPtr _GetLastNotificationData();
 
-
         [DllImport("__Internal")]
-        internal static extern void _FreeUnmanagedStruct(IntPtr ptr);
+        private static extern void _FreeUnmanagedStruct(IntPtr ptr);
 
+        private delegate void AuthorizationRequestCallback(IntPtr authdata);
+        private delegate void NotificationReceivedCallback(IntPtr notificationData);
 
-        internal delegate void AuthorizationRequestCallback(IntPtr authdata);
-        internal static AuthorizationRequestCallback onAuthenticationRequestFinished = null;
-
-
-        internal delegate void NotificationReceivedCallback(IntPtr notificationData);
-        internal static NotificationReceivedCallback onNotificationReceived = null;
-        internal static NotificationReceivedCallback onRemoteNotificationReceived = null;
-
+#if UNITY_IOS && !UNITY_EDITOR
+        private static AuthorizationRequestCallback s_OnAuthenticationRequestFinished = null;
+        private static NotificationReceivedCallback s_OnNotificationReceived = null;
+        private static NotificationReceivedCallback s_OnRemoteNotificationReceived = null;
+#endif
 
         public static void RegisterAuthorizationRequestCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            onAuthenticationRequestFinished = new AuthorizationRequestCallback(AuthorizationRequestReceived);
-            _SetAuthorizationRequestReceivedDelegate(onAuthenticationRequestFinished);
+            s_OnAuthenticationRequestFinished = new AuthorizationRequestCallback(AuthorizationRequestReceived);
+            _SetAuthorizationRequestReceivedDelegate(s_OnAuthenticationRequestFinished);
 #endif
         }
 
         public static void RegisterOnReceivedRemoteNotificationCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            onRemoteNotificationReceived = new NotificationReceivedCallback(RemoteNotificationReceived);
-            _SetRemoteNotificationReceivedDelegate(onRemoteNotificationReceived);
+            s_OnRemoteNotificationReceived = new NotificationReceivedCallback(RemoteNotificationReceived);
+            _SetRemoteNotificationReceivedDelegate(s_OnRemoteNotificationReceived);
 #endif
         }
 
         public static void RegisterOnReceivedCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            onNotificationReceived = new NotificationReceivedCallback(NotificationReceived);
-            _SetNotificationReceivedDelegate(onNotificationReceived);
+            s_OnNotificationReceived = new NotificationReceivedCallback(NotificationReceived);
+            _SetNotificationReceivedDelegate(s_OnNotificationReceived);
 #endif
         }
 
@@ -109,7 +107,7 @@ namespace Unity.Notifications.iOS
             iOSAuthorizationRequestData data;
             data = (iOSAuthorizationRequestData)Marshal.PtrToStructure(authRequestDataPtr, typeof(iOSAuthorizationRequestData));
 
-            iOSNotificationCenter.onFinishedAuthorizationRequest(data);
+            iOSNotificationCenter.OnFinishedAuthorizationRequest(data);
 #endif
         }
 
@@ -120,7 +118,7 @@ namespace Unity.Notifications.iOS
             iOSNotificationData data;
             data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
 
-            iOSNotificationCenter.onReceivedRemoteNotification(data);
+            iOSNotificationCenter.OnReceivedRemoteNotification(data);
 #endif
         }
 
@@ -131,7 +129,7 @@ namespace Unity.Notifications.iOS
             iOSNotificationData data;
             data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
 
-            iOSNotificationCenter.onSentNotification(data);
+            iOSNotificationCenter.OnSentNotification(data);
 #endif
         }
 
@@ -152,8 +150,9 @@ namespace Unity.Notifications.iOS
             _FreeUnmanagedStruct(ptr);
 
             return settings;
-#endif
+#else
             return new iOSNotificationSettings();
+#endif
         }
 
         public static void ScheduleLocalNotification(iOSNotificationData data)
@@ -186,8 +185,9 @@ namespace Unity.Notifications.iOS
             }
 
             return dataList.ToArray();
-#endif
+#else
             return new iOSNotificationData[] {};
+#endif
         }
 
         public static iOSNotificationData[] GetScheduledNotificationData()
@@ -210,8 +210,9 @@ namespace Unity.Notifications.iOS
             }
 
             return dataList.ToArray();
-#endif
+#else
             return new iOSNotificationData[] {};
+#endif
         }
 
         public static void SetApplicationBadge(int badge)
@@ -225,16 +226,18 @@ namespace Unity.Notifications.iOS
         {
 #if UNITY_IOS && !UNITY_EDITOR
             return _GetApplicationBadge();
-#endif
+#else
             return 0;
+#endif
         }
 
         public static bool GetAppOpenedUsingNotification()
         {
 #if UNITY_IOS && !UNITY_EDITOR
             return _GetAppOpenedUsingNotification();
-#endif
+#else
             return false;
+#endif
         }
 
         public static iOSNotificationData? GetLastNotificationData()
