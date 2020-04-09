@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 using Unity.Notifications.iOS;
+using UnityEngine.Assertions;
 
 namespace Unity.Notifications
 {
@@ -216,70 +217,78 @@ namespace Unity.Notifications
 
             var totalRect = new Rect(k_Padding, 0f, width - k_Padding, Screen.height);
 
+            // Draw the toolbar for Android/iOS.
             var toolBarRect = new Rect(totalRect.x, totalRect.y, totalRect.width, k_ToolbarHeight);
             m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
 
             var notificationsPanelRect = new Rect(totalRect.x, k_ToolbarHeight + 2, totalRect.width, totalRect.height - k_ToolbarHeight - k_Padding);
 
+            // Draw the notification settings.
+            if (!DrawNotificationSettingsPanel(notificationsPanelRect, m_SettingsManager.ToolbarIndex))
+                return;
 
+            float heightPlaceHolder = k_SlotSize;
+
+            // Draw drawable resources list for Android.
             if (m_SettingsManager.ToolbarIndex == 0)
             {
-                var settings = m_SettingsManager.AndroidNotificationSettings;
-                if (settings == null)
-                    return;
+                var iconListlabelRect = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 85f, 150f, 18f);
+                GUI.Label(iconListlabelRect, "Notification Icons", EditorStyles.label);
 
-                var settingsPanelRect = notificationsPanelRect;
-                GUI.BeginGroup(settingsPanelRect);
-                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, NotificationStyles.k_ToggleStyle, NotificationStyles.k_DropwDownStyle);
-                GUI.EndGroup();
+                // Draw the help message for setting the icons.
+                var iconListMessageRect = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 105f, notificationsPanelRect.width, 55f);
+                EditorGUI.TextArea(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
 
-                var labelRect = GetContentRect(new Rect(notificationsPanelRect.x - 3, notificationsPanelRect.y + 85f, 150f, 18f), 0f, 3f);
-                GUI.Label(labelRect, "Notification Icons", EditorStyles.label);
+                // Draw the reorderable list for the icon list.
+                var iconListRect = new Rect(iconListMessageRect.x, iconListMessageRect.y + 58f, notificationsPanelRect.width, notificationsPanelRect.height - 55f);
+                m_ReorderableList.DoList(iconListRect);
 
-                var iconListRectHeader = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 105f, notificationsPanelRect.width, 55f);
-                EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
-
-                var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 58f, notificationsPanelRect.width, notificationsPanelRect.height - 55f);
-                m_ReorderableList.DoList(iconListRectBody);
-
-                EditorGUILayout.GetControlRect(true, iconListRectHeader.height + m_ReorderableList.GetHeight() + k_SlotSize);
+                heightPlaceHolder += iconListMessageRect.height + m_ReorderableList.GetHeight();
             }
-            else
-            {
-                var settings = m_SettingsManager.iOSNotificationSettings;
-                if (settings == null)
-                    return;
 
-                var settingsPanelRect = notificationsPanelRect;
-                GUI.BeginGroup(settingsPanelRect);
-                DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.iOS, settings, false, NotificationStyles.k_ToggleStyle, NotificationStyles.k_DropwDownStyle);
-                GUI.EndGroup();
-
-                EditorGUILayout.GetControlRect(true, 4 * k_SlotSize);
-            }
+            // We have to do this to occupy the space that ScrollView can set the scrollbars correctly.
+            EditorGUILayout.GetControlRect(true, heightPlaceHolder);
         }
 
-        private void DrawSettingsElementList(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, GUIStyle styleToggle, GUIStyle styleDropwDown, int layer = 0)
+        private bool DrawNotificationSettingsPanel(Rect rect, int toolbarIndex)
         {
+            Assert.IsTrue(toolbarIndex == 0 || toolbarIndex == 1);
+
+            var settings = (toolbarIndex == 0) ? m_SettingsManager.AndroidNotificationSettings : m_SettingsManager.iOSNotificationSettings;
+            if (settings == null)
+                return false;
+
+            GUI.BeginGroup(rect);
+            DrawSettingElements(rect, (toolbarIndex == 0) ? BuildTargetGroup.Android : BuildTargetGroup.iOS, settings, false, 0);
+            GUI.EndGroup();
+
+            return true;
+        }
+
+        private void DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer)
+        {
+            var spaceOffset = layer * 13;
+
+            var labelStyle = new GUIStyle(NotificationStyles.s_LabelStyle);
+            labelStyle.fixedWidth = k_SlotSize * 5 - spaceOffset;
+
+            var toggleStyle = NotificationStyles.k_ToggleStyle;
+            var dropdownStyle = NotificationStyles.k_DropwDownStyle;
+
             foreach (var setting in settings)
             {
                 EditorGUI.BeginDisabledGroup(disabled);
                 EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(layer * 13);
-
-                var labelStyle = NotificationStyles.s_LabelStyle;
-                var width = rect.width - k_SlotSize * 4.5f - layer * 13;
-                labelStyle.fixedWidth = width;
+                GUILayout.Space(spaceOffset);
 
                 GUILayout.Label(new GUIContent(setting.Label, setting.Tooltip), labelStyle);
 
-                EditorGUI.BeginChangeCheck();
-
                 bool dependenciesDisabled = false;
 
+                EditorGUI.BeginChangeCheck();
                 if (setting.Value.GetType() == typeof(bool))
                 {
-                    setting.Value = EditorGUILayout.Toggle((bool)setting.Value, styleToggle);
+                    setting.Value = EditorGUILayout.Toggle((bool)setting.Value, toggleStyle);
                     dependenciesDisabled = !(bool)setting.Value;
                 }
                 else if (setting.Value.GetType() == typeof(string))
@@ -288,17 +297,16 @@ namespace Unity.Notifications
                 }
                 else if (setting.Value.GetType() == typeof(PresentationOption))
                 {
-                    setting.Value = (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.Value, styleDropwDown);
+                    setting.Value = (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.Value, dropdownStyle);
                     if ((iOSPresentationOption)setting.Value == 0)
                         setting.Value = (PresentationOption)iOSPresentationOption.All;
                 }
                 else if (setting.Value.GetType() == typeof(AuthorizationOption))
                 {
-                    setting.Value = (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.Value, styleDropwDown);
+                    setting.Value = (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.Value, dropdownStyle);
                     if ((iOSAuthorizationOption)setting.Value == 0)
                         setting.Value = (AuthorizationOption)iOSAuthorizationOption.All;
                 }
-
                 if (EditorGUI.EndChangeCheck())
                 {
                     m_SettingsManager.SaveSetting(setting, buildTarget);
@@ -309,7 +317,7 @@ namespace Unity.Notifications
 
                 if (setting.Dependencies != null)
                 {
-                    DrawSettingsElementList(rect, buildTarget, setting.Dependencies, dependenciesDisabled, styleToggle, styleDropwDown, layer + 1);
+                    DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1);
                 }
             }
         }
