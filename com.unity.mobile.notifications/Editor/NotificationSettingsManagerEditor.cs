@@ -67,25 +67,12 @@ namespace Unity.Notifications
 
         private void InitReorderableList()
         {
-            m_ReorderableList = new ReorderableList(m_SettingsManagerObject, m_DrawableResources, false, true, true, true);
+            m_ReorderableList = new ReorderableList(m_SettingsManagerObject, m_DrawableResources, false, false, true, true);
             m_ReorderableList.elementHeight = k_SlotSize + k_IconSpacing;
-            m_ReorderableList.showDefaultBackground = false;
+            m_ReorderableList.showDefaultBackground = true;
+            m_ReorderableList.headerHeight = 1;
 
             // Register all the necessary callbacks on ReorderableList.
-            m_ReorderableList.drawHeaderCallback = (rect) =>
-            {
-                if (Event.current.type != EventType.Repaint)
-                    return;
-
-                var paddedRect = GetContentRect(rect, 1f, -(ReorderableList.Defaults.padding + 2f));
-
-                var headerBackground = new GUIStyle("RL Header");
-                headerBackground.Draw(paddedRect, false, false, false, false);
-
-                var labelRect = GetContentRect(paddedRect, 0f, 3f);
-                GUI.Label(labelRect, "Notification Icons", EditorStyles.label);
-            };
-
             m_ReorderableList.onAddCallback = (list) =>
             {
                 Undo.RegisterCompleteObjectUndo(m_SettingsManager, "Add a new icon element.");
@@ -227,24 +214,13 @@ namespace Unity.Notifications
             if (width < k_SlotSize * 10)
                 width = k_SlotSize * 10;
 
-            var rect = new Rect(10f, 0f, width, Screen.height);
+            var totalRect = new Rect(k_Padding, 0f, width - k_Padding, Screen.height);
 
-            // TODO:
-            // Not sure why we have to do special things for UI in 2018.3.
-#if UNITY_2018_3
-            rect = new Rect(rect.x, rect.y + 10f, rect.width, rect.height);
-#endif
+            var toolBarRect = new Rect(totalRect.x, totalRect.y, totalRect.width, k_ToolbarHeight);
+            m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
 
-            var headerRect = GetContentRect(new Rect(k_Padding, rect.y, rect.width - k_Padding, k_Padding * 2));
+            var notificationsPanelRect = new Rect(totalRect.x, k_ToolbarHeight + 2, totalRect.width, totalRect.height - k_ToolbarHeight - k_Padding);
 
-            var bodyRect = GetContentRect(
-                new Rect(k_Padding, headerRect.yMax, rect.width - k_Padding, rect.height - headerRect.height),
-                k_Padding,
-                k_Padding
-            );
-
-            var toolBaRect = new Rect(rect.x, rect.y, rect.width, k_ToolbarHeight);
-            m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBaRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
 
             if (m_SettingsManager.ToolbarIndex == 0)
             {
@@ -252,15 +228,18 @@ namespace Unity.Notifications
                 if (settings == null)
                     return;
 
-                var settingsPanelRect = bodyRect;
+                var settingsPanelRect = notificationsPanelRect;
                 GUI.BeginGroup(settingsPanelRect);
                 DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.Android, settings, false, NotificationStyles.k_ToggleStyle, NotificationStyles.k_DropwDownStyle);
                 GUI.EndGroup();
 
-                var iconListRectHeader = new Rect(bodyRect.x, bodyRect.y + 85f, bodyRect.width, 55f);
+                var labelRect = GetContentRect(new Rect(notificationsPanelRect.x - 3, notificationsPanelRect.y + 85f, 150f, 18f), 0f, 3f);
+                GUI.Label(labelRect, "Notification Icons", EditorStyles.label);
+
+                var iconListRectHeader = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 105f, notificationsPanelRect.width, 55f);
                 EditorGUI.TextArea(iconListRectHeader, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
 
-                var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 95f, iconListRectHeader.width, iconListRectHeader.height - 55f);
+                var iconListRectBody = new Rect(iconListRectHeader.x, iconListRectHeader.y + 58f, notificationsPanelRect.width, notificationsPanelRect.height - 55f);
                 m_ReorderableList.DoList(iconListRectBody);
 
                 EditorGUILayout.GetControlRect(true, iconListRectHeader.height + m_ReorderableList.GetHeight() + k_SlotSize);
@@ -271,7 +250,7 @@ namespace Unity.Notifications
                 if (settings == null)
                     return;
 
-                var settingsPanelRect = bodyRect;
+                var settingsPanelRect = notificationsPanelRect;
                 GUI.BeginGroup(settingsPanelRect);
                 DrawSettingsElementList(settingsPanelRect, BuildTargetGroup.iOS, settings, false, NotificationStyles.k_ToggleStyle, NotificationStyles.k_DropwDownStyle);
                 GUI.EndGroup();
