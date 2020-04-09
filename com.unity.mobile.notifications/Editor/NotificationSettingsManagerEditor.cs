@@ -247,7 +247,7 @@ namespace Unity.Notifications
             }
 
             // We have to do this to occupy the space that ScrollView can set the scrollbars correctly.
-            EditorGUILayout.GetControlRect(true, heightPlaceHolder);
+            EditorGUILayout.GetControlRect(true, heightPlaceHolder, GUILayout.MinWidth(width));
         }
 
         private bool DrawNotificationSettingsPanel(Rect rect, int toolbarIndex)
