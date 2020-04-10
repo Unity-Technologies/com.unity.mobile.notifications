@@ -10,8 +10,7 @@ namespace Unity.Notifications
 {
     internal class NotificationSettingsProvider : SettingsProvider
     {
-        internal const int k_SlotSize = 64;
-        private const int k_MaxPreviewSize = 64;
+        private const int k_SlotSize = 64;
         private const int k_IconSpacing = 8;
         private const float k_Padding = 12f;
         private const float k_ToolbarHeight = 20f;
@@ -76,7 +75,7 @@ namespace Unity.Notifications
             // Register all the necessary callbacks on ReorderableList.
             m_ReorderableList.onAddCallback = (list) =>
             {
-                Undo.RegisterCompleteObjectUndo(m_SettingsManager, "Add a new icon element.");
+                Undo.RegisterCompleteObjectUndo(m_SettingsManager, "Add a new icon element");
                 m_SettingsManager.AddDrawableResource(string.Format("icon_{0}", m_SettingsManager.DrawableResources.Count), null, NotificationIconType.Small);
             };
 
@@ -123,43 +122,32 @@ namespace Unity.Notifications
             if (drawableResource == null)
                 return;
 
-            var elementRect = rect;
+            var elementRect = AddPadding(rect, k_Padding, k_Padding / 2);
 
-            float width = Mathf.Min(elementRect.width, EditorGUIUtility.labelWidth + 4 + k_SlotSize + k_IconSpacing + k_MaxPreviewSize);
+            // Calculate and draw id and type.
+            var idLabelRect = new Rect(elementRect.x, elementRect.y, k_SlotSize, k_ToolbarHeight);
+            var idTextFieldRect = new Rect(idLabelRect.x + k_SlotSize, idLabelRect.y, k_SlotSize, k_ToolbarHeight);
 
-            float idPropWidth = Mathf.Min(k_MaxPreviewSize, width - k_SlotSize - k_IconSpacing);
-            float typePropWidth = Mathf.Min(k_MaxPreviewSize, width - k_SlotSize - k_IconSpacing);
-            float assetPropWidth = k_MaxPreviewSize;
-            float errorMsgWidth = elementRect.width - k_Padding * 2;
+            var typeLabelRect = new Rect(elementRect.x, elementRect.y + 25, k_SlotSize, k_ToolbarHeight);
+            var typeEnumPopupRect = new Rect(typeLabelRect.x + k_SlotSize, typeLabelRect.y, k_SlotSize, k_ToolbarHeight);
 
-            Rect elementContentRect = GetContentRect(elementRect, 6f, 12f);
+            EditorGUI.LabelField(idLabelRect, k_IdentifierLabelText);
+            var newId = EditorGUI.TextField(idTextFieldRect, drawableResource.Id);
 
-            Rect previewTextureRect = new Rect(elementContentRect.width - (assetPropWidth - k_IconSpacing * 5),
-                elementContentRect.y - 6, assetPropWidth, k_SlotSize);
+            EditorGUI.LabelField(typeLabelRect, k_TypeLabelText);
+            var newType = (NotificationIconType)EditorGUI.EnumPopup(typeEnumPopupRect, drawableResource.Type);
 
-            Rect textureRect = new Rect(elementContentRect.width - (assetPropWidth * 2 - k_IconSpacing * 5),
-                elementContentRect.y, assetPropWidth, k_SlotSize);
-
-            Rect errorBoxRect = GetContentRect(new Rect(elementContentRect.x, elementContentRect.y + k_SlotSize, errorMsgWidth, k_SlotSize),
-                4f, 4f);
-
-            EditorGUI.LabelField(new Rect(elementContentRect.x, elementContentRect.y, idPropWidth, 20), k_IdentifierLabelText);
-
-            EditorGUI.LabelField(new Rect(elementContentRect.x, elementContentRect.y + 25, idPropWidth, 20), k_TypeLabelText);
-
-            var newId = EditorGUI.TextField(new Rect(elementContentRect.x + k_SlotSize, elementContentRect.y, idPropWidth, 20), drawableResource.Id);
-
-            var newType = (NotificationIconType)EditorGUI.EnumPopup(
-                new Rect(elementContentRect.x + k_SlotSize, elementContentRect.y + 25, typePropWidth, 20),
-                drawableResource.Type);
+            // Calculate and draw texture and preview.
+            var textureRect = new Rect(elementRect.width - (k_SlotSize * 2 - k_IconSpacing * 5), elementRect.y, k_SlotSize, k_SlotSize);
+            var previewTextureRect = new Rect(textureRect.x + k_SlotSize, textureRect.y - 6, k_SlotSize, k_SlotSize);
 
             var newAsset = (Texture2D)EditorGUI.ObjectField(textureRect, drawableResource.Asset, typeof(Texture2D), false);
 
+            // Check if the texture has been updated.
             bool updatePreviewTexture = (newId != drawableResource.Id || newType != drawableResource.Type || newAsset != drawableResource.Asset);
-
             if (updatePreviewTexture)
             {
-                Undo.RegisterCompleteObjectUndo(m_SettingsManager, "Update icon data.");
+                Undo.RegisterCompleteObjectUndo(m_SettingsManager, "Update icon data");
                 drawableResource.Id = newId;
                 drawableResource.Type = newType;
                 drawableResource.Asset = newAsset;
@@ -170,7 +158,10 @@ namespace Unity.Notifications
 
             if (drawableResource.Asset != null && !drawableResource.Verify())
             {
-                EditorGUI.HelpBox(errorBoxRect,
+                var errorMsgWidth = rect.width - k_Padding * 2;
+                var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_SlotSize), 4, 4);
+
+                EditorGUI.HelpBox(errorRect,
                     "Specified texture can't be used because: \n"
                     + (errorMsgWidth > 145 ? DrawableResourceData.GenerateErrorString(drawableResource.Errors) : "...expand to see more..."),
                     MessageType.Error);
@@ -182,15 +173,15 @@ namespace Unity.Notifications
             }
             else
             {
-                Texture2D previewTexture = drawableResource.GetPreviewTexture(updatePreviewTexture);
+                var previewTexture = drawableResource.GetPreviewTexture(updatePreviewTexture);
                 if (previewTexture != null)
                 {
+                    previewTexture.alphaIsTransparency = false;
+
                     EditorGUI.LabelField(previewTextureRect, "Preview", NotificationStyles.k_PreviewLabelTextStyle);
 
-                    Rect previewTextureRectPadded = GetContentRect(previewTextureRect, 6f, 6f);
+                    var previewTextureRectPadded = AddPadding(previewTextureRect, 6f, 6f);
                     previewTextureRectPadded.y += 8;
-
-                    previewTexture.alphaIsTransparency = false;
                     GUI.DrawTexture(previewTextureRectPadded, previewTexture);
                 }
             }
@@ -203,6 +194,17 @@ namespace Unity.Notifications
                 return resourceAssets[index];
 
             return null;
+        }
+
+        private static Rect AddPadding(Rect rect, float horizontal, float vertical)
+        {
+            Rect paddingRect = rect;
+            paddingRect.xMin += horizontal;
+            paddingRect.xMax -= horizontal;
+            paddingRect.yMin += vertical;
+            paddingRect.yMax -= vertical;
+
+            return paddingRect;
         }
 
         public override void OnGUI(string searchContext)
@@ -221,10 +223,11 @@ namespace Unity.Notifications
             var toolBarRect = new Rect(totalRect.x, totalRect.y, totalRect.width, k_ToolbarHeight);
             m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
 
-            var notificationsPanelRect = new Rect(totalRect.x, k_ToolbarHeight + 2, totalRect.width, totalRect.height - k_ToolbarHeight - k_Padding);
+            var notificationSettingsRect = new Rect(totalRect.x, k_ToolbarHeight + 2, totalRect.width, totalRect.height - k_ToolbarHeight - k_Padding);
 
             // Draw the notification settings.
-            if (!DrawNotificationSettingsPanel(notificationsPanelRect, m_SettingsManager.ToolbarIndex))
+            int drawnSettingsCount = DrawNotificationSettings(notificationSettingsRect, m_SettingsManager.ToolbarIndex);
+            if (drawnSettingsCount <= 0)
                 return;
 
             float heightPlaceHolder = k_SlotSize;
@@ -232,15 +235,15 @@ namespace Unity.Notifications
             // Draw drawable resources list for Android.
             if (m_SettingsManager.ToolbarIndex == 0)
             {
-                var iconListlabelRect = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 85f, 150f, 18f);
+                var iconListlabelRect = new Rect(notificationSettingsRect.x, notificationSettingsRect.y + 85, 180, 18);
                 GUI.Label(iconListlabelRect, "Notification Icons", EditorStyles.label);
 
                 // Draw the help message for setting the icons.
-                var iconListMessageRect = new Rect(notificationsPanelRect.x, notificationsPanelRect.y + 105f, notificationsPanelRect.width, 55f);
+                var iconListMessageRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + 20, notificationSettingsRect.width, 55f);
                 EditorGUI.SelectableLabel(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
 
                 // Draw the reorderable list for the icon list.
-                var iconListRect = new Rect(iconListMessageRect.x, iconListMessageRect.y + 58f, notificationsPanelRect.width, notificationsPanelRect.height - 55f);
+                var iconListRect = new Rect(iconListMessageRect.x, iconListMessageRect.y + 58f, iconListMessageRect.width, notificationSettingsRect.height - 55f);
                 m_ReorderableList.DoList(iconListRect);
 
                 heightPlaceHolder += iconListMessageRect.height + m_ReorderableList.GetHeight();
@@ -250,22 +253,22 @@ namespace Unity.Notifications
             EditorGUILayout.GetControlRect(true, heightPlaceHolder, GUILayout.MinWidth(width));
         }
 
-        private bool DrawNotificationSettingsPanel(Rect rect, int toolbarIndex)
+        private int DrawNotificationSettings(Rect rect, int toolbarIndex)
         {
             Assert.IsTrue(toolbarIndex == 0 || toolbarIndex == 1);
 
             var settings = (toolbarIndex == 0) ? m_SettingsManager.AndroidNotificationSettings : m_SettingsManager.iOSNotificationSettings;
             if (settings == null)
-                return false;
+                return 0;
 
             GUI.BeginGroup(rect);
-            DrawSettingElements(rect, (toolbarIndex == 0) ? BuildTargetGroup.Android : BuildTargetGroup.iOS, settings, false, 0);
+            var drawnSettingsCount = DrawSettingElements(rect, (toolbarIndex == 0) ? BuildTargetGroup.Android : BuildTargetGroup.iOS, settings, false, 0);
             GUI.EndGroup();
 
-            return true;
+            return drawnSettingsCount;
         }
 
-        private void DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer)
+        private int DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer)
         {
             var spaceOffset = layer * 13;
 
@@ -275,6 +278,7 @@ namespace Unity.Notifications
             var toggleStyle = NotificationStyles.k_ToggleStyle;
             var dropdownStyle = NotificationStyles.k_DropwDownStyle;
 
+            int elementCount = settings.Count;
             foreach (var setting in settings)
             {
                 EditorGUI.BeginDisabledGroup(disabled);
@@ -317,20 +321,11 @@ namespace Unity.Notifications
 
                 if (setting.Dependencies != null)
                 {
-                    DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1);
+                    elementCount += DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1);
                 }
             }
-        }
 
-        private static Rect GetContentRect(Rect rect, float paddingVertical = 0, float paddingHorizontal = 0)
-        {
-            Rect tempRect = rect;
-            tempRect.yMin += paddingVertical;
-            tempRect.yMax -= paddingVertical;
-            tempRect.xMin += paddingHorizontal;
-            tempRect.xMax -= paddingHorizontal;
-
-            return tempRect;
+            return elementCount;
         }
     }
 }
