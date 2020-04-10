@@ -161,15 +161,10 @@ namespace Unity.Notifications
                 var errorMsgWidth = rect.width - k_Padding * 2;
                 var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_SlotSize), 4, 4);
 
-                EditorGUI.HelpBox(errorRect,
-                    "Specified texture can't be used because: \n"
-                    + (errorMsgWidth > 145 ? DrawableResourceData.GenerateErrorString(drawableResource.Errors) : "...expand to see more..."),
-                    MessageType.Error);
+                var errorMsg = "Specified texture can't be used because: \n" + DrawableResourceData.GenerateErrorString(drawableResource.Errors);
+                EditorGUI.HelpBox(errorRect, errorMsg, MessageType.Error);
 
-                if (drawableResource.Type == NotificationIconType.Small)
-                {
-                    GUI.Box(previewTextureRect, "Preview not available. \n Make sure the texture is readable!", NotificationStyles.k_HelpBoxMessageTextStyle);
-                }
+                GUI.Box(previewTextureRect, "Preview not available", NotificationStyles.k_PreviewMessageTextStyle);
             }
             else
             {
@@ -240,7 +235,7 @@ namespace Unity.Notifications
 
                 // Draw the help message for setting the icons.
                 var iconListMessageRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + 20, notificationSettingsRect.width, 55f);
-                EditorGUI.SelectableLabel(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_HeaderMsgStyle);
+                EditorGUI.SelectableLabel(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
 
                 // Draw the reorderable list for the icon list.
                 var iconListRect = new Rect(iconListMessageRect.x, iconListMessageRect.y + 58f, iconListMessageRect.width, notificationSettingsRect.height - 55f);
@@ -272,7 +267,7 @@ namespace Unity.Notifications
         {
             var spaceOffset = layer * 13;
 
-            var labelStyle = new GUIStyle(NotificationStyles.s_LabelStyle);
+            var labelStyle = new GUIStyle(NotificationStyles.k_LabelStyle);
             labelStyle.fixedWidth = k_SlotSize * 5 - spaceOffset;
 
             var toggleStyle = NotificationStyles.k_ToggleStyle;
