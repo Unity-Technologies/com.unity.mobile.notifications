@@ -268,8 +268,9 @@ namespace Unity.Notifications
             {
                 if (!drawableResource.Verify())
                 {
-                    Debug.LogWarning(string.Format("Failed exporting: '{0}' AndroidSettings notification icon because:\n {1} ", drawableResource.Id,
-                        DrawableResourceData.GenerateErrorString(drawableResource.Errors)));
+                    Debug.LogWarning(string.Format("Failed exporting: '{0}' AndroidSettings notification icon because:\n {1} ",
+                        drawableResource.Id,
+                        drawableResource.GenerateErrorString()));
                     continue;
                 }
 

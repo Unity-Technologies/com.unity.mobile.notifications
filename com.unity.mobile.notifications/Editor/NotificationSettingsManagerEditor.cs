@@ -35,15 +35,13 @@ namespace Unity.Notifications
         private NotificationSettingsProvider(string path, SettingsScope scopes)
             : base(path, scopes)
         {
+            Initialize();
         }
 
         [SettingsProvider]
         static SettingsProvider CreateMobileNotificationsSettingsProvider()
         {
-            var provider = new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
-            provider.Initialize();
-
-            return provider;
+            return new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
         }
 
         private void Initialize()
@@ -161,7 +159,7 @@ namespace Unity.Notifications
                 var errorMsgWidth = rect.width - k_Padding * 2;
                 var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_SlotSize), 4, 4);
 
-                var errorMsg = "Specified texture can't be used because: \n" + DrawableResourceData.GenerateErrorString(drawableResource.Errors);
+                var errorMsg = "Specified texture can't be used because: \n" + drawableResource.GenerateErrorString();
                 EditorGUI.HelpBox(errorRect, errorMsg, MessageType.Error);
 
                 GUI.Box(previewTextureRect, "Preview not available", NotificationStyles.k_PreviewMessageTextStyle);
@@ -234,14 +232,14 @@ namespace Unity.Notifications
                 GUI.Label(iconListlabelRect, "Notification Icons", EditorStyles.label);
 
                 // Draw the help message for setting the icons.
-                var iconListMessageRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + 20, notificationSettingsRect.width, 55f);
-                EditorGUI.SelectableLabel(iconListMessageRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
+                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + 20, notificationSettingsRect.width, 55f);
+                EditorGUI.SelectableLabel(iconListMsgRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
 
                 // Draw the reorderable list for the icon list.
-                var iconListRect = new Rect(iconListMessageRect.x, iconListMessageRect.y + 58f, iconListMessageRect.width, notificationSettingsRect.height - 55f);
+                var iconListRect = new Rect(iconListMsgRect.x, iconListMsgRect.y + 58f, iconListMsgRect.width, notificationSettingsRect.height - 55f);
                 m_ReorderableList.DoList(iconListRect);
 
-                heightPlaceHolder += iconListMessageRect.height + m_ReorderableList.GetHeight();
+                heightPlaceHolder += iconListMsgRect.height + m_ReorderableList.GetHeight();
             }
 
             // We have to do this to occupy the space that ScrollView can set the scrollbars correctly.

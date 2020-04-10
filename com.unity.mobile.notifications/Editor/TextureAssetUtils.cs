@@ -27,7 +27,7 @@ namespace Unity.Notifications
 
             var isSquare = texture.width == texture.height;
             var isLargeEnough = texture.width >= minSize;
-            var hasAlpha = true;// texture.format == TextureFormat.Alpha8;
+            var hasAlpha = true;// TODO: texture.format == TextureFormat.Alpha8;
 
             var isReadable = texture.isReadable;
 
