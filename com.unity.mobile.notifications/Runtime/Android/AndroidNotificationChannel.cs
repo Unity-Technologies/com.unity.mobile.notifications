@@ -46,12 +46,12 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Show this notification on all lock screens, but conceal sensitive or private information on secure lock screens.
         /// </summary>
-        Private = -1000,
+        Private = 0,
 
         /// <summary>
         /// Show this notification in its entirety on the lock screen.
         /// </summary>
-        Public = 1,
+        Public = -1000,
     }
 
     public struct AndroidNotificationChannel
