@@ -44,6 +44,11 @@ namespace Unity.Notifications
             return new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
         }
 
+        public override void OnDeactivate()
+        {
+            m_SettingsManager.SaveSettings(false);
+        }
+
         private void Initialize()
         {
             label = "Mobile Notifications";
