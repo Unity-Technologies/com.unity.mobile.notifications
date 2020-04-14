@@ -121,9 +121,9 @@ namespace Unity.Notifications.Tests.Sample
             {
                 StartCoroutine(GetCurrentLocation());
             });
-            m_groups["General"]["Request Authorization"] = new Action(() =>
+            m_groups["General"]["Request Authorization Sound + Badge + Alert"] = new Action(() =>
             {
-                StartCoroutine(RequestAuthorization());
+                StartCoroutine(RequestAuthorization(AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound));
             });
             m_groups["General"]["Request Authorization Sound + Badge"] = new Action(() =>
             {
@@ -338,22 +338,18 @@ namespace Unity.Notifications.Tests.Sample
         }
 
         //Request authorization if it is not enabled in Editor UI
-        IEnumerator RequestAuthorization(AuthorizationOption options =
-                AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound)
+        IEnumerator RequestAuthorization(AuthorizationOption options)
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
-            AuthorizationRequest request = new AuthorizationRequest(options, true);
-            yield return request;
-            using (AuthorizationRequest req =
-                       new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
+            using (AuthorizationRequest request = new AuthorizationRequest(options, true))
             {
-                while (!req.IsFinished) { yield return null; };
-                if (req.Granted)
+                while (!request.IsFinished) { yield return null; };
+                if (request.Granted)
                 {
                     m_LOGGER
                         .Green($"Authorization request was granted")
-                        .Properties(req);
-                    Debug.Log(req.DeviceToken);
+                        .Properties(request);
+                    Debug.Log(request.DeviceToken);
                 }
                 else
                 {
