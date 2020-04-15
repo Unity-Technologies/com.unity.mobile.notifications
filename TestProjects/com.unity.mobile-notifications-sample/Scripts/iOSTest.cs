@@ -343,7 +343,9 @@ namespace Unity.Notifications.Tests.Sample
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             using (AuthorizationRequest request = new AuthorizationRequest(options, true))
             {
-                while (!request.IsFinished) { yield return null; };
+                while (!request.IsFinished)
+                    yield return null;
+
                 if (request.Granted)
                 {
                     m_LOGGER
