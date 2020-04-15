@@ -51,7 +51,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Show this notification in its entirety on the lock screen.
         /// </summary>
-        Public = -1000,
+        Public = 1,
     }
 
     public struct AndroidNotificationChannel
