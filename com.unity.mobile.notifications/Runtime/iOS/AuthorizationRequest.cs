@@ -100,17 +100,20 @@ namespace Unity.Notifications.iOS
             iOSNotificationsWrapper.RegisterAuthorizationRequestCallback();
             iOSNotificationsWrapper.RequestAuthorization((int)authorizationOption, registerForRemoteNotifications);
 
-            iOSNotificationCenter.OnAuthorizationRequestCompleted += data =>
-            {
-                IsFinished = data.finished;
-                Granted = data.granted;
-                Error = data.error;
-                DeviceToken = data.deviceToken;
-            };
+            iOSNotificationCenter.OnAuthorizationRequestCompleted += OnAuthorizationRequestCompleted;
+        }
+
+        private void OnAuthorizationRequestCompleted(iOSAuthorizationRequestData requestData)
+        {
+            IsFinished = requestData.finished;
+            Granted = requestData.granted;
+            Error = requestData.error;
+            DeviceToken = requestData.deviceToken;
         }
 
         public void Dispose()
         {
+            iOSNotificationCenter.OnAuthorizationRequestCompleted -= OnAuthorizationRequestCompleted;
         }
     }
 }
