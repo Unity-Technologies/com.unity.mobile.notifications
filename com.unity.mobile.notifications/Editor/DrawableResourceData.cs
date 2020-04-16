@@ -10,18 +10,18 @@ namespace Unity.Notifications
         public NotificationIconType Type;
         public Texture2D Asset;
 
-        private bool isValid = false;
-        private List<string> errors = null;
-        private Texture2D previewTexture;
+        private bool m_IsValid = false;
+        private List<string> m_Errors = null;
+        private Texture2D m_PreviewTexture;
 
         public bool IsValid
         {
             get
             {
-                if (isValid == false && errors == null)
+                if (m_IsValid == false && m_Errors == null)
                     Verify();
 
-                return isValid;
+                return m_IsValid;
             }
         }
 
@@ -29,24 +29,22 @@ namespace Unity.Notifications
         {
             get
             {
-                if (isValid == false && errors == null)
+                if (m_IsValid == false && m_Errors == null)
                     Verify();
 
-                return errors.ToArray();
+                return m_Errors.ToArray();
             }
         }
 
         public Texture2D GetPreviewTexture(bool update)
         {
             if (Asset == null)
-            {
                 return null;
-            }
 
-            if (isValid && (previewTexture == null || update))
-                previewTexture = TextureAssetUtils.ProcessTextureForType(Asset, Type);
+            if (m_IsValid && (m_PreviewTexture == null || update))
+                m_PreviewTexture = TextureAssetUtils.ProcessTextureForType(Asset, Type);
 
-            return previewTexture;
+            return m_PreviewTexture;
         }
 
         internal bool Initialized()
@@ -56,29 +54,28 @@ namespace Unity.Notifications
 
         public void Clean()
         {
-            isValid = false;
-            errors = null;
-            previewTexture = null;
+            m_IsValid = false;
+            m_Errors = null;
+            m_PreviewTexture = null;
         }
 
         public bool Verify()
         {
-            List<string> errors;
-            isValid = TextureAssetUtils.VerifyTextureByType(Asset, Type, out errors);
-            this.errors = errors;
-            return isValid;
+            m_IsValid = TextureAssetUtils.VerifyTextureByType(Asset, Type, out m_Errors);
+            return m_IsValid;
         }
 
-        public static string GenerateErrorString(string[] errors)
+        public string GenerateErrorString()
         {
-            var error = "";
+            var errors = Errors;
 
+            var errorString = string.Empty;
             for (var i = 0; i < errors.Length; i++)
             {
-                error += string.Format("{0}{1}", errors[i], i + 1 >= errors.Length ? "." : ", ");
+                errorString += string.Format("{0}{1}", errors[i], i + 1 >= errors.Length ? "." : ", ");
             }
 
-            return error;
+            return errorString;
         }
     }
 }
