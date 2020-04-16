@@ -21,7 +21,7 @@ namespace Unity.Notifications
         private readonly string[] k_ToolbarStrings = {"Android", "iOS"};
         private const string k_InfoStringAndroid =
             "Only icons added to this list or manually added to the 'res/drawable' folder can be used for notifications.\n\n" +
-            "Small icons must be 48x48px at least and composed of white pixels on a transparent background.\n" +
+            "Small icons must be at least 48x48px and only composed of white pixels on a transparent background.\n" +
             "Large icons must be no smaller than 192x192px and may contain colors.";
 
         private NotificationSettingsManager m_SettingsManager;
