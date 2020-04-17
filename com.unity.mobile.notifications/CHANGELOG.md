@@ -5,7 +5,7 @@ All notable changes to this package will be documented in this file.
 ## [1.2.0-preview] - 2020-04-16
 
 ### Changes & Improvements:
-- [Editor] Improved the Notification Settings UI, also stored the notification setting asset under 'Project Settings' folder rather than 'Assets' folder.
+- [Editor] Improved the Notification Settings UI, also stored the notification setting asset under 'ProjectSettings' folder rather than 'Assets' folder.
 
 ### Fixes:
 - Fixed a lot of notification settings UI related bugs.
