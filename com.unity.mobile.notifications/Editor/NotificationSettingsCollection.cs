@@ -35,11 +35,14 @@ namespace Unity.Notifications
                 if (index == -1 || m_Values.Count <= index)
                     return null;
 
-                if (int.TryParse(m_Values[index], out var intValue))
+                int intValue;
+                if (int.TryParse(m_Values[index], out intValue))
                 {
                     return intValue;
                 }
-                if (bool.TryParse(m_Values[index], out var boolValue))
+
+                bool boolValue;
+                if (bool.TryParse(m_Values[index], out boolValue))
                 {
                     return boolValue;
                 }
