@@ -44,8 +44,10 @@ test_{{ platform.name }}_{{ editor.version }}:
   artifacts:
     logs:
       paths:
-        - "*/upm-ci~/test-results/**/*"
-        - com.unity.mobile.notifications/upm-ci~/packages/*
+        - "upm-ci~/test-results/**/*"
+    packages:
+      paths:
+        - "upm-ci~/packages/**/*"
   dependencies:
     - .yamato/upm-ci.yml#pack
 {% endfor %}
