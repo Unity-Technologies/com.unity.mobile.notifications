@@ -2,10 +2,20 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.2.0-preview] - 2020-04-16
+
+### Changes & Improvements:
+- [Editor] Improved the Notification Settings UI, also stored the notification setting asset under 'ProjectSettings' folder rather than 'Assets' folder.
+
+### Fixes:
+- Fixed a lot of notification settings UI related bugs.
+- [iOS] Fixed the issue that the authorization request callback hasn't been removed.
+- [Android] Fixed the wrong value of LockscreenVisiblity.Private.
+
 ## [1.1.0-preview] - 2020-03-24
 
 ### Changes & Improvements:
-- [Android] Exposing the java source code in the package rather than building into an .aar. Users can now debug the java code in Android Studio by exporting to a gradle project.
+- [Android] Exposed the java source code in the package rather than building into an .aar. Users can now debug the java code in Android Studio by exporting to a gradle project.
 - Refactored the managed plugin code to have them better structured.
 
 ### Fixes:
