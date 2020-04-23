@@ -20,7 +20,7 @@ pack:
 
   commands:
     - ./add_sample.sh
-    - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
     - upm-ci package pack --package-path com.unity.mobile.notifications
   artifacts:
     packages:
@@ -36,13 +36,18 @@ test_{{ platform.name }}_{{ editor.version }}:
     image: {{ platform.image }}
     flavor: {{ platform.flavor}}
   commands:
-    - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
     - upm-ci package test --package-path com.unity.mobile.notifications --unity-version {{ editor.version }} --platform editmode
+    {% if editor.version == "2018.4" %}
+    - upm-ci~/tools/utr/utr --suite=editor --editor-location=.Editor --testproject=TestProjects/NotificationSamples_2018_4_dotnet3.5 --artifacts_path=upm-ci~/test-results/test_2018_4_dotnet3.5/ --api-profile=NET_2_0_Subset
+    {% endif %}
   artifacts:
     logs:
       paths:
-        - "*/upm-ci~/test-results/**/*"
-        - com.unity.mobile.notifications/upm-ci~/packages/*
+        - "upm-ci~/test-results/**/*"
+    packages:
+      paths:
+        - "upm-ci~/packages/**/*"
   dependencies:
     - .yamato/upm-ci.yml#pack
 {% endfor %}
@@ -82,7 +87,7 @@ publish:
     image: package-ci/win10:stable
     flavor: b1.large
   commands:
-    - npm install upm-ci-utils@stable -g --registry https://api.bintray.com/npm/unity/unity-npm
+    - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
     - upm-ci package publish --package-path com.unity.mobile.notifications
   triggers:
     tags:
