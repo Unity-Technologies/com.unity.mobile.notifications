@@ -48,7 +48,7 @@
     }
 }
 
-- (void)requestAuthorization:(NSInteger)authorizationOptions:(BOOL)registerRemote
+- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote
 {
     if (!SYSTEM_VERSION_10_OR_ABOVE)
         return;

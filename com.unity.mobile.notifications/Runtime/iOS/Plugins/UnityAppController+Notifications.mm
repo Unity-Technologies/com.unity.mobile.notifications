@@ -35,6 +35,7 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+
         [nc addObserverForName: UIApplicationDidBecomeActiveNotification
          object: nil
          queue: [NSOperationQueue mainQueue]
@@ -71,7 +72,7 @@
              if (authorizeOnLaunch)
              {
                  UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-                 [manager requestAuthorization: defaultAuthorizationOptions: registerRemoteOnLaunch];
+                 [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch];
                  manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
          }];
@@ -87,7 +88,7 @@
              if ([notification.userInfo isKindOfClass: [NSData class]])
              {
                  NSData* data = (NSData*)notification.userInfo;
-                 [manager setDeviceTokenFromNSData: (NSData*)notification.userInfo];
+                 [manager setDeviceTokenFromNSData: data];
              }
              [manager checkAuthorizationFinished];
          }];
