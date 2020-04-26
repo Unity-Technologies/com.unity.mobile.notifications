@@ -83,7 +83,7 @@
          usingBlock:^(NSNotification *notification) {
              NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken");
              UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-             manager.remoteNotificationsRegistered = UNAuthorizationStatusDenied;
+             manager.remoteNotificationsRegistered = UNAuthorizationStatusAuthorized;
 
              if ([notification.userInfo isKindOfClass: [NSData class]])
              {
@@ -99,7 +99,7 @@
          usingBlock:^(NSNotification *notification) {
              NSLog(@"didFailToRegisterForRemoteNotificationsWithError");
              UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-             manager.remoteNotificationsRegistered = UNAuthorizationStatusAuthorized;
+             manager.remoteNotificationsRegistered = UNAuthorizationStatusDenied;
              [manager checkAuthorizationFinished];
          }];
     });
