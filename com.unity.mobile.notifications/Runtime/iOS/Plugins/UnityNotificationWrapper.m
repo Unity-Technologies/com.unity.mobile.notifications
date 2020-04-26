@@ -77,23 +77,29 @@ void _RequestAuthorization(int options, BOOL registerRemote)
     center.delegate = manager;
 }
 
+bool validateAuthorizationStatus(UnityNotificationManager* manager)
+{
+    UNAuthorizationStatus authorizationStatus = manager.cachedNotificationSettings.authorizationStatus;
+
+    if (authorizationStatus == UNAuthorizationStatusAuthorized)
+        return true;
+
+    if (@available(iOS 12.0, *))
+    {
+        if (authorizationStatus == UNAuthorizationStatusProvisional)
+            return true;
+    }
+
+    NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization first.");
+    return false;
+}
+
 void _ScheduleLocalNotification(struct iOSNotificationData* data)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-
-    UNAuthorizationStatus authorizationStatus = manager.cachedNotificationSettings.authorizationStatus;
-
-    bool canSendNotifications = authorizationStatus != UNAuthorizationStatusAuthorized;
-    if (@available(iOS 12.0, *))
-    {
-        if (!canSendNotifications)
-            canSendNotifications = authorizationStatus == UNAuthorizationStatusProvisional;
-    }
-    if (canSendNotifications)
-    {
-        NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization before attempting to schedule any notifications.");
+    if (!validateAuthorizationStatus(manager))
         return;
-    }
+
     assert(manager.onNotificationReceivedCallback != NULL);
 
     NSDictionary *userInfo = @{
