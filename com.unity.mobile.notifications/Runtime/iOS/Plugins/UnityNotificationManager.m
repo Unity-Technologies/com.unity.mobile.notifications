@@ -13,6 +13,7 @@
     #import <CoreLocation/CoreLocation.h>
 #endif
 
+const int kDefaultPresentationOptions = -1;
 
 @implementation UnityNotificationManager
 
@@ -34,9 +35,8 @@
 {
     bool requestRejected = self.authorizationRequestFinished && !self.authorized;
 
-    if (!requestRejected && self.needRemoteNotifications)
-        if (!self.remoteNotificationsRegistered)
-            return;
+    if (!requestRejected && self.needRemoteNotifications && self.remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
+        return;
 
     if (self.authorizationRequestFinished && self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
     {
@@ -53,7 +53,8 @@
     if (!SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
-    registerRemote = true;
+    // TODO: Why we need this parameter as we always set it to YES here?
+    registerRemote = YES;
 
     self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
@@ -208,10 +209,22 @@
     return settingsData;
 }
 
+void initiOSNotificationData(iOSNotificationData* notificationData)
+{
+    notificationData->title = " ";
+    notificationData->body = " ";
+    notificationData->badge = 0;
+    notificationData->subtitle = " ";
+    notificationData->categoryIdentifier = " ";
+    notificationData->threadIdentifier = " ";
+    notificationData->triggerType = PUSH_TRIGGER;
+    notificationData->data = " ";
+}
+
 + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData:(UNNotificationRequest*)request
 {
-    struct iOSNotificationData* notificationData = (struct iOSNotificationData*)malloc(sizeof(*notificationData));
-    [UnityNotificationManager InitiOSNotificationData: notificationData];
+    struct iOSNotificationData* notificationData = malloc(sizeof(*notificationData));
+    initiOSNotificationData(notificationData);
 
     UNNotificationContent* content = request.content;
 
@@ -319,18 +332,6 @@
 {
     UNNotificationRequest* request = notification.request;
     return [UnityNotificationManager UNNotificationRequestToiOSNotificationData: request];
-}
-
-+ (void)InitiOSNotificationData:(iOSNotificationData*)notificationData;
-{
-    notificationData->title = " ";
-    notificationData->body = " ";
-    notificationData->badge = 0;
-    notificationData->subtitle = " ";
-    notificationData->categoryIdentifier = " ";
-    notificationData->threadIdentifier = " ";
-    notificationData->triggerType = PUSH_TRIGGER;
-    notificationData->data = " ";
 }
 
 @end

@@ -85,8 +85,6 @@ typedef struct NotificationSettingsData
     int showPreviewsSetting;
 } NotificationSettingsData;
 
-const int kDefaultPresentationOptions = -1;
-
 @interface UnityNotificationManager : NSObject<UNUserNotificationCenterDelegate>
 
 @property UNNotificationSettings* cachedNotificationSettings;
@@ -114,8 +112,6 @@ const int kDefaultPresentationOptions = -1;
 + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData:(UNNotificationRequest*)request;
 + (struct iOSNotificationData*)UNNotificationToiOSNotificationData:(UNNotification*)notification;
 + (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData:(UNNotificationSettings*)settings;
-
-+ (void)InitiOSNotificationData:(iOSNotificationData*)notificationData;
 
 - (void)checkAuthorizationFinished;
 - (void)updateScheduledNotificationList;

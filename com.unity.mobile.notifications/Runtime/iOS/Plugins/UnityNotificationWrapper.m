@@ -104,8 +104,8 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
 
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
 
-    NSString *title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments: nil];
-    NSString *body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments: nil];
+    NSString* title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments: nil];
+    NSString* body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments: nil];
 
     // iOS 10 does not show notifications with an empty body or title fields. Since this works fine on iOS 11+ we'll add assign a string
     // with a space to maintain consistent behaviour.
@@ -122,13 +122,10 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
 
     content.title = title;
     content.body = body;
-
     content.userInfo = userInfo;
 
     if (data->badge >= 0)
-    {
         content.badge = [NSNumber numberWithInt: data->badge];
-    }
 
     if (data->subtitle != NULL)
         content.subtitle = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->subtitle] arguments: nil];
@@ -202,43 +199,38 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
 NotificationSettingsData* _GetNotificationSettings()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return [UnityNotificationManager UNNotificationSettingsToNotificationSettingsData: [manager cachedNotificationSettings]];
+    return [UnityNotificationManager UNNotificationSettingsToNotificationSettingsData: manager.cachedNotificationSettings];
 }
 
 int _GetScheduledNotificationDataCount()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return (int)[manager.cachedPendingNotificationRequests count];
+    return (int)manager.cachedPendingNotificationRequests.count;
 }
 
 iOSNotificationData* _GetScheduledNotificationDataAt(int index)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-
-    if (index >= [manager.cachedPendingNotificationRequests count])
+    if (index >= manager.cachedPendingNotificationRequests.count)
         return NULL;
 
     UNNotificationRequest * request = manager.cachedPendingNotificationRequests[index];
-
-
     return [UnityNotificationManager UNNotificationRequestToiOSNotificationData: request];
 }
 
 int _GetDeliveredNotificationDataCount()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return [manager.cachedDeliveredNotifications count];
+    return (int)manager.cachedDeliveredNotifications.count;
 }
 
 iOSNotificationData* _GetDeliveredNotificationDataAt(int index)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-
-    if (index >= [manager.cachedDeliveredNotifications count])
+    if (index >= manager.cachedDeliveredNotifications.count)
         return NULL;
 
     UNNotification * notification = manager.cachedDeliveredNotifications[index];
-
     return [UnityNotificationManager UNNotificationToiOSNotificationData: notification];
 }
 
@@ -289,8 +281,7 @@ bool _GetAppOpenedUsingNotification()
 iOSNotificationData* _GetLastNotificationData()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    iOSNotificationData* data = [UnityNotificationManager UNNotificationRequestToiOSNotificationData: manager.lastReceivedNotification.request];
-    return data;
+    return [UnityNotificationManager UNNotificationRequestToiOSNotificationData: manager.lastReceivedNotification.request];
 }
 
 #endif
