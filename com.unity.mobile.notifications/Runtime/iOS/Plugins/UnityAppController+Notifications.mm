@@ -9,7 +9,6 @@
 
 #import "UnityNotificationManager.h"
 #import "UnityAppController+Notifications.h"
-
 #import "UnityNotificationWrapper.h"
 
 @implementation UnityNotificationLifeCycleManager

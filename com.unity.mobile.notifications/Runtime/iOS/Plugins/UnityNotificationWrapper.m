@@ -10,9 +10,7 @@
 #import <CoreLocation/CoreLocation.h>
 #endif
 
-#import "UnityNotificationData.h"
 #import "UnityNotificationManager.h"
-
 #import "UnityNotificationWrapper.h"
 
 AuthorizationRequestResponse req_callback;

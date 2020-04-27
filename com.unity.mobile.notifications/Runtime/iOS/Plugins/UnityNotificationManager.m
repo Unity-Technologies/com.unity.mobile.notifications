@@ -100,9 +100,8 @@ const int kDefaultPresentationOptions = -1;
 {
     NSUInteger len = deviceTokenData.length;
     if (len == 0)
-    {
         return;
-    }
+
     const unsigned char *buffer = deviceTokenData.bytes;
     NSMutableString *str  = [NSMutableString stringWithCapacity: (len * 2)];
     for (int i = 0; i < len; ++i)
@@ -310,7 +309,7 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
 
             if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(value)))
             {
-                notificationData->data = (value == 1) ? "true" : "false";
+                notificationData->data = (value.intValue == 1) ? "true" : "false";
             }
             else
             {
