@@ -1,9 +1,8 @@
 //
 //  UnityAppController+Notifications.m
-//  Unity-iPhone
+//  iOS.notifications
 //
-//  Copyright © 2018 Unity Technologies. All rights reserved.
-//
+
 #if TARGET_OS_IOS
 
 #import <objc/runtime.h>
@@ -14,7 +13,6 @@
 #import "UnityNotificationWrapper.h"
 
 @implementation UnityNotificationLifeCycleManager
-
 
 + (void)load
 {

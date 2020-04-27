@@ -2,9 +2,7 @@
 //  UnityNotificationWrapper.h
 //  iOS.notifications
 //
-//  Created by Paulius on 26/07/2018.
-//  Copyright © 2018 Unity Technologies. All rights reserved.
-//
+
 #if TARGET_OS_IOS
 
 #ifndef UnityNotificationWrapper_h
@@ -20,7 +18,6 @@ void _RequestAuthorization(int options, BOOL registerRemote);
 
 int _GetScheduledNotificationDataCount();
 iOSNotificationData* _GetScheduledNotificationDataAt(int index);
-
 
 #endif /* UnityNotificationWrapper_h */
 #endif

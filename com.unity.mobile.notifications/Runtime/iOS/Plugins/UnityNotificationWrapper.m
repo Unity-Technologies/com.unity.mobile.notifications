@@ -2,17 +2,17 @@
 //  UnityNotificationWrapper.m
 //  iOS.notifications
 //
-//  Copyright © 2018 Unity Technologies. All rights reserved.
-//
 
 #if TARGET_OS_IOS
 #import <Foundation/Foundation.h>
 
 #if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
-    #import <CoreLocation/CoreLocation.h>
+#import <CoreLocation/CoreLocation.h>
 #endif
 
+#import "UnityNotificationData.h"
 #import "UnityNotificationManager.h"
+
 #import "UnityNotificationWrapper.h"
 
 AuthorizationRequestResponse req_callback;
@@ -189,8 +189,8 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
         return;
     }
 
-    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:
-                                      [NSString stringWithUTF8String: data->identifier] content: content trigger: trigger];
+    NSString* identifier = [NSString stringWithUTF8String: data->identifier];
+    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier: identifier content: content trigger: trigger];
 
     // Schedule the notification.
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
