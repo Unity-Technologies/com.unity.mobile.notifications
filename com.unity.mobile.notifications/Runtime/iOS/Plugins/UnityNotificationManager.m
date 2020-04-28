@@ -122,10 +122,10 @@ const int kDefaultPresentationOptions = -1;
 
     if ([notification.request.trigger isKindOfClass: [UNPushNotificationTrigger class]])
     {
-        if (self.onCatchReceivedRemoteNotificationCallback != NULL)
+        if (self.onRemoteNotificationReceivedCallback != NULL)
         {
             showInForeground = NO;
-            self.onCatchReceivedRemoteNotificationCallback([UnityNotificationManager UNNotificationToiOSNotificationData: notification]);
+            self.onRemoteNotificationReceivedCallback([UnityNotificationManager UNNotificationToiOSNotificationData: notification]);
         }
         else
         {
@@ -141,9 +141,7 @@ const int kDefaultPresentationOptions = -1;
         showInForeground = [[notification.request.content.userInfo objectForKey: @"showInForeground"] boolValue];
     }
     if (showInForeground)
-    {
         completionHandler(presentationOptions);
-    }
     else
         completionHandler(UNNotificationPresentationOptionNone);
 
@@ -181,29 +179,6 @@ const int kDefaultPresentationOptions = -1;
     [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
         self.cachedNotificationSettings = settings;
     }];
-}
-
-+ (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData:(UNNotificationSettings*)settings
-{
-    struct NotificationSettingsData* settingsData = (struct NotificationSettingsData*)malloc(sizeof(*settingsData));
-    settingsData->alertSetting = (int)settings.alertSetting;
-    settingsData->authorizationStatus = (int)settings.authorizationStatus;
-    settingsData->badgeSetting = (int)settings.badgeSetting;
-    settingsData->carPlaySetting = (int)settings.carPlaySetting;
-    settingsData->lockScreenSetting = (int)settings.lockScreenSetting;
-    settingsData->notificationCenterSetting = (int)settings.notificationCenterSetting;
-    settingsData->soundSetting = (int)settings.soundSetting;
-    settingsData->alertStyle = (int)settings.alertStyle;
-
-    if (@available(iOS 11.0, *))
-    {
-        settingsData->showPreviewsSetting = (int)settings.showPreviewsSetting;
-    }
-    else
-    {
-        settingsData->showPreviewsSetting = 2;
-    }
-    return settingsData;
 }
 
 void initiOSNotificationData(iOSNotificationData* notificationData)

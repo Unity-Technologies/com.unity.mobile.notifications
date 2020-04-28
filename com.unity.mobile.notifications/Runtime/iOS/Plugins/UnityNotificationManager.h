@@ -18,7 +18,7 @@
 @property struct iOSNotificationAuthorizationData* authData;
 
 @property NotificationDataReceivedResponse onNotificationReceivedCallback;
-@property NotificationDataReceivedResponse onCatchReceivedRemoteNotificationCallback;
+@property NotificationDataReceivedResponse onRemoteNotificationReceivedCallback;
 @property AuthorizationRequestResponse onAuthorizationCompletionCallback;
 
 @property NSArray<UNNotificationRequest *> * cachedPendingNotificationRequests;
@@ -38,7 +38,6 @@
 
 + (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData:(UNNotificationRequest*)request;
 + (struct iOSNotificationData*)UNNotificationToiOSNotificationData:(UNNotification*)notification;
-+ (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData:(UNNotificationSettings*)settings;
 
 - (void)checkAuthorizationFinished;
 - (void)updateScheduledNotificationList;

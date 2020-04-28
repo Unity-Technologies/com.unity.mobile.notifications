@@ -78,6 +78,8 @@ typedef struct NotificationSettingsData
 typedef void (*NotificationDataReceivedResponse)(struct iOSNotificationData* data);
 typedef void (*AuthorizationRequestResponse) (struct iOSNotificationAuthorizationData* data);
 
+NotificationSettingsData* UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings);
+
 #endif /* UnityNotificationData_h */
 
 #endif

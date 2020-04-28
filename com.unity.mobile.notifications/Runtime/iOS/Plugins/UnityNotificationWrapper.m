@@ -71,7 +71,7 @@ void _SetRemoteNotificationReceivedDelegate(NotificationDataReceivedResponse cal
     g_RemoteNotificationCallback = callback;
 
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    manager.onCatchReceivedRemoteNotificationCallback = &onRemoteNotificationReceived;
+    manager.onRemoteNotificationReceivedCallback = &onRemoteNotificationReceived;
 }
 
 void _RequestAuthorization(int options, BOOL registerRemote)
@@ -210,7 +210,8 @@ void _ScheduleLocalNotification(struct iOSNotificationData* data)
 NotificationSettingsData* _GetNotificationSettings()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return [UnityNotificationManager UNNotificationSettingsToNotificationSettingsData: manager.cachedNotificationSettings];
+    // The native NotificationSettingsData pointer will be freed by GetNotificationSettings() in the Runtime/iOS/iOSNotificationsWrapper.cs.
+    return UNNotificationSettingsToNotificationSettingsData(manager.cachedNotificationSettings);
 }
 
 int _GetScheduledNotificationDataCount()
