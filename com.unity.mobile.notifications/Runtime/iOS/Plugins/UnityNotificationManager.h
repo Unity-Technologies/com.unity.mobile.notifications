@@ -42,6 +42,8 @@
 - (void)updateNotificationSettings;
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote;
 - (void)setDeviceTokenFromNSData:(NSData*)deviceToken;
+- (void)scheduleLocalNotification:(iOSNotificationData*)data;
+
 @end
 
 #endif

@@ -6,10 +6,6 @@
 #if TARGET_OS_IOS
 #import <Foundation/Foundation.h>
 
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
-#import <CoreLocation/CoreLocation.h>
-#endif
-
 #import "UnityNotificationManager.h"
 #import "UnityNotificationWrapper.h"
 
@@ -48,129 +44,10 @@ void _RequestAuthorization(int options, BOOL registerRemote)
     center.delegate = manager;
 }
 
-bool validateAuthorizationStatus(UnityNotificationManager* manager)
-{
-    UNAuthorizationStatus authorizationStatus = manager.cachedNotificationSettings.authorizationStatus;
-
-    if (authorizationStatus == UNAuthorizationStatusAuthorized)
-        return true;
-
-    if (@available(iOS 12.0, *))
-    {
-        if (authorizationStatus == UNAuthorizationStatusProvisional)
-            return true;
-    }
-
-    NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization first.");
-    return false;
-}
-
 void _ScheduleLocalNotification(struct iOSNotificationData* data)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    if (!validateAuthorizationStatus(manager))
-        return;
-
-    assert(manager.onNotificationReceivedCallback != NULL);
-
-    NSDictionary *userInfo = @{
-        @"showInForeground": @(data->showInForeground),
-        @"showInForegroundPresentationOptions": [NSNumber numberWithInteger: data->showInForegroundPresentationOptions],
-        @"data": @(data->data ? data->data : ""),
-    };
-
-    UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
-
-    NSString* title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments: nil];
-    NSString* body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments: nil];
-
-    // iOS 10 does not show notifications with an empty body or title fields. Since this works fine on iOS 11+ we'll add assign a string
-    // with a space to maintain consistent behaviour.
-    if (@available(iOS 11.0, *))
-    {
-    }
-    else
-    {
-        if (title.length == 0)
-            title = @" ";
-        if (body.length == 0)
-            body = @" ";
-    }
-
-    content.title = title;
-    content.body = body;
-    content.userInfo = userInfo;
-
-    if (data->badge >= 0)
-        content.badge = [NSNumber numberWithInt: data->badge];
-
-    if (data->subtitle != NULL)
-        content.subtitle = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->subtitle] arguments: nil];
-
-    if (data->categoryIdentifier != NULL)
-        content.categoryIdentifier = [NSString stringWithUTF8String: data->categoryIdentifier];
-
-    if (data->threadIdentifier != NULL)
-        content.threadIdentifier = [NSString stringWithUTF8String: data->threadIdentifier];
-
-    // TODO add a way to specify custom sounds.
-    content.sound = [UNNotificationSound defaultSound];
-
-    UNNotificationTrigger* trigger;
-
-    if (data->triggerType == TIME_TRIGGER)
-    {
-        trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval: data->timeTriggerInterval repeats: data->repeats];
-    }
-    else if (data->triggerType == CALENDAR_TRIGGER)
-    {
-        NSDateComponents* date = [[NSDateComponents alloc] init];
-        if (data->calendarTriggerYear >= 0)
-            date.year = data->calendarTriggerYear;
-        if (data->calendarTriggerMonth >= 0)
-            date.month = data->calendarTriggerMonth;
-        if (data->calendarTriggerDay >= 0)
-            date.day = data->calendarTriggerDay;
-        if (data->calendarTriggerHour >= 0)
-            date.hour = data->calendarTriggerHour;
-        if (data->calendarTriggerMinute >= 0)
-            date.minute = data->calendarTriggerMinute;
-        if (data->calendarTriggerSecond >= 0)
-            date.second = data->calendarTriggerSecond;
-
-        trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents: date repeats: data->repeats];
-    }
-    else if (data->triggerType == LOCATION_TRIGGER)
-    {
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
-        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
-
-        CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center
-                                    radius: data->locationTriggerRadius identifier: @"Headquarters"];
-        region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
-        region.notifyOnExit = data->locationTriggerNotifyOnExit;
-
-        trigger = [UNLocationNotificationTrigger triggerWithRegion: region repeats: NO];
-#else
-        return;
-#endif
-    }
-    else
-    {
-        return;
-    }
-
-    NSString* identifier = [NSString stringWithUTF8String: data->identifier];
-    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier: identifier content: content trigger: trigger];
-
-    // Schedule the notification.
-    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-    [center addNotificationRequest: request withCompletionHandler:^(NSError * _Nullable error) {
-        if (error != NULL)
-            NSLog(@"%@", [error localizedDescription]);
-
-        [manager updateScheduledNotificationList];
-    }];
+    [manager scheduleLocalNotification: data];
 }
 
 NotificationSettingsData* _GetNotificationSettings()
