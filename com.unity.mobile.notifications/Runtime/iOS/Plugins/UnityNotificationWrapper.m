@@ -13,10 +13,6 @@
 #import "UnityNotificationManager.h"
 #import "UnityNotificationWrapper.h"
 
-AuthorizationRequestResponse g_AuthorizationRequestCallback;
-NotificationDataReceivedResponse g_NotificationReceivedCallback;
-NotificationDataReceivedResponse g_RemoteNotificationCallback;
-
 void _FreeUnmanagedStruct(void* ptr)
 {
     if (ptr != NULL)
@@ -26,50 +22,22 @@ void _FreeUnmanagedStruct(void* ptr)
     }
 }
 
-void onAuthorizationCompletion(struct iOSNotificationAuthorizationData* data)
-{
-    if (g_AuthorizationRequestCallback != NULL)
-        g_AuthorizationRequestCallback(data);
-}
-
-void onNotificationReceived(struct iOSNotificationData* data)
-{
-    if (g_NotificationReceivedCallback != NULL)
-    {
-        g_NotificationReceivedCallback(data);
-    }
-}
-
-void onRemoteNotificationReceived(struct iOSNotificationData* data)
-{
-    if (g_RemoteNotificationCallback != NULL)
-    {
-        g_RemoteNotificationCallback(data);
-    }
-}
-
 void _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestResponse callback)
 {
-    g_AuthorizationRequestCallback = callback;
-
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    manager.onAuthorizationCompletionCallback = &onAuthorizationCompletion;
+    manager.onAuthorizationCompletionCallback = callback;
 }
 
 void _SetNotificationReceivedDelegate(NotificationDataReceivedResponse callback)
 {
-    g_NotificationReceivedCallback = callback;
-
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    manager.onNotificationReceivedCallback = &onNotificationReceived;
+    manager.onNotificationReceivedCallback = callback;
 }
 
 void _SetRemoteNotificationReceivedDelegate(NotificationDataReceivedResponse callback)
 {
-    g_RemoteNotificationCallback = callback;
-
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    manager.onRemoteNotificationReceivedCallback = &onRemoteNotificationReceived;
+    manager.onRemoteNotificationReceivedCallback = callback;
 }
 
 void _RequestAuthorization(int options, BOOL registerRemote)

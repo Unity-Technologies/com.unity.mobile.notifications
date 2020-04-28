@@ -145,6 +145,7 @@ const int kDefaultPresentationOptions = -1;
         showInForeground = [[notification.request.content.userInfo objectForKey: @"showInForeground"] boolValue];
     }
 
+    // Free the notification data.
     if (notificationData != NULL)
     {
         free(notificationData);
