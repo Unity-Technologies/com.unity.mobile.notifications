@@ -37,7 +37,6 @@ void onNotificationReceived(struct iOSNotificationData* data)
     if (g_NotificationReceivedCallback != NULL)
     {
         g_NotificationReceivedCallback(data);
-        _FreeUnmanagedStruct(data);
     }
 }
 
@@ -46,7 +45,6 @@ void onRemoteNotificationReceived(struct iOSNotificationData* data)
     if (g_RemoteNotificationCallback != NULL)
     {
         g_RemoteNotificationCallback(data);
-        _FreeUnmanagedStruct(data);
     }
 }
 

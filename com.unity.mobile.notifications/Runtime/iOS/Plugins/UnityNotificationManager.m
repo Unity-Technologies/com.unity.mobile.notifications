@@ -108,10 +108,15 @@ const int kDefaultPresentationOptions = -1;
 }
 
 //Called when a notification is delivered to a foreground app.
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification
+    withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
+    iOSNotificationData* notificationData = NULL;
     if (self.onNotificationReceivedCallback != NULL)
-        self.onNotificationReceivedCallback(UNNotificationRequestToiOSNotificationData(notification.request));
+    {
+        notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
+        self.onNotificationReceivedCallback(notificationData);
+    }
 
     BOOL showInForeground;
     NSInteger presentationOptions;
@@ -120,8 +125,11 @@ const int kDefaultPresentationOptions = -1;
     {
         if (self.onRemoteNotificationReceivedCallback != NULL)
         {
+            if (notificationData == NULL)
+                notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
+
             showInForeground = NO;
-            self.onRemoteNotificationReceivedCallback(UNNotificationRequestToiOSNotificationData(notification.request));
+            self.onRemoteNotificationReceivedCallback(notificationData);
         }
         else
         {
@@ -136,6 +144,13 @@ const int kDefaultPresentationOptions = -1;
         presentationOptions = [[notification.request.content.userInfo objectForKey: @"showInForegroundPresentationOptions"] intValue];
         showInForeground = [[notification.request.content.userInfo objectForKey: @"showInForeground"] boolValue];
     }
+
+    if (notificationData != NULL)
+    {
+        free(notificationData);
+        notificationData = NULL;
+    }
+
     if (showInForeground)
         completionHandler(presentationOptions);
     else
@@ -145,7 +160,8 @@ const int kDefaultPresentationOptions = -1;
 }
 
 //Called to let your app know which action was selected by the user for a given notification.
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(nonnull void(^)(void))completionHandler
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response
+    withCompletionHandler:(nonnull void(^)(void))completionHandler
 {
     self.lastReceivedNotification = response.notification;
     completionHandler();
