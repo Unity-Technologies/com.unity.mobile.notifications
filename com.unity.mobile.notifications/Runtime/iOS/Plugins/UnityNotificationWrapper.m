@@ -7,7 +7,6 @@
 #import <Foundation/Foundation.h>
 
 #import "UnityNotificationManager.h"
-#import "UnityNotificationWrapper.h"
 
 void _FreeUnmanagedStruct(void* ptr)
 {
