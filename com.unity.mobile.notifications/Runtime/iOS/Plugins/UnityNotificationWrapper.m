@@ -13,9 +13,9 @@
 #import "UnityNotificationManager.h"
 #import "UnityNotificationWrapper.h"
 
-AuthorizationRequestResponse req_callback;
-DATA_CALLBACK g_notificationReceivedCallback;
-DATA_CALLBACK g_remoteNotificationCallback;
+AuthorizationRequestResponse g_AuthorizationRequestCallback;
+NotificationDataReceivedResponse g_NotificationReceivedCallback;
+NotificationDataReceivedResponse g_RemoteNotificationCallback;
 
 void _FreeUnmanagedStruct(void* ptr)
 {
@@ -26,42 +26,49 @@ void _FreeUnmanagedStruct(void* ptr)
     }
 }
 
+void onAuthorizationCompletion(struct iOSNotificationAuthorizationData* data)
+{
+    if (g_AuthorizationRequestCallback != NULL)
+        g_AuthorizationRequestCallback(data);
+}
+
 void onNotificationReceived(struct iOSNotificationData* data)
 {
-    if (g_notificationReceivedCallback != NULL)
+    if (g_NotificationReceivedCallback != NULL)
     {
-        g_notificationReceivedCallback(data);
+        g_NotificationReceivedCallback(data);
         _FreeUnmanagedStruct(data);
     }
 }
 
 void onRemoteNotificationReceived(struct iOSNotificationData* data)
 {
-    if (g_remoteNotificationCallback != NULL)
+    if (g_RemoteNotificationCallback != NULL)
     {
-        g_remoteNotificationCallback(data);
+        g_RemoteNotificationCallback(data);
         _FreeUnmanagedStruct(data);
     }
 }
 
-void _SetAuthorizationRequestReceivedDelegate(AUTHORIZATION_CALBACK callback)
+void _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestResponse callback)
 {
-    req_callback = callback;
+    g_AuthorizationRequestCallback = callback;
+
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    manager.onAuthorizationCompletionCallback = req_callback;
+    manager.onAuthorizationCompletionCallback = &onAuthorizationCompletion;
 }
 
-void _SetNotificationReceivedDelegate(DATA_CALLBACK callback)
+void _SetNotificationReceivedDelegate(NotificationDataReceivedResponse callback)
 {
-    g_notificationReceivedCallback = callback;
+    g_NotificationReceivedCallback = callback;
 
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     manager.onNotificationReceivedCallback = &onNotificationReceived;
 }
 
-void _SetRemoteNotificationReceivedDelegate(DATA_CALLBACK callback)
+void _SetRemoteNotificationReceivedDelegate(NotificationDataReceivedResponse callback)
 {
-    g_remoteNotificationCallback = callback;
+    g_RemoteNotificationCallback = callback;
 
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     manager.onCatchReceivedRemoteNotificationCallback = &onRemoteNotificationReceived;
