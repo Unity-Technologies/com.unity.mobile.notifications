@@ -78,7 +78,9 @@ typedef struct NotificationSettingsData
 typedef void (*NotificationDataReceivedResponse)(struct iOSNotificationData* data);
 typedef void (*AuthorizationRequestResponse) (struct iOSNotificationAuthorizationData* data);
 
+// Who calls these two below methods should be responsible for freeing the returned pointer.
 NotificationSettingsData* UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings);
+iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request);
 
 #endif /* UnityNotificationData_h */
 

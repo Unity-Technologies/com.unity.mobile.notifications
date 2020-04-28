@@ -36,9 +36,6 @@
 
 + (instancetype)sharedInstance;
 
-+ (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData:(UNNotificationRequest*)request;
-+ (struct iOSNotificationData*)UNNotificationToiOSNotificationData:(UNNotification*)notification;
-
 - (void)checkAuthorizationFinished;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;

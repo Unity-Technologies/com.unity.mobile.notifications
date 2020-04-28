@@ -227,7 +227,7 @@ iOSNotificationData* _GetScheduledNotificationDataAt(int index)
         return NULL;
 
     UNNotificationRequest * request = manager.cachedPendingNotificationRequests[index];
-    return [UnityNotificationManager UNNotificationRequestToiOSNotificationData: request];
+    return UNNotificationRequestToiOSNotificationData(request);
 }
 
 int _GetDeliveredNotificationDataCount()
@@ -242,8 +242,8 @@ iOSNotificationData* _GetDeliveredNotificationDataAt(int index)
     if (index >= manager.cachedDeliveredNotifications.count)
         return NULL;
 
-    UNNotification * notification = manager.cachedDeliveredNotifications[index];
-    return [UnityNotificationManager UNNotificationToiOSNotificationData: notification];
+    UNNotification* notification = manager.cachedDeliveredNotifications[index];
+    return UNNotificationRequestToiOSNotificationData(notification.request);
 }
 
 void _RemoveScheduledNotification(const char* identifier)
@@ -293,7 +293,7 @@ bool _GetAppOpenedUsingNotification()
 iOSNotificationData* _GetLastNotificationData()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return [UnityNotificationManager UNNotificationRequestToiOSNotificationData: manager.lastReceivedNotification.request];
+    return UNNotificationRequestToiOSNotificationData(manager.lastReceivedNotification.request);
 }
 
 #endif
