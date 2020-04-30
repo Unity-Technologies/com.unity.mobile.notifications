@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.BadParcelableException;
 import android.service.notification.StatusBarNotification;
-import android.support.annotation.Keep;
 import android.util.Log;
 
 import static android.app.Notification.VISIBILITY_PUBLIC;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Keep
 public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;

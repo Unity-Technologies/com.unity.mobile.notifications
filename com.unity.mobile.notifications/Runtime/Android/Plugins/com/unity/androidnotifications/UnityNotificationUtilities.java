@@ -7,11 +7,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.support.annotation.Keep;
 import android.util.Base64;
 import android.util.Log;
 
-@Keep
 public class UnityNotificationUtilities {
     protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
