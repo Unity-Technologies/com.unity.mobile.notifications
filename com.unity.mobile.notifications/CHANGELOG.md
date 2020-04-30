@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.2.1-preview] - 2020-04-30
+
+### Fixes:
+- [Android] [[1231218](https://issuetracker.unity3d.com/product/unity/issues/guid/1231218)] Fixed the issue by removing the "com.android.support:appcompat-v7:27.1.1" dependency.
+
 ## [1.2.0-preview] - 2020-04-16
 
 ### Changes & Improvements:
