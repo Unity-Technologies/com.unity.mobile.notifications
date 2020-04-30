@@ -16,37 +16,9 @@ namespace Unity.Notifications
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
-            InsertGradleDependencies(projectPath);
-
             CopyNotificationResources(projectPath);
 
             InjectAndroidManifest(projectPath);
-        }
-
-        // Insert dependencies that need by mobile notification package.
-        private void InsertGradleDependencies(string projectPath)
-        {
-            // Here always insert a '\n' at the beginning, as in gradle:
-            //  1. for dependencies, you can put '}' at the end of the last 'implementation' line;
-            //  2. but you can't put two 'implementation's in one line.
-            // so just always add a new line to make sure it work for all cases.
-            const string kDependency = "\n    implementation 'com.android.support:appcompat-v7:27.1.1'\n";
-
-            var gradleFilePath = Path.Combine(projectPath, "build.gradle");
-            if (!File.Exists(gradleFilePath))
-                throw new FileNotFoundException(string.Format("'{0}' doesn't exist.", gradleFilePath));
-
-            var content = File.ReadAllText(gradleFilePath);
-            if (string.IsNullOrEmpty(content))
-                throw new ArgumentException(string.Format("'{0}' is empty.", gradleFilePath));
-
-            // Find the first '}' after 'dependencies' which has 'implementation' come after.
-            var regex = new Regex(@"dependencies[\s\S]+?implementation[\s\S]+?(?<index>}+?)");
-            var result = regex.Match(content);
-            if (!result.Success)
-                throw new ArgumentException(string.Format("Failed to parse '{0}'.", gradleFilePath));
-
-            File.WriteAllText(gradleFilePath, content.Insert(result.Groups["index"].Index, kDependency));
         }
 
         private void CopyNotificationResources(string projectPath)
