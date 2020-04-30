@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.Keep;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Keep
 public class UnityNotificationManagerOreo extends UnityNotificationManager {
     public UnityNotificationManagerOreo(Context context, Activity activity) {
         super(context, activity);
