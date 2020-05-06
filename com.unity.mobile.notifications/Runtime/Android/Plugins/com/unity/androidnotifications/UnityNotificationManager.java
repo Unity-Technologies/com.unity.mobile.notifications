@@ -498,6 +498,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Create a Notification.Builder from the intent.
+    @SuppressWarnings("deprecation")
     protected static Notification.Builder buildNotification(Context context, Intent intent) {
         String channelID = intent.getStringExtra("channelID");
 
