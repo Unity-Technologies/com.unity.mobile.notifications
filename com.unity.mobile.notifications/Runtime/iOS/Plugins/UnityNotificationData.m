@@ -39,14 +39,64 @@ NotificationSettingsData* UNNotificationSettingsToNotificationSettingsData(UNNot
 
 void initiOSNotificationData(iOSNotificationData* notificationData)
 {
-    notificationData->title = " ";
-    notificationData->body = " ";
+    notificationData->title = NULL;
+    notificationData->body = NULL;
     notificationData->badge = 0;
-    notificationData->subtitle = " ";
-    notificationData->categoryIdentifier = " ";
-    notificationData->threadIdentifier = " ";
+    notificationData->subtitle = NULL;
+    notificationData->categoryIdentifier = NULL;
+    notificationData->threadIdentifier = NULL;
     notificationData->triggerType = PUSH_TRIGGER;
-    notificationData->data = " ";
+    notificationData->data = NULL;
+}
+
+void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
+{
+    NSObject* customizedData = [request.content.userInfo objectForKey: @"data"];
+    if (customizedData == nil)
+        return;
+
+    // For local notifications, the customzied data is always a string.
+    if (notificationData->triggerType == TIME_TRIGGER || notificationData->triggerType == CALENDAR_TRIGGER)
+    {
+        notificationData->data = strdup([[customizedData description] UTF8String]);
+        return;
+    }
+
+    // For push notifications, we have to handle more cases.
+    if ([NSJSONSerialization isValidJSONObject: customizedData])
+    {
+        NSError* error;
+        NSData* data = [NSJSONSerialization dataWithJSONObject: customizedData options: NSJSONWritingPrettyPrinted error: &error];
+
+        if (!data)
+        {
+            NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
+        }
+        else
+        {
+            notificationData->data = strdup([[data description] UTF8String]);
+        }
+    }
+    else
+    {
+        if ([customizedData isKindOfClass: [NSNumber class]])
+        {
+            NSNumber* value = (NSNumber*)customizedData;
+
+            if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(value)))
+            {
+                notificationData->data = strdup((value.intValue == 1) ? "true" : "false");
+            }
+            else
+            {
+                notificationData->data = strdup([[value description] UTF8String]);
+            }
+        }
+        else
+        {
+            notificationData->data = strdup([[customizedData description] UTF8String]);
+        }
+    }
 }
 
 iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request)
@@ -56,24 +106,24 @@ iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRe
 
     UNNotificationContent* content = request.content;
 
-    notificationData->identifier = (char*)[request.identifier UTF8String];
+    notificationData->identifier = strdup([request.identifier UTF8String]);
 
     if (content.title != nil && content.title.length > 0)
-        notificationData->title = (char*)[content.title  UTF8String];
+        notificationData->title = strdup([content.title UTF8String]);
 
     if (content.body != nil && content.body.length > 0)
-        notificationData->body = (char*)[content.body UTF8String];
+        notificationData->body = strdup([content.body UTF8String]);
 
     notificationData->badge = [content.badge intValue];
 
     if (content.subtitle != nil && content.subtitle.length > 0)
-        notificationData->subtitle = (char*)[content.subtitle  UTF8String];
+        notificationData->subtitle = strdup([content.subtitle UTF8String]);
 
     if (content.categoryIdentifier != nil && content.categoryIdentifier.length > 0)
-        notificationData->categoryIdentifier = (char*)[content.categoryIdentifier  UTF8String];
+        notificationData->categoryIdentifier = strdup([content.categoryIdentifier UTF8String]);
 
     if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
-        notificationData->threadIdentifier = (char*)[content.threadIdentifier  UTF8String];
+        notificationData->threadIdentifier = strdup([content.threadIdentifier UTF8String]);
 
     if ([request.trigger isKindOfClass: [UNTimeIntervalNotificationTrigger class]])
     {
@@ -117,43 +167,39 @@ iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRe
         notificationData->triggerType = PUSH_TRIGGER;
     }
 
-    if ([NSJSONSerialization isValidJSONObject: [request.content.userInfo objectForKey: @"data"]])
-    {
-        NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject: [request.content.userInfo objectForKey: @"data"]
-                        options: NSJSONWritingPrettyPrinted
-                        error: &error];
-        if (!data)
-        {
-            NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
-        }
-        else
-        {
-            notificationData->data = (char*)[[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] UTF8String];
-        }
-    }
-    else
-    {
-        if ([[request.content.userInfo valueForKey: @"data"] isKindOfClass: [NSNumber class]])
-        {
-            NSNumber *value = (NSNumber*)[request.content.userInfo valueForKey: @"data"];
-
-            if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(value)))
-            {
-                notificationData->data = (value.intValue == 1) ? "true" : "false";
-            }
-            else
-            {
-                notificationData->data = (char*)[[value description] UTF8String];
-            }
-        }
-        else
-        {
-            notificationData->data = (char*)[[[request.content.userInfo objectForKey: @"data"]description] UTF8String];
-        }
-    }
+    parseCustomizedData(notificationData, request);
 
     return notificationData;
+}
+
+void freeiOSNotificationData(iOSNotificationData* notificationData)
+{
+    if (notificationData == NULL)
+        return;
+
+    if (notificationData->identifier != NULL)
+        free(notificationData->identifier);
+
+    if (notificationData->title != NULL)
+        free(notificationData->title);
+
+    if (notificationData->body != NULL)
+        free(notificationData->body);
+
+    if (notificationData->subtitle != NULL)
+        free(notificationData->subtitle);
+
+    if (notificationData->categoryIdentifier != NULL)
+        free(notificationData->categoryIdentifier);
+
+    if (notificationData->threadIdentifier != NULL)
+        free(notificationData->threadIdentifier);
+
+    if (notificationData->data != NULL)
+        free(notificationData->data);
+
+    free(notificationData);
+    notificationData = NULL;
 }
 
 #endif

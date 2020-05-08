@@ -8,13 +8,19 @@
 
 #import "UnityNotificationManager.h"
 
-void _FreeUnmanagedStruct(void* ptr)
+void _FreeUnmanagedMemory(void* ptr)
 {
     if (ptr != NULL)
     {
         free(ptr);
         ptr = NULL;
     }
+}
+
+void _FreeUnmanagediOSNotificationData(iOSNotificationData* ptr)
+{
+    freeiOSNotificationData(ptr);
+    ptr = NULL;
 }
 
 void _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestResponse callback)

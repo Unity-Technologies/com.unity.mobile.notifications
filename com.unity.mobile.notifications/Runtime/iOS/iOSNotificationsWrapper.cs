@@ -65,7 +65,10 @@ namespace Unity.Notifications.iOS
         private static extern IntPtr _GetLastNotificationData();
 
         [DllImport("__Internal")]
-        private static extern void _FreeUnmanagedStruct(IntPtr ptr);
+        private static extern void _FreeUnmanagedMemory(IntPtr ptr);
+
+        [DllImport("__Internal")]
+        private static extern void _FreeUnmanagediOSNotificationData(IntPtr ptr);
 
         private delegate void AuthorizationRequestCallback(IntPtr authdata);
         private delegate void NotificationReceivedCallback(IntPtr notificationData);
@@ -147,7 +150,7 @@ namespace Unity.Notifications.iOS
 
             IntPtr ptr = _GetNotificationSettings();
             settings = (iOSNotificationSettings)Marshal.PtrToStructure(ptr, typeof(iOSNotificationSettings));
-            _FreeUnmanagedStruct(ptr);
+            _FreeUnmanagedMemory(ptr);
 
             return settings;
 #else
@@ -180,7 +183,7 @@ namespace Unity.Notifications.iOS
                 {
                     data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
                     dataList.Add(data);
-                    _FreeUnmanagedStruct(ptr);
+                    _FreeUnmanagediOSNotificationData(ptr);
                 }
             }
 
@@ -205,7 +208,7 @@ namespace Unity.Notifications.iOS
                 {
                     data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
                     dataList.Add(data);
-                    _FreeUnmanagedStruct(ptr);
+                    _FreeUnmanagediOSNotificationData(ptr);
                 }
             }
 
@@ -251,7 +254,7 @@ namespace Unity.Notifications.iOS
                 if (ptr != IntPtr.Zero)
                 {
                     data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
-                    _FreeUnmanagedStruct(ptr);
+                    _FreeUnmanagediOSNotificationData(ptr);
                     return data;
                 }
             }
