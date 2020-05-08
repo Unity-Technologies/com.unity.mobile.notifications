@@ -7,7 +7,7 @@
 
 #import "UnityNotificationManager.h"
 
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+#if UNITY_USES_LOCATION
 #import <CoreLocation/CoreLocation.h>
 #endif
 
@@ -288,7 +288,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     }
     else if (data->triggerType == LOCATION_TRIGGER)
     {
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+#if UNITY_USES_LOCATION
         CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
 
         CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center

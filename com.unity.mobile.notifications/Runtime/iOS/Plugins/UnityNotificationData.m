@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+#if UNITY_USES_LOCATION
 #import <CoreLocation/CoreLocation.h>
 #endif
 
@@ -149,7 +149,7 @@ iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRe
     }
     else if ([request.trigger isKindOfClass: [UNLocationNotificationTrigger class]])
     {
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
+#if UNITY_USES_LOCATION
         notificationData->triggerType = LOCATION_TRIGGER;
 
         UNLocationNotificationTrigger* locationTrigger = (UNLocationNotificationTrigger*)request.trigger;
