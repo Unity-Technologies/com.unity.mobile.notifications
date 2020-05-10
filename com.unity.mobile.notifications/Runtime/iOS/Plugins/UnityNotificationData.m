@@ -74,7 +74,7 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
         }
         else
         {
-            notificationData->data = strdup([[data description] UTF8String]);
+            notificationData->data = strdup([data bytes]);
         }
     }
     else
