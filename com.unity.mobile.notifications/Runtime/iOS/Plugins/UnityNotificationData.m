@@ -79,18 +79,11 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
     }
     else
     {
-        if ([customizedData isKindOfClass: [NSNumber class]])
+        // Convert bool defined with true/false in payload to "true"/"false", otherwise it will be converted to 1/0.
+        if ([customizedData isKindOfClass: [NSNumber class]] && CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(customizedData)))
         {
-            NSNumber* value = (NSNumber*)customizedData;
-
-            if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(value)))
-            {
-                notificationData->data = strdup((value.intValue == 1) ? "true" : "false");
-            }
-            else
-            {
-                notificationData->data = strdup([[value description] UTF8String]);
-            }
+            NSNumber* number = (NSNumber*)customizedData;
+            notificationData->data = strdup([number boolValue] ? "true" : "false");
         }
         else
         {
