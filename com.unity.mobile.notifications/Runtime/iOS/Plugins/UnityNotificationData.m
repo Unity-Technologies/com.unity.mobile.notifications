@@ -67,15 +67,16 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
     {
         NSError* error;
         NSData* data = [NSJSONSerialization dataWithJSONObject: customizedData options: NSJSONWritingPrettyPrinted error: &error];
-
         if (!data)
         {
             NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
+            return;
         }
-        else
-        {
-            notificationData->data = strdup([data bytes]);
-        }
+
+        // Cannot promise NSData:bytes is a C style string.
+        notificationData->data = malloc(data.length + 1);
+        [data getBytes: notificationData->data length: data.length];
+        notificationData->data[data.length] = '\0';
     }
     else
     {
