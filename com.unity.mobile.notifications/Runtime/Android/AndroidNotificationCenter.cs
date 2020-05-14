@@ -254,7 +254,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return;
 
-            if (s_NotificationManager.CallStatic<bool>("checkIfPendingNotificationIsRegistered", id))
+            if (s_NotificationManager.Call<bool>("checkIfPendingNotificationIsRegistered", id))
                 SendNotification(id, notification, channelId);
         }
 
