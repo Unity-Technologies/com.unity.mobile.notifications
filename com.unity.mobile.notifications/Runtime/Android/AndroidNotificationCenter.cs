@@ -167,11 +167,8 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static void CancelDisplayedNotification(int id)
         {
-            if (!Initialize())
-                return;
-
-            AndroidJavaObject androidNotificationManager = s_NotificationManager.Call<AndroidJavaObject>("getNotificationManager");
-            androidNotificationManager.Call("cancel", id);
+            if (Initialize())
+                s_NotificationManager.Call("cancelDisplayedNotification", id);
         }
 
         /// <summary>
