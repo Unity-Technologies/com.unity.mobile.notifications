@@ -2,17 +2,16 @@
 //  UnityNotificationManager.m
 //  iOS.notifications
 //
-//  Created by Paulius on 24/07/2018.
-//  Copyright © 2018 Unity Technologies. All rights reserved.
-//
+
 #if TARGET_OS_IOS
 
 #import "UnityNotificationManager.h"
 
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
-    #import <CoreLocation/CoreLocation.h>
+#if UNITY_USES_LOCATION
+#import <CoreLocation/CoreLocation.h>
 #endif
 
+const int kDefaultPresentationOptions = -1;
 
 @implementation UnityNotificationManager
 
@@ -34,9 +33,8 @@
 {
     bool requestRejected = self.authorizationRequestFinished && !self.authorized;
 
-    if (!requestRejected && self.needRemoteNotifications)
-        if (!self.remoteNotificationsRegistered)
-            return;
+    if (!requestRejected && self.needRemoteNotifications && self.remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
+        return;
 
     if (self.authorizationRequestFinished && self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
     {
@@ -48,12 +46,13 @@
     }
 }
 
-- (void)requestAuthorization:(NSInteger)authorizationOptions:(BOOL)registerRemote
+- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote
 {
     if (!SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
-    registerRemote = true;
+    // TODO: Why we need this parameter as we always set it to YES here?
+    registerRemote = YES;
 
     self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
@@ -101,9 +100,8 @@
 {
     NSUInteger len = deviceTokenData.length;
     if (len == 0)
-    {
         return;
-    }
+
     const unsigned char *buffer = deviceTokenData.bytes;
     NSMutableString *str  = [NSMutableString stringWithCapacity: (len * 2)];
     for (int i = 0; i < len; ++i)
@@ -114,20 +112,28 @@
 }
 
 //Called when a notification is delivered to a foreground app.
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification
+    withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
+    iOSNotificationData* notificationData = NULL;
     if (self.onNotificationReceivedCallback != NULL)
-        self.onNotificationReceivedCallback([UnityNotificationManager UNNotificationToiOSNotificationData: notification]);
+    {
+        notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
+        self.onNotificationReceivedCallback(notificationData);
+    }
 
     BOOL showInForeground;
     NSInteger presentationOptions;
 
     if ([notification.request.trigger isKindOfClass: [UNPushNotificationTrigger class]])
     {
-        if (self.onCatchReceivedRemoteNotificationCallback != NULL)
+        if (self.onRemoteNotificationReceivedCallback != NULL)
         {
+            if (notificationData == NULL)
+                notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
+
             showInForeground = NO;
-            self.onCatchReceivedRemoteNotificationCallback([UnityNotificationManager UNNotificationToiOSNotificationData: notification]);
+            self.onRemoteNotificationReceivedCallback(notificationData);
         }
         else
         {
@@ -142,10 +148,12 @@
         presentationOptions = [[notification.request.content.userInfo objectForKey: @"showInForegroundPresentationOptions"] intValue];
         showInForeground = [[notification.request.content.userInfo objectForKey: @"showInForeground"] boolValue];
     }
+
+    freeiOSNotificationData(notificationData);
+    notificationData = NULL;
+
     if (showInForeground)
-    {
         completionHandler(presentationOptions);
-    }
     else
         completionHandler(UNNotificationPresentationOptionNone);
 
@@ -153,7 +161,8 @@
 }
 
 //Called to let your app know which action was selected by the user for a given notification.
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(nonnull void(^)(void))completionHandler
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response
+    withCompletionHandler:(nonnull void(^)(void))completionHandler
 {
     self.lastReceivedNotification = response.notification;
     completionHandler();
@@ -185,152 +194,129 @@
     }];
 }
 
-+ (struct NotificationSettingsData*)UNNotificationSettingsToNotificationSettingsData:(UNNotificationSettings*)settings
+bool validateAuthorizationStatus(UnityNotificationManager* manager)
 {
-    struct NotificationSettingsData* settingsData = (struct NotificationSettingsData*)malloc(sizeof(*settingsData));
-    settingsData->alertSetting = (int)settings.alertSetting;
-    settingsData->authorizationStatus = (int)settings.authorizationStatus;
-    settingsData->badgeSetting = (int)settings.badgeSetting;
-    settingsData->carPlaySetting = (int)settings.carPlaySetting;
-    settingsData->lockScreenSetting = (int)settings.lockScreenSetting;
-    settingsData->notificationCenterSetting = (int)settings.notificationCenterSetting;
-    settingsData->soundSetting = (int)settings.soundSetting;
-    settingsData->alertStyle = (int)settings.alertStyle;
+    UNAuthorizationStatus authorizationStatus = manager.cachedNotificationSettings.authorizationStatus;
 
+    if (authorizationStatus == UNAuthorizationStatusAuthorized)
+        return true;
+
+    if (@available(iOS 12.0, *))
+    {
+        if (authorizationStatus == UNAuthorizationStatusProvisional)
+            return true;
+    }
+
+    NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization first.");
+    return false;
+}
+
+- (void)scheduleLocalNotification:(iOSNotificationData*)data
+{
+    if (!validateAuthorizationStatus(self))
+        return;
+
+    assert(self.onNotificationReceivedCallback != NULL);
+
+    NSDictionary* userInfo = @{
+        @"showInForeground": @(data->showInForeground),
+        @"showInForegroundPresentationOptions": [NSNumber numberWithInteger: data->showInForegroundPresentationOptions],
+        @"data": @(data->data ? data->data : ""),
+    };
+
+    // Convert from iOSNotificationData to UNMutableNotificationContent.
+    UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+
+    NSString* title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments: nil];
+    NSString* body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments: nil];
+
+    // iOS 10 does not show notifications with an empty body or title fields. Since this works fine on iOS 11+ we'll add assign a string
+    // with a space to maintain consistent behaviour.
     if (@available(iOS 11.0, *))
     {
-        settingsData->showPreviewsSetting = (int)settings.showPreviewsSetting;
     }
     else
     {
-        settingsData->showPreviewsSetting = 2;
+        if (title.length == 0)
+            title = @" ";
+        if (body.length == 0)
+            body = @" ";
     }
-    return settingsData;
-}
 
-+ (struct iOSNotificationData*)UNNotificationRequestToiOSNotificationData:(UNNotificationRequest*)request
-{
-    struct iOSNotificationData* notificationData = (struct iOSNotificationData*)malloc(sizeof(*notificationData));
-    [UnityNotificationManager InitiOSNotificationData: notificationData];
+    content.title = title;
+    content.body = body;
+    content.userInfo = userInfo;
 
-    UNNotificationContent* content = request.content;
+    if (data->badge >= 0)
+        content.badge = [NSNumber numberWithInt: data->badge];
 
-    notificationData->identifier = (char*)[request.identifier UTF8String];
+    if (data->subtitle != NULL)
+        content.subtitle = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->subtitle] arguments: nil];
 
-    if (content.title != nil && content.title.length > 0)
-        notificationData->title = (char*)[content.title  UTF8String];
+    if (data->categoryIdentifier != NULL)
+        content.categoryIdentifier = [NSString stringWithUTF8String: data->categoryIdentifier];
 
-    if (content.body != nil && content.body.length > 0)
-        notificationData->body = (char*)[content.body UTF8String];
+    if (data->threadIdentifier != NULL)
+        content.threadIdentifier = [NSString stringWithUTF8String: data->threadIdentifier];
 
-    notificationData->badge = [content.badge intValue];
+    // TODO add a way to specify custom sounds.
+    content.sound = [UNNotificationSound defaultSound];
 
-    if (content.subtitle != nil && content.subtitle.length > 0)
-        notificationData->subtitle = (char*)[content.subtitle  UTF8String];
-
-    if (content.categoryIdentifier != nil && content.categoryIdentifier.length > 0)
-        notificationData->categoryIdentifier = (char*)[content.categoryIdentifier  UTF8String];
-
-    if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
-        notificationData->threadIdentifier = (char*)[content.threadIdentifier  UTF8String];
-
-    if ([request.trigger isKindOfClass: [UNTimeIntervalNotificationTrigger class]])
+    // Generate UNNotificationTrigger from iOSNotificationData.
+    UNNotificationTrigger* trigger;
+    if (data->triggerType == TIME_TRIGGER)
     {
-        notificationData->triggerType = TIME_TRIGGER;
-
-        UNTimeIntervalNotificationTrigger* timeTrigger = (UNTimeIntervalNotificationTrigger*)request.trigger;
-        notificationData->timeTriggerInterval = timeTrigger.timeInterval;
-        notificationData->repeats = timeTrigger.repeats;
+        trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval: data->timeTriggerInterval repeats: data->repeats];
     }
-    else if ([request.trigger isKindOfClass: [UNCalendarNotificationTrigger class]])
+    else if (data->triggerType == CALENDAR_TRIGGER)
     {
-        notificationData->triggerType = CALENDAR_TRIGGER;
+        NSDateComponents* date = [[NSDateComponents alloc] init];
+        if (data->calendarTriggerYear >= 0)
+            date.year = data->calendarTriggerYear;
+        if (data->calendarTriggerMonth >= 0)
+            date.month = data->calendarTriggerMonth;
+        if (data->calendarTriggerDay >= 0)
+            date.day = data->calendarTriggerDay;
+        if (data->calendarTriggerHour >= 0)
+            date.hour = data->calendarTriggerHour;
+        if (data->calendarTriggerMinute >= 0)
+            date.minute = data->calendarTriggerMinute;
+        if (data->calendarTriggerSecond >= 0)
+            date.second = data->calendarTriggerSecond;
 
-        UNCalendarNotificationTrigger* calendarTrigger = (UNCalendarNotificationTrigger*)request.trigger;
-        NSDateComponents* date = calendarTrigger.dateComponents;
-
-        notificationData->calendarTriggerYear = (int)date.year;
-        notificationData->calendarTriggerMonth = (int)date.month;
-        notificationData->calendarTriggerDay = (int)date.day;
-        notificationData->calendarTriggerHour = (int)date.hour;
-        notificationData->calendarTriggerMinute = (int)date.minute;
-        notificationData->calendarTriggerSecond = (int)date.second;
+        trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents: date repeats: data->repeats];
     }
-    else if ([request.trigger isKindOfClass: [UNLocationNotificationTrigger class]])
+    else if (data->triggerType == LOCATION_TRIGGER)
     {
-#if defined(UNITY_USES_LOCATION) && UNITY_USES_LOCATION
-        notificationData->triggerType = LOCATION_TRIGGER;
+#if UNITY_USES_LOCATION
+        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
 
-        UNLocationNotificationTrigger* locationTrigger = (UNLocationNotificationTrigger*)request.trigger;
-        CLCircularRegion *region = (CLCircularRegion*)locationTrigger.region;
+        CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center
+                                    radius: data->locationTriggerRadius identifier: @"Headquarters"];
+        region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
+        region.notifyOnExit = data->locationTriggerNotifyOnExit;
 
-        notificationData->locationTriggerCenterX = region.center.latitude;
-        notificationData->locationTriggerCenterY = region.center.longitude;
-        notificationData->locationTriggerRadius = region.radius;
-        notificationData->locationTriggerNotifyOnExit = region.notifyOnEntry;
-        notificationData->locationTriggerNotifyOnEntry = region.notifyOnExit;
+        trigger = [UNLocationNotificationTrigger triggerWithRegion: region repeats: NO];
+#else
+        return;
 #endif
     }
-    else if ([request.trigger isKindOfClass: [UNPushNotificationTrigger class]])
-    {
-        notificationData->triggerType = PUSH_TRIGGER;
-    }
-
-    if ([NSJSONSerialization isValidJSONObject: [request.content.userInfo objectForKey: @"data"]])
-    {
-        NSError *error;
-        NSData *data = [NSJSONSerialization dataWithJSONObject: [request.content.userInfo objectForKey: @"data"]
-                        options: NSJSONWritingPrettyPrinted
-                        error: &error];
-        if (!data)
-        {
-            NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
-        }
-        else
-        {
-            notificationData->data = (char*)[[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] UTF8String];
-        }
-    }
     else
     {
-        if ([[request.content.userInfo valueForKey: @"data"] isKindOfClass: [NSNumber class]])
-        {
-            NSNumber *value = (NSNumber*)[request.content.userInfo valueForKey: @"data"];
-
-            if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(value)))
-            {
-                notificationData->data = (value == 1) ? "true" : "false";
-            }
-            else
-            {
-                notificationData->data = (char*)[[value description] UTF8String];
-            }
-        }
-        else
-        {
-            notificationData->data = (char*)[[[request.content.userInfo objectForKey: @"data"]description] UTF8String];
-        }
+        return;
     }
 
-    return notificationData;
-}
+    NSString* identifier = [NSString stringWithUTF8String: data->identifier];
+    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier: identifier content: content trigger: trigger];
 
-+ (struct iOSNotificationData*)UNNotificationToiOSNotificationData:(UNNotification*)notification
-{
-    UNNotificationRequest* request = notification.request;
-    return [UnityNotificationManager UNNotificationRequestToiOSNotificationData: request];
-}
+    // Schedule the notification.
+    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+    [center addNotificationRequest: request withCompletionHandler:^(NSError * _Nullable error) {
+        if (error != NULL)
+            NSLog(@"%@", [error localizedDescription]);
 
-+ (void)InitiOSNotificationData:(iOSNotificationData*)notificationData;
-{
-    notificationData->title = " ";
-    notificationData->body = " ";
-    notificationData->badge = 0;
-    notificationData->subtitle = " ";
-    notificationData->categoryIdentifier = " ";
-    notificationData->threadIdentifier = " ";
-    notificationData->triggerType = PUSH_TRIGGER;
-    notificationData->data = " ";
+        [self updateScheduledNotificationList];
+    }];
 }
 
 @end

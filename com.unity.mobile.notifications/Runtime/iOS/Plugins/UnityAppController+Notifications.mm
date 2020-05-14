@@ -1,9 +1,8 @@
 //
 //  UnityAppController+Notifications.m
-//  Unity-iPhone
+//  iOS.notifications
 //
-//  Copyright © 2018 Unity Technologies. All rights reserved.
-//
+
 #if TARGET_OS_IOS
 
 #import <objc/runtime.h>
@@ -11,10 +10,7 @@
 #import "UnityNotificationManager.h"
 #import "UnityAppController+Notifications.h"
 
-#import "UnityNotificationWrapper.h"
-
 @implementation UnityNotificationLifeCycleManager
-
 
 + (void)load
 {
@@ -35,6 +31,7 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+
         [nc addObserverForName: UIApplicationDidBecomeActiveNotification
          object: nil
          queue: [NSOperationQueue mainQueue]
@@ -71,7 +68,7 @@
              if (authorizeOnLaunch)
              {
                  UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-                 [manager requestAuthorization: defaultAuthorizationOptions: registerRemoteOnLaunch];
+                 [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch];
                  manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
          }];
@@ -82,12 +79,12 @@
          usingBlock:^(NSNotification *notification) {
              NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken");
              UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-             manager.remoteNotificationsRegistered = UNAuthorizationStatusDenied;
+             manager.remoteNotificationsRegistered = UNAuthorizationStatusAuthorized;
 
              if ([notification.userInfo isKindOfClass: [NSData class]])
              {
                  NSData* data = (NSData*)notification.userInfo;
-                 [manager setDeviceTokenFromNSData: (NSData*)notification.userInfo];
+                 [manager setDeviceTokenFromNSData: data];
              }
              [manager checkAuthorizationFinished];
          }];
@@ -98,7 +95,7 @@
          usingBlock:^(NSNotification *notification) {
              NSLog(@"didFailToRegisterForRemoteNotificationsWithError");
              UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-             manager.remoteNotificationsRegistered = UNAuthorizationStatusAuthorized;
+             manager.remoteNotificationsRegistered = UNAuthorizationStatusDenied;
              [manager checkAuthorizationFinished];
          }];
     });
