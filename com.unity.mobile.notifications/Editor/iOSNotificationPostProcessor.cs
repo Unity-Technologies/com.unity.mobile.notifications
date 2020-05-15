@@ -17,6 +17,22 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (buildTarget != BuildTarget.iOS)
             return;
 
+        // Check if we have the minimal iOS version set.
+        bool hasMinOSVersion;
+        try
+        {
+            var requiredVersion = new Version(10, 0);
+            var currentVersion = new Version(PlayerSettings.iOS.targetOSVersionString);
+            hasMinOSVersion = currentVersion >= requiredVersion;
+        }
+        catch (Exception)
+        {
+            hasMinOSVersion = false;
+        }
+
+        if (!hasMinOSVersion)
+            Debug.Log("UserNotifications framework is only available on iOS 10.0+, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
+
         var projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
 
         var proj = new PBXProject();
@@ -82,21 +98,6 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         // Get root
         var rootDict = plist.root;
 
-        var requiredVersion = new Version(8, 0);
-        bool hasMinOSVersion;
-
-        try
-        {
-            var currentVersion = new Version(PlayerSettings.iOS.targetOSVersionString);
-            hasMinOSVersion = currentVersion >= requiredVersion;
-        }
-        catch (Exception)
-        {
-            hasMinOSVersion = false;
-        }
-
-        if (!hasMinOSVersion)
-            Debug.Log("UserNotifications are only available on iOSSettings 10 and above, please make sure that you set a correct `Target minimum iOSSettings Version` in Player Settings.");
 
         foreach (var setting in settings)
         {
