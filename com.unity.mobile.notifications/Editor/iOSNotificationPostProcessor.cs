@@ -1,11 +1,11 @@
 #if UNITY_IOS
 using System;
 using System.IO;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
 using UnityEngine;
-
 using Unity.Notifications;
 using Unity.Notifications.iOS;
 
@@ -33,72 +33,80 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (!hasMinOSVersion)
             Debug.Log("UserNotifications framework is only available on iOS 10.0+, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
 
-        var projPath = path + "/Unity-iPhone.xcodeproj/project.pbxproj";
+        var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
 
-        var proj = new PBXProject();
-        proj.ReadFromString(File.ReadAllText(projPath));
+        var needLocationFramework = (bool)settings.Find(i => i.Key == "UnityUseLocationNotificationTrigger").Value;
+        var addPushNotificationCapability = (bool)settings.Find(i => i.Key == "UnityAddRemoteNotificationCapability").Value;
+        var useReleaseAPSEnv = false;
+        if (addPushNotificationCapability)
+        {
+            var useReleaseAPSEnvSetting = settings.Find(i => i.Key == "UnityUseAPSReleaseEnvironment");
+            if (useReleaseAPSEnvSetting != null)
+                useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.Value;
+        }
+
+        PatchPBXProject(path, needLocationFramework, addPushNotificationCapability, useReleaseAPSEnv);
+        PatchPlist(path, settings, addPushNotificationCapability);
+        PatchPreprocessor(path, needLocationFramework);
+    }
+
+    private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv)
+    {
+        var pbxProjectPath = PBXProject.GetPBXProjectPath(path);
+
+        var pbxProject = new PBXProject();
+        pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
 
         string mainTarget;
         string unityFrameworkTarget;
 
-        var unityMainTargetGuidMethod = proj.GetType().GetMethod("GetUnityMainTargetGuid");
-        var unityFrameworkTargetGuidMethod = proj.GetType().GetMethod("GetUnityFrameworkTargetGuid");
+        var unityMainTargetGuidMethod = pbxProject.GetType().GetMethod("GetUnityMainTargetGuid");
+        var unityFrameworkTargetGuidMethod = pbxProject.GetType().GetMethod("GetUnityFrameworkTargetGuid");
 
         if (unityMainTargetGuidMethod != null && unityFrameworkTargetGuidMethod != null)
         {
-            mainTarget = (string)unityMainTargetGuidMethod.Invoke(proj, null);
-            unityFrameworkTarget = (string)unityFrameworkTargetGuidMethod.Invoke(proj, null);
+            mainTarget = (string)unityMainTargetGuidMethod.Invoke(pbxProject, null);
+            unityFrameworkTarget = (string)unityFrameworkTargetGuidMethod.Invoke(pbxProject, null);
         }
         else
         {
-            mainTarget = proj.TargetGuidByName("Unity-iPhone");
+            mainTarget = pbxProject.TargetGuidByName("Unity-iPhone");
             unityFrameworkTarget = mainTarget;
         }
 
-        var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
-
-        var addPushNotificationCapability = (bool)settings.Find(i => i.Key == "UnityAddRemoteNotificationCapability").Value;
-
-        var needLocationFramework = (bool)settings.Find(i => i.Key == "UnityUseLocationNotificationTrigger").Value;
-
-        proj.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
-
+        // Add necessary frameworks.
+        pbxProject.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
         if (needLocationFramework)
-            proj.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
+            pbxProject.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
 
-        File.WriteAllText(projPath, proj.WriteToString());
+        File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
 
+        // Update the entitlements file.
         if (addPushNotificationCapability)
         {
-            var useReleaseAPSEnvSetting = settings.Find(i => i.Key == "UnityUseAPSReleaseEnvironment");
-            var useReleaseAPSEnv = false;
-
-            if (useReleaseAPSEnvSetting != null)
-                useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.Value;
-
-            var entitlementsFileName = proj.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
+            var entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
             if (entitlementsFileName == null)
             {
                 var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
-                entitlementsFileName = string.Format("{0}.entitlements",
-                    bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+                entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
             }
 
-            var pbxPath = PBXProject.GetPBXProjectPath(path);
-            var capManager = new ProjectCapabilityManager(pbxPath, entitlementsFileName, "Unity-iPhone");
+            var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, "Unity-iPhone");
             capManager.AddPushNotifications(!useReleaseAPSEnv);
             capManager.WriteToFile();
         }
+    }
 
-        // Get plist
+    private static void PatchPlist(string path, List<Unity.Notifications.NotificationSetting> settings, bool addPushNotificationCapability)
+    {
         var plistPath = path + "/Info.plist";
+
         var plist = new PlistDocument();
         plist.ReadFromString(File.ReadAllText(plistPath));
 
-        // Get root
         var rootDict = plist.root;
 
-
+        // Add all the settings to the plist.
         foreach (var setting in settings)
         {
             if (setting.Value.GetType() == typeof(bool))
@@ -107,30 +115,29 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 rootDict.SetInteger(setting.Key, (int)setting.Value);
         }
 
+        // Add "remote-notification" to the list of supported UIBackgroundModes.
         if (addPushNotificationCapability)
         {
             PlistElementArray currentBacgkgroundModes = (PlistElementArray)rootDict["UIBackgroundModes"];
-
             if (currentBacgkgroundModes == null)
                 currentBacgkgroundModes = rootDict.CreateArray("UIBackgroundModes");
 
             currentBacgkgroundModes.AddString("remote-notification");
         }
 
-        // Write to file
         File.WriteAllText(plistPath, plist.WriteToString());
+    }
 
-        //Get Preprocessor.h
+    private static void PatchPreprocessor(string path, bool needLocationFramework)
+    {
         var preprocessorPath = path + "/Classes/Preprocessor.h";
         var preprocessor = File.ReadAllText(preprocessorPath);
 
-        if (needLocationFramework)
-        {
-            if (preprocessor.Contains("UNITY_USES_LOCATION"))
-                preprocessor = preprocessor.Replace("UNITY_USES_LOCATION 0", "UNITY_USES_LOCATION 1");
-        }
+        if (needLocationFramework && preprocessor.Contains("UNITY_USES_LOCATION"))
+            preprocessor = preprocessor.Replace("UNITY_USES_LOCATION 0", "UNITY_USES_LOCATION 1");
 
         preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
+
         File.WriteAllText(preprocessorPath, preprocessor);
     }
 }
