@@ -1,4 +1,4 @@
-## FAQ
+# FAQ
 
 **Why are small Android icons white in the editor notification settings preview ?**
 
