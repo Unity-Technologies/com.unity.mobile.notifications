@@ -13,9 +13,10 @@ namespace Unity.Notifications.Tests.Sample
     public class AndroidNotificationTemplate : ScriptableObject
     {
 #if UNITY_ANDROID || UNITY_EDITOR
-        [Space(10)][Header("General")] public string ButtonName = "Send A Notifiation";
+        [Space(10)][Header("General")] public string ButtonName = "Send A Notification";
         public string Channel = "default_channel";
         public int FireInSeconds;
+        public int NotificationID;
 
         [Space(10)][Header("Notification Parameters")]
         public string Title = "";
