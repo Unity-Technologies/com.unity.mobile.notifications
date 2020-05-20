@@ -1,94 +1,94 @@
 # Android
 
-**Create a notification channel**
+## Manage notification channels
 
-Every local notification must belong to a notification channel. Notification channels are only supported on Android 8.0 Oreo and above. On older Android versions, this package emulates notification channel behavior. Settings such as priority (`Importance`) set for notification channels apply to individual notifications even on Android versions prior to 8.0.
-
+Starting in Android 8.0, all notifications must be assgined to a notification channel. In the notification package, a set of APIs are provided to manage notification channels. Below is an example of how to create a notification channel.
 
 ```c#
-var c = new AndroidNotificationChannel()
+var channel = new AndroidNotificationChannel()
 {
     Id = "channel_id",
     Name = "Default Channel",
-    Importance = Importance.High,
+    Importance = Importance.Default,
     Description = "Generic notifications",
 };
-AndroidNotificationCenter.RegisterNotificationChannel(c);
+AndroidNotificationCenter.RegisterNotificationChannel(channel);
 ```
 
+You can also delete or get a notification channel, etc. Please refer to [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html) for more notification channel related APIs.
 
+One thing to keep in mind is you cannot change the behavior of a created notification channel, read more about these at [Android Notification Channel Document](https://developer.android.com/training/notify-user/channels).
 
+On devices which is lower than Android 8.0, this package emulates this behavior by applying properties on notification channels like `Importance` to individual notifications.
 
-**Send a simple notification**
+## Manage notifications
 
-This example shows you how to schedule a simple text notification and send it to the notification channel you created in the previous step.
+In the notification package, a set of APIs are provided to manage notifications including sending, updating, deleting etc. Please refer to [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html) for more notification related APIs.
 
+### Send a simple notification
+
+The below example shows how to schedule a simple text notification with the notification channel created in the previous step.
 
 ```c#
 var notification = new AndroidNotification();
-notification.Title = "SomeTitle";
-notification.Text = "SomeText";
-notification.FireTime = System.DateTime.Now.AddMinutes(5);
+notification.Title = "Your Title";
+notification.Text = "Your Text";
+notification.FireTime = System.DateTime.Now.AddMinutes(1);
 
 AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
+### Set icons
 
-If you don’t specify a custom icon for each notification, the default Unity icon displays in the status bar instead. You can configure notification icons in the **Project Settings **window (menu: **Edit** > **Project Settings** > **Mobile Notification Settings**). Whenever you schedule a notification in your script, use the icon ID you define in the **Mobile Notification Settings** window.
+You can set a custom icon as small icon for each notification. If you don't specify any icons as small icon, the default application icon will be used instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings, please refer to [Notification Settings](Settings.html) for more info. 
 
+Below is an example shows how to set the small and large icons with the icon ids you set in the notification settings.
 
 ```c#
 notification.SmallIcon = "my_custom_icon_id";
-```
-
-
-You can optionally set a large icon which also displays in the notification view. The smaller icon displays as a small badge on top of the large one.
-
-
-```c#
 notification.LargeIcon = "my_custom_large_icon_id";
 ```
 
+### Notification id
 
-Unity assigns a unique identifier to each notification after you schedule it. You can use the identifier to track the notification status or to cancel it. Notification status tracking only works on Android 6.0 Marshmallow and above.
-
-
-```c#
-var identifier = AndroidNotificationCenter.SendNotification(n, "channel_id");
-```
-
-
-Use the following code example to check if your app has delivered the notification to the device and perform any actions depending on the result.
-
+Usually Unity generates a unique id for each notification after you schedule it. The below is an example shows how to get the generated notification id.
 
 ```c#
-if ( AndroidNotificationCenter.CheckScheduledNotificationStatus(identifier) == NotificationStatus.Scheduled)
+var id = AndroidNotificationCenter.SendNotification(notification, "channel_id");
+```
+
+You can use this id to track, cancel or update the notification. The following example shows how to check the notification status and perform any actions depending on the result. Notification status tracking only works on Android 6.0 Marshmallow and above.
+
+```c#
+var notificationStatus = AndroidNotificationCenter.CheckScheduledNotificationStatus(id);
+
+if (notificationStatus == NotificationStatus.Scheduled)
 {
-	// Replace the currently scheduled notification with a new notification.
-	AndroidNotificationCenter.UpdateScheduledNotification(identifier, newNotification, channel);
+    // Replace the scheduled notification with a new notification.
+    AndroidNotificationCenter.UpdateScheduledNotification(id, newNotification, "channel_id");
 }
-else if ( AndroidNotificationCenter.CheckScheduledNotificationStatus(identifier) == NotificationStatus.Delivered)
+else if (notificationStatus == NotificationStatus.Delivered)
 {
-	//Remove the notification from the status bar
-	AndroidNotificationCenter.CancelNotification(identifier);
+    // Remove the previously shown notification from the status bar.
+    AndroidNotificationCenter.CancelNotification(id);
 }
-else if ( AndroidNotificationCenter.CheckScheduledNotificationStatus(identifier) == NotificationStatus.Unknown)
+else if (notificationStatus == NotificationStatus.Unknown)
 {
-	AndroidNotificationCenter.SendNotification(newNotification, "channel_id");
+    AndroidNotificationCenter.SendNotification(newNotification, "channel_id");
 }
 ```
 
+You can also set your own notification id explicitly.
 
-**Preserve scheduled notifications after the device restarts**
+```c#
+var notificationID = 10000;
+AndroidNotificationCenter.SendNotificationWithExplicitID(notification, "channel_id", notificationId);
+```
+And this API can be used to update a delivered notification with the same id.
 
-By default, apps remove scheduled notifications when the device restarts. To automatically reschedule all notifications when the user turns the device back on, enable the **Reschedule Notifications on Device Restart** setting in the **Project Settings** window (menu: **Edit** > **Project Settings** > **Mobile Notification Settings**). This adds the `RECEIVE_BOOT_COMPLETED` permissions to your app's manifest.
+### Notification received callback
 
- 
-
-**Handle received notifications while the app is running**
-
-You can subscribe to the `AndroidNotificationCenter.OnNotificationReceived` event to receive a callback whenever the device receives a remote notification while your app is running.
-
+You can subscribe to the `AndroidNotificationCenter.OnNotificationReceived` event to receive a callback after a notification is delivered while your app is running.
 
 ```c#
 AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
@@ -105,11 +105,9 @@ AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandl
 AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
 ```
 
+### Store and retrieve custom data
 
-**Save custom data and retrieve it when the user opens the app from the notification**
-
-To store arbitrary string data in a notification object set the `IntentData` property.
-
+You can store arbitrary string data on the notification with the `IntentData` property, and retrieve it when the user taps the notification to open the app.
 
 ```c#
 var notification = new AndroidNotification();
@@ -117,20 +115,16 @@ notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
  AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
-
-If the user opens the app from the notification, you can retrieve it any and any data it has assigned to it like this:
-
+If the user taps the notification to open the app, you can retrieve it any and any data it has assigned to it like this:
 
 ```c#
 var notificationIntentData = AndroidNotificationCenter.GetLastNotificationIntent();
-
 if (notificationIntentData != null)
 {
-  var id = notificationIntentData.Id;
-  var channel = notificationIntentData.Channel;
-  var notification = notificationIntentData.Notification;
+    var id = notificationIntentData.Id;
+    var channel = notificationIntentData.Channel;
+    var notification = notificationIntentData.Notification;
 }
 ```
 
-
-If the app is opened in any other way, `GetLastNotificationIntent` returns null. 
+If the app is opened in any other way, `GetLastNotificationIntent` returns null.
