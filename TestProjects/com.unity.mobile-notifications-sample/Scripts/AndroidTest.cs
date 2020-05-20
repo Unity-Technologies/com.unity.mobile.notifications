@@ -25,12 +25,16 @@ namespace Unity.Notifications.Tests.Sample
         public int notificationExplicidID
         {
             get { return _notificationExplicidID; }
-            set {
+            set
+            {
                 _notificationExplicidID = value;
-                if (_notificationExplicidID == 0){
-                   ButtonExplicitID.interactable = false;
-                } else {
-                   ButtonExplicitID.interactable = true;
+                if (_notificationExplicidID == 0)
+                {
+                    ButtonExplicitID.interactable = false;
+                }
+                else
+                {
+                    ButtonExplicitID.interactable = true;
                 }
             }
         }
@@ -58,8 +62,9 @@ namespace Unity.Notifications.Tests.Sample
                 .Orange($"Id: {notificationIntentData.Id}", 1)
                 .Orange($"Channel: {notificationIntentData.Channel}", 1)
                 .Properties(notificationIntentData.Notification, 1);
-            if (notificationIntentData.Id == notificationExplicidID){
-                notificationExplicidID=0;
+            if (notificationIntentData.Id == notificationExplicidID)
+            {
+                notificationExplicidID = 0;
             }
         }
 
@@ -205,8 +210,8 @@ namespace Unity.Notifications.Tests.Sample
                 foreach (DictionaryEntry test in group.Value)
                 {
                     Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
-                    button.name=group.Key.ToString()+"/"+test.Key.ToString();
-                    Debug.Log("NAMING  "+button.name);
+                    button.name = group.Key.ToString() + "/" + test.Key.ToString();
+                    Debug.Log("NAMING  " + button.name);
                     button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                     button.GetComponent<Button>().onClick.AddListener(delegate {
                         try
@@ -222,19 +227,20 @@ namespace Unity.Notifications.Tests.Sample
                 }
                 buttonGameObject.gameObject.SetActive(false);
             }
-            ButtonExplicitID=GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
-            ButtonExplicitID.interactable=false;
+            ButtonExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
+            ButtonExplicitID.interactable = false;
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
         }
 
-        public void ModifyExplicitNotification(){
-            AndroidNotification template=new AndroidNotification() //TODO: TEMPORARY,Implement GUI for Notification building
-                {
-                    Title = "Modified Explicit Notification title",
-                    Text = "Modified Explicit Notification text",
-                    FireTime = System.DateTime.Now.AddSeconds(60)
-                };
-            AndroidNotificationCenter.UpdateScheduledNotification(notificationExplicidID, template, "default_channel"); 
+        public void ModifyExplicitNotification()
+        {
+            AndroidNotification template = new AndroidNotification() //TODO: TEMPORARY,Implement GUI for Notification building
+            {
+                Title = "Modified Explicit Notification title",
+                Text = "Modified Explicit Notification text",
+                FireTime = System.DateTime.Now.AddSeconds(60)
+            };
+            AndroidNotificationCenter.UpdateScheduledNotification(notificationExplicidID, template, "default_channel");
             m_LOGGER
                 .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                 .Properties(template, 1);
@@ -248,10 +254,13 @@ namespace Unity.Notifications.Tests.Sample
                     .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                     .Properties(notification, 1);
             }
-            if (notificationID!= 0){
+            if (notificationID != 0)
+            {
                 AndroidNotificationCenter.SendNotificationWithExplicitID(notification, channel, notificationID);
-                notificationExplicidID=notificationID;
-            } else {
+                notificationExplicidID = notificationID;
+            }
+            else
+            {
                 AndroidNotificationCenter.SendNotification(notification, channel);
             }
         }
@@ -260,21 +269,21 @@ namespace Unity.Notifications.Tests.Sample
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllNotifications();
-            notificationExplicidID=0;
+            notificationExplicidID = 0;
         }
 
         public void CancelPendingNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllScheduledNotifications();
-            notificationExplicidID=0;
+            notificationExplicidID = 0;
         }
 
         public void CancelDisplayedNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllDisplayedNotifications();
-            notificationExplicidID=0;
+            notificationExplicidID = 0;
         }
 
         public void ListAllChannels()
