@@ -118,7 +118,7 @@ namespace Unity.Notifications
                 new NotificationSetting(
                     "UnityAddRemoteNotificationCapability",
                     "Enable Push Notifications",
-                    "Enable this to add the push notification capability to the Xcode project.",
+                    "Enable this to add the push notification capability to the Xcode project, also to retrieve the device token from an AuthorizationRequest.",
                     settingsManager.GetOrAddNotificationSettingValue("UnityAddRemoteNotificationCapability", false, false),
                     false,
                     new List<NotificationSetting>()

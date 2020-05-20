@@ -19,6 +19,25 @@ namespace Unity.Notifications.Tests.Sample
         private GameObjectReferences m_gameObjectReferences;
         private Dictionary<string, OrderedDictionary> m_groups;
         private Logger m_LOGGER;
+        private int _notificationExplicidID;
+        private Button ButtonExplicitID;
+
+        public int notificationExplicidID
+        {
+            get { return _notificationExplicidID; }
+            set
+            {
+                _notificationExplicidID = value;
+                if (_notificationExplicidID == 0)
+                {
+                    ButtonExplicitID.interactable = false;
+                }
+                else
+                {
+                    ButtonExplicitID.interactable = true;
+                }
+            }
+        }
 
         void Awake()
         {
@@ -43,6 +62,10 @@ namespace Unity.Notifications.Tests.Sample
                 .Orange($"Id: {notificationIntentData.Id}", 1)
                 .Orange($"Channel: {notificationIntentData.Channel}", 1)
                 .Properties(notificationIntentData.Notification, 1);
+            if (notificationIntentData.Id == notificationExplicidID)
+            {
+                notificationExplicidID = 0;
+            }
         }
 
         void Start()
@@ -91,6 +114,10 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["General"] = new OrderedDictionary();
             m_groups["General"]["Clear Log"] = new Action(() => { m_LOGGER.Clear(); });
 
+            m_groups["Modify"] = new OrderedDictionary();
+            //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
+            m_groups["Modify"]["Modify pending Explicit notification"] = new Action(() => { ModifyExplicitNotification(); });
+
             m_groups["Send"] = new OrderedDictionary();
             foreach (AndroidNotificationTemplate template in Resources.LoadAll("AndroidNotifications", typeof(AndroidNotificationTemplate)))
             {
@@ -116,7 +143,7 @@ namespace Unity.Notifications.Tests.Sample
                             ShowTimestamp = template.ShowTimestamp,
                             RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval)
                         },
-                        template.Channel
+                        template.Channel, template.NotificationID
                     );
                 });
             }
@@ -183,6 +210,8 @@ namespace Unity.Notifications.Tests.Sample
                 foreach (DictionaryEntry test in group.Value)
                 {
                     Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
+                    button.name = group.Key.ToString() + "/" + test.Key.ToString();
+                    Debug.Log("NAMING  " + button.name);
                     button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                     button.GetComponent<Button>().onClick.AddListener(delegate {
                         try
@@ -198,10 +227,26 @@ namespace Unity.Notifications.Tests.Sample
                 }
                 buttonGameObject.gameObject.SetActive(false);
             }
+            ButtonExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
+            ButtonExplicitID.interactable = false;
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
         }
 
-        public void SendNotification(AndroidNotification notification, string channel = "default_channel", bool log = true)
+        public void ModifyExplicitNotification()
+        {
+            AndroidNotification template = new AndroidNotification() //TODO: TEMPORARY,Implement GUI for Notification building
+            {
+                Title = "Modified Explicit Notification title",
+                Text = "Modified Explicit Notification text",
+                FireTime = System.DateTime.Now.AddSeconds(60)
+            };
+            AndroidNotificationCenter.UpdateScheduledNotification(notificationExplicidID, template, "default_channel");
+            m_LOGGER
+                .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
+                .Properties(template, 1);
+        }
+
+        public void SendNotification(AndroidNotification notification, string channel = "default_channel", int notificationID = 0, bool log = true)
         {
             if (log)
             {
@@ -209,25 +254,36 @@ namespace Unity.Notifications.Tests.Sample
                     .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                     .Properties(notification, 1);
             }
-            AndroidNotificationCenter.SendNotification(notification, channel);
+            if (notificationID != 0)
+            {
+                AndroidNotificationCenter.SendNotificationWithExplicitID(notification, channel, notificationID);
+                notificationExplicidID = notificationID;
+            }
+            else
+            {
+                AndroidNotificationCenter.SendNotification(notification, channel);
+            }
         }
 
         public void CancelAllNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllNotifications();
+            notificationExplicidID = 0;
         }
 
         public void CancelPendingNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllScheduledNotifications();
+            notificationExplicidID = 0;
         }
 
         public void CancelDisplayedNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllDisplayedNotifications();
+            notificationExplicidID = 0;
         }
 
         public void ListAllChannels()

@@ -472,7 +472,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         notificationPrefs.edit().clear().apply();
     }
 
-    // Cancel all notifications.
+    // Cancel a previously shown notification by id.
+    public void cancelDisplayedNotification(int id) {
+        getNotificationManager().cancel(id);
+    }
+
+    // Cancel all previously shown notifications.
     public void cancelAllNotifications() {
         getNotificationManager().cancelAll();
     }
@@ -498,6 +503,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Create a Notification.Builder from the intent.
+    @SuppressWarnings("deprecation")
     protected static Notification.Builder buildNotification(Context context, Intent intent) {
         String channelID = intent.getStringExtra("channelID");
 
