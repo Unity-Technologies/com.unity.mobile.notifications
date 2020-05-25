@@ -1,6 +1,6 @@
 # Notification Settings
 
-You can access `Notification settings` by menu `Edit > Project Settings -> Mobile Notifications`, where you can control the behavior of the notification package to some extent.
+You can access `Notification settings` by menu `Edit -> Project Settings -> Mobile Notifications`, where you can control the behavior of the notification package to some extent.
 
 ## Android
 
@@ -20,7 +20,7 @@ Add custom icons to this list which can be used for notifications. Whenever you 
 
 ### Request Authorization on App Launch
 
-Normally you can request authorization in your script, check [the example](iOS.html#RequestAuthorizationExample) for details.
+Normally you can request authorization in your script, check [the example](iOS.html#authorization-request) for details.
 
 Alternatively, you can check `Request Authorization on App Launch` which makes the app automatically request the authorization when the user launches the app.
 
