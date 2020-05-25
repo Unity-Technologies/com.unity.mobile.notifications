@@ -19,9 +19,9 @@ You can check what other properties you can set at [AndroidNotificationChannel](
 
 You can also delete or get a notification channel, etc. Please refer to [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html) for more notification channel related APIs.
 
-One thing to keep in mind is you cannot change the behavior of a created notification channel, read more about these at [Android Notification Channel Document](https://developer.android.com/training/notify-user/channels).
+Once you create a notification channel, you cannot change the behavior of it, read more at [Android Notification Channel Document](https://developer.android.com/training/notify-user/channels).
 
-On devices which is lower than Android 8.0, this package emulates this behavior by applying properties on notification channels like `Importance` to individual notifications.
+On devices which are lower than Android 8.0, this package emulates the same behavior by applying properties on notification channels like `Importance` to individual notifications.
 
 ## Manage notifications
 
@@ -115,10 +115,10 @@ You can store arbitrary string data on the notification with [AndroidNotificatio
 ```c#
 var notification = new AndroidNotification();
 notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
- AndroidNotificationCenter.SendNotification(notification, "channel_id");
+AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
-If the user taps the notification to open the app, you can retrieve it any and any data it has assigned to it like this:
+If users tap the notification to open the app, you can get it and retrieve any data assigned to it like as below.
 
 ```c#
 var notificationIntentData = AndroidNotificationCenter.GetLastNotificationIntent();

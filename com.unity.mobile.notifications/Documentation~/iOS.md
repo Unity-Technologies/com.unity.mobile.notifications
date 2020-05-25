@@ -1,8 +1,8 @@
 # iOS Notifications
 
-## Authorization request <a name="RequestAuthorizationExample"/>
+## Authorization request
 
-You need to request permissions from the system to send local notifications and receive remote ones by [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can ask the user for permissions to only send certain notification types. The below example shows how to request permissions to show UI Alert dialogs and add a badge on the app icon.
+You need to request permissions from the system to send local notifications and receive remote notifications by [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can ask for permissions to only send certain types of notification. The below example shows how to request permissions to show UI Alert dialogs and add a badge on the app icon.
 
 ```c#
 IEnumerator RequestAuthorization()
@@ -15,7 +15,7 @@ IEnumerator RequestAuthorization()
             yield return null;
         };
         
-        string res = "\n RequestAuthorization: \n";
+        string res = "\n RequestAuthorization:";
         res += "\n finished: " + req.IsFinished;
         res += "\n granted :  " + req.Granted;
         res += "\n error:  " + req.Error;
@@ -25,7 +25,7 @@ IEnumerator RequestAuthorization()
 }
 ```
 
-You can do the request again to check the current authorization status afterwards. The permissions request dialog won’t display again if the user has already granted or denied authorization.
+You can request again to check the current authorization status afterwards. The permissions request dialog won’t display again if the user has already granted or denied authorization.
 
 You can also enable the automatical authorization request when the user launches the app, please check [notification settings](settings.html#request-authorization-on-app-launchs) for more details.
 
@@ -59,9 +59,8 @@ var timeTrigger = new iOSNotificationTimeIntervalTrigger()
 
 var notification = new iOSNotification()
 {
-    // You can optionally specify a custom identifier which can later be 
-    // used to cancel the notification, if you don't set one, a unique 
-    // string will be generated automatically.
+    // You can specify a custom identifier which can be used to manage the notification later.
+    // If you don't provide one, a unique string will be generated automatically.
     Identifier = "_notification_01",
     Title = "Title",
     Body = "Scheduled at: " + DateTime.Now.ToShortDateString() + " triggered in 5 seconds",
@@ -192,14 +191,14 @@ The following code example shows how to retrieve the last notification the app r
 var notification = iOSNotificationCenter.GetLastRespondedNotification();
 if (notification != null)
 {
-    var msg = "Last Received Notification : " + n.Identifier + "\n";
+    var msg = "Last Received Notification: " + notification.Identifier;
     msg += "\n - Notification received: ";
-    msg += "\n - .Title: " + n.Title;
-    msg += "\n - .Badge: " + n.Badge;
-    msg += "\n - .Body: " + n.Body;
-    msg += "\n - .CategoryIdentifier: " + n.CategoryIdentifier;
-    msg += "\n - .Subtitle: " + n.Subtitle;
-    msg += "\n - .Data: " + n.Data;
+    msg += "\n - .Title: " + notification.Title;
+    msg += "\n - .Badge: " + notification.Badge;
+    msg += "\n - .Body: " + notification.Body;
+    msg += "\n - .CategoryIdentifier: " + notification.CategoryIdentifier;
+    msg += "\n - .Subtitle: " + notification.Subtitle;
+    msg += "\n - .Data: " + notification.Data;
     Debug.Log(msg);
 }
 ```
@@ -208,7 +207,7 @@ If the user opens the app from a notification, [iOSNotificationCenter.GetLastRes
 
 #### Set custom data for remote notifications
 
-Sometimes users might want to set custom data on the payload of a remote notification and retrieve it by [iOSNotification.Data](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Data). Below is an example of setting a string as `data` on the payload.
+Sometimes users might want to set custom data on the payload for a remote notification and retrieve it by [iOSNotification.Data](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Data). Below is an example of setting a string as `data` on the payload.
 
 ```
 {

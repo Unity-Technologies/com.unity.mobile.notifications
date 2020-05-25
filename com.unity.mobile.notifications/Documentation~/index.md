@@ -1,6 +1,6 @@
 # Introduction
 
-Mobile Notification Package adds support for scheduling local one-time or repeatable notifications on Android and iOS platforms.
+Mobile Notification package adds support for scheduling local one-time or repeatable notifications on Android and iOS platforms.
 
 ### Requirements
 
@@ -21,3 +21,6 @@ The runtime notification APIs are split into two parts for both Android and iOS.
     *   Use the Apple Push Notification Service (APNs) to receive remote notifications.
     *   Modify remote notification content if the device receives notifications from other apps while your app is running.
     *   Group notifications into threads (only supported on iOS 12+).
+
+### Installing
+To install the Mobile Notification package, please follow the instructions in the [Package Manager documentation](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html).
