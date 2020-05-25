@@ -1,6 +1,6 @@
-# iOS
+# iOS Notifications
 
-## Authorization request 
+## Authorization request <a name="RequestAuthorizationExample"/>
 
 You need to request permissions from the system to send local notifications and receive remote ones by [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can ask the user for permissions to only send certain notification types. The below example shows how to request permissions to show UI Alert dialogs and add a badge on the app icon.
 
@@ -25,7 +25,9 @@ IEnumerator RequestAuthorization()
 }
 ```
 
-Users might change the authorization status for each notification type at any time in the system settings, you can call [iOSNotificationCenter.GetNotificationSettings](../api/Unity.Notifications.iOS.iOSNotificationCenter.html) to check the actual authorization status when necessary.
+You can do the request again to check the current authorization status afterwards. The permissions request dialog won’t display again if the user has already granted or denied authorization.
+
+Users might change the authorization status for each notification type at any time in the system settings, you can call [iOSNotificationCenter.GetNotificationSettings](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetNotificationSettings) to check the actual authorization status when necessary.
 
 ### Device token
 
@@ -130,7 +132,7 @@ You shouldn't really create an [iOSNotificationPushTrigger](../api/Unity.Notific
 
 ### Notification received callbacks
 
-#### iOSNotificationCenter.OnNotificationReceived
+#### [iOSNotificationCenter.OnNotificationReceived](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnNotificationReceived)
 
 By default, if your app triggers a local notification while it is in the foreground, the device won’t display an alert for that notification. If you want the notification to behave as though the device isn’t running the app, set the `ShowInForeground` property when you schedule the notification as below.
 
@@ -143,7 +145,7 @@ notification.ForegroundPresentationOption = (PresentationOption.Sound | Presenta
 
 By subscribing to the `iOSNotificationCenter.OnNotificationReceived` event, you can also perform other actions when the app triggers a notification. For example, you can display the notification content using the app’s UI. Your app calls this event whenever a local or a remote notification is received, regardless if it's shown in the foreground.
 
-#### iOSNotificationCenter.OnRemoteNotificationReceived
+#### [iOSNotificationCenter.OnRemoteNotificationReceived](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnRemoteNotificationReceived)
 
 To modify or hide the content of a received remote notification while your app is running, subscribe to the `iOSNotificationCenter.OnRemoteNotificationReceived` event. With subscribing to this event, the remote notification won’t display when your app is running. If you still want to show an alert for it, schedule a local notification using the remote notification’s content, like below:
 
