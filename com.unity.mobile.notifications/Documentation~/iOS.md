@@ -27,6 +27,8 @@ IEnumerator RequestAuthorization()
 
 You can do the request again to check the current authorization status afterwards. The permissions request dialog won’t display again if the user has already granted or denied authorization.
 
+You can also enable the automatical authorization request when the user launches the app, please check [notification settings](settings.html#request-authorization-on-app-launchs) for more details.
+
 Users might change the authorization status for each notification type at any time in the system settings, you can call [iOSNotificationCenter.GetNotificationSettings](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetNotificationSettings) to check the actual authorization status when necessary.
 
 ### Device token
@@ -34,7 +36,7 @@ Users might change the authorization status for each notification type at any ti
 A device token is a data that contains a unique identifier assigned by Apple to a specific app on a specific device. If you intend to send push notifications to the users after they confirm the authorization request, you need to retrieve the device token first.
 
 To retrieve the device token, you need to:
-- Check `Enable Push Notifications` in the [notification settings](settings.html#EnablePushNotifications).
+- Check `Enable Push Notifications` in the [notification settings](settings.html#enable-push-notifications).
 - Create the authorization request with `registerForRemoteNotifications` set to true.
 
 For more information on how to send push notifications to a device and how to add push notification support to your app, please check [Apple Developer Document](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1).
@@ -111,7 +113,7 @@ var calendarTrigger = new iOSNotificationCalendarTrigger()
 
 You can also create an [iOSNotificationLocationTrigger](../api/Unity.Notifications.iOS.iOSNotificationLocationTrigger.html) if you want to schedule the delivery of a notification when the device enters or leaves a specific geographic region.
 
-Before you schedule any notifications with this trigger, you need to check `Include CoreLocation Framework` in the [notifications settings](settings.html#IncludeCoreLocation). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization. 
+Before you schedule any notifications with this trigger, you need to check `Include CoreLocation Framework` in the [notifications settings](settings.html#include-corelocation-framework). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization. 
 For additional information, see the [Core Location](https://developer.apple.com/documentation/corelocation/clregion?language=objc) documentation on the Apple Developer website.
 
 In the below example, the center coordinate is defined using the WGS 84 system. The app triggers the notification when the user enters an area within a 250 meter radius around the Eiffel Tower in Paris.
@@ -134,7 +136,7 @@ You shouldn't really create an [iOSNotificationPushTrigger](../api/Unity.Notific
 
 #### [iOSNotificationCenter.OnNotificationReceived](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnNotificationReceived)
 
-By default, if your app triggers a local notification while it is in the foreground, the device won’t display an alert for that notification. If you want the notification to behave as though the device isn’t running the app, set the `ShowInForeground` property when you schedule the notification as below.
+By default if your app triggers a local notification while it is in the foreground, the device won’t display an alert for that notification. If you want the notification to behave as though the device isn’t running the app, set the `ShowInForeground` property when you schedule the notification as below.
 
 ```c#
 notification.ShowInForeground = true;
@@ -147,7 +149,7 @@ By subscribing to the `iOSNotificationCenter.OnNotificationReceived` event, you 
 
 #### [iOSNotificationCenter.OnRemoteNotificationReceived](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnRemoteNotificationReceived)
 
-To modify or hide the content of a received remote notification while your app is running, subscribe to the `iOSNotificationCenter.OnRemoteNotificationReceived` event. With subscribing to this event, the remote notification won’t display when your app is running. If you still want to show an alert for it, schedule a local notification using the remote notification’s content, like below:
+To modify or hide the content of a received remote notification while your app is running, subscribe to the `iOSNotificationCenter.OnRemoteNotificationReceived` event. With subscribing to this event, the remote notification won’t display when your app is running. If you still want to show an alert for it, schedule a local notification using the remote notification’s content. Below is an example of how to do this.
 
 ```c#
 iOSNotificationCenter.OnRemoteNotificationReceived += remoteNotification =>
@@ -175,9 +177,8 @@ iOSNotificationCenter.OnRemoteNotificationReceived += remoteNotification =>
 ```
 
 ### Store and retrieve custom data
-**Save custom data and retrieve it when the user opens the app from the notification**
 
-You can store arbitrary string data on the notification with the `Data` property.
+You can store arbitrary string data on the notification with [iOSNotification.Data](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Data), and retrieve it later from the received notification.
 
 ```c#
 var notification = new iOSNotification();
@@ -185,7 +186,7 @@ notification.Data = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
 iOSNotificationCenter.ScheduleNotification(notification);
 ```
 
-The following code example shows how to retrieve the last notification the app received:
+The following code example shows how to retrieve the last notification the app received.
 
 ```c#
 var notification = iOSNotificationCenter.GetLastRespondedNotification();
@@ -203,4 +204,23 @@ if (notification != null)
 }
 ```
 
-If the user opens the app from a notification, `GetLastRespondedNotification` also returns that notification. Otherwise it returns null.
+If the user opens the app from a notification, [iOSNotificationCenter.GetLastRespondedNotification](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetLastRespondedNotification) also returns that notification. Otherwise it returns null.
+
+#### Set custom data for remote notifications
+
+Sometimes users might want to set custom data on the payload of a remote notification and retrieve it by [iOSNotification.Data](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Data). Below is an example of setting a string as `data` on the payload.
+
+```
+{
+    "aps": {
+        "alert": {
+            "title": "Hello world!",
+            "body": "This is an example of a remote notification"
+            }
+    },
+    "data": "Test data"
+}
+```
+
+You have to use the exact `data` as the key of your custom data as it's what the package looks for.
+

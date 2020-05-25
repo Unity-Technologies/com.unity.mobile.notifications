@@ -1,4 +1,4 @@
-# Android
+# Android Notifications
 
 ## Manage notification channels
 
@@ -43,7 +43,7 @@ You can check what other properties you can set at [AndroidNotification](../api/
 
 ### Set icons
 
-You can set a custom icon as small icon for each notification. If you don't specify any icons as small icon, the default application icon will be used instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings, please refer to [Notification Settings](Settings.html) for more info.
+You can set a custom icon as small icon for each notification. If you don't specify any icons as small icon, the default application icon will be used instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings, please refer to [Notification Settings](Settings.html#custom-icons).
 
 Below is an example shows how to set the small and large icons with the icon ids you set in the notification settings.
 
@@ -91,7 +91,7 @@ And this API can be used to update a delivered notification with the same id.
 
 ### Notification received callback
 
-You can subscribe to the `AndroidNotificationCenter.OnNotificationReceived` event to receive a callback after a notification is delivered while your app is running.
+You can subscribe to the [AndroidNotificationCenter.OnNotificationReceived](../api/Unity.Notifications.Android.AndroidNotificationCenter.html#Unity_Notifications_Android_AndroidNotificationCenter_OnNotificationReceived) event to receive a callback after a notification is delivered while your app is running.
 
 ```c#
 AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
@@ -110,7 +110,7 @@ AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
 
 ### Store and retrieve custom data
 
-You can store arbitrary string data on the notification with the `IntentData` property, and retrieve it when the user taps the notification to open the app.
+You can store arbitrary string data on the notification with [AndroidNotification.IntentData](../api/Unity.Notifications.Android.AndroidNotification.html#Unity_Notifications_Android_AndroidNotification_IntentData), and retrieve it when the user taps the notification to open the app.
 
 ```c#
 var notification = new AndroidNotification();
@@ -130,4 +130,4 @@ if (notificationIntentData != null)
 }
 ```
 
-If the app is opened in any other way, `GetLastNotificationIntent` returns null.
+If the app is opened in any other way, [AndroidNotificationCenter.GetLastNotificationIntent](../api/Unity.Notifications.Android.AndroidNotificationCenter.html#Unity_Notifications_Android_AndroidNotificationCenter_GetLastNotificationIntent) returns null.
