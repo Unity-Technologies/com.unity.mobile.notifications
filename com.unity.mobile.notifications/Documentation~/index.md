@@ -4,8 +4,8 @@ Mobile Notification Package adds support for scheduling local one-time or repeat
 
 ### Requirements
 
-- Compatible with Android 4.4+ (API 19) and iOS 10.0+.
 - Compatible with Unity 2018.3 or above.
+- Compatible with Android 4.4+ (API 19) and iOS 10.0+.
 
 ### Supported features
 

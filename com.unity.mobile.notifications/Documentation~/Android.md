@@ -15,6 +15,8 @@ var channel = new AndroidNotificationChannel()
 AndroidNotificationCenter.RegisterNotificationChannel(channel);
 ```
 
+You can check what other properties you can set at [AndroidNotificationChannel](../api/Unity.Notifications.Android.AndroidNotificationChannel.html).
+
 You can also delete or get a notification channel, etc. Please refer to [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html) for more notification channel related APIs.
 
 One thing to keep in mind is you cannot change the behavior of a created notification channel, read more about these at [Android Notification Channel Document](https://developer.android.com/training/notify-user/channels).
@@ -37,10 +39,11 @@ notification.FireTime = System.DateTime.Now.AddMinutes(1);
 
 AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
+You can check what other properties you can set at [AndroidNotification](../api/Unity.Notifications.Android.AndroidNotification.html).
 
 ### Set icons
 
-You can set a custom icon as small icon for each notification. If you don't specify any icons as small icon, the default application icon will be used instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings, please refer to [Notification Settings](Settings.html) for more info. 
+You can set a custom icon as small icon for each notification. If you don't specify any icons as small icon, the default application icon will be used instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings, please refer to [Notification Settings](Settings.html) for more info.
 
 Below is an example shows how to set the small and large icons with the icon ids you set in the notification settings.
 
