@@ -7,7 +7,7 @@ test_editors:
 test_platforms:
   - name: mac
     type: Unity::VM::osx
-    image: buildfarm/mac:stable
+    image: package-ci/mac:stable
     flavor: m1.mac
 
 ---
