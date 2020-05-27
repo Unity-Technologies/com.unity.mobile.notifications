@@ -44,12 +44,12 @@ namespace Unity.Notifications.Android
             int g = (color >> 8) & 0xff;
             int b = (color) & 0xff;
 
-            return new Color(a, r, g, b);
+            return new Color32((byte)r, (byte)g, (byte)b, (byte)a);
         }
 
         public static int ToInt(this Color? color)
         {
-            if (color.HasValue)
+            if (!color.HasValue)
                 return 0;
 
             var color32 = (Color32)color.Value;
