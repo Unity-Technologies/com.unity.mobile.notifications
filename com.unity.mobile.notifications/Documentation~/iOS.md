@@ -90,9 +90,9 @@ iOSNotificationCenter.RemoveDeliveredNotification(notification.Identifier);
 ### Other triggers
 
 Besides the time interval trigger, this package provides three additional types of triggers:
-* Calendar
-* Location
-* Push
+* Calendar trigger
+* Location trigger
+* Push trigger
 
 #### Calendar trigger
 

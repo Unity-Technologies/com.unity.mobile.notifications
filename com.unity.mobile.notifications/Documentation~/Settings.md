@@ -1,8 +1,10 @@
 # Notification settings
 
-From the **Notification Settings** window, you can control this package's behavior to some extent. Access this window from Unity's main menu: **Edit &gt; Project Settings &gt; Mobile Notifications**.
+From the **Notification Settings** window, you can control this package's behavior. Access this window from Unity's main menu: **Edit &gt; Project Settings &gt; Mobile Notifications**.
 
 ## Android
+
+The following settings are available for Android notifications.
 
 ### Reschedule Notifications on Device Restart 
 
@@ -18,11 +20,14 @@ Add custom icons your app can use for notifications. Whenever you schedule notif
 
 ## iOS
 
+The following settings are available for iOS notifications.
+
 ### Request Authorization on App Launch
 
-Normally, you can request authorization in your script. See this [example](iOS.html#authorization-request) for details.
+You can configure your app to request authorization in one of two ways:
 
-Alternatively, you can enable the **Request Authorization on App Launch** option, which makes the app automatically request the authorization when the user launches the app.
+- From script (see this [example](iOS.html#authorization-request) for details).
+- By enabling the **Request Authorization on App Launch** option, which makes the app automatically request the authorization when the user launches the app.
 
 ### Enable Push Notifications
 
