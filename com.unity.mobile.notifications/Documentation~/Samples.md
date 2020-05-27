@@ -1,7 +1,7 @@
 # Notification Samples
 
-This package includes a sample which demonstrates how to use the package in real-world use cases. You can install it under the package description page in the package manager as below.
+The Unity Mobile Notifications package includes a sample which shows how to use the package in real-world scenarios. You can install this sample from the package description page in the Package Manager window, as shown below.
 
 ![Installing sample](images/install-sample.png)
 
-You can also get the source of the sample from [Notification Sample](https://github.com/Unity-Technologies/NotificationsSamples).
+You can also download the source of the sample from the [Notification Samples](https://github.com/Unity-Technologies/NotificationsSamples) repository on GitHub.

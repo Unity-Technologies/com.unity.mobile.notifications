@@ -1,6 +1,6 @@
 # Introduction
 
-Mobile Notification package adds support for scheduling local one-time or repeatable notifications on Android and iOS platforms.
+The Unity Mobile Notifications package adds support for scheduling local one-time or repeatable notifications on Android and iOS.
 
 ### Requirements
 
@@ -9,12 +9,12 @@ Mobile Notification package adds support for scheduling local one-time or repeat
 
 ### Supported features
 
-The runtime notification APIs are split into two parts for both Android and iOS. These APIs can be used to schedule and manage notifications as listed blow:
+The runtime notification APIs are split into two parts for both Android and iOS. These APIs can be used to schedule and manage notifications as listed below:
 
 *   Schedule local one-time or repeatable notifications.
 *   Cancel already displayed and upcoming (scheduled) notifications.
 *   Android:
-    *   Create and modify notification channels (categories) on Android Oreo and above.
+    *   Create and modify notification channels (categories) on Android 8.0 (Oreo) and above.
     *   Preserve notifications when the device restarts.
     *   Set custom notification icons.
 *   iOS:

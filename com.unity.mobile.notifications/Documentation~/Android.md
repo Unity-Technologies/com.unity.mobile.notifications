@@ -1,8 +1,8 @@
-# Android Notifications
+# Android notifications
 
 ## Manage notification channels
 
-Starting in Android 8.0, all notifications must be assgined to a notification channel. In the notification package, a set of APIs are provided to manage notification channels. Below is an example of how to create a notification channel.
+Starting in Android 8.0, all notifications must be assigned to a notification channel. The Unity Mobile Notifications package provides a set of APIs to manage notification channels. The example below shows how to create a notification channel.
 
 ```c#
 var channel = new AndroidNotificationChannel()
@@ -15,21 +15,21 @@ var channel = new AndroidNotificationChannel()
 AndroidNotificationCenter.RegisterNotificationChannel(channel);
 ```
 
-You can check what other properties you can set at [AndroidNotificationChannel](../api/Unity.Notifications.Android.AndroidNotificationChannel.html).
+For details about other properties you can set, see [AndroidNotificationChannel](../api/Unity.Notifications.Android.AndroidNotificationChannel.html).
 
-You can also delete or get a notification channel, etc. Please refer to [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html) for more notification channel related APIs.
+You can also perform other actions on notification channels, such as get or delete. For more notification channel related APIs, see [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html).
 
-Once you create a notification channel, you cannot change the behavior of it, read more at [Android Notification Channel Document](https://developer.android.com/training/notify-user/channels).
+After you create a notification channel, you can't change its behavior. For more information, see Android developer documentation on [creating and managing notification channels](https://developer.android.com/training/notify-user/channels).
 
-On devices which are lower than Android 8.0, this package emulates the same behavior by applying properties on notification channels like `Importance` to individual notifications.
+On devices that use Android versions prior to 8.0, this package emulates the same behavior by applying properties on notification channels like `Importance` to individual notifications.
 
 ## Manage notifications
 
-In the notification package, a set of APIs are provided to manage notifications including sending, updating, deleting etc. Please refer to [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html) for more notification related APIs.
+This package provides a set of APIs to manage notifications. These APIs allow you to perform actions such as sending, updating, and deleting notifications. For more notification-related APIs, see [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html).
 
 ### Send a simple notification
 
-The below example shows how to schedule a simple text notification with the notification channel created in the previous step.
+The example below shows how to schedule a simple text notification on the notification channel created in the previous step.
 
 ```c#
 var notification = new AndroidNotification();
@@ -39,13 +39,13 @@ notification.FireTime = System.DateTime.Now.AddMinutes(1);
 
 AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
-You can check what other properties you can set at [AndroidNotification](../api/Unity.Notifications.Android.AndroidNotification.html).
+For details about other properties you can set, see [AndroidNotification](../api/Unity.Notifications.Android.AndroidNotification.html).
 
 ### Set icons
 
-You can set a custom icon as small icon for each notification. If you don't specify any icons as small icon, the default application icon will be used instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings, please refer to [Notification Settings](Settings.html#custom-icons).
+You can set a custom icon as a small icon to display for each notification. If you don't specify any small icons, notifications will display the default application icon instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings; for more information, see [Notification Settings](Settings.html#custom-icons).
 
-Below is an example shows how to set the small and large icons with the icon ids you set in the notification settings.
+The example below shows how to set the small and large icons with the icon ids you set in the notification settings.
 
 ```c#
 notification.SmallIcon = "my_custom_icon_id";
@@ -54,13 +54,13 @@ notification.LargeIcon = "my_custom_large_icon_id";
 
 ### Notification id
 
-Usually Unity generates a unique id for each notification after you schedule it. The below is an example shows how to get the generated notification id.
+Usually, Unity generates a unique id for each notification after you schedule it. The example below shows how to get the generated notification id.
 
 ```c#
 var id = AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
-You can use this id to track, cancel or update the notification. The following example shows how to check the notification status and perform any actions depending on the result. Notification status tracking only works on Android 6.0 Marshmallow and above.
+You can use this id to track, cancel, or update the notification. The following example shows how to check the notification status and perform any actions depending on the result. Notification status tracking only works on Android 6.0 Marshmallow and above.
 
 ```c#
 var notificationStatus = AndroidNotificationCenter.CheckScheduledNotificationStatus(id);
@@ -87,7 +87,7 @@ You can also set your own notification id explicitly.
 var notificationID = 10000;
 AndroidNotificationCenter.SendNotificationWithExplicitID(notification, "channel_id", notificationId);
 ```
-And this API can be used to update a delivered notification with the same id.
+You can use this API to update a delivered notification with the same id.
 
 ### Notification received callback
 
@@ -118,7 +118,7 @@ notification.IntentData = "{\"title\": \"Notification 1\", \"data\": \"200\"}";
 AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
-If users tap the notification to open the app, you can get it and retrieve any data assigned to it like as below.
+If a user taps the notification to open the app, you can get the notification and retrieve any data assigned to it like in the example below.
 
 ```c#
 var notificationIntentData = AndroidNotificationCenter.GetLastNotificationIntent();

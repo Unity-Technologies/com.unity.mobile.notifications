@@ -1,35 +1,35 @@
-# Notification Settings
+# Notification settings
 
-You can access `Notification settings` by menu `Edit -> Project Settings -> Mobile Notifications`, where you can control the behavior of the notification package to some extent.
+From the **Notification Settings** window, you can control this package's behavior to some extent. Access this window from Unity's main menu: **Edit &gt; Project Settings &gt; Mobile Notifications**.
 
 ## Android
 
 ### Reschedule Notifications on Device Restart 
 
-By default scheduled notifications will be removed after device restarts. To preserve scheduled notifications after the device restarts, you need to check the `Reschedule Notifications on Device Restart` setting. This adds the `RECEIVE_BOOT_COMPLETED` permissions to your app's manifest.
+By default, scheduled notifications are removed after the device restarts. To preserve scheduled notifications after the device restarts, you need to enable the **Reschedule Notifications on Device Restart** option. This adds the `RECEIVE_BOOT_COMPLETED` permissions to your app's manifest.
 
 ### Custom Activity
 
-You can check `Use Custom Activity` to override the activity which will be opened when the user taps the notification, and `UnityPlayerActivity` will be used by default.
+You can enable the **Use Custom Activity** option to override the activity that opens when the user taps the notification. By default, your app will use `UnityPlayerActivity`.
 
 ### Custom Icons
 
-Add custom icons to this list which can be used for notifications. Whenever you schedule notifications in your script, use the icon IDs you define in the list.
+Add custom icons your app can use for notifications. Whenever you schedule notifications in your script, use the icon ids you define in the list.
 
 ## iOS
 
 ### Request Authorization on App Launch
 
-Normally you can request authorization in your script, check [the example](iOS.html#authorization-request) for details.
+Normally, you can request authorization in your script. See this [example](iOS.html#authorization-request) for details.
 
-Alternatively, you can check `Request Authorization on App Launch` which makes the app automatically request the authorization when the user launches the app.
+Alternatively, you can enable the **Request Authorization on App Launch** option, which makes the app automatically request the authorization when the user launches the app.
 
 ### Enable Push Notifications
 
-You can check `Enable Push Notifications` to add the push notification capability to the Xcode project.
+You can enable the **Enable Push Notifications** options to add the push notification capability to the Xcode project.
 
-Also you need to check it to retrieve the device token from an [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html).
+You also need to enable this option to retrieve the device token from an [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html).
 
 ### Include CoreLocation Framework
 
-You need to check `Include CoreLocation Framework` to use the [iOSNotificationLocationTrigger](../api/Unity.Notifications.iOS.iOSNotificationLocationTrigger.html). as it will add the `CoreLocation` framework to your Xcode project.
+You must enable the **Include CoreLocation Framework** option to use the [iOSNotificationLocationTrigger](../api/Unity.Notifications.iOS.iOSNotificationLocationTrigger.html). This option adds the `CoreLocation` framework to your Xcode project.
