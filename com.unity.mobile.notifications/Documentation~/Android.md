@@ -21,7 +21,7 @@ You can also perform other actions on notification channels, such as get or dele
 
 After you create a notification channel, you can't change its behavior. For more information, see Android developer documentation on [creating and managing notification channels](https://developer.android.com/training/notify-user/channels).
 
-On devices that use Android versions prior to 8.0, this package emulates the same behavior by applying properties on notification channels like `Importance` to individual notifications.
+On devices that use Android versions prior to 8.0, this package emulates the same behavior by applying notification channel properties, such as `Importance`, to individual notifications.
 
 ## Manage notifications
 
