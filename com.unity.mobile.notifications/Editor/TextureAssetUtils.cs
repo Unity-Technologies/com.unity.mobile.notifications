@@ -100,43 +100,20 @@ namespace Unity.Notifications
             if (sourceTexture.width == width && sourceTexture.height == height)
                 return sourceTexture;
 
-            if (Application.isBatchMode && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-            {
-                // If unity is running in batch mode without graphics, we have to go to the slow CPU code path.
-                var result = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            var result = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
-                var destPixels = new Color[width * height];
-                for (int y = 0; y < height; ++y)
+            var destPixels = new Color[width * height];
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
                 {
-                    for (int x = 0; x < width; ++x)
-                    {
-                        destPixels[y * width + x] = sourceTexture.GetPixelBilinear((float)x / (float)width, (float)y / (float)height);
-                    }
+                    destPixels[y * width + x] = sourceTexture.GetPixelBilinear((float)x / (float)width, (float)y / (float)height);
                 }
-                result.SetPixels(destPixels);
-                result.Apply();
-
-                return result;
             }
-            else
-            {
-                // Scale the texture at GPU side.
-                sourceTexture.filterMode = FilterMode.Trilinear;
-                sourceTexture.Apply(true);
+            result.SetPixels(destPixels);
+            result.Apply();
 
-                var rtt = new RenderTexture(width, height, 32);
-                Graphics.SetRenderTarget(rtt);
-
-                GL.LoadPixelMatrix(0, 1, 1, 0);
-                GL.Clear(true, true, new Color(0, 0, 0, 0));
-
-                Graphics.DrawTexture(new Rect(0, 0, 1, 1), sourceTexture);
-
-                var result = new Texture2D(width, height, TextureFormat.ARGB32, true);
-                result.ReadPixels(new Rect(0, 0, width, height), 0, 0, true);
-
-                return result;
-            }
+            return result;
         }
     }
 }
