@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Unity.Notifications
 {
@@ -96,25 +97,22 @@ namespace Unity.Notifications
 
         public static Texture2D ScaleTexture(Texture2D sourceTexture, int width, int height)
         {
-            if (sourceTexture.width == width && sourceTexture.height == sourceTexture.height)
+            if (sourceTexture.width == width && sourceTexture.height == height)
                 return sourceTexture;
 
-            Rect rect = new Rect(0, 0, width, height);
+            var result = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
-            sourceTexture.filterMode = FilterMode.Trilinear;
-            sourceTexture.Apply(true);
+            var destPixels = new Color[width * height];
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    destPixels[y * width + x] = sourceTexture.GetPixelBilinear((float)x / (float)width, (float)y / (float)height);
+                }
+            }
+            result.SetPixels(destPixels);
+            result.Apply();
 
-            RenderTexture rtt = new RenderTexture(width, height, 32);
-            Graphics.SetRenderTarget(rtt);
-
-            GL.LoadPixelMatrix(0, 1, 1, 0);
-            GL.Clear(true, true, new Color(0, 0, 0, 0));
-
-            Graphics.DrawTexture(new Rect(0, 0, 1, 1), sourceTexture);
-
-            Texture2D result = new Texture2D(width, height, TextureFormat.ARGB32, true);
-            result.Resize(width, height);
-            result.ReadPixels(rect, 0, 0, true);
             return result;
         }
     }

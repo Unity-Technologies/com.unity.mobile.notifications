@@ -20,7 +20,7 @@ MonoBehaviour:
   SmallIcon:
   LargeIcon:
   NotificationStyle: 0
-  Color: {r: 0, g: 0, b: 0, a: 0}
+  Color: {r: 0, g: 1, b: 0, a: 0}
   Number: 0
   ShouldAutoCancel: 0
   UsesStopWatch: 0
