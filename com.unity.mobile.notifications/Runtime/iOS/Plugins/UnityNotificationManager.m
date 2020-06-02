@@ -11,8 +11,6 @@
 #import <CoreLocation/CoreLocation.h>
 #endif
 
-const int kDefaultPresentationOptions = -1;
-
 @implementation UnityNotificationManager
 
 + (instancetype)sharedInstance
@@ -111,7 +109,7 @@ const int kDefaultPresentationOptions = -1;
     self.deviceToken = [str copy];
 }
 
-//Called when a notification is delivered to a foreground app.
+// Called when a notification is delivered to a foreground app.
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification
     withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
@@ -139,8 +137,6 @@ const int kDefaultPresentationOptions = -1;
         {
             showInForeground = YES;
             presentationOptions = self.remoteNotificationForegroundPresentationOptions;
-            if (presentationOptions == 0)
-                presentationOptions = kDefaultPresentationOptions;
         }
     }
     else
@@ -160,7 +156,7 @@ const int kDefaultPresentationOptions = -1;
     [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
 }
 
-//Called to let your app know which action was selected by the user for a given notification.
+// Called to let your app know which action was selected by the user for a given notification.
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response
     withCompletionHandler:(nonnull void(^)(void))completionHandler
 {

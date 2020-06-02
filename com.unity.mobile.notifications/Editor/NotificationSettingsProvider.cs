@@ -300,14 +300,12 @@ namespace Unity.Notifications
                 else if (setting.Value.GetType() == typeof(PresentationOption))
                 {
                     setting.Value = (PresentationOption)EditorGUILayout.EnumFlagsField((iOSPresentationOption)setting.Value, dropdownStyle);
-                    if ((iOSPresentationOption)setting.Value == 0)
-                        setting.Value = (PresentationOption)iOSPresentationOption.All;
                 }
                 else if (setting.Value.GetType() == typeof(AuthorizationOption))
                 {
                     setting.Value = (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.Value, dropdownStyle);
                     if ((iOSAuthorizationOption)setting.Value == 0)
-                        setting.Value = (AuthorizationOption)iOSAuthorizationOption.All;
+                        setting.Value = (AuthorizationOption)(iOSAuthorizationOption.Badge | iOSAuthorizationOption.Sound | iOSAuthorizationOption.Alert);
                 }
                 if (EditorGUI.EndChangeCheck())
                 {
