@@ -76,25 +76,6 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
-        /// </summary>
-        /// <returns>
-        /// Returns the AndroidNotification used to open the app, returns null if the app was not opened with a notification.
-        /// </returns>
-        public static AndroidNotificationIntentData GetLastNotificationIntent()
-        {
-            if (!Initialize())
-                return null;
-
-            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-
-            AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
-
-            return ParseNotificationIntentData(intent);
-        }
-
-        /// <summary>
         ///  Creates a notification channel that notifications can be posted to.
         ///  Notification channel settings can be changed by users on devices running Android 8.0 and above.
         ///  On older Android versions settings set on the notification channel struct will still be applied to the notification
@@ -137,68 +118,12 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// Cancel a scheduled or previously shown notification.
-        /// The notification will no longer be displayed on it's scheduled time. If it's already delivered it will be removed from the status bar.
+        /// Returns the notification channel with the specified id.
+        /// The notification channel struct fields might not be identical to the channel struct used to initially register the channel if they were changed by the user.
         /// </summary>
-        public static void CancelNotification(int id)
+        public static AndroidNotificationChannel GetNotificationChannel(string channelId)
         {
-            if (!Initialize())
-                return;
-
-            CancelScheduledNotification(id);
-            CancelDisplayedNotification(id);
-        }
-
-        /// <summary>
-        /// Cancel a scheduled notification.
-        /// The notification will no longer be displayed on it's scheduled time. It it will not be removed from the status bar if it's already delivered.
-        /// </summary>
-        public static void CancelScheduledNotification(int id)
-        {
-            if (!Initialize())
-                return;
-
-            s_NotificationManager.Call("cancelPendingNotificationIntent", id);
-        }
-
-        /// <summary>
-        /// Cancel a previously shown notification.
-        /// The notification will be removed from the status bar.
-        /// </summary>
-        public static void CancelDisplayedNotification(int id)
-        {
-            if (Initialize())
-                s_NotificationManager.Call("cancelDisplayedNotification", id);
-        }
-
-        /// <summary>
-        /// Cancel all notifications scheduled or previously shown by the app.
-        /// All scheduled notifications will be canceled. All notifications shown by the app will be removed from the status bar.
-        /// </summary>
-        public static void CancelAllNotifications()
-        {
-            CancelAllScheduledNotifications();
-            CancelAllDisplayedNotifications();
-        }
-
-        /// <summary>
-        /// Cancel all notifications scheduled by the app.
-        /// All scheduled notifications will be canceled. Notifications will not be removed from the status bar if they are already shown.
-        /// </summary>
-        public static void CancelAllScheduledNotifications()
-        {
-            if (Initialize())
-                s_NotificationManager.Call("cancelAllPendingNotificationIntents");
-        }
-
-        /// <summary>
-        /// Cancel all previously shown notifications.
-        /// All notifications shown by the app will be removed from the status bar. All scheduled notifications will still be shown on their scheduled time.
-        /// </summary>
-        public static void CancelAllDisplayedNotifications()
-        {
-            if (Initialize())
-                s_NotificationManager.Call("cancelAllNotifications");
+            return GetNotificationChannels().SingleOrDefault(channel => channel.Id == channelId);
         }
 
         /// <summary>
@@ -234,35 +159,12 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// Returns the notification channel with the specified id.
-        /// The notification channel struct fields might not be identical to the channel struct used to initially register the channel if they were changed by the user.
+        /// Delete the specified notification channel.
         /// </summary>
-        public static AndroidNotificationChannel GetNotificationChannel(string channelId)
-        {
-            return GetNotificationChannels().SingleOrDefault(channel => channel.Id == channelId);
-        }
-
-        /// <summary>
-        /// Update an already scheduled notification.
-        /// If a notification with the specified id was already scheduled it will be overridden with the information from the passed notification struct.
-        /// </summary>
-        public static void UpdateScheduledNotification(int id, AndroidNotification notification, string channelId)
-        {
-            if (!Initialize())
-                return;
-
-            if (s_NotificationManager.Call<bool>("checkIfPendingNotificationIsRegistered", id))
-                SendNotification(id, notification, channelId);
-        }
-
-        /// <summary>
-        /// Schedule a notification which will be shown at the time specified in the notification struct.
-        /// The specified id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
-        /// </summary>
-        public static void SendNotificationWithExplicitID(AndroidNotification notification, string channelId, int id)
+        public static void DeleteNotificationChannel(string channelId)
         {
             if (Initialize())
-                SendNotification(id, notification, channelId);
+                s_NotificationManager.Call("deleteNotificationChannel", channelId);
         }
 
         /// <summary>
@@ -281,13 +183,124 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
+        /// Schedule a notification which will be shown at the time specified in the notification struct.
+        /// The specified id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
+        /// </summary>
+        public static void SendNotificationWithExplicitID(AndroidNotification notification, string channelId, int id)
+        {
+            if (Initialize())
+                SendNotification(id, notification, channelId);
+        }
+
+        /// <summary>
+        /// Update an already scheduled notification.
+        /// If a notification with the specified id was already scheduled it will be overridden with the information from the passed notification struct.
+        /// </summary>
+        public static void UpdateScheduledNotification(int id, AndroidNotification notification, string channelId)
+        {
+            if (!Initialize())
+                return;
+
+            if (s_NotificationManager.Call<bool>("checkIfPendingNotificationIsRegistered", id))
+                SendNotification(id, notification, channelId);
+        }
+
+        /// <summary>
+        /// Cancel a scheduled or previously shown notification.
+        /// The notification will no longer be displayed on it's scheduled time. If it's already delivered it will be removed from the status bar.
+        /// </summary>
+        public static void CancelNotification(int id)
+        {
+            if (!Initialize())
+                return;
+
+            CancelScheduledNotification(id);
+            CancelDisplayedNotification(id);
+        }
+
+        /// <summary>
+        /// Cancel a scheduled notification.
+        /// The notification will no longer be displayed on it's scheduled time. It it will not be removed from the status bar if it's already delivered.
+        /// </summary>
+        public static void CancelScheduledNotification(int id)
+        {
+            if (Initialize())
+                s_NotificationManager.Call("cancelPendingNotificationIntent", id);
+        }
+
+        /// <summary>
+        /// Cancel a previously shown notification.
+        /// The notification will be removed from the status bar.
+        /// </summary>
+        public static void CancelDisplayedNotification(int id)
+        {
+            if (Initialize())
+                s_NotificationManager.Call("cancelDisplayedNotification", id);
+        }
+
+        /// <summary>
+        /// Cancel all notifications scheduled or previously shown by the app.
+        /// All scheduled notifications will be canceled. All notifications shown by the app will be removed from the status bar.
+        /// </summary>
+        public static void CancelAllNotifications()
+        {
+            if (!Initialize())
+                return;
+
+            CancelAllScheduledNotifications();
+            CancelAllDisplayedNotifications();
+        }
+
+        /// <summary>
+        /// Cancel all notifications scheduled by the app.
+        /// All scheduled notifications will be canceled. Notifications will not be removed from the status bar if they are already shown.
+        /// </summary>
+        public static void CancelAllScheduledNotifications()
+        {
+            if (Initialize())
+                s_NotificationManager.Call("cancelAllPendingNotificationIntents");
+        }
+
+        /// <summary>
+        /// Cancel all previously shown notifications.
+        /// All notifications shown by the app will be removed from the status bar. All scheduled notifications will still be shown on their scheduled time.
+        /// </summary>
+        public static void CancelAllDisplayedNotifications()
+        {
+            if (Initialize())
+                s_NotificationManager.Call("cancelAllNotifications");
+        }
+
+        /// <summary>
         /// Return the status of a scheduled notification.
         /// Only available in API  23 and above.
         /// </summary>
         public static NotificationStatus CheckScheduledNotificationStatus(int id)
         {
+            if (!Initialize())
+                return NotificationStatus.Unavailable;
+
             var status = s_NotificationManager.Call<int>("checkNotificationStatus", id);
             return (NotificationStatus)status;
+        }
+
+        /// <summary>
+        /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
+        /// </summary>
+        /// <returns>
+        /// Returns the AndroidNotification used to open the app, returns null if the app was not opened with a notification.
+        /// </returns>
+        public static AndroidNotificationIntentData GetLastNotificationIntent()
+        {
+            if (!Initialize())
+                return null;
+
+            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+            AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
+
+            return ParseNotificationIntentData(intent);
         }
 
         internal static void SendNotification(int id, AndroidNotification notification, string channelId)
@@ -328,15 +341,6 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
 
             s_NotificationManager.Call("scheduleNotificationIntent", notificationIntent);
-        }
-
-        /// <summary>
-        /// Delete the specified notification channel.
-        /// </summary>
-        public static void DeleteNotificationChannel(string channelId)
-        {
-            if (Initialize())
-                s_NotificationManager.Call("deleteNotificationChannel", channelId);
         }
 
         internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
