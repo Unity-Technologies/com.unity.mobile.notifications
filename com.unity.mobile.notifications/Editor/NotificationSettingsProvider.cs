@@ -305,7 +305,7 @@ namespace Unity.Notifications
                 {
                     setting.Value = (AuthorizationOption)EditorGUILayout.EnumFlagsField((iOSAuthorizationOption)setting.Value, dropdownStyle);
                     if ((iOSAuthorizationOption)setting.Value == 0)
-                        setting.Value = (AuthorizationOption)iOSAuthorizationOption.All;
+                        setting.Value = (AuthorizationOption)(iOSAuthorizationOption.Badge | iOSAuthorizationOption.Sound | iOSAuthorizationOption.Alert);
                 }
                 if (EditorGUI.EndChangeCheck())
                 {
