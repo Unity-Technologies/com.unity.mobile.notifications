@@ -1,7 +1,6 @@
 #if UNITY_ANDROID
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;

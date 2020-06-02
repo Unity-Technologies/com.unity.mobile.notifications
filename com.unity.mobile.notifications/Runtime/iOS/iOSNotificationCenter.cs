@@ -66,6 +66,15 @@ namespace Unity.Notifications.iOS
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
         internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted = delegate {};
 
+        /// <summary>
+        /// The number currently set as the badge of the app icon.
+        /// </summary>
+        public static int ApplicationBadge
+        {
+            get { return iOSNotificationsWrapper.GetApplicationBadge(); }
+            set { iOSNotificationsWrapper.SetApplicationBadge(value); }
+        }
+
         static bool Initialize()
         {
 #if UNITY_EDITOR || !UNITY_IOS
@@ -78,6 +87,48 @@ namespace Unity.Notifications.iOS
             iOSNotificationsWrapper.RegisterOnReceivedCallback();
             return s_Initialized = true;
 #endif
+        }
+
+        /// <summary>
+        /// Schedules a local notification for delivery.
+        /// </summary>
+        public static void ScheduleNotification(iOSNotification notification)
+        {
+            if (!Initialize())
+                return;
+
+            notification.Verify();
+            iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
+        }
+
+        /// <summary>
+        /// Returns all notifications that are currently scheduled.
+        /// </summary>
+        public static iOSNotification[] GetScheduledNotifications()
+        {
+            var iOSNotifications = new List<iOSNotification>();
+
+            foreach (var d in iOSNotificationsWrapper.GetScheduledNotificationData())
+            {
+                iOSNotifications.Add(new iOSNotification(d));
+            }
+
+            return iOSNotifications.ToArray();
+        }
+
+        /// <summary>
+        /// Returns all of the app's delivered notifications that are currently shown in the Notification Center.
+        /// </summary>
+        public static iOSNotification[] GetDeliveredNotifications()
+        {
+            var iOSNotifications = new List<iOSNotification>();
+
+            foreach (var d in iOSNotificationsWrapper.GetDeliveredNotificationData())
+            {
+                iOSNotifications.Add(new iOSNotification(d));
+            }
+
+            return iOSNotifications.ToArray();
         }
 
         /// <summary>
@@ -97,15 +148,6 @@ namespace Unity.Notifications.iOS
             notification.data = data.Value;
 
             return notification;
-        }
-
-        /// <summary>
-        /// The number currently set as the badge of the app icon.
-        /// </summary>
-        public static int ApplicationBadge
-        {
-            get { return iOSNotificationsWrapper.GetApplicationBadge(); }
-            set { iOSNotificationsWrapper.SetApplicationBadge(value); }
         }
 
         /// <summary>
@@ -136,7 +178,7 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Removes all of the app’s delivered notifications from the Notification Center.
+        /// Removes all of the app's delivered notifications from the Notification Center.
         /// </summary>
         public static void RemoveAllDeliveredNotifications()
         {
@@ -150,48 +192,6 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationSettings GetNotificationSettings()
         {
             return iOSNotificationsWrapper.GetNotificationSettings();
-        }
-
-        /// <summary>
-        /// Returns all notifications that are currently scheduled.
-        /// </summary>
-        public static iOSNotification[] GetScheduledNotifications()
-        {
-            var iOSNotifications = new List<iOSNotification>();
-
-            foreach (var d in iOSNotificationsWrapper.GetScheduledNotificationData())
-            {
-                iOSNotifications.Add(new iOSNotification(d));
-            }
-
-            return iOSNotifications.ToArray();
-        }
-
-        /// <summary>
-        /// Returns all of the app’s delivered notifications that are currently shown in the Notification Center.
-        /// </summary>
-        public static iOSNotification[] GetDeliveredNotifications()
-        {
-            var iOSNotifications = new List<iOSNotification>();
-
-            foreach (var d in iOSNotificationsWrapper.GetDeliveredNotificationData())
-            {
-                iOSNotifications.Add(new iOSNotification(d));
-            }
-
-            return iOSNotifications.ToArray();
-        }
-
-        /// <summary>
-        /// Schedules a local notification for delivery.
-        /// </summary>
-        public static void ScheduleNotification(iOSNotification notification)
-        {
-            if (!Initialize())
-                return;
-
-            notification.Verify();
-            iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
         }
 
         internal static void OnReceivedRemoteNotification(iOSNotificationData data)
