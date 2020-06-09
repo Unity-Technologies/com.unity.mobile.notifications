@@ -101,6 +101,6 @@ publish:
     - .yamato/upm-ci.yml#pack
     {% for editor in test_editors %}
     {% for platform in test_platforms %}
-    - .yamato/promotion.yml#promotion_test_{{ platform.name }}_{{ editor.version }}
+    - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
