@@ -7,7 +7,7 @@
         "TestAssemblies"
     ],
     "includePlatforms": [
-        "Android"
+
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

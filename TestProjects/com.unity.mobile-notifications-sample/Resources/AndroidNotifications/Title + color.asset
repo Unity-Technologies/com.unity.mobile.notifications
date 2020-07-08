@@ -10,23 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb7d100a40edf48f99686ea68a90ff4c, type: 3}
-  m_Name: Only Title
+  m_Name: Title + color
   m_EditorClassIdentifier: 
-  ButtonName: Empty notification + title
+  ButtonName: Empty notification + title + color
   Channel: default_channel
   FireInSeconds: 5
+  NotificationID: 0
   Title: Hello world!
-  Text:
-  SmallIcon:
-  LargeIcon:
+  Text: 
+  SmallIcon: 
+  LargeIcon: 
   NotificationStyle: 0
   Color: {r: 0, g: 1, b: 0, a: 0}
   Number: 0
   ShouldAutoCancel: 0
   UsesStopWatch: 0
-  Group:
+  Group: 
   GroupSummary: 0
   GroupAlertBehaviours: 0
-  SortKey:
-  IntentData:
+  SortKey: 
+  IntentData: 
   ShowTimestamp: 0
+  RepeatInterval: 0
