@@ -12,21 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb7d100a40edf48f99686ea68a90ff4c, type: 3}
   m_Name: Only Stopwatch
   m_EditorClassIdentifier: 
-  ButtonName: Empty notification + title
+  ButtonName: Empty notification + stopwatch
   Channel: default_channel
   FireInSeconds: 5
-  Title:
-  Text:
-  SmallIcon:
-  LargeIcon:
+  NotificationID: 0
+  Title: 
+  Text: 
+  SmallIcon: 
+  LargeIcon: 
   NotificationStyle: 0
   Color: {r: 0, g: 0, b: 0, a: 0}
   Number: 0
   ShouldAutoCancel: 0
   UsesStopWatch: 1
-  Group:
+  Group: 
   GroupSummary: 0
   GroupAlertBehaviours: 0
-  SortKey:
-  IntentData:
+  SortKey: 
+  IntentData: 
   ShowTimestamp: 0
+  RepeatInterval: 0

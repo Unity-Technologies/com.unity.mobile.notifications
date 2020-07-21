@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb7d100a40edf48f99686ea68a90ff4c, type: 3}
-  m_Name: Empty ExplictID
+  m_Name: Empty rescheduled
   m_EditorClassIdentifier: 
-  ButtonName: Empty with explict ID
+  ButtonName: Empty rescheduled after restart
   Channel: default_channel
-  FireInSeconds: 10
-  NotificationID: 5461
+  FireInSeconds: 60
+  NotificationID: 0
   Title: 
-  Text: 
+  Text: should arrive after deivce restart
   SmallIcon: 
   LargeIcon: 
   NotificationStyle: 0

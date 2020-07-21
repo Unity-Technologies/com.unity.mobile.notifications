@@ -19,16 +19,16 @@ namespace Unity.Notifications.Tests.Sample
         private GameObjectReferences m_gameObjectReferences;
         private Dictionary<string, OrderedDictionary> m_groups;
         private Logger m_LOGGER;
-        private int _notificationExplicidID;
+        private int _notificationExplicitID;
         private Button ButtonExplicitID;
 
-        public int notificationExplicidID
+        public int notificationExplicitID
         {
-            get { return _notificationExplicidID; }
+            get { return _notificationExplicitID; }
             set
             {
-                _notificationExplicidID = value;
-                if (_notificationExplicidID == 0)
+                _notificationExplicitID = value;
+                if (_notificationExplicitID == 0)
                 {
                     ButtonExplicitID.interactable = false;
                 }
@@ -62,9 +62,9 @@ namespace Unity.Notifications.Tests.Sample
                 .Orange($"Id: {notificationIntentData.Id}", 1)
                 .Orange($"Channel: {notificationIntentData.Channel}", 1)
                 .Properties(notificationIntentData.Notification, 1);
-            if (notificationIntentData.Id == notificationExplicidID)
+            if (notificationIntentData.Id == notificationExplicitID)
             {
-                notificationExplicidID = 0;
+                notificationExplicitID = 0;
             }
         }
 
@@ -211,7 +211,6 @@ namespace Unity.Notifications.Tests.Sample
                 {
                     Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
                     button.name = group.Key.ToString() + "/" + test.Key.ToString();
-                    Debug.Log("NAMING  " + button.name);
                     button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                     button.GetComponent<Button>().onClick.AddListener(delegate {
                         try
@@ -238,9 +237,9 @@ namespace Unity.Notifications.Tests.Sample
             {
                 Title = "Modified Explicit Notification title",
                 Text = "Modified Explicit Notification text",
-                FireTime = System.DateTime.Now.AddSeconds(60)
+                FireTime = System.DateTime.Now.AddSeconds(3)
             };
-            AndroidNotificationCenter.UpdateScheduledNotification(notificationExplicidID, template, "default_channel");
+            AndroidNotificationCenter.UpdateScheduledNotification(notificationExplicitID, template, "default_channel");
             m_LOGGER
                 .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                 .Properties(template, 1);
@@ -257,7 +256,7 @@ namespace Unity.Notifications.Tests.Sample
             if (notificationID != 0)
             {
                 AndroidNotificationCenter.SendNotificationWithExplicitID(notification, channel, notificationID);
-                notificationExplicidID = notificationID;
+                notificationExplicitID = notificationID;
             }
             else
             {
@@ -269,21 +268,21 @@ namespace Unity.Notifications.Tests.Sample
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllNotifications();
-            notificationExplicidID = 0;
+            notificationExplicitID = 0;
         }
 
         public void CancelPendingNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllScheduledNotifications();
-            notificationExplicidID = 0;
+            notificationExplicitID = 0;
         }
 
         public void CancelDisplayedNotifications()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             AndroidNotificationCenter.CancelAllDisplayedNotifications();
-            notificationExplicidID = 0;
+            notificationExplicitID = 0;
         }
 
         public void ListAllChannels()

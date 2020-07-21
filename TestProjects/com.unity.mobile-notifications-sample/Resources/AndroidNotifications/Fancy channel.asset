@@ -10,23 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb7d100a40edf48f99686ea68a90ff4c, type: 3}
-  m_Name: With Large Icon And Stopwatch
+  m_Name: Fancy channel
   m_EditorClassIdentifier: 
-  ButtonName: Notification + data + large_icon + stopwatch
-  Channel: default_channel
+  ButtonName: Fancy channel
+  Channel: fancy_channel
   FireInSeconds: 5
-  Title: Example Notification
+  NotificationID: 0
+  Title: 
   Text: This notification was supposed to be fired in 5 seconds
-  SmallIcon:
-  LargeIcon: icon_1
+  SmallIcon: 
+  LargeIcon: 
   NotificationStyle: 0
-  Color: {r: 0.99737024, g: 0, b: 1, a: 0}
+  Color: {r: 1, g: 0.57911325, b: 0, a: 0}
   Number: 0
   ShouldAutoCancel: 0
-  UsesStopWatch: 1
-  Group:
+  UsesStopWatch: 0
+  Group: 
   GroupSummary: 0
   GroupAlertBehaviours: 0
-  SortKey:
+  SortKey: 
   IntentData: Arbitrary Data
   ShowTimestamp: 0
+  RepeatInterval: 0
