@@ -10,5 +10,7 @@
     "Notifications",
     "Mobile"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "com.unity.modules.androidjni": "1.0.0"
+  }
 }
