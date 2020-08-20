@@ -7,7 +7,9 @@ namespace Unity.Notifications.Android
     {
         private static AndroidReceivedNotificationMainThreadDispatcher instance = null;
 
-        private static Queue<AndroidJavaObject> s_ReceivedNotificationQueue = new Queue<AndroidJavaObject>();
+        private static readonly Queue<AndroidJavaObject> s_ReceivedNotificationQueue = new Queue<AndroidJavaObject>();
+
+        private static readonly List<AndroidJavaObject> s_ReceivedNotificationList = new List<AndroidJavaObject>();
 
         internal static void EnqueueReceivedNotification(AndroidJavaObject intent)
         {
@@ -24,19 +26,20 @@ namespace Unity.Notifications.Android
 
         public void Update()
         {
-            var tempList = new List<AndroidJavaObject>();
             // Note: Don't call callbacks while locking receivedNotificationQueue, otherwise there's a risk
             //       that callback might introduce an operations which would create a deadlock
             lock (s_ReceivedNotificationQueue)
             {
-                tempList.AddRange(s_ReceivedNotificationQueue);
+                s_ReceivedNotificationList.AddRange(s_ReceivedNotificationQueue);
                 s_ReceivedNotificationQueue.Clear();
             }
 
-            foreach (var t in tempList)
+            foreach (var notification in s_ReceivedNotificationList)
             {
-                AndroidNotificationCenter.ReceivedNotificationCallback(t);
+                AndroidNotificationCenter.ReceivedNotificationCallback(notification);
             }
+
+            s_ReceivedNotificationList.Clear();
         }
 
         void Awake()
