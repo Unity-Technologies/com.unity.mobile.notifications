@@ -213,8 +213,6 @@ namespace Unity.Notifications
 
             var noHeightRect = GUILayoutUtility.GetRect(GUIContent.none, EditorStyles.label, GUILayout.ExpandWidth(true), GUILayout.Height(0));
             var width = noHeightRect.width;
-            if (width < k_SlotSize * 10)
-                width = k_SlotSize * 10;
 
             var totalRect = new Rect(k_Padding, 0f, width - k_Padding, Screen.height);
 
