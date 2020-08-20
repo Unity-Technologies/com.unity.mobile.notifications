@@ -18,7 +18,7 @@ rm -rf tmp/Assets/Plugins
 mv tmp/Assets NotificationsSamples
 
 mv tmp/README.md NotificationsSamples/README.md
-mv tmp/License.md NotificationsSamples/Licnese.md
+mv tmp/License.md NotificationsSamples/License.md
 
 rm -rf tmp
 
