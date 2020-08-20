@@ -6,6 +6,7 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 - [Samples] [[1258554](https://issuetracker.unity3d.com/product/unity/issues/guid/1258554)] Fixed errors and warnings on startup in the demo scene.
+- [iOS] [[1259811](https://issuetracker.unity3d.com/product/unity/issues/guid/1259811)] Fixed UNITY_USES_REMOTE_NOTIFICATIONS being falsely set to 1 when Mobile Notifications isn't used.
 
 ## [1.3.0] - 2020-06-02
 
