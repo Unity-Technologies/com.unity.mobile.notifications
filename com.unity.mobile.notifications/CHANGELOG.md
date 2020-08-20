@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.3.1] -
+
+### Fixes:
+- [Samples] [[1258554](https://issuetracker.unity3d.com/product/unity/issues/guid/1258554)] Fixed errors and warnings on startup in the demo scene.
+
 ## [1.3.0] - 2020-06-02
 
 ### Changes & Improvements:
