@@ -5,13 +5,13 @@ All notable changes to this package will be documented in this file.
 ## [Unreleased]
 
 ### Changes & Improvements:
-- [Editor] Improved content scaling in the Mobile Notifications settings UI.
+- [Editor] [[1195293](https://issuetracker.unity3d.com/product/unity/issues/guid/1195293)] Improved content scaling in the Mobile Notifications settings UI.
 
 ### Fixes:
 - [Samples] [[1258554](https://issuetracker.unity3d.com/product/unity/issues/guid/1258554)] Fixed errors and warnings on startup in the demo scene.
 - [iOS] [[1259811](https://issuetracker.unity3d.com/product/unity/issues/guid/1259811)] Fixed UNITY_USES_REMOTE_NOTIFICATIONS being falsely set to 1 when Mobile Notifications isn't used.
-- [[Android] [1271866](https://issuetracker.unity3d.com/product/unity/issues/guid/1271866)] Fix AndroidReceivedNotificationMainThreadDispatcher allocating a new list on every frame.
-- [[Editor] [1254618](https://issuetracker.unity3d.com/product/unity/issues/guid/1254618)] Fix "SerializedObject target has been destroyed" errors when navigating Mobile Notifications settings.
+- [Android] [[1271866](https://issuetracker.unity3d.com/product/unity/issues/guid/1271866)] Fixed AndroidReceivedNotificationMainThreadDispatcher allocating a new list on every frame.
+- [Editor] [[1254618](https://issuetracker.unity3d.com/product/unity/issues/guid/1254618)] Fixed "SerializedObject target has been destroyed" errors when navigating Mobile Notifications settings.
 
 ## [1.3.0] - 2020-06-02
 
