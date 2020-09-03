@@ -47,7 +47,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
         PatchPBXProject(path, needLocationFramework, addPushNotificationCapability, useReleaseAPSEnv);
         PatchPlist(path, settings, addPushNotificationCapability);
-        PatchPreprocessor(path, needLocationFramework);
+        PatchPreprocessor(path, needLocationFramework, addPushNotificationCapability);
     }
 
     private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv)
@@ -128,7 +128,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         File.WriteAllText(plistPath, plist.WriteToString());
     }
 
-    private static void PatchPreprocessor(string path, bool needLocationFramework)
+    private static void PatchPreprocessor(string path, bool needLocationFramework, bool addPushNotificationCapability)
     {
         var preprocessorPath = path + "/Classes/Preprocessor.h";
         var preprocessor = File.ReadAllText(preprocessorPath);
@@ -136,7 +136,8 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (needLocationFramework && preprocessor.Contains("UNITY_USES_LOCATION"))
             preprocessor = preprocessor.Replace("UNITY_USES_LOCATION 0", "UNITY_USES_LOCATION 1");
 
-        preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
+        if (addPushNotificationCapability && preprocessor.Contains("UNITY_USES_REMOTE_NOTIFICATIONS"))
+            preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
 
         File.WriteAllText(preprocessorPath, preprocessor);
     }
