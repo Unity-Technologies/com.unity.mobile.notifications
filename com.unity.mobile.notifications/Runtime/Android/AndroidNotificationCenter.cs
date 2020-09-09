@@ -46,6 +46,8 @@ namespace Unity.Notifications.Android
         private static AndroidJavaClass s_NotificationManagerClass;
         private static AndroidJavaObject s_NotificationManager;
         private static AndroidJavaObject s_NotificationManagerContext;
+        private static AndroidJavaClass s_UnityPlayer;
+        private static AndroidJavaObject s_CurrentActivity;
         private static bool s_Initialized;
 
         public static bool Initialize()
@@ -64,13 +66,15 @@ namespace Unity.Notifications.Android
             s_Initialized = false;
             s_NotificationManagerClass = null;
             s_NotificationManagerContext = null;
+            s_UnityPlayer = null;
+            s_CurrentActivity = null;
 #elif UNITY_ANDROID
-            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-            AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
+            s_UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            s_CurrentActivity = s_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            var context = s_CurrentActivity.Call<AndroidJavaObject>("getApplicationContext");
 
             s_NotificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-            s_NotificationManager = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, activity);
+            s_NotificationManager = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
             s_NotificationManager.Call("setNotificationCallback", new NotificationCallback());
             s_NotificationManagerContext = s_NotificationManager.Get<AndroidJavaObject>("mContext");
 
@@ -299,11 +303,7 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return null;
 
-            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-
-            AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
-
+            var intent = s_CurrentActivity.Call<AndroidJavaObject>("getIntent");
             return ParseNotificationIntentData(intent);
         }
 
