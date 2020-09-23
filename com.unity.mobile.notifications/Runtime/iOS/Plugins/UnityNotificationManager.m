@@ -223,24 +223,22 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     // Convert from iOSNotificationData to UNMutableNotificationContent.
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
 
-    NSString* title = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->title] arguments: nil];
-    NSString* body = [NSString localizedUserNotificationStringForKey: [NSString stringWithUTF8String: data->body] arguments: nil];
-
-    // iOS 10 does not show notifications with an empty body or title fields. Since this works fine on iOS 11+ we'll add assign a string
-    // with a space to maintain consistent behaviour.
+    // iOS 10 does not show notifications with an empty body or title fields.
+    // Since this works fine on iOS 11+ we'll add assign a string with a space to maintain consistent behaviour.
+    NSString *dataTitle, *dataBody;
     if (@available(iOS 11.0, *))
     {
+        dataTitle = data->title ? [NSString stringWithUTF8String: data->title] : [NSString string];
+        dataBody  = data->body  ? [NSString stringWithUTF8String: data->body]  : [NSString string];
     }
     else
     {
-        if (title.length == 0)
-            title = @" ";
-        if (body.length == 0)
-            body = @" ";
+        dataTitle = data->title && data->title[0] ? [NSString stringWithUTF8String: data->title] : @" ";
+        dataBody  = data->body  && data->body[0]  ? [NSString stringWithUTF8String: data->body]  : @" ";
     }
 
-    content.title = title;
-    content.body = body;
+    content.title = [NSString localizedUserNotificationStringForKey: dataTitle arguments: nil];
+    content.body  = [NSString localizedUserNotificationStringForKey: dataBody arguments: nil];
     content.userInfo = userInfo;
 
     if (data->badge >= 0)
