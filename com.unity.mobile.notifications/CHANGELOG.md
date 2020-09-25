@@ -12,6 +12,7 @@ All notable changes to this package will be documented in this file.
 - [iOS] [[1259811](https://issuetracker.unity3d.com/product/unity/issues/guid/1259811)] Fixed UNITY_USES_REMOTE_NOTIFICATIONS being falsely set to 1 when Mobile Notifications isn't used.
 - [Android] [[1271866](https://issuetracker.unity3d.com/product/unity/issues/guid/1271866)] Fixed AndroidReceivedNotificationMainThreadDispatcher allocating a new list on every frame.
 - [Editor] [[1254618](https://issuetracker.unity3d.com/product/unity/issues/guid/1254618)] Fixed "SerializedObject target has been destroyed" errors when navigating Mobile Notifications settings.
+- [Android] [[1172850](https://issuetracker.unity3d.com/product/unity/issues/guid/1172850)] Fix Android crash when many notifications are scheduled at once.
 
 ## [1.3.0] - 2020-06-02
 
