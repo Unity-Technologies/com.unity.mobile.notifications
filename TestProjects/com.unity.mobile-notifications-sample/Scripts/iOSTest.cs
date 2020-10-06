@@ -145,6 +145,10 @@ namespace Unity.Notifications.Tests.Sample
             {
                 RemoveFirstNotificationInListById();
             });
+            m_groups["General"]["Set the badge"] = new Action(() =>
+            {
+                SetBadge();
+            });
             m_groups["General"]["Clear the badge"] = new Action(() =>
             {
                 ClearBadge();
@@ -395,6 +399,12 @@ namespace Unity.Notifications.Tests.Sample
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             iOSNotificationCenter.ApplicationBadge = 0;
+        }
+        
+        public void SetBadge()
+        {
+            m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
+            iOSNotificationCenter.ApplicationBadge = 40;
         }
 
         public iOSNotification ScheduleNotification(iOSNotification notification, bool log = true)

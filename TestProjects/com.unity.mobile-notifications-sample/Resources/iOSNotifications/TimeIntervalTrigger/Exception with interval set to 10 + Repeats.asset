@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
   m_Name: Exception with interval set to 10 + Repeats
   m_EditorClassIdentifier: 
-  ButtonName: 'EXCEPTION: interval 10 + repeats'
+  ButtonName: Repeatable notification
   Identifier: 
   CategoryIdentifier: 
   ThreadIdentifier: 
-  Title:
+  Title: 
   Subtitle: 
   Body: 
   ShowInForeground: 1
   PresentationOptions: 6
   Badge: -1
   Data: 
-  TimeTriggerInterval: 10
+  TimeTriggerInterval: 60
   Repeats: 1
