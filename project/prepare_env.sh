@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
-export SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" 
+export SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
 export ANDROID_HOME=/home/bokken/android-sdk
-export ANDROID_VERSION="26" 
+export ANDROID_VERSION="26"
 export ANDROID_BUILD_TOOLS_VERSION="26.0.2"
 
 # printf "\n Download Android SDK: \n"
@@ -13,7 +13,7 @@ mkdir "$ANDROID_HOME"  \
    && curl -o sdk.zip $SDK_URL \
    && unzip sdk.zip \
     && rm sdk.zip
-    
+
 expect -c '
 set timeout -1;
 spawn '"${ANDROID_HOME}"'/tools/bin/sdkmanager --licenses --proxy=http --proxy_host=proxy.bf.unity3d.com --proxy_port=3128;

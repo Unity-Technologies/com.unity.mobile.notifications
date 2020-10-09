@@ -6,7 +6,7 @@ From the **Notification Settings** window, you can control this package's behavi
 
 The following settings are available for Android notifications.
 
-### Reschedule Notifications on Device Restart 
+### Reschedule Notifications on Device Restart
 
 By default, scheduled notifications are removed after the device restarts. To preserve scheduled notifications after the device restarts, you need to enable the **Reschedule Notifications on Device Restart** option. This adds the `RECEIVE_BOOT_COMPLETED` permissions to your app's manifest.
 

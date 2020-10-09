@@ -25,5 +25,3 @@ rm -rf tmp
 cd NotificationsSamples
 touch .sample.json
 echo "{\"displayName\": \"Notification Samples\",\"description\": \"Description for sample\"}" >> .sample.json
-
-

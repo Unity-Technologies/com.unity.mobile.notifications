@@ -109,14 +109,14 @@ All notable changes to this package will be documented in this file.
 ### Fixes:
 
 - [iOS] It's no longer necessary to enable the `Request Authorization on App Start` setting in UI to be able to turn on  `Enable Push Notifications`.
-- [iOS] `GetLastRespondedNotification` should now properly return the notification used to open the app even if "Request Authorization on App Start" is turned off. 
+- [iOS] `GetLastRespondedNotification` should now properly return the notification used to open the app even if "Request Authorization on App Start" is turned off.
 - [iOS] `iOSNotification.data` field should now work properly with all valid JSON structures and not only with dictionaries and strings.
 - [Android] Added a temporary fix for an IL2CPP compilation issue on Unity 2019.2 and above.
 - Fixed an issue with NUnit Test assemblies not being detected correctly due to which exceptions were thrown in the editor.
 - [Android][1165178](https://issuetracker.unity3d.com/product/unity/issues/guid/1165178/): An Android JAVA exception should no longer be thrown when attempting to schedule more than 500 notifications on Samsung devices. Samsung seems to impose a fixed limit of concurrent Alarms so if the limit is reached all attempts to schedule new notifications will be ignored until the currently scheduled ones are triggered or manually cancelled.
 - [[1114987](https://issuetracker.unity3d.com/product/unity/issues/guid/1114987/)]  Reopening the project should no longer override Mobile Notification Settings.
 - [iOS] Fixed an issue with `iOSNotification.data` not being set correctly for remote notifications if the data field is not a string. It will now return a full JSON string for the data field.
-- [Android] Notifications cancelled using `CancelScheduledNotification` or `CancelAllScheduledNotifications` should no longer be recreated on device restart if the device is restarted before the time they were supposed to be triggered. 
+- [Android] Notifications cancelled using `CancelScheduledNotification` or `CancelAllScheduledNotifications` should no longer be recreated on device restart if the device is restarted before the time they were supposed to be triggered.
 
 ### Changes & Improvements:
 
@@ -156,13 +156,13 @@ Includes all changes from previous preview releases.
 
 - [Editor] Editor settings window should not automatically detect changes to Android icon source texture assets.
 
-- [Editor] The settings window should work properly  and no longer throw exceptions when opening a project used with a previous version of the package. 
+- [Editor] The settings window should work properly  and no longer throw exceptions when opening a project used with a previous version of the package.
 
 - [iOS] `AuthorizationRequest` should properly finish even when the user denies the request.
 
 - [Android] Canceling scheduled notifications now works correctly when the app is restarted.
 
-- [iOS] Subscribing to OnNotificationReceived on iOS should now work, even if no other notification was called 
+- [iOS] Subscribing to OnNotificationReceived on iOS should now work, even if no other notification was called
 
 - Notification settings should no longer dissappear if Unity is closed while settings editor screen is not opened.
 
@@ -185,7 +185,7 @@ Includes all changes from previous preview releases.
 
   - Set `Group` property to group multiple notifications in a single thread.
   - Enable `GroupSummary`on a notification to use it as the summary notification for it's group.
-  - `GroupAlertBehaviour`  can be used to override the alert behaviour for all notifications in a group. 
+  - `GroupAlertBehaviour`  can be used to override the alert behaviour for all notifications in a group.
 
 - [Android] Added a `SortKey` property for Android.
 
@@ -204,7 +204,7 @@ Includes all changes from previous preview releases.
 - [iOS] Exposed additional `iOSNotificationSettings` properties:
 
   - ShowPreviewsSetting`indicates whether the app can a preview of the notification's contenton the lock screen.
-  - `AlertStyle` indicates the type of alerts the user has authorized (`Banner`, `Alert` or `None`). 
+  - `AlertStyle` indicates the type of alerts the user has authorized (`Banner`, `Alert` or `None`).
 
 - [Android] Added an option to reshedule all non expired notification on device restart.
 
@@ -212,8 +212,8 @@ Includes all changes from previous preview releases.
 
 - Changed the minimum Unity version supported by the package to 2018.3.
 
-- Added an option to not add Remote Notifications capability to the Xcode project. 
+- Added an option to not add Remote Notifications capability to the Xcode project.
 
 - Allow sending notifications without title or body. Allows scheduling sounds only notifications that do not have an alert or are shown in the notification center.
 
-  ## 
+  ##

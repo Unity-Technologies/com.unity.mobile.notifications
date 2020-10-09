@@ -400,7 +400,7 @@ namespace Unity.Notifications.Tests.Sample
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             iOSNotificationCenter.ApplicationBadge = 0;
         }
-        
+
         public void SetBadge()
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");

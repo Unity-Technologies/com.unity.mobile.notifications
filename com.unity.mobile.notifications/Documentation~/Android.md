@@ -94,7 +94,7 @@ You can use this API to update a delivered notification with the same id.
 You can subscribe to the [AndroidNotificationCenter.OnNotificationReceived](../api/Unity.Notifications.Android.AndroidNotificationCenter.html#Unity_Notifications_Android_AndroidNotificationCenter_OnNotificationReceived) event to receive a callback after a notification is delivered while your app is running.
 
 ```c#
-AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler = 
+AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
     delegate(AndroidNotificationIntentData data)
     {
         var msg = "Notification received : " + data.Id + "\n";

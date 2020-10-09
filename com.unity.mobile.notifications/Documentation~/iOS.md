@@ -14,7 +14,7 @@ IEnumerator RequestAuthorization()
         {
             yield return null;
         };
-        
+
         string res = "\n RequestAuthorization:";
         res += "\n finished: " + req.IsFinished;
         res += "\n granted :  " + req.Granted;
@@ -115,7 +115,7 @@ var calendarTrigger = new iOSNotificationCalendarTrigger()
 
 You can also create an [iOSNotificationLocationTrigger](../api/Unity.Notifications.iOS.iOSNotificationLocationTrigger.html) if you want to schedule the delivery of a notification when the device enters or leaves a specific geographic region.
 
-Before you schedule any notifications with this trigger, you need to enable the **Include CoreLocation Framework** option in the [notifications settings](settings.html#include-corelocation-framework). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization. 
+Before you schedule any notifications with this trigger, you need to enable the **Include CoreLocation Framework** option in the [notifications settings](settings.html#include-corelocation-framework). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization.
 For additional information, see the [Core Location](https://developer.apple.com/documentation/corelocation/clregion?language=objc) documentation on the Apple Developer website.
 
 In the example below, the center coordinate is defined using the WGS 84 system. The app triggers the notification when the user enters an area within a 250 meter radius around the Eiffel Tower in Paris.
@@ -162,7 +162,7 @@ iOSNotificationCenter.OnRemoteNotificationReceived += remoteNotification =>
         TimeInterval = new TimeSpan(0, 0, 1),
         Repeats = false
     };
-    
+
     iOSNotification notification = new iOSNotification()
     {
         Title = "Remote: " + remoteNotification.Title,

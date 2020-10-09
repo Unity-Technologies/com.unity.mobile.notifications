@@ -10,7 +10,7 @@ The notification color can be modified by [AndroidNotification.Color](../api/Uni
 
 #### Why are notifications not delivered on certain Huawei and Xiaomi phones when my app is closed and not running in the background?
 
-It seems that Huawei (including Honor) and Xiaomi utilize [aggressive battery saver techniques](https://stackoverflow.com/questions/47145722/how-to-deal-with-huaweis-and-xiaomis-battery-optimizations) which restrict app background activities, unless the app has been whitelisted by the user in device settings. 
+It seems that Huawei (including Honor) and Xiaomi utilize [aggressive battery saver techniques](https://stackoverflow.com/questions/47145722/how-to-deal-with-huaweis-and-xiaomis-battery-optimizations) which restrict app background activities, unless the app has been whitelisted by the user in device settings.
 This means that scheduled notifications will not be delivered if the app is closed or not running in the background. Currently, there's no available workaround besides encouraging the user to whitelist your app.
 
 #### What can I do if notifications with a location trigger don’t work?
