@@ -2,10 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.3.1] - 2020-08-28
+## [1.3.1] - 2020-10-09
 
 ### Changes & Improvements:
 - [Editor] [[1195293](https://issuetracker.unity3d.com/product/unity/issues/guid/1195293)] Improved content scaling in the Mobile Notifications settings UI.
+- [Samples] Add IGameNotification.Data propery, so that notification data could be read in cross-platform fashion.
+- [Samples] Add IGameNotification.GetLastNotification method to retrieve the last opened notification.
+- [Samples] Add retrieval of notification enabled status on Android.
 
 ### Fixes:
 - [Samples] [[1258554](https://issuetracker.unity3d.com/product/unity/issues/guid/1258554)] Fixed errors and warnings on startup in the demo scene.
