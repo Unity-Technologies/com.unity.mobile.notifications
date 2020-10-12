@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.3.1] - 2020-10-09
+## [1.3.1-pre.1] - 2020-10-09
 
 ### Changes & Improvements:
 - [Editor] [[1195293](https://issuetracker.unity3d.com/product/unity/issues/guid/1195293)] Improved content scaling in the Mobile Notifications settings UI.
