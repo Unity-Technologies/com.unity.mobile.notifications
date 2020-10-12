@@ -46,7 +46,6 @@ namespace Unity.Notifications.Android
         private static AndroidJavaClass s_NotificationManagerClass;
         private static AndroidJavaObject s_NotificationManager;
         private static AndroidJavaObject s_NotificationManagerContext;
-        private static AndroidJavaClass s_UnityPlayer;
         private static AndroidJavaObject s_CurrentActivity;
         private static bool s_Initialized;
 
@@ -66,11 +65,10 @@ namespace Unity.Notifications.Android
             s_Initialized = false;
             s_NotificationManagerClass = null;
             s_NotificationManagerContext = null;
-            s_UnityPlayer = null;
             s_CurrentActivity = null;
 #elif UNITY_ANDROID
-            s_UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            s_CurrentActivity = s_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            s_CurrentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             var context = s_CurrentActivity.Call<AndroidJavaObject>("getApplicationContext");
 
             s_NotificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
