@@ -8,11 +8,11 @@
 ## Test strategy
 
 Project is getting tested every months or so manually by doing exploratory testing or TestRails driven testing
-Most recent TestRails testing (2020-10-14): https://qatestrail.hq.unity3d.com/index.php?/runs/view/26024&group_by=cases:section_id&group_id=78000&group_order=asc. 
+Most recent TestRails testing (2020-10-14): https://qatestrail.hq.unity3d.com/index.php?/runs/view/26024&group_by=cases:section_id&group_id=78000&group_order=asc <br/> 
 Current issues:
-public: https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues. 
-Internal: https://fogbugz.unity3d.com/f/search/?sSearchFor=mobile+notifications+status%3Aactive+category%3ABug. 
-Forum: https://forum.unity.com/threads/mobile-notification-preview-package.620227/. 
+public: https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues <br/>
+Internal: https://fogbugz.unity3d.com/f/search/?sSearchFor=mobile+notifications+status%3Aactive+category%3ABug <br/>
+Forum: https://forum.unity.com/threads/mobile-notification-preview-package.620227/ <br/>
 
 ## Package Status
 
