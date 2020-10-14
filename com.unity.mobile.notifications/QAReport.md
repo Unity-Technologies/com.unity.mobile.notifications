@@ -1,26 +1,24 @@
 # Quality Report
-Use this file to outline the test strategy for this package.
 
-## Version tested: [*package version*]
+## Version tested: 1.3.1-pre.1
 
-## QA Owner: [*Add Name*]
-## UX Owner: [*Add Name*]
+## QA Owner: @vaidasm
+## UX Owner: @vaidasm
 
 ## Test strategy
-*Use this section to describe how this feature was tested.*
-* A link to the Test Plan (Test Rails, other)
-* Results from the package's editor and runtime test suite.
-* Link to automated test results (if any)
-* Manual test Results, [here's an example](https://docs.google.com/spreadsheets/d/12A76U5Gf969w10KL4Ik0wC1oFIBDUoRrqIvQgD18TFo/edit#gid=0)
-* Scenario test week outcome
-* etc.
+
+Most recent TestRails testing (2020-10-14): https://qatestrail.hq.unity3d.com/index.php?/runs/view/26024&group_by=cases:section_id&group_id=78000&group_order=asc
+Current issues:
+public: https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues
+Internal: https://fogbugz.unity3d.com/f/search/?sSearchFor=mobile+notifications+status%3Aactive+category%3ABug
+Forum: https://forum.unity.com/threads/mobile-notification-preview-package.620227/
 
 ## Package Status
-Use this section to describe:
-* UX status/evaluation results
-* package stability
-* known bugs, issues
-* performance metrics,
-* etc
 
-In other words, a general feeling on the health of this package.
+ Quality status: good
+ 
+ Still has a number of issues, but for the most part the package is able to serve it's purpose
+ The project could also benefit from automated tests.
+ 
+ 
+ Related project: notification samples (extra samples that can be imported to Unity for the users to better grasp the workflow of Notifications): https://github.com/Unity-Technologies/NotificationsSamples
