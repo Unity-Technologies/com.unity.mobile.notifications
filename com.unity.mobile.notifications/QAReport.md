@@ -14,6 +14,9 @@ public: https://github.com/Unity-Technologies/com.unity.mobile.notifications/iss
 Internal: https://fogbugz.unity3d.com/f/search/?sSearchFor=mobile+notifications+status%3Aactive+category%3ABug <br/>
 Forum: https://forum.unity.com/threads/mobile-notification-preview-package.620227/ <br/>
 
+Feature's testing document:
+https://docs.google.com/document/d/1B9RfS0kEuYLAvveg2oviXdaPKbtBuo5m6BlzrtPqkQ4/edit?usp=sharing
+
 ## Package Status
 
  Quality status: good
