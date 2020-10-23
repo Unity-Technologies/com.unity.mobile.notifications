@@ -47,6 +47,7 @@ namespace Unity.Notifications
         public override void OnDeactivate()
         {
             m_SettingsManager.SaveSettings(false);
+            SettingsService.NotifySettingsProviderChanged();
         }
 
         private void Initialize()
