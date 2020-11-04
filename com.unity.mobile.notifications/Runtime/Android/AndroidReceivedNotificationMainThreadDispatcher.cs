@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Unity.Notifications.Android
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     public class AndroidReceivedNotificationMainThreadDispatcher : MonoBehaviour
     {
         private static AndroidReceivedNotificationMainThreadDispatcher instance = null;
@@ -24,6 +27,9 @@ namespace Unity.Notifications.Android
             return instance;
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public void Update()
         {
             // Note: Don't call callbacks while locking receivedNotificationQueue, otherwise there's a risk

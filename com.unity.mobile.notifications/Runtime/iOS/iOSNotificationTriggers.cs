@@ -29,6 +29,9 @@ namespace Unity.Notifications.iOS
     ///</remarks>
     public struct iOSNotificationLocationTrigger : iOSNotificationTrigger
     {
+        /// <summary>
+        /// TODO
+        /// </summary>
         public static int Type { get { return (int)NotificationTriggerType.LocationTrigger; } }
 
         /// <summary>iOSNotificationLocationTrigger
@@ -65,6 +68,9 @@ namespace Unity.Notifications.iOS
 
     public struct iOSNotificationPushTrigger : iOSNotificationTrigger
     {
+        /// <summary>
+        /// The type of notification trigger.
+        /// </summary>
         public static int Type { get { return (int)NotificationTriggerType.PushTrigger; } }
     }
 
@@ -76,10 +82,16 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationTimeIntervalTrigger : iOSNotificationTrigger
     {
+        /// <summary>
+        /// The type of notification trigger.
+        /// </summary>
         public static int Type { get { return (int)NotificationTriggerType.TimeTrigger; } }
 
         internal int timeInterval;
 
+        /// <summary>
+        /// Time interval after which the notification should be delivered.
+        /// </summary>
         public TimeSpan TimeInterval
         {
             get { return TimeSpan.FromMilliseconds(timeInterval); }
@@ -90,6 +102,10 @@ namespace Unity.Notifications.iOS
                     throw new ArgumentException("Time interval must be greater than 0.");
             }
         }
+
+        /// <summary>
+        /// Whether the notification should repeat.
+        /// </summary>
         public bool Repeats { get; set; }
     }
 
@@ -102,32 +118,41 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationCalendarTrigger : iOSNotificationTrigger
     {
+        /// <summary>
+        /// The type of notification trigger.
+        /// </summary>
         public static int Type { get { return (int)NotificationTriggerType.CalendarTrigger; } }
 
         /// <summary>
         /// Year
         /// </summary>
         public int? Year { get; set; }
+
         /// <summary>
         /// Month
         /// </summary>
         public int? Month { get; set; }
+
         /// <summary>
         /// Day
         /// </summary>
         public int? Day { get; set; }
+
         /// <summary>
         /// Hour
         /// </summary>
         public int? Hour { get; set; }
+
         /// <summary>
         /// Minute
         /// </summary>
         public int? Minute { get; set; }
+
         /// <summary>
         /// Second
         /// </summary>
         public int? Second { get; set; }
+
         /// <summary>
         /// Indicate whether the notification is repeated every defined time period. For instance if hour and minute fields are set the notification will be triggered every day at the specified hour and minute.
         /// </summary>

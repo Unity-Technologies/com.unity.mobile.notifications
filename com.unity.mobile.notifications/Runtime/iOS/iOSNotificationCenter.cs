@@ -9,6 +9,9 @@ namespace Unity.Notifications.iOS
     {
         private static bool s_Initialized;
 
+        /// <summary>
+        /// TODO
+        /// </summary>
         public delegate void NotificationReceivedCallback(iOSNotification notification);
 
         /// <summary>

@@ -54,6 +54,9 @@ namespace Unity.Notifications.Android
         Public = 1,
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public struct AndroidNotificationChannel
     {
         /// <summary>
