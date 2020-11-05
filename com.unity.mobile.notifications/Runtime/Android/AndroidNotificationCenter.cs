@@ -53,7 +53,7 @@ namespace Unity.Notifications.Android
         private static bool s_Initialized;
 
         /// <summary>
-        /// Initialize the Android notification center class. (Does this need to be public?)
+        /// Initialize the Android notification center class.
         /// </summary>
         public static bool Initialize()
         {
