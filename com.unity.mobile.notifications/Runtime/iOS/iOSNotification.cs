@@ -221,7 +221,7 @@ namespace Unity.Notifications.iOS
                     var trigger = (iOSNotificationLocationTrigger)value;
                     data.triggerType = iOSNotificationLocationTrigger.Type;
                     data.locationTriggerCenterX = trigger.Center.x;
-                    data.locationTriggerCenterY = trigger.Center.x;
+                    data.locationTriggerCenterY = trigger.Center.y;
                     data.locationTriggerNotifyOnEntry = trigger.NotifyOnEntry;
                     data.locationTriggerNotifyOnExit = trigger.NotifyOnExit;
                     data.locationTriggerRadius = trigger.Radius;

@@ -28,12 +28,12 @@ typedef struct iOSNotificationData
 
     //Custom data
     char* data;
-    BOOL showInForeground;
+    int showInForeground;
     int showInForegroundPresentationOptions;
 
     // Trigger
     int triggerType;  //0 - time, 1 - calendar, 2 - location, 3 - push.
-    BOOL repeats;
+    int repeats;
 
     //Time trigger
     int timeTriggerInterval;
@@ -50,8 +50,8 @@ typedef struct iOSNotificationData
     float locationTriggerCenterX;
     float locationTriggerCenterY;
     float locationTriggerRadius;
-    bool locationTriggerNotifyOnEntry;
-    bool locationTriggerNotifyOnExit;
+    int locationTriggerNotifyOnEntry;
+    int locationTriggerNotifyOnExit;
 } iOSNotificationData;
 
 typedef struct iOSNotificationAuthorizationData
