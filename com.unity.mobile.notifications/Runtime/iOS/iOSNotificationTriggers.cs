@@ -30,11 +30,11 @@ namespace Unity.Notifications.iOS
     public struct iOSNotificationLocationTrigger : iOSNotificationTrigger
     {
         /// <summary>
-        /// TODO
+        /// The type of notification trigger.
         /// </summary>
         public static int Type { get { return (int)NotificationTriggerType.LocationTrigger; } }
 
-        /// <summary>iOSNotificationLocationTrigger
+        /// <summary>
         /// The center point of the geographic area.
         /// </summary>
         public Vector2 Center { get; set; }

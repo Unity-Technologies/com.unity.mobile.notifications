@@ -112,7 +112,7 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// TODO
+        /// Dispose to unregister the OnAuthorizationRequestCompleted callback.
         /// </summary>
         public void Dispose()
         {

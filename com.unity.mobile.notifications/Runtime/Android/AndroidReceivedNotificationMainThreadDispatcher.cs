@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Unity.Notifications.Android
 {
     /// <summary>
-    /// TODO
+    /// A class which queues the received notifications and triggers the notification callbacks.
     /// </summary>
     public class AndroidReceivedNotificationMainThreadDispatcher : MonoBehaviour
     {
@@ -28,7 +28,7 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// TODO
+        /// Update is called once per frame.
         /// </summary>
         public void Update()
         {

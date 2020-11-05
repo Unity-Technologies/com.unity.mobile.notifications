@@ -11,7 +11,7 @@ namespace Unity.Notifications.iOS
     public enum PresentationOption
     {
         /// <summary>
-        /// TODO - Do not present the notification. ?
+        /// No options are set.
         /// </summary>
         None = 0,
 
