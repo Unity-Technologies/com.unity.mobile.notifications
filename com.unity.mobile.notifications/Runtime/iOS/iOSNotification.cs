@@ -10,6 +10,9 @@ namespace Unity.Notifications.iOS
     [Flags]
     public enum PresentationOption
     {
+        /// <summary>
+        /// No options are set.
+        /// </summary>
         None = 0,
 
         /// <summary>
@@ -80,6 +83,8 @@ namespace Unity.Notifications.iOS
     {
         /// <summary>
         /// The unique identifier for this notification request.
+        /// </summary>
+        /// <remarks>
         /// If not explicitly specified the identifier  will be automatically generated when creating the notification.
         /// </remarks>
         public string Identifier
@@ -99,6 +104,8 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// An identifier that used to group related notifications together.
+        /// </summary>
+        /// <remarks>
         /// Automatic notification grouping according to the thread identifier is only supported on iOS 12 and above.
         /// </remarks>
         public string ThreadIdentifier
@@ -280,7 +287,7 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Create a new instance of <see cref="iOSNotification"/> and automatically generate an unique string for <see cref="iOSNotification.identifier"/>  with all optional fields set to default values.
+        /// Create a new instance of <see cref="iOSNotification"/> and automatically generate an unique string for <see cref="iOSNotification.Identifier"/>  with all optional fields set to default values.
         /// </summary>
         public iOSNotification() : this(GenerateUniqueID())
         {

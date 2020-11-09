@@ -10,23 +10,23 @@ namespace Unity.Notifications.Android
     /// </summary>
     public enum NotificationStatus
     {
-        //// <summary>
-        /// Status of the specified notification cannot be determined, this is only supported on Android Marshmallow (6.0) and above.
+        /// <summary>
+        /// Status of a specified notification cannot be determined. This is only supported on Android Marshmallow (6.0) and above.
         /// </summary>
         Unavailable = -1,
 
-        //// <summary>
-        /// A notification with the specified id could not be found.
+        /// <summary>
+        /// A notification with a specified id could not be found.
         /// </summary>
         Unknown = 0,
 
-        //// <summary>
-        /// A notification with the specified is scheduled but not yet delivered.
+        /// <summary>
+        /// A notification with a specified id is scheduled but not yet delivered.
         /// </summary>
         Scheduled = 1,
 
-        //// <summary>
-        /// A notification with the specified was already delivered.
+        /// <summary>
+        /// A notification with a specified id was already delivered.
         /// </summary>
         Delivered = 2,
     }
@@ -36,6 +36,9 @@ namespace Unity.Notifications.Android
     /// </summary>
     public class AndroidNotificationCenter
     {
+        /// <summary>
+        /// The delegate type for the notification received callbacks.
+        /// </summary>
         public delegate void NotificationReceivedCallback(AndroidNotificationIntentData data);
 
         /// <summary>
@@ -49,6 +52,9 @@ namespace Unity.Notifications.Android
         private static AndroidJavaObject s_CurrentActivity;
         private static bool s_Initialized;
 
+        /// <summary>
+        /// Initialize the AndroidNotificationCenter class.
+        /// </summary>
         public static bool Initialize()
         {
             if (s_Initialized)

@@ -223,6 +223,9 @@ namespace Unity.Notifications.Android
             RepeatInterval = repeatInterval;
         }
 
+        /// <summary>
+        /// Create a notification struct with a custom small icon and all optional fields set to default values.
+        /// </summary>
         public AndroidNotification(string title, string text, DateTime fireTime, TimeSpan repeatInterval, string smallIcon)
             : this(title, text, fireTime, repeatInterval)
         {

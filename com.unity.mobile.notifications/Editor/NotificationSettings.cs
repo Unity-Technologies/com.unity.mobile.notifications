@@ -3,6 +3,9 @@ using UnityEditor;
 
 namespace Unity.Notifications
 {
+    /// <summary>
+    /// Class used to access notification settings for a specific platform.
+    /// </summary>
     public class NotificationSettings
     {
         private static NotificationSetting GetSetting(BuildTargetGroup target, string key)
@@ -40,6 +43,9 @@ namespace Unity.Notifications
             return (T)setting.Value;
         }
 
+        /// <summary>
+        /// Class used to access Android-specific notification settings.
+        /// </summary>
         public static class AndroidSettings
         {
             /// <summary>
@@ -88,6 +94,9 @@ namespace Unity.Notifications
             }
         }
 
+        /// <summary>
+        /// Class used to access iOS-specific notification settings.
+        /// </summary>
         public static class iOSSettings
         {
             /// <summary>

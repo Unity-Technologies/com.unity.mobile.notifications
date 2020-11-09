@@ -111,6 +111,9 @@ namespace Unity.Notifications.iOS
             DeviceToken = requestData.deviceToken;
         }
 
+        /// <summary>
+        /// Dispose to unregister the OnAuthorizationRequestCompleted callback.
+        /// </summary>
         public void Dispose()
         {
             iOSNotificationCenter.OnAuthorizationRequestCompleted -= OnAuthorizationRequestCompleted;
