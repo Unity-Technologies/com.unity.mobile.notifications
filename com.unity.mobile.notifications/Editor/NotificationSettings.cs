@@ -95,7 +95,7 @@ namespace Unity.Notifications
         }
 
         /// <summary>
-        /// Class used to access iOS specific notification settings.
+        /// Class used to access iOS-specific notification settings.
         /// </summary>
         public static class iOSSettings
         {
