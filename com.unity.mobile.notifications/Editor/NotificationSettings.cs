@@ -44,7 +44,7 @@ namespace Unity.Notifications
         }
 
         /// <summary>
-        /// Class used to access Android specific notification settings.
+        /// Class used to access Android-specific notification settings.
         /// </summary>
         public static class AndroidSettings
         {
