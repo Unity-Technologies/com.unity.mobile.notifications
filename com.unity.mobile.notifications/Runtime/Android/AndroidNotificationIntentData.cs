@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Unity.Notifications.Android
 {
     /// <summary>
-    /// This is a wrapper for the AndroidNotification with the id and the channel.
+    /// Wrapper for the AndroidNotification. Contains the notification's id and channel.
     /// </summary>
     public class AndroidNotificationIntentData
     {
@@ -23,7 +23,7 @@ namespace Unity.Notifications.Android
         public AndroidNotification Notification { get; }
 
         /// <summary>
-        /// Create an AndroidNotificationIntentData with AndroidNotification, id and channel id.
+        /// Create an AndroidNotificationIntentData with AndroidNotification, id, and channel id.
         /// </summary>
         public AndroidNotificationIntentData(int id, string channelId, AndroidNotification notification)
         {

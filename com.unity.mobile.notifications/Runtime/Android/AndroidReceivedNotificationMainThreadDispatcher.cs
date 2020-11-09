@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Unity.Notifications.Android
 {
     /// <summary>
-    /// A class which queues the received notifications and triggers the notification callbacks.
+    /// Class that queues the received notifications and triggers the notification callbacks.
     /// </summary>
     public class AndroidReceivedNotificationMainThreadDispatcher : MonoBehaviour
     {

@@ -55,7 +55,7 @@ namespace Unity.Notifications.Android
     }
 
     /// <summary>
-    /// The wrapper of the Android notification channel which enables developers to group the notifications by groups.
+    /// The wrapper of the Android notification channel. Use this to group notifications by groups.
     /// </summary>
     public struct AndroidNotificationChannel
     {

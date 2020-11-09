@@ -11,7 +11,7 @@ namespace Unity.Notifications.Android
     public enum NotificationStatus
     {
         /// <summary>
-        /// Status of a specified notification cannot be determined, this is only supported on Android Marshmallow (6.0) and above.
+        /// Status of a specified notification cannot be determined. This is only supported on Android Marshmallow (6.0) and above.
         /// </summary>
         Unavailable = -1,
 
