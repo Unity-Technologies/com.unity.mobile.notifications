@@ -258,23 +258,38 @@ namespace Unity.Notifications
         {
             Assert.IsTrue(toolbarIndex == 0 || toolbarIndex == 1);
 
-            var settings = (toolbarIndex == 0) ? m_SettingsManager.AndroidNotificationSettings : m_SettingsManager.iOSNotificationSettings;
+            List<NotificationSetting> settings;
+            BuildTargetGroup buildTarget;
+            int labelWidthMultiplier;
+            if (toolbarIndex == 0)
+            {
+                settings = m_SettingsManager.AndroidNotificationSettings;
+                buildTarget = BuildTargetGroup.Android;
+                labelWidthMultiplier = 3;
+            }
+            else
+            {
+                settings = m_SettingsManager.iOSNotificationSettings;
+                buildTarget = BuildTargetGroup.iOS;
+                labelWidthMultiplier = 5;
+            }
+
             if (settings == null)
                 return 0;
 
             GUI.BeginGroup(rect);
-            var drawnSettingsCount = DrawSettingElements(rect, (toolbarIndex == 0) ? BuildTargetGroup.Android : BuildTargetGroup.iOS, settings, false, 0);
+            var drawnSettingsCount = DrawSettingElements(rect, buildTarget, settings, false, 0, labelWidthMultiplier);
             GUI.EndGroup();
 
             return drawnSettingsCount;
         }
 
-        private int DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer)
+        private int DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer, int labelWidthMultiplier)
         {
             var spaceOffset = layer * 13;
 
             var labelStyle = new GUIStyle(NotificationStyles.k_LabelStyle);
-            labelStyle.fixedWidth = k_SlotSize * 5 - spaceOffset;
+            labelStyle.fixedWidth = k_SlotSize * labelWidthMultiplier - spaceOffset;
 
             var toggleStyle = NotificationStyles.k_ToggleStyle;
             var dropdownStyle = NotificationStyles.k_DropwDownStyle;
@@ -320,7 +335,7 @@ namespace Unity.Notifications
 
                 if (setting.Dependencies != null)
                 {
-                    elementCount += DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1);
+                    elementCount += DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1, labelWidthMultiplier);
                 }
             }
 
