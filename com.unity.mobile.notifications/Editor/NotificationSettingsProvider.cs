@@ -14,6 +14,8 @@ namespace Unity.Notifications
         private const int k_IconSpacing = 8;
         private const float k_Padding = 12f;
         private const float k_ToolbarHeight = 20f;
+        private const int k_VerticalSeparator = 2;
+        private const int k_LabelLineHeight = 18;
 
         private readonly GUIContent k_IdentifierLabelText = new GUIContent("Identifier");
         private readonly GUIContent k_TypeLabelText = new GUIContent("Type");
@@ -163,7 +165,7 @@ namespace Unity.Notifications
             if (drawableResource.Asset != null && !drawableResource.Verify())
             {
                 var errorMsgWidth = rect.width - k_Padding * 2;
-                var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_SlotSize), 4, 4);
+                var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_LabelLineHeight * 3), 4, 4);
 
                 var errorMsg = "Specified texture can't be used because: \n" + drawableResource.GenerateErrorString();
                 EditorGUI.HelpBox(errorRect, errorMsg, MessageType.Error);
@@ -233,15 +235,15 @@ namespace Unity.Notifications
             // Draw drawable resources list for Android.
             if (m_SettingsManager.ToolbarIndex == 0)
             {
-                var iconListlabelRect = new Rect(notificationSettingsRect.x, notificationSettingsRect.y + 85, 180, 18);
+                var iconListlabelRect = new Rect(notificationSettingsRect.x, notificationSettingsRect.y + 85, 180, k_LabelLineHeight);
                 GUI.Label(iconListlabelRect, "Notification Icons", EditorStyles.label);
 
                 // Draw the help message for setting the icons.
-                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + 20, notificationSettingsRect.width, 55f);
+                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + iconListlabelRect.height + k_VerticalSeparator, notificationSettingsRect.width, k_LabelLineHeight * 4);
                 EditorGUI.SelectableLabel(iconListMsgRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
 
                 // Draw the reorderable list for the icon list.
-                var iconListRect = new Rect(iconListMsgRect.x, iconListMsgRect.y + 58f, iconListMsgRect.width, notificationSettingsRect.height - 55f);
+                var iconListRect = new Rect(iconListMsgRect.x, iconListMsgRect.y + iconListMsgRect.height + k_VerticalSeparator, iconListMsgRect.width, notificationSettingsRect.height - 55f);
                 m_ReorderableList.DoList(iconListRect);
 
                 heightPlaceHolder += iconListMsgRect.height + m_ReorderableList.GetHeight();
