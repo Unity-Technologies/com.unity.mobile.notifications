@@ -144,7 +144,8 @@ namespace Unity.Notifications
             var newType = (NotificationIconType)EditorGUI.EnumPopup(typeEnumPopupRect, drawableResource.Type);
 
             // Calculate and draw texture and preview.
-            var textureRect = new Rect(elementRect.width - (k_SlotSize * 2 - k_IconSpacing * 5), elementRect.y, k_SlotSize, k_SlotSize);
+            var textureX = Mathf.Max(elementRect.width - (k_SlotSize * 2 - k_IconSpacing * 5), k_SlotSize * 3);
+            var textureRect = new Rect(textureX, elementRect.y, k_SlotSize, k_SlotSize);
             var previewTextureRect = new Rect(textureRect.x + k_SlotSize, textureRect.y - 6, k_SlotSize, k_SlotSize);
 
             var newAsset = (Texture2D)EditorGUI.ObjectField(textureRect, drawableResource.Asset, typeof(Texture2D), false);
