@@ -35,7 +35,7 @@
 
 + (instancetype)sharedInstance;
 
-- (void)checkAuthorizationFinished;
+- (void)finishAuthorization;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;

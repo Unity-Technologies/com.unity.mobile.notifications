@@ -27,7 +27,7 @@
     return sharedInstance;
 }
 
-- (void)checkAuthorizationFinished
+- (void)finishAuthorization
 {
     bool requestRejected = self.authorizationRequestFinished;
 
@@ -88,7 +88,7 @@
             NSLog(@"Requesting notification authorization failed with: %@", error);
         }
 
-        [self checkAuthorizationFinished];
+        [self finishAuthorization];
         [self updateNotificationSettings];
     }];
 }
