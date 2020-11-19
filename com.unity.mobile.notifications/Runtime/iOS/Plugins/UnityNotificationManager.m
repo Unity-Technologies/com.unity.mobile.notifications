@@ -29,7 +29,7 @@
 
 - (void)checkAuthorizationFinished
 {
-    bool requestRejected = self.authorizationRequestFinished && !self.authorized;
+    bool requestRejected = self.authorizationRequestFinished;
 
     if (!requestRejected && self.needRemoteNotifications && self.remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
         return;
@@ -68,8 +68,7 @@
         authData->deviceToken = "";
 
         self.authData = authData;
-        self.authorized = granted;
-        if (self.authorized)
+        if (granted)
         {
             if (registerRemote)
             {
