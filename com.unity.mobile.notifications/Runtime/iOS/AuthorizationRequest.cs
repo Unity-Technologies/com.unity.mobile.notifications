@@ -34,9 +34,8 @@ namespace Unity.Notifications.iOS
     [StructLayout(LayoutKind.Sequential)]
     internal struct iOSAuthorizationRequestData
     {
-        internal bool granted;
+        internal int granted;
         internal string error;
-        internal bool finished;
         internal string deviceToken;
     }
 
@@ -132,8 +131,8 @@ namespace Unity.Notifications.iOS
         {
             lock (this)
             {
-                IsFinished = requestData.finished;
-                Granted = requestData.granted;
+                IsFinished = true;
+                Granted = requestData.granted != 0;
                 Error = requestData.error;
                 DeviceToken = requestData.deviceToken;
             }

@@ -56,9 +56,8 @@ typedef struct iOSNotificationData
 
 typedef struct iOSNotificationAuthorizationData
 {
-    bool granted;
+    int granted;
     const char* error;
-    bool finished;
     const char* deviceToken;
 } iOSNotificationAuthorizationData;
 

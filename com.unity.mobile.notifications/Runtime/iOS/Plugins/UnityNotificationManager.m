@@ -58,7 +58,6 @@
         deviceToken = [UnityNotificationManager deviceTokenFromNotification:notification];
         authData.deviceToken = [deviceToken UTF8String];
     }
-    authData.finished = YES;
     authData.error = NULL;
 
     [_lock lock];
@@ -91,7 +90,6 @@
     {
         BOOL authorizationRequestFinished = YES;
         struct iOSNotificationAuthorizationData authData;
-        authData.finished = YES;
         authData.granted = granted;
         authData.error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
         authData.deviceToken = "";
