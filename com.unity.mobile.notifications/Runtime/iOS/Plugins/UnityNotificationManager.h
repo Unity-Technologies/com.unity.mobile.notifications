@@ -27,18 +27,17 @@
 @property (nonatomic) UNNotification* lastReceivedNotification;
 
 @property NSString* deviceToken;
-@property UNAuthorizationStatus remoteNotificationsRegistered;
 
 @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 
 + (instancetype)sharedInstance;
 
 - (void)finishAuthorization:(BOOL)granted;
+- (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote;
-- (void)setDeviceTokenFromNSData:(NSData*)deviceToken;
 - (void)scheduleLocalNotification:(iOSNotificationData*)data;
 
 @end

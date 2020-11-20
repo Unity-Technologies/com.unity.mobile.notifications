@@ -12,6 +12,9 @@
 #endif
 
 @implementation UnityNotificationManager
+{
+    UNAuthorizationStatus _remoteNotificationsRegistered;
+}
 
 + (instancetype)sharedInstance
 {
@@ -40,6 +43,15 @@
     }
 }
 
+- (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
+{
+    _remoteNotificationsRegistered = status;
+    bool granted = status == UNAuthorizationStatusAuthorized;
+    if (granted)
+        self.deviceToken = [UnityNotificationManager deviceTokenFromNotification:notification];
+    [self finishAuthorization: granted];
+}
+
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote
 {
     if (!SYSTEM_VERSION_10_OR_ABOVE)
@@ -62,7 +74,7 @@
         self.authData = authData;
         if (granted)
         {
-            if (registerRemote)
+            if (registerRemote && _remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
             {
                 authorizationRequestFinished = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -79,19 +91,24 @@
     }];
 }
 
-- (void)setDeviceTokenFromNSData:(NSData *)deviceTokenData
++ (NSString*)deviceTokenFromNotification:(NSNotification*) notification
 {
+    NSData* deviceTokenData;
+    if ([notification.userInfo isKindOfClass: [NSData class]])
+        deviceTokenData = (NSData*)notification.userInfo;
+    else
+        return nil;
+
     NSUInteger len = deviceTokenData.length;
     if (len == 0)
-        return;
+        return nil;
 
     const unsigned char *buffer = deviceTokenData.bytes;
     NSMutableString *str  = [NSMutableString stringWithCapacity: (len * 2)];
     for (int i = 0; i < len; ++i)
-    {
         [str appendFormat: @"%02x", buffer[i]];
-    }
-    self.deviceToken = [str copy];
+
+    return str;
 }
 
 // Called when a notification is delivered to a foreground app.
