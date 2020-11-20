@@ -40,10 +40,10 @@
     return self;
 }
 
-- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData
+- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request
 {
     if (self.onAuthorizationCompletionCallback != NULL)
-        self.onAuthorizationCompletionCallback(authData);
+        self.onAuthorizationCompletionCallback(request, authData);
 }
 
 - (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
@@ -64,10 +64,10 @@
     _deviceToken = deviceToken;
     [_lock unlock];
 
-    [self finishAuthorization: &authData];
+    [self finishAuthorization: &authData forRequest: NULL];
 }
 
-- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote
+- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request
 {
     if (!SYSTEM_VERSION_10_OR_ABOVE)
         return;
@@ -104,7 +104,7 @@
             NSLog(@"Requesting notification authorization failed with: %@", error);
 
         if (authorizationRequestFinished)
-            [self finishAuthorization: &authData];
+            [self finishAuthorization: &authData forRequest: request];
         [self updateNotificationSettings];
     }];
 }

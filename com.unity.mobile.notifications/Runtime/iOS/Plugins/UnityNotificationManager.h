@@ -30,12 +30,12 @@
 + (instancetype)sharedInstance;
 
 - (id)init;
-- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData;
+- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request;
 - (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;
-- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote;
+- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request;
 - (void)scheduleLocalNotification:(iOSNotificationData*)data;
 
 @end

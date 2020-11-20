@@ -67,7 +67,6 @@ namespace Unity.Notifications.iOS
         private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate {};
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
-        internal static event AuthorizationRequestCompletedCallback OnAuthorizationRequestCompleted = delegate {};
 
         /// <summary>
         /// The number currently set as the badge of the app icon.
@@ -209,11 +208,6 @@ namespace Unity.Notifications.iOS
             var notification = new iOSNotification(data.identifier);
             notification.data = data;
             s_OnNotificationReceived(notification);
-        }
-
-        internal static void OnFinishedAuthorizationRequest(iOSAuthorizationRequestData data)
-        {
-            OnAuthorizationRequestCompleted(data);
         }
     }
 }

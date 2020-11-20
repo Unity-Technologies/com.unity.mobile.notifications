@@ -68,7 +68,7 @@
              if (authorizeOnLaunch)
              {
                  UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-                 [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch];
+                 [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
                  manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
          }];

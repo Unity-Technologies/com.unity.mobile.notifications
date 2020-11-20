@@ -41,10 +41,10 @@ void _SetRemoteNotificationReceivedDelegate(NotificationDataReceivedResponse cal
     manager.onRemoteNotificationReceivedCallback = callback;
 }
 
-void _RequestAuthorization(int options, BOOL registerRemote)
+void _RequestAuthorization(void* request, int options, BOOL registerRemote)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    [manager requestAuthorization: options withRegisterRemote: registerRemote];
+    [manager requestAuthorization: options withRegisterRemote: registerRemote forRequest: request];
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = manager;
 }

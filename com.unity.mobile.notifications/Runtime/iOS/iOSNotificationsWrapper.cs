@@ -11,7 +11,7 @@ namespace Unity.Notifications.iOS
     internal class iOSNotificationsWrapper : MonoBehaviour
     {
         [DllImport("__Internal")]
-        private static extern void _RequestAuthorization(Int32 options, bool registerForRemote);
+        private static extern void _RequestAuthorization(IntPtr request, Int32 options, bool registerForRemote);
 
         [DllImport("__Internal")]
         private static extern void _ScheduleLocalNotification(IntPtr ptr);
@@ -70,7 +70,7 @@ namespace Unity.Notifications.iOS
         [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationData(IntPtr ptr);
 
-        private delegate void AuthorizationRequestCallback(IntPtr authdata);
+        private delegate void AuthorizationRequestCallback(IntPtr request, IntPtr authdata);
         private delegate void NotificationReceivedCallback(IntPtr notificationData);
 
 #if UNITY_IOS && !UNITY_EDITOR
@@ -102,13 +102,13 @@ namespace Unity.Notifications.iOS
         }
 
         [MonoPInvokeCallback(typeof(AuthorizationRequestCallback))]
-        public static void AuthorizationRequestReceived(IntPtr authRequestDataPtr)
+        public static void AuthorizationRequestReceived(IntPtr request, IntPtr authRequestDataPtr)
         {
 #if UNITY_IOS && !UNITY_EDITOR
             iOSAuthorizationRequestData data;
             data = (iOSAuthorizationRequestData)Marshal.PtrToStructure(authRequestDataPtr, typeof(iOSAuthorizationRequestData));
 
-            iOSNotificationCenter.OnFinishedAuthorizationRequest(data);
+            AuthorizationRequest.OnAuthorizationRequestCompleted(request, data);
 #endif
         }
 
@@ -134,10 +134,10 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
-        public static void RequestAuthorization(int options, bool registerRemote)
+        public static void RequestAuthorization(IntPtr request, int options, bool registerRemote)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            _RequestAuthorization(options, registerRemote);
+            _RequestAuthorization(request, options, registerRemote);
 #endif
         }
 

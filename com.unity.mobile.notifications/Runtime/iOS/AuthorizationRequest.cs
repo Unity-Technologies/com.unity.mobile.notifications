@@ -102,9 +102,8 @@ namespace Unity.Notifications.iOS
         /// If registration succeeds the DeviceToken will be returned. You should pass this token along to the server you use to generate remote notifications for the device. </param>
         public AuthorizationRequest(AuthorizationOption authorizationOption, bool registerForRemoteNotifications)
         {
-            iOSNotificationsWrapper.RequestAuthorization((int)authorizationOption, registerForRemoteNotifications);
-
-            iOSNotificationCenter.OnAuthorizationRequestCompleted += OnAuthorizationRequestCompleted;
+            var handle = GCHandle.Alloc(this);
+            iOSNotificationsWrapper.RequestAuthorization(GCHandle.ToIntPtr(handle), (int)authorizationOption, registerForRemoteNotifications);
         }
 
         private void OnAuthorizationRequestCompleted(iOSAuthorizationRequestData requestData)
@@ -115,12 +114,25 @@ namespace Unity.Notifications.iOS
             DeviceToken = requestData.deviceToken;
         }
 
+        internal static void OnAuthorizationRequestCompleted(IntPtr request, iOSAuthorizationRequestData requestData)
+        {
+            try
+            {
+                var handle = GCHandle.FromIntPtr(request);
+                var req = handle.Target as AuthorizationRequest;
+                handle.Free();
+                req.OnAuthorizationRequestCompleted(requestData);
+            }
+            catch
+            {
+            }
+        }
+
         /// <summary>
         /// Dispose to unregister the OnAuthorizationRequestCompleted callback.
         /// </summary>
         public void Dispose()
         {
-            iOSNotificationCenter.OnAuthorizationRequestCompleted -= OnAuthorizationRequestCompleted;
         }
     }
 }
