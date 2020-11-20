@@ -59,7 +59,7 @@
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
 
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
-    registerRemote = supportsPushNotification == YES ? registerRemote : NO;
+    registerRemote = registerRemote && supportsPushNotification;
 
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
