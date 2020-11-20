@@ -79,6 +79,8 @@
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
                 });
             }
+            else
+                authData.deviceToken = [self.deviceToken UTF8String];
         }
         else
             NSLog(@"Requesting notification authorization failed with: %@", error);
