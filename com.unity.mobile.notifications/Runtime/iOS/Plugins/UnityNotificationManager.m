@@ -46,7 +46,7 @@
         self.onAuthorizationCompletionCallback(authData);
 }
 
-- (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
+- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
 {
     struct iOSNotificationAuthorizationData authData;
     authData.granted = status == UNAuthorizationStatusAuthorized;
