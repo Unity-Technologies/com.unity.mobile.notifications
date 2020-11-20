@@ -25,12 +25,11 @@
 
 @property (nonatomic) UNNotification* lastReceivedNotification;
 
-@property NSString* deviceToken;
-
 @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 
 + (instancetype)sharedInstance;
 
+- (id)init;
 - (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData;
 - (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification;
 - (void)updateScheduledNotificationList;

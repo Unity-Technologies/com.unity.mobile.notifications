@@ -13,7 +13,9 @@
 
 @implementation UnityNotificationManager
 {
+    NSLock* _lock;
     UNAuthorizationStatus _remoteNotificationsRegistered;
+    NSString* _deviceToken;
 }
 
 + (instancetype)sharedInstance
@@ -30,6 +32,14 @@
     return sharedInstance;
 }
 
+- (id)init
+{
+    _lock = [[NSLock alloc] init];
+    _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
+    _deviceToken = nil;
+    return self;
+}
+
 - (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData
 {
     if (self.onAuthorizationCompletionCallback != NULL)
@@ -38,16 +48,22 @@
 
 - (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
 {
-    _remoteNotificationsRegistered = status;
     struct iOSNotificationAuthorizationData authData;
     authData.granted = status == UNAuthorizationStatusAuthorized;
+    NSString* deviceToken = nil;
     if (authData.granted)
     {
-        self.deviceToken = [UnityNotificationManager deviceTokenFromNotification:notification];
-        authData.deviceToken = [self.deviceToken UTF8String];
+        deviceToken = [UnityNotificationManager deviceTokenFromNotification:notification];
+        authData.deviceToken = [deviceToken UTF8String];
     }
     authData.finished = YES;
     authData.error = NULL;
+
+    [_lock lock];
+    _remoteNotificationsRegistered = status;
+    _deviceToken = deviceToken;
+    [_lock unlock];
+
     [self finishAuthorization: &authData];
 }
 
@@ -72,6 +88,7 @@
 
         if (granted)
         {
+            [_lock lock];
             if (registerRemote && _remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
             {
                 authorizationRequestFinished = NO;
@@ -80,7 +97,8 @@
                 });
             }
             else
-                authData.deviceToken = [self.deviceToken UTF8String];
+                authData.deviceToken = [_deviceToken UTF8String];
+            [_lock unlock];
         }
         else
             NSLog(@"Requesting notification authorization failed with: %@", error);
