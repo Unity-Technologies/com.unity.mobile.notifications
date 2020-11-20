@@ -15,7 +15,6 @@
 @interface UnityNotificationManager : NSObject<UNUserNotificationCenterDelegate>
 
 @property UNNotificationSettings* cachedNotificationSettings;
-@property struct iOSNotificationAuthorizationData* authData;
 
 @property NotificationDataReceivedResponse onNotificationReceivedCallback;
 @property NotificationDataReceivedResponse onRemoteNotificationReceivedCallback;
@@ -32,7 +31,7 @@
 
 + (instancetype)sharedInstance;
 
-- (void)finishAuthorization:(BOOL)granted;
+- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData;
 - (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;

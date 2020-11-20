@@ -30,26 +30,25 @@
     return sharedInstance;
 }
 
-- (void)finishAuthorization:(BOOL)granted
+- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData
 {
-    if (self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
-    {
-        self.authData->granted = granted;
-        self.authData->deviceToken = [self.deviceToken UTF8String];
-        self.onAuthorizationCompletionCallback(self.authData);
-
-        free(self.authData);
-        self.authData = NULL;
-    }
+    if (self.onAuthorizationCompletionCallback != NULL)
+        self.onAuthorizationCompletionCallback(authData);
 }
 
 - (void)finishRemoveNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
 {
     _remoteNotificationsRegistered = status;
-    bool granted = status == UNAuthorizationStatusAuthorized;
-    if (granted)
+    struct iOSNotificationAuthorizationData authData;
+    authData.granted = status == UNAuthorizationStatusAuthorized;
+    if (authData.granted)
+    {
         self.deviceToken = [UnityNotificationManager deviceTokenFromNotification:notification];
-    [self finishAuthorization: granted];
+        authData.deviceToken = [self.deviceToken UTF8String];
+    }
+    authData.finished = YES;
+    authData.error = NULL;
+    [self finishAuthorization: &authData];
 }
 
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote
@@ -65,13 +64,12 @@
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
         BOOL authorizationRequestFinished = YES;
-        struct iOSNotificationAuthorizationData* authData = (struct iOSNotificationAuthorizationData*)malloc(sizeof(*authData));
-        authData->finished = YES;
-        authData->granted = granted;
-        authData->error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
-        authData->deviceToken = "";
+        struct iOSNotificationAuthorizationData authData;
+        authData.finished = YES;
+        authData.granted = granted;
+        authData.error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
+        authData.deviceToken = "";
 
-        self.authData = authData;
         if (granted)
         {
             if (registerRemote && _remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
@@ -86,7 +84,7 @@
             NSLog(@"Requesting notification authorization failed with: %@", error);
 
         if (authorizationRequestFinished)
-            [self finishAuthorization: granted];
+            [self finishAuthorization: &authData];
         [self updateNotificationSettings];
     }];
 }
