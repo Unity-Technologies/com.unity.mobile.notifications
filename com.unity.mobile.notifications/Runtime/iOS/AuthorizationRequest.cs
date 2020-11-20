@@ -68,26 +68,48 @@ namespace Unity.Notifications.iOS
     /// </example>
     public class AuthorizationRequest : IDisposable
     {
+        bool _IsFinished;
+        bool _Granted;
+        string _Error;
+        string _DeviceToken;
+
         /// <summary>
         /// Indicates whether the authorization request has completed.
         /// </summary>
-        public bool IsFinished { get; private set; }
+        public bool IsFinished
+        {
+            get { lock (this) { return _IsFinished; } }
+            private set { _IsFinished = value; }
+        }
 
         /// <summary>
         /// A property indicating whether authorization was granted. The value of this parameter is set to true when authorization was granted for one or more options. The value is set to false when authorization is denied for all options.
         /// </summary>
-        public bool Granted { get; private set; }
+        public bool Granted
+        {
+            get { lock (this) { return _Granted; } }
+            private set { _Granted = value; }
+        }
 
         /// <summary>
         /// Contains error information of the request failed for some reason or an empty string if no error occurred.
         /// </summary>
-        public string Error { get; private set; }
+        public string Error
+        {
+            get { lock (this) { return _Error; } }
+            private set { _Error = value; }
+        }
+
         /// <summary>
         /// A globally unique token that identifies this device to Apple Push Notification Network. Send this token to the server that you use to generate remote notifications.
         /// Your server must pass this token unmodified back to APNs when sending those remote notifications.
         /// This property will be empty if you set the registerForRemoteNotifications parameter to false when creating the Authorization request or if the app fails registration with the APN.
         /// </summary>
-        public string DeviceToken { get; private set; }
+        public string DeviceToken
+        {
+            get { lock (this) { return _DeviceToken; } }
+            private set { _DeviceToken = value; }
+        }
 
         static AuthorizationRequest()
         {
@@ -108,10 +130,13 @@ namespace Unity.Notifications.iOS
 
         private void OnAuthorizationRequestCompleted(iOSAuthorizationRequestData requestData)
         {
-            IsFinished = requestData.finished;
-            Granted = requestData.granted;
-            Error = requestData.error;
-            DeviceToken = requestData.deviceToken;
+            lock (this)
+            {
+                IsFinished = requestData.finished;
+                Granted = requestData.granted;
+                Error = requestData.error;
+                DeviceToken = requestData.deviceToken;
+            }
         }
 
         internal static void OnAuthorizationRequestCompleted(IntPtr request, iOSAuthorizationRequestData requestData)
