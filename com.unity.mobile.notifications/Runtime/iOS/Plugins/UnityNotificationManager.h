@@ -26,7 +26,6 @@
 
 @property (nonatomic) UNNotification* lastReceivedNotification;
 
-@property BOOL authorizationRequestFinished;
 @property BOOL needRemoteNotifications;
 @property NSString* deviceToken;
 @property UNAuthorizationStatus remoteNotificationsRegistered;
@@ -35,7 +34,7 @@
 
 + (instancetype)sharedInstance;
 
-- (void)finishAuthorization;
+- (void)finishAuthorization:(BOOL)granted;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;

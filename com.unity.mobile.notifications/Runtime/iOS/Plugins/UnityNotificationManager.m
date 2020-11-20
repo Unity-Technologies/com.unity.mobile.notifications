@@ -27,15 +27,11 @@
     return sharedInstance;
 }
 
-- (void)finishAuthorization
+- (void)finishAuthorization:(BOOL)granted
 {
-    bool requestRejected = self.authorizationRequestFinished;
-
-    if (!requestRejected && self.needRemoteNotifications && self.remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
-        return;
-
-    if (self.authorizationRequestFinished && self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
+    if (self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
     {
+        self.authData->granted = granted;
         self.authData->deviceToken = [self.deviceToken UTF8String];
         self.onAuthorizationCompletionCallback(self.authData);
 
@@ -49,10 +45,6 @@
     if (!SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
-    // TODO: Why we need this parameter as we always set it to YES here?
-    registerRemote = YES;
-
-    self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
 
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
@@ -61,6 +53,7 @@
     self.needRemoteNotifications = registerRemote;
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
+        BOOL authorizationRequestFinished = YES;
         struct iOSNotificationAuthorizationData* authData = (struct iOSNotificationAuthorizationData*)malloc(sizeof(*authData));
         authData->finished = YES;
         authData->granted = granted;
@@ -72,23 +65,17 @@
         {
             if (registerRemote)
             {
+                authorizationRequestFinished = NO;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
-                    self.authorizationRequestFinished = YES;
                 });
-            }
-            else
-            {
-                self.authorizationRequestFinished = YES;
             }
         }
         else
-        {
-            self.authorizationRequestFinished = YES;
             NSLog(@"Requesting notification authorization failed with: %@", error);
-        }
 
-        [self finishAuthorization];
+        if (authorizationRequestFinished)
+            [self finishAuthorization: granted];
         [self updateNotificationSettings];
     }];
 }
