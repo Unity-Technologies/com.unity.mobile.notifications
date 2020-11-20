@@ -50,7 +50,6 @@
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
     registerRemote = supportsPushNotification == YES ? registerRemote : NO;
 
-    self.needRemoteNotifications = registerRemote;
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
         BOOL authorizationRequestFinished = YES;

@@ -26,7 +26,6 @@
 
 @property (nonatomic) UNNotification* lastReceivedNotification;
 
-@property BOOL needRemoteNotifications;
 @property NSString* deviceToken;
 @property UNAuthorizationStatus remoteNotificationsRegistered;
 
