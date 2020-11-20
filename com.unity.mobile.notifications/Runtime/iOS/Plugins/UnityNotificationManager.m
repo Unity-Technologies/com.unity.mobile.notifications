@@ -16,6 +16,7 @@
     NSLock* _lock;
     UNAuthorizationStatus _remoteNotificationsRegistered;
     NSString* _deviceToken;
+    NSPointerArray* _pendingRemoteAuthRequests;
 }
 
 + (instancetype)sharedInstance
@@ -37,12 +38,13 @@
     _lock = [[NSLock alloc] init];
     _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
     _deviceToken = nil;
+    _pendingRemoteAuthRequests = nil;
     return self;
 }
 
 - (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request
 {
-    if (self.onAuthorizationCompletionCallback != NULL)
+    if (self.onAuthorizationCompletionCallback != NULL && request)
         self.onAuthorizationCompletionCallback(request, authData);
 }
 
@@ -62,9 +64,17 @@
     [_lock lock];
     _remoteNotificationsRegistered = status;
     _deviceToken = deviceToken;
+    NSPointerArray* pointers = _pendingRemoteAuthRequests;
+    _pendingRemoteAuthRequests = nil;
     [_lock unlock];
 
-    [self finishAuthorization: &authData forRequest: NULL];
+    while (pointers.count > 0)
+    {
+        unsigned long idx = pointers.count - 1;
+        void* request = [pointers pointerAtIndex:idx];
+        [pointers removePointerAtIndex:idx];
+        [self finishAuthorization: &authData forRequest: request];
+    }
 }
 
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request
@@ -92,6 +102,12 @@
             if (registerRemote && _remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
             {
                 authorizationRequestFinished = NO;
+                if (request)
+                {
+                    if (_pendingRemoteAuthRequests == nil)
+                        _pendingRemoteAuthRequests = [NSPointerArray pointerArrayWithOptions:NSPointerFunctionsOpaqueMemory];
+                    [_pendingRemoteAuthRequests addPointer:request];
+                }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
                 });
