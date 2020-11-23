@@ -70,7 +70,7 @@ namespace Unity.Notifications.iOS
         [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationData(IntPtr ptr);
 
-        private delegate void AuthorizationRequestCallback(IntPtr request, IntPtr authdata);
+        private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(IntPtr notificationData);
 
 #if UNITY_IOS && !UNITY_EDITOR
@@ -102,12 +102,9 @@ namespace Unity.Notifications.iOS
         }
 
         [MonoPInvokeCallback(typeof(AuthorizationRequestCallback))]
-        public static void AuthorizationRequestReceived(IntPtr request, IntPtr authRequestDataPtr)
+        public static void AuthorizationRequestReceived(IntPtr request, iOSAuthorizationRequestData data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            iOSAuthorizationRequestData data;
-            data = (iOSAuthorizationRequestData)Marshal.PtrToStructure(authRequestDataPtr, typeof(iOSAuthorizationRequestData));
-
             AuthorizationRequest.OnAuthorizationRequestCompleted(request, data);
 #endif
         }

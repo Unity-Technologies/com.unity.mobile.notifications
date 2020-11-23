@@ -45,7 +45,7 @@
 - (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request
 {
     if (self.onAuthorizationCompletionCallback != NULL && request)
-        self.onAuthorizationCompletionCallback(request, authData);
+        self.onAuthorizationCompletionCallback(request, *authData);
 }
 
 - (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*)notification
