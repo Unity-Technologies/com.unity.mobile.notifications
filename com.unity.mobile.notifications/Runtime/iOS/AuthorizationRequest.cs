@@ -67,18 +67,18 @@ namespace Unity.Notifications.iOS
     /// </example>
     public class AuthorizationRequest : IDisposable
     {
-        bool _IsFinished;
-        bool _Granted;
-        string _Error;
-        string _DeviceToken;
+        bool m_IsFinished;
+        bool m_Granted;
+        string m_Error;
+        string m_DeviceToken;
 
         /// <summary>
         /// Indicates whether the authorization request has completed.
         /// </summary>
         public bool IsFinished
         {
-            get { lock (this) { return _IsFinished; } }
-            private set { _IsFinished = value; }
+            get { lock (this) { return m_IsFinished; } }
+            private set { m_IsFinished = value; }
         }
 
         /// <summary>
@@ -86,8 +86,8 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public bool Granted
         {
-            get { lock (this) { return _Granted; } }
-            private set { _Granted = value; }
+            get { lock (this) { return m_Granted; } }
+            private set { m_Granted = value; }
         }
 
         /// <summary>
@@ -95,8 +95,8 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string Error
         {
-            get { lock (this) { return _Error; } }
-            private set { _Error = value; }
+            get { lock (this) { return m_Error; } }
+            private set { m_Error = value; }
         }
 
         /// <summary>
@@ -106,8 +106,8 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string DeviceToken
         {
-            get { lock (this) { return _DeviceToken; } }
-            private set { _DeviceToken = value; }
+            get { lock (this) { return m_DeviceToken; } }
+            private set { m_DeviceToken = value; }
         }
 
         static AuthorizationRequest()
