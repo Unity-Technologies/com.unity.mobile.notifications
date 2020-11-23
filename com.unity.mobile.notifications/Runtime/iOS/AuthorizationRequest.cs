@@ -147,8 +147,9 @@ namespace Unity.Notifications.iOS
                 handle.Free();
                 req.OnAuthorizationRequestCompleted(requestData);
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogException(e);
             }
         }
 
