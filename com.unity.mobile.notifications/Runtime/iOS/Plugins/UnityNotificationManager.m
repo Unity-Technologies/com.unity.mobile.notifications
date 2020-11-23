@@ -48,14 +48,14 @@
         self.onAuthorizationCompletionCallback(request, authData);
 }
 
-- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification
+- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*)notification
 {
     struct iOSNotificationAuthorizationData authData;
     authData.granted = status == UNAuthorizationStatusAuthorized;
     NSString* deviceToken = nil;
     if (authData.granted)
     {
-        deviceToken = [UnityNotificationManager deviceTokenFromNotification:notification];
+        deviceToken = [UnityNotificationManager deviceTokenFromNotification: notification];
         authData.deviceToken = [deviceToken UTF8String];
     }
     authData.error = NULL;
@@ -70,8 +70,8 @@
     while (pointers.count > 0)
     {
         unsigned long idx = pointers.count - 1;
-        void* request = [pointers pointerAtIndex:idx];
-        [pointers removePointerAtIndex:idx];
+        void* request = [pointers pointerAtIndex: idx];
+        [pointers removePointerAtIndex: idx];
         [self finishAuthorization: &authData forRequest: request];
     }
 }
@@ -103,8 +103,8 @@
                 if (request)
                 {
                     if (_pendingRemoteAuthRequests == nil)
-                        _pendingRemoteAuthRequests = [NSPointerArray pointerArrayWithOptions:NSPointerFunctionsOpaqueMemory];
-                    [_pendingRemoteAuthRequests addPointer:request];
+                        _pendingRemoteAuthRequests = [NSPointerArray pointerArrayWithOptions: NSPointerFunctionsOpaqueMemory];
+                    [_pendingRemoteAuthRequests addPointer: request];
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
@@ -123,7 +123,7 @@
     }];
 }
 
-+ (NSString*)deviceTokenFromNotification:(NSNotification*) notification
++ (NSString*)deviceTokenFromNotification:(NSNotification*)notification
 {
     NSData* deviceTokenData;
     if ([notification.userInfo isKindOfClass: [NSData class]])

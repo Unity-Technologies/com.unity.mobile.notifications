@@ -31,7 +31,7 @@
 
 - (id)init;
 - (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request;
-- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*) notification;
+- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*)notification;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;
