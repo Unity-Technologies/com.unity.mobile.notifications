@@ -151,7 +151,7 @@
     if (self.onNotificationReceivedCallback != NULL)
     {
         notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
-        self.onNotificationReceivedCallback(notificationData);
+        self.onNotificationReceivedCallback(*notificationData);
     }
 
     BOOL showInForeground;
@@ -165,7 +165,7 @@
                 notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
 
             showInForeground = NO;
-            self.onRemoteNotificationReceivedCallback(notificationData);
+            self.onRemoteNotificationReceivedCallback(*notificationData);
         }
         else
         {

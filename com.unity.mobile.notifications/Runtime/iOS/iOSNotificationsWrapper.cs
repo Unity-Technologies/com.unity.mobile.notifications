@@ -79,7 +79,7 @@ namespace Unity.Notifications.iOS
         private static extern void _FreeUnmanagediOSNotificationData(IntPtr ptr);
 
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
-        private delegate void NotificationReceivedCallback(IntPtr notificationData);
+        private delegate void NotificationReceivedCallback(iOSNotificationData notificationData);
 
 #if UNITY_IOS && !UNITY_EDITOR && DEVELOPMENT_BUILD
         static iOSNotificationsWrapper()
@@ -126,23 +126,17 @@ namespace Unity.Notifications.iOS
         }
 
         [MonoPInvokeCallback(typeof(NotificationReceivedCallback))]
-        public static void RemoteNotificationReceived(IntPtr notificationDataPtr)
+        public static void RemoteNotificationReceived(iOSNotificationData data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            iOSNotificationData data;
-            data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
-
             iOSNotificationCenter.OnReceivedRemoteNotification(data);
 #endif
         }
 
         [MonoPInvokeCallback(typeof(NotificationReceivedCallback))]
-        public static void NotificationReceived(IntPtr notificationDataPtr)
+        public static void NotificationReceived(iOSNotificationData data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            iOSNotificationData data;
-            data = (iOSNotificationData)Marshal.PtrToStructure(notificationDataPtr, typeof(iOSNotificationData));
-
             iOSNotificationCenter.OnSentNotification(data);
 #endif
         }
