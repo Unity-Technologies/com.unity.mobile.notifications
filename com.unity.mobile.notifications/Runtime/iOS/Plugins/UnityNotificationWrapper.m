@@ -14,6 +14,11 @@ int _NativeSizeof_iOSNotificationAuthorizationData()
     return sizeof(iOSNotificationAuthorizationData);
 }
 
+int _NativeSizeof_iOSNotificationData()
+{
+    return sizeof(iOSNotificationData);
+}
+
 void _FreeUnmanagedMemory(void* ptr)
 {
     if (ptr != NULL)

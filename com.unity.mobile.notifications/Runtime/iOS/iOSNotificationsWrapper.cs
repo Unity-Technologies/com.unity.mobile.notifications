@@ -13,6 +13,9 @@ namespace Unity.Notifications.iOS
 #if DEVELOPMENT_BUILD
         [DllImport("__Internal")]
         private static extern int _NativeSizeof_iOSNotificationAuthorizationData();
+
+        [DllImport("__Internal")]
+        private static extern int _NativeSizeof_iOSNotificationData();
 #endif
 
         [DllImport("__Internal")]
@@ -81,8 +84,13 @@ namespace Unity.Notifications.iOS
 #if UNITY_IOS && !UNITY_EDITOR && DEVELOPMENT_BUILD
         static iOSNotificationsWrapper()
         {
-            var nativeSize = _NativeSizeof_iOSNotificationAuthorizationData();
-            var managedSize = Marshal.SizeOf(typeof(iOSAuthorizationRequestData));
+            VerifyNativeManagedSize(_NativeSizeof_iOSNotificationAuthorizationData(), typeof(iOSAuthorizationRequestData));
+            VerifyNativeManagedSize(_NativeSizeof_iOSNotificationData(), typeof(iOSNotificationData));
+        }
+
+        static void VerifyNativeManagedSize(int nativeSize, Type managedType)
+        {
+            var managedSize = Marshal.SizeOf(managedType);
             if (nativeSize != managedSize)
                 throw new Exception(string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize));
         }
