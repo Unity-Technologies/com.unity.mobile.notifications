@@ -22,7 +22,7 @@ namespace Unity.Notifications.iOS
         private static extern void _RequestAuthorization(IntPtr request, Int32 options, bool registerForRemote);
 
         [DllImport("__Internal")]
-        private static extern void _ScheduleLocalNotification(IntPtr ptr);
+        private static extern void _ScheduleLocalNotification(iOSNotificationData data);
 
         [DllImport("__Internal")]
         private static extern void _SetNotificationReceivedDelegate(NotificationReceivedCallback callback);
@@ -172,10 +172,7 @@ namespace Unity.Notifications.iOS
         public static void ScheduleLocalNotification(iOSNotificationData data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(data));
-            Marshal.StructureToPtr(data, ptr, false);
-
-            _ScheduleLocalNotification(ptr);
+            _ScheduleLocalNotification(data);
 #endif
         }
 

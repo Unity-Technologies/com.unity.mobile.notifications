@@ -60,10 +60,10 @@ void _RequestAuthorization(void* request, int options, BOOL registerRemote)
     center.delegate = manager;
 }
 
-void _ScheduleLocalNotification(struct iOSNotificationData* data)
+void _ScheduleLocalNotification(iOSNotificationData data)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    [manager scheduleLocalNotification: data];
+    [manager scheduleLocalNotification: &data];
 }
 
 NotificationSettingsData* _GetNotificationSettings()
