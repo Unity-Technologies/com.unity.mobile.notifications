@@ -108,14 +108,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public static iOSNotification[] GetScheduledNotifications()
         {
-            var iOSNotifications = new List<iOSNotification>();
-
-            foreach (var d in iOSNotificationsWrapper.GetScheduledNotificationData())
-            {
-                iOSNotifications.Add(new iOSNotification(d));
-            }
-
-            return iOSNotifications.ToArray();
+            return NotificationDataToNotifications(iOSNotificationsWrapper.GetScheduledNotificationData());
         }
 
         /// <summary>
@@ -123,7 +116,11 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public static iOSNotification[] GetDeliveredNotifications()
         {
-            var notificationData = iOSNotificationsWrapper.GetDeliveredNotificationData();
+            return NotificationDataToNotifications(iOSNotificationsWrapper.GetDeliveredNotificationData());
+        }
+
+        private static iOSNotification[] NotificationDataToNotifications(iOSNotificationData[] notificationData)
+        {
             var iOSNotifications = new iOSNotification[notificationData == null ? 0 : notificationData.Length];
 
             for (int i = 0; i < iOSNotifications.Length; ++i)
