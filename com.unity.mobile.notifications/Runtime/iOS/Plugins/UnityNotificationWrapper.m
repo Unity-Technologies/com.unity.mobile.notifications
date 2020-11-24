@@ -8,6 +8,12 @@
 
 #import "UnityNotificationManager.h"
 
+
+int _NativeSizeof_iOSNotificationAuthorizationData()
+{
+    return sizeof(iOSNotificationAuthorizationData);
+}
+
 void _FreeUnmanagedMemory(void* ptr)
 {
     if (ptr != NULL)

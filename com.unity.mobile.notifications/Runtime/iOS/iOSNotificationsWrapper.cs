@@ -10,6 +10,11 @@ namespace Unity.Notifications.iOS
 {
     internal class iOSNotificationsWrapper : MonoBehaviour
     {
+#if DEVELOPMENT_BUILD
+        [DllImport("__Internal")]
+        private static extern int _NativeSizeof_iOSNotificationAuthorizationData();
+#endif
+
         [DllImport("__Internal")]
         private static extern void _RequestAuthorization(IntPtr request, Int32 options, bool registerForRemote);
 
@@ -81,6 +86,18 @@ namespace Unity.Notifications.iOS
         public static void RegisterAuthorizationRequestCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
+    #if DEVELOPMENT_BUILD
+            {
+                var nativeSize = _NativeSizeof_iOSNotificationAuthorizationData();
+                var managedSize = Marshal.SizeOf(typeof(iOSAuthorizationRequestData));
+                if (nativeSize != managedSize)
+                {
+                    var error = string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize);
+                    Debug.LogError(error);
+                    throw new Exception(error);
+                }
+            }
+    #endif
             _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestReceived);
 #endif
         }
