@@ -78,17 +78,19 @@ namespace Unity.Notifications.iOS
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(IntPtr notificationData);
 
+#if UNITY_IOS && !UNITY_EDITOR && DEVELOPMENT_BUILD
+        static iOSNotificationsWrapper()
+        {
+            var nativeSize = _NativeSizeof_iOSNotificationAuthorizationData();
+            var managedSize = Marshal.SizeOf(typeof(iOSAuthorizationRequestData));
+            if (nativeSize != managedSize)
+                throw new Exception(string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize));
+        }
+#endif
+
         public static void RegisterAuthorizationRequestCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-    #if DEVELOPMENT_BUILD
-            {
-                var nativeSize = _NativeSizeof_iOSNotificationAuthorizationData();
-                var managedSize = Marshal.SizeOf(typeof(iOSAuthorizationRequestData));
-                if (nativeSize != managedSize)
-                    throw new Exception(string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize));
-            }
-    #endif
             _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestReceived);
 #endif
         }
