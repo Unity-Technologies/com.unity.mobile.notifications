@@ -91,11 +91,7 @@ namespace Unity.Notifications.iOS
                 var nativeSize = _NativeSizeof_iOSNotificationAuthorizationData();
                 var managedSize = Marshal.SizeOf(typeof(iOSAuthorizationRequestData));
                 if (nativeSize != managedSize)
-                {
-                    var error = string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize);
-                    Debug.LogError(error);
-                    throw new Exception(error);
-                }
+                    throw new Exception(string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize));
             }
     #endif
             _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestReceived);
