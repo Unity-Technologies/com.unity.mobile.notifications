@@ -123,14 +123,13 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public static iOSNotification[] GetDeliveredNotifications()
         {
-            var iOSNotifications = new List<iOSNotification>();
+            var notificationData = iOSNotificationsWrapper.GetDeliveredNotificationData();
+            var iOSNotifications = new iOSNotification[notificationData == null ? 0 : notificationData.Length];
 
-            foreach (var d in iOSNotificationsWrapper.GetDeliveredNotificationData())
-            {
-                iOSNotifications.Add(new iOSNotification(d));
-            }
+            for (int i = 0; i < iOSNotifications.Length; ++i)
+                iOSNotifications[i] = new iOSNotification(notificationData[i]);
 
-            return iOSNotifications.ToArray();
+            return iOSNotifications;
         }
 
         /// <summary>
