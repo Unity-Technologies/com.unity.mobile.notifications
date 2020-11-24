@@ -78,11 +78,6 @@ namespace Unity.Notifications.iOS
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(IntPtr notificationData);
 
-#if UNITY_IOS && !UNITY_EDITOR
-        private static NotificationReceivedCallback s_OnNotificationReceived = null;
-        private static NotificationReceivedCallback s_OnRemoteNotificationReceived = null;
-#endif
-
         public static void RegisterAuthorizationRequestCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
@@ -101,16 +96,14 @@ namespace Unity.Notifications.iOS
         public static void RegisterOnReceivedRemoteNotificationCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            s_OnRemoteNotificationReceived = new NotificationReceivedCallback(RemoteNotificationReceived);
-            _SetRemoteNotificationReceivedDelegate(s_OnRemoteNotificationReceived);
+            _SetRemoteNotificationReceivedDelegate(RemoteNotificationReceived);
 #endif
         }
 
         public static void RegisterOnReceivedCallback()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            s_OnNotificationReceived = new NotificationReceivedCallback(NotificationReceived);
-            _SetNotificationReceivedDelegate(s_OnNotificationReceived);
+            _SetNotificationReceivedDelegate(NotificationReceived);
 #endif
         }
 
