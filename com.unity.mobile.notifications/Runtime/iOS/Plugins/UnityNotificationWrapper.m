@@ -104,21 +104,26 @@ iOSNotificationData* _GetScheduledNotificationDataArray(int* count)
     return ret;
 }
 
-int _GetDeliveredNotificationDataCount()
+iOSNotificationData* _GetDeliveredNotificationDataArray(int* count)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return (int)manager.cachedDeliveredNotifications.count;
-}
-
-iOSNotificationData* _GetDeliveredNotificationDataAt(int index)
-{
-    UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    if (index >= manager.cachedDeliveredNotifications.count)
+    NSArray<UNNotification*>* deliveredNotifications = manager.cachedDeliveredNotifications;
+    if (deliveredNotifications == nil)
+    {
+        *count = 0;
+        return NULL;
+    }
+    *count = (int)deliveredNotifications.count;
+    if (*count == 0)
         return NULL;
 
-    UNNotification* notification = manager.cachedDeliveredNotifications[index];
-    iOSNotificationData* ret = (iOSNotificationData*)malloc(sizeof(iOSNotificationData));
-    *ret = UNNotificationRequestToiOSNotificationData(notification.request);
+    iOSNotificationData* ret = (iOSNotificationData*)malloc(*count * sizeof(iOSNotificationData));
+    for (int i = 0; i < *count; ++i)
+    {
+        UNNotification* notification = deliveredNotifications[i];
+        ret[i] = UNNotificationRequestToiOSNotificationData(notification.request);
+    }
+
     return ret;
 }
 

@@ -40,10 +40,7 @@ namespace Unity.Notifications.iOS
         private static extern IntPtr _GetScheduledNotificationDataArray(out Int32 count);
 
         [DllImport("__Internal")]
-        private static extern Int32 _GetDeliveredNotificationDataCount();
-
-        [DllImport("__Internal")]
-        private static extern IntPtr _GetDeliveredNotificationDataAt(Int32 index);
+        private static extern IntPtr _GetDeliveredNotificationDataArray(out Int32 count);
 
         [DllImport("__Internal")]
         internal static extern void _RemoveScheduledNotification(string identifier);
@@ -174,25 +171,11 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationData[] GetDeliveredNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            var size = _GetDeliveredNotificationDataCount();
-
-            var dataList = new List<iOSNotificationData>();
-            for (var i = 0; i < size; i++)
-            {
-                iOSNotificationData data;
-                IntPtr ptr = _GetDeliveredNotificationDataAt(i);
-
-                if (ptr != IntPtr.Zero)
-                {
-                    data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
-                    dataList.Add(data);
-                    _FreeUnmanagediOSNotificationData(ptr);
-                }
-            }
-
-            return dataList.ToArray();
+            int count;
+            var ptr = _GetDeliveredNotificationDataArray(out count);
+            return MarshalAndFreeNotificationDataArray(ptr, count);
 #else
-            return new iOSNotificationData[] {};
+            return null;
 #endif
         }
 
@@ -201,6 +184,15 @@ namespace Unity.Notifications.iOS
 #if UNITY_IOS && !UNITY_EDITOR
             int count;
             var ptr = _GetScheduledNotificationDataArray(out count);
+            return MarshalAndFreeNotificationDataArray(ptr, count);
+#else
+            return null;
+#endif
+        }
+
+#if UNITY_IOS && !UNITY_EDITOR
+        static iOSNotificationData[] MarshalAndFreeNotificationDataArray(IntPtr ptr, int count)
+        {
             if (count == 0 || ptr == IntPtr.Zero)
                 return null;
 
@@ -215,10 +207,9 @@ namespace Unity.Notifications.iOS
             _FreeUnmanagediOSNotificationDataArray(ptr, count);
 
             return dataArray;
-#else
-            return null;
-#endif
         }
+
+#endif
 
         public static void SetApplicationBadge(int badge)
         {
