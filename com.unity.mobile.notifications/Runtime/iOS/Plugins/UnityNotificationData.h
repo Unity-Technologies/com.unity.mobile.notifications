@@ -79,7 +79,7 @@ typedef void (*AuthorizationRequestResponse) (void* request, struct iOSNotificat
 
 // Who calls these two below methods should be responsible for freeing the returned memory.
 NotificationSettingsData* UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings);
-iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request);
+iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request);
 void freeiOSNotificationData(iOSNotificationData* notificationData);
 
 #endif /* UnityNotificationData_h */

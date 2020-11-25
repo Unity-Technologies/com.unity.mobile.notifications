@@ -93,84 +93,81 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
     }
 }
 
-iOSNotificationData* UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request)
+iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request)
 {
-    struct iOSNotificationData* notificationData = malloc(sizeof(*notificationData));
-    initiOSNotificationData(notificationData);
+    iOSNotificationData notificationData;
+    initiOSNotificationData(&notificationData);
 
     UNNotificationContent* content = request.content;
 
-    notificationData->identifier = strdup([request.identifier UTF8String]);
+    notificationData.identifier = strdup([request.identifier UTF8String]);
 
     if (content.title != nil && content.title.length > 0)
-        notificationData->title = strdup([content.title UTF8String]);
+        notificationData.title = strdup([content.title UTF8String]);
 
     if (content.body != nil && content.body.length > 0)
-        notificationData->body = strdup([content.body UTF8String]);
+        notificationData.body = strdup([content.body UTF8String]);
 
-    notificationData->badge = [content.badge intValue];
+    notificationData.badge = [content.badge intValue];
 
     if (content.subtitle != nil && content.subtitle.length > 0)
-        notificationData->subtitle = strdup([content.subtitle UTF8String]);
+        notificationData.subtitle = strdup([content.subtitle UTF8String]);
 
     if (content.categoryIdentifier != nil && content.categoryIdentifier.length > 0)
-        notificationData->categoryIdentifier = strdup([content.categoryIdentifier UTF8String]);
+        notificationData.categoryIdentifier = strdup([content.categoryIdentifier UTF8String]);
 
     if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
-        notificationData->threadIdentifier = strdup([content.threadIdentifier UTF8String]);
+        notificationData.threadIdentifier = strdup([content.threadIdentifier UTF8String]);
 
     if ([request.trigger isKindOfClass: [UNTimeIntervalNotificationTrigger class]])
     {
-        notificationData->triggerType = TIME_TRIGGER;
+        notificationData.triggerType = TIME_TRIGGER;
 
         UNTimeIntervalNotificationTrigger* timeTrigger = (UNTimeIntervalNotificationTrigger*)request.trigger;
-        notificationData->timeTriggerInterval = timeTrigger.timeInterval;
-        notificationData->repeats = timeTrigger.repeats;
+        notificationData.timeTriggerInterval = timeTrigger.timeInterval;
+        notificationData.repeats = timeTrigger.repeats;
     }
     else if ([request.trigger isKindOfClass: [UNCalendarNotificationTrigger class]])
     {
-        notificationData->triggerType = CALENDAR_TRIGGER;
+        notificationData.triggerType = CALENDAR_TRIGGER;
 
         UNCalendarNotificationTrigger* calendarTrigger = (UNCalendarNotificationTrigger*)request.trigger;
         NSDateComponents* date = calendarTrigger.dateComponents;
 
-        notificationData->calendarTriggerYear = (int)date.year;
-        notificationData->calendarTriggerMonth = (int)date.month;
-        notificationData->calendarTriggerDay = (int)date.day;
-        notificationData->calendarTriggerHour = (int)date.hour;
-        notificationData->calendarTriggerMinute = (int)date.minute;
-        notificationData->calendarTriggerSecond = (int)date.second;
+        notificationData.calendarTriggerYear = (int)date.year;
+        notificationData.calendarTriggerMonth = (int)date.month;
+        notificationData.calendarTriggerDay = (int)date.day;
+        notificationData.calendarTriggerHour = (int)date.hour;
+        notificationData.calendarTriggerMinute = (int)date.minute;
+        notificationData.calendarTriggerSecond = (int)date.second;
     }
     else if ([request.trigger isKindOfClass: [UNLocationNotificationTrigger class]])
     {
 #if UNITY_USES_LOCATION
-        notificationData->triggerType = LOCATION_TRIGGER;
+        notificationData.triggerType = LOCATION_TRIGGER;
 
         UNLocationNotificationTrigger* locationTrigger = (UNLocationNotificationTrigger*)request.trigger;
         CLCircularRegion *region = (CLCircularRegion*)locationTrigger.region;
 
-        notificationData->locationTriggerCenterX = region.center.latitude;
-        notificationData->locationTriggerCenterY = region.center.longitude;
-        notificationData->locationTriggerRadius = region.radius;
-        notificationData->locationTriggerNotifyOnExit = region.notifyOnEntry;
-        notificationData->locationTriggerNotifyOnEntry = region.notifyOnExit;
+        notificationData.locationTriggerCenterX = region.center.latitude;
+        notificationData.locationTriggerCenterY = region.center.longitude;
+        notificationData.locationTriggerRadius = region.radius;
+        notificationData.locationTriggerNotifyOnExit = region.notifyOnEntry;
+        notificationData.locationTriggerNotifyOnEntry = region.notifyOnExit;
 #endif
     }
     else if ([request.trigger isKindOfClass: [UNPushNotificationTrigger class]])
     {
-        notificationData->triggerType = PUSH_TRIGGER;
+        notificationData.triggerType = PUSH_TRIGGER;
     }
 
-    parseCustomizedData(notificationData, request);
+    parseCustomizedData(&notificationData, request);
 
     return notificationData;
 }
 
 void freeiOSNotificationData(iOSNotificationData* notificationData)
 {
-    if (notificationData == NULL)
-        return;
-
     if (notificationData->identifier != NULL)
         free(notificationData->identifier);
 
@@ -191,9 +188,6 @@ void freeiOSNotificationData(iOSNotificationData* notificationData)
 
     if (notificationData->data != NULL)
         free(notificationData->data);
-
-    free(notificationData);
-    notificationData = NULL;
 }
 
 #endif

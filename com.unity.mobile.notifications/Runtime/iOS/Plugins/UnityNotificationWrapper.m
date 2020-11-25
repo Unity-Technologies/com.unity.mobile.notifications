@@ -31,6 +31,7 @@ void _FreeUnmanagedMemory(void* ptr)
 void _FreeUnmanagediOSNotificationData(iOSNotificationData* ptr)
 {
     freeiOSNotificationData(ptr);
+    free(ptr);
     ptr = NULL;
 }
 
@@ -86,7 +87,9 @@ iOSNotificationData* _GetScheduledNotificationDataAt(int index)
         return NULL;
 
     UNNotificationRequest * request = manager.cachedPendingNotificationRequests[index];
-    return UNNotificationRequestToiOSNotificationData(request);
+    iOSNotificationData* ret = (iOSNotificationData*)malloc(sizeof(iOSNotificationData));
+    *ret = UNNotificationRequestToiOSNotificationData(request);
+    return ret;
 }
 
 int _GetDeliveredNotificationDataCount()
@@ -102,7 +105,9 @@ iOSNotificationData* _GetDeliveredNotificationDataAt(int index)
         return NULL;
 
     UNNotification* notification = manager.cachedDeliveredNotifications[index];
-    return UNNotificationRequestToiOSNotificationData(notification.request);
+    iOSNotificationData* ret = (iOSNotificationData*)malloc(sizeof(iOSNotificationData));
+    *ret = UNNotificationRequestToiOSNotificationData(notification.request);
+    return ret;
 }
 
 void _RemoveScheduledNotification(const char* identifier)
@@ -152,7 +157,9 @@ bool _GetAppOpenedUsingNotification()
 iOSNotificationData* _GetLastNotificationData()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return UNNotificationRequestToiOSNotificationData(manager.lastReceivedNotification.request);
+    iOSNotificationData* ret = (iOSNotificationData*)malloc(sizeof(iOSNotificationData));
+    *ret = UNNotificationRequestToiOSNotificationData(manager.lastReceivedNotification.request);
+    return ret;
 }
 
 #endif
