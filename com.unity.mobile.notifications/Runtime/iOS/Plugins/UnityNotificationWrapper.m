@@ -19,6 +19,11 @@ int _NativeSizeof_iOSNotificationData()
     return sizeof(iOSNotificationData);
 }
 
+int _NativeSizeof_NotificationSettingsData()
+{
+    return sizeof(NotificationSettingsData);
+}
+
 void _FreeUnmanagediOSNotificationDataArray(iOSNotificationData* ptr, int count)
 {
     for (int i = 0; i < count; ++i)

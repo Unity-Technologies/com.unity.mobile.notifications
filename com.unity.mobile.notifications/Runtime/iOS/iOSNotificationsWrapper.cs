@@ -16,6 +16,9 @@ namespace Unity.Notifications.iOS
 
         [DllImport("__Internal")]
         private static extern int _NativeSizeof_iOSNotificationData();
+
+        [DllImport("__Internal")]
+        private static extern int _NativeSizeof_NotificationSettingsData();
 #endif
 
         [DllImport("__Internal")]
@@ -77,6 +80,7 @@ namespace Unity.Notifications.iOS
         {
             VerifyNativeManagedSize(_NativeSizeof_iOSNotificationAuthorizationData(), typeof(iOSAuthorizationRequestData));
             VerifyNativeManagedSize(_NativeSizeof_iOSNotificationData(), typeof(iOSNotificationData));
+            VerifyNativeManagedSize(_NativeSizeof_NotificationSettingsData(), typeof(iOSNotificationSettings));
         }
 
         static void VerifyNativeManagedSize(int nativeSize, Type managedType)
