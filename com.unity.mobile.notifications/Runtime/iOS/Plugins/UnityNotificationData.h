@@ -77,8 +77,7 @@ typedef struct NotificationSettingsData
 typedef void (*NotificationDataReceivedResponse)(iOSNotificationData data);
 typedef void (*AuthorizationRequestResponse) (void* request, struct iOSNotificationAuthorizationData data);
 
-// Who calls these two below methods should be responsible for freeing the returned memory.
-NotificationSettingsData* UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings);
+NotificationSettingsData UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings);
 iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request);
 void freeiOSNotificationData(iOSNotificationData* notificationData);
 

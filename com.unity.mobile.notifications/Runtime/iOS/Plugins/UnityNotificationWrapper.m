@@ -19,15 +19,6 @@ int _NativeSizeof_iOSNotificationData()
     return sizeof(iOSNotificationData);
 }
 
-void _FreeUnmanagedMemory(void* ptr)
-{
-    if (ptr != NULL)
-    {
-        free(ptr);
-        ptr = NULL;
-    }
-}
-
 void _FreeUnmanagediOSNotificationDataArray(iOSNotificationData* ptr, int count)
 {
     for (int i = 0; i < count; ++i)
@@ -67,10 +58,9 @@ void _ScheduleLocalNotification(iOSNotificationData data)
     [manager scheduleLocalNotification: &data];
 }
 
-NotificationSettingsData* _GetNotificationSettings()
+NotificationSettingsData _GetNotificationSettings()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    // The native NotificationSettingsData pointer will be freed by GetNotificationSettings() in the Runtime/iOS/iOSNotificationsWrapper.cs.
     return UNNotificationSettingsToNotificationSettingsData(manager.cachedNotificationSettings);
 }
 

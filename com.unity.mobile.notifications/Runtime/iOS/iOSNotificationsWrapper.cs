@@ -34,7 +34,7 @@ namespace Unity.Notifications.iOS
         private static extern void _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestCallback callback);
 
         [DllImport("__Internal")]
-        private static extern IntPtr _GetNotificationSettings();
+        private static extern iOSNotificationSettings _GetNotificationSettings();
 
         [DllImport("__Internal")]
         private static extern IntPtr _GetScheduledNotificationDataArray(out Int32 count);
@@ -65,9 +65,6 @@ namespace Unity.Notifications.iOS
 
         [DllImport("__Internal")]
         private static extern IntPtr _GetLastNotificationData();
-
-        [DllImport("__Internal")]
-        private static extern void _FreeUnmanagedMemory(IntPtr ptr);
 
         [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationDataArray(IntPtr ptr, int count);
@@ -146,13 +143,7 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationSettings GetNotificationSettings()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            iOSNotificationSettings settings;
-
-            IntPtr ptr = _GetNotificationSettings();
-            settings = (iOSNotificationSettings)Marshal.PtrToStructure(ptr, typeof(iOSNotificationSettings));
-            _FreeUnmanagedMemory(ptr);
-
-            return settings;
+            return _GetNotificationSettings();
 #else
             return new iOSNotificationSettings();
 #endif
