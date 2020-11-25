@@ -37,10 +37,7 @@ namespace Unity.Notifications.iOS
         private static extern IntPtr _GetNotificationSettings();
 
         [DllImport("__Internal")]
-        private static extern Int32 _GetScheduledNotificationDataCount();
-
-        [DllImport("__Internal")]
-        private static extern IntPtr _GetScheduledNotificationDataAt(Int32 index);
+        private static extern IntPtr _GetScheduledNotificationDataArray(out Int32 count);
 
         [DllImport("__Internal")]
         private static extern Int32 _GetDeliveredNotificationDataCount();
@@ -78,6 +75,9 @@ namespace Unity.Notifications.iOS
         [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationData(IntPtr ptr);
 
+        [DllImport("__Internal")]
+        private static extern void _FreeUnmanagediOSNotificationDataArray(IntPtr ptr, int count);
+
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(iOSNotificationData notificationData);
 
@@ -94,6 +94,7 @@ namespace Unity.Notifications.iOS
             if (nativeSize != managedSize)
                 throw new Exception(string.Format("Native/managed struct size missmatch: {0} vs {1}", nativeSize, managedSize));
         }
+
 #endif
 
         public static void RegisterAuthorizationRequestCallback()
@@ -198,25 +199,24 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationData[] GetScheduledNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            var size = _GetScheduledNotificationDataCount();
+            int count;
+            var ptr = _GetScheduledNotificationDataArray(out count);
+            if (count == 0 || ptr == IntPtr.Zero)
+                return null;
 
-            var dataList = new List<iOSNotificationData>();
-            for (var i = 0; i < size; i++)
+            var dataArray = new iOSNotificationData[count];
+            var structSize = Marshal.SizeOf(typeof(iOSNotificationData));
+            var next = ptr;
+            for (var i = 0; i < count; ++i)
             {
-                iOSNotificationData data;
-                IntPtr ptr = _GetScheduledNotificationDataAt(i);
-
-                if (ptr != IntPtr.Zero)
-                {
-                    data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
-                    dataList.Add(data);
-                    _FreeUnmanagediOSNotificationData(ptr);
-                }
+                dataArray[i] = (iOSNotificationData)Marshal.PtrToStructure(next, typeof(iOSNotificationData));
+                next = next + structSize;
             }
+            _FreeUnmanagediOSNotificationDataArray(ptr, count);
 
-            return dataList.ToArray();
+            return dataArray;
 #else
-            return new iOSNotificationData[] {};
+            return null;
 #endif
         }
 

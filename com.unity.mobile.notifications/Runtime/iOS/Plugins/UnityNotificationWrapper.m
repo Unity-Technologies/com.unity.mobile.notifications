@@ -35,6 +35,13 @@ void _FreeUnmanagediOSNotificationData(iOSNotificationData* ptr)
     ptr = NULL;
 }
 
+void _FreeUnmanagediOSNotificationDataArray(iOSNotificationData* ptr, int count)
+{
+    for (int i = 0; i < count; ++i)
+        freeiOSNotificationData(&ptr[i]);
+    free(ptr);
+}
+
 void _SetAuthorizationRequestReceivedDelegate(AuthorizationRequestResponse callback)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
@@ -74,21 +81,26 @@ NotificationSettingsData* _GetNotificationSettings()
     return UNNotificationSettingsToNotificationSettingsData(manager.cachedNotificationSettings);
 }
 
-int _GetScheduledNotificationDataCount()
+iOSNotificationData* _GetScheduledNotificationDataArray(int* count)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return (int)manager.cachedPendingNotificationRequests.count;
-}
-
-iOSNotificationData* _GetScheduledNotificationDataAt(int index)
-{
-    UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    if (index >= manager.cachedPendingNotificationRequests.count)
+    NSArray<UNNotificationRequest*>* pendingNotificationRequests = manager.cachedPendingNotificationRequests;
+    if (pendingNotificationRequests == nil)
+    {
+        *count = 0;
+        return NULL;
+    }
+    *count = (int)pendingNotificationRequests.count;
+    if (*count == 0)
         return NULL;
 
-    UNNotificationRequest * request = manager.cachedPendingNotificationRequests[index];
-    iOSNotificationData* ret = (iOSNotificationData*)malloc(sizeof(iOSNotificationData));
-    *ret = UNNotificationRequestToiOSNotificationData(request);
+    iOSNotificationData* ret = (iOSNotificationData*)malloc(*count * sizeof(iOSNotificationData));
+    for (int i = 0; i < *count; ++i)
+    {
+        UNNotificationRequest *request = pendingNotificationRequests[i];
+        ret[i] = UNNotificationRequestToiOSNotificationData(request);
+    }
+
     return ret;
 }
 
