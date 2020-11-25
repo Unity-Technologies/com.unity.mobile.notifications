@@ -28,13 +28,6 @@ void _FreeUnmanagedMemory(void* ptr)
     }
 }
 
-void _FreeUnmanagediOSNotificationData(iOSNotificationData* ptr)
-{
-    freeiOSNotificationData(ptr);
-    free(ptr);
-    ptr = NULL;
-}
-
 void _FreeUnmanagediOSNotificationDataArray(iOSNotificationData* ptr, int count)
 {
     for (int i = 0; i < count; ++i)

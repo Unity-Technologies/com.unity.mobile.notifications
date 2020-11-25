@@ -70,9 +70,6 @@ namespace Unity.Notifications.iOS
         private static extern void _FreeUnmanagedMemory(IntPtr ptr);
 
         [DllImport("__Internal")]
-        private static extern void _FreeUnmanagediOSNotificationData(IntPtr ptr);
-
-        [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationDataArray(IntPtr ptr, int count);
 
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
@@ -241,13 +238,12 @@ namespace Unity.Notifications.iOS
 #if UNITY_IOS && !UNITY_EDITOR
             if (_GetAppOpenedUsingNotification())
             {
-                iOSNotificationData data;
                 IntPtr ptr = _GetLastNotificationData();
 
                 if (ptr != IntPtr.Zero)
                 {
-                    data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
-                    _FreeUnmanagediOSNotificationData(ptr);
+                    iOSNotificationData data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
+                    _FreeUnmanagediOSNotificationDataArray(ptr, 1);
                     return data;
                 }
             }
