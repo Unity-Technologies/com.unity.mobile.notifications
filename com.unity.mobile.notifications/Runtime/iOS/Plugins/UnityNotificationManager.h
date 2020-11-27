@@ -15,7 +15,6 @@
 @interface UnityNotificationManager : NSObject<UNUserNotificationCenterDelegate>
 
 @property UNNotificationSettings* cachedNotificationSettings;
-@property struct iOSNotificationAuthorizationData* authData;
 
 @property NotificationDataReceivedResponse onNotificationReceivedCallback;
 @property NotificationDataReceivedResponse onRemoteNotificationReceivedCallback;
@@ -26,22 +25,17 @@
 
 @property (nonatomic) UNNotification* lastReceivedNotification;
 
-@property BOOL authorized;
-@property BOOL authorizationRequestFinished;
-@property BOOL needRemoteNotifications;
-@property NSString* deviceToken;
-@property UNAuthorizationStatus remoteNotificationsRegistered;
-
 @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 
 + (instancetype)sharedInstance;
 
-- (void)checkAuthorizationFinished;
+- (id)init;
+- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request;
+- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*)notification;
 - (void)updateScheduledNotificationList;
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;
-- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote;
-- (void)setDeviceTokenFromNSData:(NSData*)deviceToken;
+- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request;
 - (void)scheduleLocalNotification:(iOSNotificationData*)data;
 
 @end

@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.0] - 2020-11-26
+
+### Fixes:
+- [iOS] Multiple authorization requests now can be performed simultaneously.
+
 ## [1.3.2] - 2020-11-10
 
 ### Changes & Improvements:
