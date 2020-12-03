@@ -240,7 +240,14 @@ namespace Unity.Notifications
                 GUI.Label(iconListlabelRect, "Notification Icons", EditorStyles.label);
 
                 // Draw the help message for setting the icons.
-                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + iconListlabelRect.height + k_VerticalSeparator, notificationSettingsRect.width, k_LabelLineHeight * 4);
+                float labelHeight;
+                if (notificationSettingsRect.width > 510)
+                    labelHeight = k_LabelLineHeight * 3;
+                else if (notificationSettingsRect.width > 500)
+                    labelHeight = k_LabelLineHeight * 4;
+                else
+                    labelHeight = k_LabelLineHeight * 5;
+                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + iconListlabelRect.height + k_VerticalSeparator, notificationSettingsRect.width, labelHeight);
                 EditorGUI.SelectableLabel(iconListMsgRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
 
                 // Draw the reorderable list for the icon list.
