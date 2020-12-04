@@ -12,6 +12,12 @@
 #endif
 
 @implementation UnityNotificationManager
+{
+    NSLock* _lock;
+    UNAuthorizationStatus _remoteNotificationsRegistered;
+    NSString* _deviceToken;
+    NSPointerArray* _pendingRemoteAuthRequests;
+}
 
 + (instancetype)sharedInstance
 {
@@ -27,86 +33,114 @@
     return sharedInstance;
 }
 
-- (void)checkAuthorizationFinished
+- (id)init
 {
-    bool requestRejected = self.authorizationRequestFinished && !self.authorized;
+    _lock = [[NSLock alloc] init];
+    _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
+    _deviceToken = nil;
+    _pendingRemoteAuthRequests = nil;
+    return self;
+}
 
-    if (!requestRejected && self.needRemoteNotifications && self.remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
-        return;
+- (void)finishAuthorization:(struct iOSNotificationAuthorizationData*)authData forRequest:(void*)request
+{
+    if (self.onAuthorizationCompletionCallback != NULL && request)
+        self.onAuthorizationCompletionCallback(request, *authData);
+}
 
-    if (self.authorizationRequestFinished && self.onAuthorizationCompletionCallback != NULL && self.authData != NULL)
+- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*)notification
+{
+    struct iOSNotificationAuthorizationData authData;
+    authData.granted = status == UNAuthorizationStatusAuthorized;
+    NSString* deviceToken = nil;
+    if (authData.granted)
     {
-        self.authData->deviceToken = [self.deviceToken UTF8String];
-        self.onAuthorizationCompletionCallback(self.authData);
+        deviceToken = [UnityNotificationManager deviceTokenFromNotification: notification];
+        authData.deviceToken = [deviceToken UTF8String];
+    }
+    authData.error = NULL;
 
-        free(self.authData);
-        self.authData = NULL;
+    [_lock lock];
+    _remoteNotificationsRegistered = status;
+    _deviceToken = deviceToken;
+    NSPointerArray* pointers = _pendingRemoteAuthRequests;
+    _pendingRemoteAuthRequests = nil;
+    [_lock unlock];
+
+    while (pointers.count > 0)
+    {
+        unsigned long idx = pointers.count - 1;
+        void* request = [pointers pointerAtIndex: idx];
+        [pointers removePointerAtIndex: idx];
+        [self finishAuthorization: &authData forRequest: request];
     }
 }
 
-- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote
+- (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request
 {
     if (!SYSTEM_VERSION_10_OR_ABOVE)
         return;
 
-    // TODO: Why we need this parameter as we always set it to YES here?
-    registerRemote = YES;
-
-    self.authorizationRequestFinished = NO;
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
 
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
-    registerRemote = supportsPushNotification == YES ? registerRemote : NO;
+    registerRemote = registerRemote && supportsPushNotification;
 
-    self.needRemoteNotifications = registerRemote;
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
-        struct iOSNotificationAuthorizationData* authData = (struct iOSNotificationAuthorizationData*)malloc(sizeof(*authData));
-        authData->finished = YES;
-        authData->granted = granted;
-        authData->error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
-        authData->deviceToken = "";
+        BOOL authorizationRequestFinished = YES;
+        struct iOSNotificationAuthorizationData authData;
+        authData.granted = granted;
+        authData.error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
+        authData.deviceToken = "";
 
-        self.authData = authData;
-        self.authorized = granted;
-        if (self.authorized)
+        if (granted)
         {
-            if (registerRemote)
+            [_lock lock];
+            if (registerRemote && _remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
             {
+                authorizationRequestFinished = NO;
+                if (request)
+                {
+                    if (_pendingRemoteAuthRequests == nil)
+                        _pendingRemoteAuthRequests = [NSPointerArray pointerArrayWithOptions: NSPointerFunctionsOpaqueMemory];
+                    [_pendingRemoteAuthRequests addPointer: request];
+                }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
-                    self.authorizationRequestFinished = YES;
                 });
             }
             else
-            {
-                self.authorizationRequestFinished = YES;
-            }
+                authData.deviceToken = [_deviceToken UTF8String];
+            [_lock unlock];
         }
         else
-        {
-            self.authorizationRequestFinished = YES;
             NSLog(@"Requesting notification authorization failed with: %@", error);
-        }
 
-        [self checkAuthorizationFinished];
+        if (authorizationRequestFinished)
+            [self finishAuthorization: &authData forRequest: request];
         [self updateNotificationSettings];
     }];
 }
 
-- (void)setDeviceTokenFromNSData:(NSData *)deviceTokenData
++ (NSString*)deviceTokenFromNotification:(NSNotification*)notification
 {
+    NSData* deviceTokenData;
+    if ([notification.userInfo isKindOfClass: [NSData class]])
+        deviceTokenData = (NSData*)notification.userInfo;
+    else
+        return nil;
+
     NSUInteger len = deviceTokenData.length;
     if (len == 0)
-        return;
+        return nil;
 
     const unsigned char *buffer = deviceTokenData.bytes;
     NSMutableString *str  = [NSMutableString stringWithCapacity: (len * 2)];
     for (int i = 0; i < len; ++i)
-    {
         [str appendFormat: @"%02x", buffer[i]];
-    }
-    self.deviceToken = [str copy];
+
+    return str;
 }
 
 // Called when a notification is delivered to a foreground app.

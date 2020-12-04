@@ -68,7 +68,7 @@
              if (authorizeOnLaunch)
              {
                  UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-                 [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch];
+                 [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
                  manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
          }];
@@ -79,14 +79,7 @@
          usingBlock:^(NSNotification *notification) {
              NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken");
              UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-             manager.remoteNotificationsRegistered = UNAuthorizationStatusAuthorized;
-
-             if ([notification.userInfo isKindOfClass: [NSData class]])
-             {
-                 NSData* data = (NSData*)notification.userInfo;
-                 [manager setDeviceTokenFromNSData: data];
-             }
-             [manager checkAuthorizationFinished];
+             [manager finishRemoteNotificationRegistration: UNAuthorizationStatusAuthorized notification: notification];
          }];
 
         [nc addObserverForName: kUnityDidFailToRegisterForRemoteNotificationsWithError
@@ -95,8 +88,7 @@
          usingBlock:^(NSNotification *notification) {
              NSLog(@"didFailToRegisterForRemoteNotificationsWithError");
              UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-             manager.remoteNotificationsRegistered = UNAuthorizationStatusDenied;
-             [manager checkAuthorizationFinished];
+             [manager finishRemoteNotificationRegistration: UNAuthorizationStatusDenied notification: notification];
          }];
     });
     return sharedInstance;
