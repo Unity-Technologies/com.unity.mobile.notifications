@@ -14,6 +14,8 @@ namespace Unity.Notifications
         private const int k_IconSpacing = 8;
         private const float k_Padding = 12f;
         private const float k_ToolbarHeight = 20f;
+        private const int k_VerticalSeparator = 2;
+        private const int k_LabelLineHeight = 18;
 
         private readonly GUIContent k_IdentifierLabelText = new GUIContent("Identifier");
         private readonly GUIContent k_TypeLabelText = new GUIContent("Type");
@@ -142,7 +144,8 @@ namespace Unity.Notifications
             var newType = (NotificationIconType)EditorGUI.EnumPopup(typeEnumPopupRect, drawableResource.Type);
 
             // Calculate and draw texture and preview.
-            var textureRect = new Rect(elementRect.width - (k_SlotSize * 2 - k_IconSpacing * 5), elementRect.y, k_SlotSize, k_SlotSize);
+            var textureX = Mathf.Max(elementRect.width - (k_SlotSize * 2 - k_IconSpacing * 5), k_SlotSize * 3);
+            var textureRect = new Rect(textureX, elementRect.y, k_SlotSize, k_SlotSize);
             var previewTextureRect = new Rect(textureRect.x + k_SlotSize, textureRect.y - 6, k_SlotSize, k_SlotSize);
 
             var newAsset = (Texture2D)EditorGUI.ObjectField(textureRect, drawableResource.Asset, typeof(Texture2D), false);
@@ -163,7 +166,7 @@ namespace Unity.Notifications
             if (drawableResource.Asset != null && !drawableResource.Verify())
             {
                 var errorMsgWidth = rect.width - k_Padding * 2;
-                var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_SlotSize), 4, 4);
+                var errorRect = AddPadding(new Rect(elementRect.x, elementRect.y + k_SlotSize, errorMsgWidth, k_LabelLineHeight * 3), 4, 4);
 
                 var errorMsg = "Specified texture can't be used because: \n" + drawableResource.GenerateErrorString();
                 EditorGUI.HelpBox(errorRect, errorMsg, MessageType.Error);
@@ -233,15 +236,22 @@ namespace Unity.Notifications
             // Draw drawable resources list for Android.
             if (m_SettingsManager.ToolbarIndex == 0)
             {
-                var iconListlabelRect = new Rect(notificationSettingsRect.x, notificationSettingsRect.y + 85, 180, 18);
+                var iconListlabelRect = new Rect(notificationSettingsRect.x, notificationSettingsRect.y + 85, 180, k_LabelLineHeight);
                 GUI.Label(iconListlabelRect, "Notification Icons", EditorStyles.label);
 
                 // Draw the help message for setting the icons.
-                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + 20, notificationSettingsRect.width, 55f);
+                float labelHeight;
+                if (notificationSettingsRect.width > 510)
+                    labelHeight = k_LabelLineHeight * 3;
+                else if (notificationSettingsRect.width > 500)
+                    labelHeight = k_LabelLineHeight * 4;
+                else
+                    labelHeight = k_LabelLineHeight * 5;
+                var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + iconListlabelRect.height + k_VerticalSeparator, notificationSettingsRect.width, labelHeight);
                 EditorGUI.SelectableLabel(iconListMsgRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
 
                 // Draw the reorderable list for the icon list.
-                var iconListRect = new Rect(iconListMsgRect.x, iconListMsgRect.y + 58f, iconListMsgRect.width, notificationSettingsRect.height - 55f);
+                var iconListRect = new Rect(iconListMsgRect.x, iconListMsgRect.y + iconListMsgRect.height + k_VerticalSeparator, iconListMsgRect.width, notificationSettingsRect.height - 55f);
                 m_ReorderableList.DoList(iconListRect);
 
                 heightPlaceHolder += iconListMsgRect.height + m_ReorderableList.GetHeight();
@@ -255,23 +265,38 @@ namespace Unity.Notifications
         {
             Assert.IsTrue(toolbarIndex == 0 || toolbarIndex == 1);
 
-            var settings = (toolbarIndex == 0) ? m_SettingsManager.AndroidNotificationSettings : m_SettingsManager.iOSNotificationSettings;
+            List<NotificationSetting> settings;
+            BuildTargetGroup buildTarget;
+            int labelWidthMultiplier;
+            if (toolbarIndex == 0)
+            {
+                settings = m_SettingsManager.AndroidNotificationSettings;
+                buildTarget = BuildTargetGroup.Android;
+                labelWidthMultiplier = 3;
+            }
+            else
+            {
+                settings = m_SettingsManager.iOSNotificationSettings;
+                buildTarget = BuildTargetGroup.iOS;
+                labelWidthMultiplier = 5;
+            }
+
             if (settings == null)
                 return 0;
 
             GUI.BeginGroup(rect);
-            var drawnSettingsCount = DrawSettingElements(rect, (toolbarIndex == 0) ? BuildTargetGroup.Android : BuildTargetGroup.iOS, settings, false, 0);
+            var drawnSettingsCount = DrawSettingElements(rect, buildTarget, settings, false, 0, labelWidthMultiplier);
             GUI.EndGroup();
 
             return drawnSettingsCount;
         }
 
-        private int DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer)
+        private int DrawSettingElements(Rect rect, BuildTargetGroup buildTarget, List<NotificationSetting> settings, bool disabled, int layer, int labelWidthMultiplier)
         {
             var spaceOffset = layer * 13;
 
             var labelStyle = new GUIStyle(NotificationStyles.k_LabelStyle);
-            labelStyle.fixedWidth = k_SlotSize * 5 - spaceOffset;
+            labelStyle.fixedWidth = k_SlotSize * labelWidthMultiplier - spaceOffset;
 
             var toggleStyle = NotificationStyles.k_ToggleStyle;
             var dropdownStyle = NotificationStyles.k_DropwDownStyle;
@@ -317,7 +342,7 @@ namespace Unity.Notifications
 
                 if (setting.Dependencies != null)
                 {
-                    elementCount += DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1);
+                    elementCount += DrawSettingElements(rect, buildTarget, setting.Dependencies, dependenciesDisabled, layer + 1, labelWidthMultiplier);
                 }
             }
 
