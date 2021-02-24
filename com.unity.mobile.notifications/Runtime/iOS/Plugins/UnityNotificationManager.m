@@ -147,10 +147,12 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification
     withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
-    iOSNotificationData* notificationData = NULL;
+    iOSNotificationData notificationData;
+    BOOL haveNotificationData = NO;
     if (self.onNotificationReceivedCallback != NULL)
     {
         notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
+        haveNotificationData = YES;
         self.onNotificationReceivedCallback(notificationData);
     }
 
@@ -161,8 +163,11 @@
     {
         if (self.onRemoteNotificationReceivedCallback != NULL)
         {
-            if (notificationData == NULL)
+            if (!haveNotificationData)
+            {
                 notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
+                haveNotificationData = YES;
+            }
 
             showInForeground = NO;
             self.onRemoteNotificationReceivedCallback(notificationData);
@@ -179,8 +184,8 @@
         showInForeground = [[notification.request.content.userInfo objectForKey: @"showInForeground"] boolValue];
     }
 
-    freeiOSNotificationData(notificationData);
-    notificationData = NULL;
+    if (haveNotificationData)
+        freeiOSNotificationData(&notificationData);
 
     if (showInForeground)
         completionHandler(presentationOptions);
