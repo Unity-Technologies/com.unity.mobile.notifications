@@ -94,7 +94,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public TimeSpan TimeInterval
         {
-            get { return TimeSpan.FromMilliseconds(timeInterval); }
+            get { return TimeSpan.FromSeconds(timeInterval); }
             set
             {
                 timeInterval = (int)value.TotalSeconds;
