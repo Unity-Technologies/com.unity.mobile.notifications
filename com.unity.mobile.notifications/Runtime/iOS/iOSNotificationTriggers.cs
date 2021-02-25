@@ -90,7 +90,7 @@ namespace Unity.Notifications.iOS
         internal int timeInterval;
 
         /// <summary>
-        /// Time interval after which the notification should be delivered.
+        /// Time interval after which the notification should be delivered (only total of full seconds is considered).
         /// </summary>
         public TimeSpan TimeInterval
         {
