@@ -93,7 +93,7 @@ namespace Unity.Notifications.Tests.Sample
 
         public Logger Fields(object obj, int tabs = 0)
         {
-            foreach (var field in obj.GetType().GetFields(BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public))
+            foreach (var field in obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 var value = field.GetValue(obj).ToString();
                 if (string.IsNullOrEmpty(value))
