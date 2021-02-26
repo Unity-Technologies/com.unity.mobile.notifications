@@ -98,7 +98,7 @@ namespace Unity.Notifications.Tests.Sample
                 var value = field.GetValue(obj).ToString();
                 if (string.IsNullOrEmpty(value))
                     continue;
-                Blue($"{field.Name}: {value}");
+                Blue($"{field.Name}: {value}", tabs);
             }
 
             return this;
