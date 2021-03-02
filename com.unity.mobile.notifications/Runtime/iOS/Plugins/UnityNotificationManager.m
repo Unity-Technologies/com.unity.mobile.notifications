@@ -321,7 +321,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
 
         CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center
-                                    radius: data->locationTriggerRadius identifier: identifier]];
+                                    radius: data->locationTriggerRadius identifier: identifier];
         region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
         region.notifyOnExit = data->locationTriggerNotifyOnExit;
 
