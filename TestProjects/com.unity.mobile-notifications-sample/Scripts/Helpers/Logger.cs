@@ -90,5 +90,18 @@ namespace Unity.Notifications.Tests.Sample
 
             return this;
         }
+
+        public Logger Fields(object obj, int tabs = 0)
+        {
+            foreach (var field in obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+            {
+                var value = field.GetValue(obj).ToString();
+                if (string.IsNullOrEmpty(value))
+                    continue;
+                Blue($"{field.Name}: {value}", tabs);
+            }
+
+            return this;
+        }
     }
 }

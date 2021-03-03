@@ -368,7 +368,7 @@ namespace Unity.Notifications.Tests.Sample
         {
             m_LOGGER.Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
             iOSNotificationSettings settings = iOSNotificationCenter.GetNotificationSettings();
-            m_LOGGER.Properties(settings);
+            m_LOGGER.Fields(settings);
         }
 
         public void ListScheduledNotifications()
