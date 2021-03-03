@@ -295,6 +295,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     // TODO add a way to specify custom sounds.
     content.sound = [UNNotificationSound defaultSound];
 
+    NSString* identifier = [NSString stringWithUTF8String: data->identifier];
     // Generate UNNotificationTrigger from iOSNotificationData.
     UNNotificationTrigger* trigger;
     if (data->triggerType == TIME_TRIGGER)
@@ -325,7 +326,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
 
         CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center
-                                    radius: data->locationTriggerRadius identifier: @"Headquarters"];
+                                    radius: data->locationTriggerRadius identifier: identifier];
         region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
         region.notifyOnExit = data->locationTriggerNotifyOnExit;
 
@@ -339,7 +340,6 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         return;
     }
 
-    NSString* identifier = [NSString stringWithUTF8String: data->identifier];
     UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier: identifier content: content trigger: trigger];
 
     // Schedule the notification.
