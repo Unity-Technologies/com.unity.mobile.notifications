@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ButtonName: Empty rescheduled after restart
   Channel: default_channel
-  FireInSeconds: 60
+  FireInSeconds: 120
   NotificationID: 0
   Title: 
   Text: should arrive after deivce restart
