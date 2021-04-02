@@ -22,7 +22,8 @@ namespace Unity.Notifications
 
         private readonly string[] k_ToolbarStrings = {"Android", "iOS"};
         private const string k_InfoStringAndroid =
-            "Only icons added to this list or manually added to the 'res/drawable' folder can be used for notifications.\n\n" +
+            "Only icons added to this list or manually added to the 'res/drawable' folder can be used for notifications.\n" +
+            "Note, that not all devices support colored icons.\n\n" +
             "Small icons must be at least 48x48px and only composed of white pixels on a transparent background.\n" +
             "Large icons must be no smaller than 192x192px and may contain colors.";
 
@@ -242,11 +243,11 @@ namespace Unity.Notifications
                 // Draw the help message for setting the icons.
                 float labelHeight;
                 if (notificationSettingsRect.width > 510)
-                    labelHeight = k_LabelLineHeight * 3;
-                else if (notificationSettingsRect.width > 500)
                     labelHeight = k_LabelLineHeight * 4;
-                else
+                else if (notificationSettingsRect.width > 500)
                     labelHeight = k_LabelLineHeight * 5;
+                else
+                    labelHeight = k_LabelLineHeight * 6;
                 var iconListMsgRect = new Rect(iconListlabelRect.x, iconListlabelRect.y + iconListlabelRect.height + k_VerticalSeparator, notificationSettingsRect.width, labelHeight);
                 EditorGUI.SelectableLabel(iconListMsgRect, k_InfoStringAndroid, NotificationStyles.k_IconHelpMessageStyle);
 
