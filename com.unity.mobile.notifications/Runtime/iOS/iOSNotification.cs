@@ -43,6 +43,7 @@ namespace Unity.Notifications.iOS
         public string threadIdentifier;
 
         //Custom information
+        public string userInfo;
         public string data;
         public bool showInForeground;
         public Int32 showInForegroundPresentationOptions;
@@ -177,6 +178,15 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
+        /// UserInfo which can be retrieved when the notification is used to open the app or is received while the app is running.
+        /// </summary>
+        public string UserInfo
+        {
+            get { return data.userInfo; }
+            set { data.userInfo = value; }
+        }
+
+        /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
         /// </summary>
         public string Data
@@ -308,6 +318,7 @@ namespace Unity.Notifications.iOS
             data.categoryIdentifier = "";
             data.threadIdentifier = "";
 
+            data.userInfo = "";
             data.data = "";
             data.showInForeground = false;
             data.showInForegroundPresentationOptions = (int)(PresentationOption.Alert |

@@ -27,6 +27,7 @@ typedef struct iOSNotificationData
     char* threadIdentifier;
 
     //Custom data
+    char* userInfo;
     char* data;
     int showInForeground;
     int showInForegroundPresentationOptions;

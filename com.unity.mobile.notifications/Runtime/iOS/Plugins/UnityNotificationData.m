@@ -46,11 +46,27 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->categoryIdentifier = NULL;
     notificationData->threadIdentifier = NULL;
     notificationData->triggerType = PUSH_TRIGGER;
+    notificationData->userInfo = NULL;
     notificationData->data = NULL;
 }
 
 void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
 {
+    NSError* userInfoError;
+    NSData* userInfo = [NSJSONSerialization dataWithJSONObject: request.content.userInfo options: NSJSONWritingPrettyPrinted error: &userInfoError];
+    if (!userInfo)
+    {
+        NSLog(@"Failed parsing notification userInfo: %@", userInfoError);
+        return;
+    }
+    else
+    {
+        // Cannot promise NSData:bytes is a C style string.
+        notificationData->userInfo = malloc(userInfo.length + 1);
+        [userInfo getBytes: notificationData->userInfo length: userInfo.length];
+        notificationData->userInfo[userInfo.length] = '\0';
+    }
+        
     NSObject* customizedData = [request.content.userInfo objectForKey: @"data"];
     if (customizedData == nil)
         return;
