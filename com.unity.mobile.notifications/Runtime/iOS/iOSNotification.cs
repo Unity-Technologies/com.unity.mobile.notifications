@@ -349,5 +349,12 @@ namespace Unity.Notifications.iOS
                 data.identifier = GenerateUniqueID();
             }
         }
+
+        internal iOSNotificationData GetDataForSending()
+        {
+            if (data.identifier == null)
+                data.identifier = GenerateUniqueID();
+            return data;
+        }
     }
 }

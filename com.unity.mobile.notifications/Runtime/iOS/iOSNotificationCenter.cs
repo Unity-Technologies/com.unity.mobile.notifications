@@ -99,8 +99,7 @@ namespace Unity.Notifications.iOS
             if (!Initialize())
                 return;
 
-            notification.Verify();
-            iOSNotificationsWrapper.ScheduleLocalNotification(notification.data);
+            iOSNotificationsWrapper.ScheduleLocalNotification(notification.GetDataForSending());
         }
 
         /// <summary>
