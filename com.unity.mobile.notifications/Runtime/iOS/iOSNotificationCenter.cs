@@ -142,10 +142,7 @@ namespace Unity.Notifications.iOS
             if (data == null)
                 return null;
 
-            var notification = new iOSNotification(data.Value.identifier);
-            notification.data = data.Value;
-
-            return notification;
+            return new iOSNotification(data.Value);
         }
 
         /// <summary>
@@ -194,15 +191,13 @@ namespace Unity.Notifications.iOS
 
         internal static void OnReceivedRemoteNotification(iOSNotificationData data)
         {
-            var notification = new iOSNotification(data.identifier);
-            notification.data = data;
+            var notification = new iOSNotification(data);
             s_OnRemoteNotificationReceived(notification);
         }
 
         internal static void OnSentNotification(iOSNotificationData data)
         {
-            var notification = new iOSNotification(data.identifier);
-            notification.data = data;
+            var notification = new iOSNotification(data);
             s_OnNotificationReceived(notification);
         }
     }
