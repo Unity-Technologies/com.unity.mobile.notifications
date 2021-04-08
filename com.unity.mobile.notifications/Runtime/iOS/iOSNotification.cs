@@ -342,14 +342,6 @@ namespace Unity.Notifications.iOS
 
         internal iOSNotificationData data;
 
-        internal void Verify()
-        {
-            if (data.identifier == null)
-            {
-                data.identifier = GenerateUniqueID();
-            }
-        }
-
         internal iOSNotificationData GetDataForSending()
         {
             if (data.identifier == null)
