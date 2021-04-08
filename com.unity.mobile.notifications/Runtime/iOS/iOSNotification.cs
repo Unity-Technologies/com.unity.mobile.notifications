@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -42,10 +43,7 @@ namespace Unity.Notifications.iOS
         public string categoryIdentifier;
         public string threadIdentifier;
 
-        //Custom information
-        public string data;
-        public bool showInForeground;
-        public Int32 showInForegroundPresentationOptions;
+        public IntPtr userInfo;
 
         // Trigger
         public Int32 triggerType;
@@ -149,8 +147,8 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public bool ShowInForeground
         {
-            get { return data.showInForeground; }
-            set { data.showInForeground = value; }
+            get { return Boolean.Parse(userInfo["showInForeground"]); }
+            set { userInfo["showInForeground"] = value.ToString(); }
         }
 
 
@@ -161,9 +159,9 @@ namespace Unity.Notifications.iOS
         {
             get
             {
-                return (PresentationOption)data.showInForegroundPresentationOptions;
+                return (PresentationOption)Int32.Parse(userInfo["showInForegroundPresentationOptions"]);
             }
-            set { data.showInForegroundPresentationOptions = (int)value; }
+            set { userInfo["showInForegroundPresentationOptions"] = ((int)value).ToString(); }
         }
 
 
@@ -181,8 +179,13 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string Data
         {
-            get { return data.data; }
-            set { data.data = value; }
+            get { return userInfo["data"]; }
+            set { userInfo["data"] = value; }
+        }
+
+        public Dictionary<string, string> UserInfo
+        {
+            get { return userInfo; }
         }
 
         /// <summary>
@@ -308,11 +311,6 @@ namespace Unity.Notifications.iOS
             data.categoryIdentifier = "";
             data.threadIdentifier = "";
 
-            data.data = "";
-            data.showInForeground = false;
-            data.showInForegroundPresentationOptions = (int)(PresentationOption.Alert |
-                PresentationOption.Sound);
-
             data.triggerType = -1;
             data.repeats = false;
 
@@ -333,6 +331,12 @@ namespace Unity.Notifications.iOS
             data.locationTriggerRadius = 2f;
             data.locationTriggerNotifyOnEntry = true;
             data.locationTriggerNotifyOnExit = false;
+
+            data.userInfo = IntPtr.Zero;
+            userInfo = new Dictionary<string, string>();
+            Data = "";
+            ShowInForeground = false;
+            ForegroundPresentationOption = PresentationOption.Alert | PresentationOption.Sound;
         }
 
         internal iOSNotification(iOSNotificationData data)
@@ -340,7 +344,8 @@ namespace Unity.Notifications.iOS
             this.data = data;
         }
 
-        internal iOSNotificationData data;
+        iOSNotificationData data;
+        Dictionary<string, string> userInfo;
 
         internal iOSNotificationData GetDataForSending()
         {
