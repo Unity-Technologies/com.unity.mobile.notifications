@@ -46,7 +46,7 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->categoryIdentifier = NULL;
     notificationData->threadIdentifier = NULL;
     notificationData->triggerType = PUSH_TRIGGER;
-    notificationData->data = NULL;
+    notificationData->userInfo = NULL;
 }
 
 void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)

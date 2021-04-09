@@ -252,12 +252,10 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         return;
 
     assert(self.onNotificationReceivedCallback != NULL);
+    assert(data->userInfo != NULL);
 
-    NSDictionary* userInfo = @{
-        @"showInForeground": @(data->showInForeground),
-        @"showInForegroundPresentationOptions": [NSNumber numberWithInteger: data->showInForegroundPresentationOptions],
-        @"data": @(data->data ? data->data : ""),
-    };
+    NSDictionary* userInfo = (__bridge_transfer NSDictionary*)data->userInfo;
+    data->userInfo = NULL;
 
     // Convert from iOSNotificationData to UNMutableNotificationContent.
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
