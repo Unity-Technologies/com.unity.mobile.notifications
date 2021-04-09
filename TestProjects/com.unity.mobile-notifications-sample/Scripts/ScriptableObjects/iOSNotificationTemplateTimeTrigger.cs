@@ -36,6 +36,26 @@ namespace Unity.Notifications.Tests.Sample
         [Header("Time Trigger")]
         public Int32 TimeTriggerInterval;
         public bool Repeats = false;
+
+        [Serializable]
+        public struct UserDataItem
+        {
+            public string Key;
+            public string Value;
+        }
+        public UserDataItem[] UserInfo;
+
+        public Dictionary<string, string> UserInfoDict
+        {
+            get
+            {
+                var dict = new Dictionary<string, string>();
+                if (UserInfo != null)
+                    foreach (var item in UserInfo)
+                        dict.Add(item.Key, item.Value);
+                return dict;
+            }
+        }
 #endif
     }
 }
