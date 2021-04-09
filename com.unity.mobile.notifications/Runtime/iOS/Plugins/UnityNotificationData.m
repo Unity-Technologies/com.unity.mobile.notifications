@@ -51,18 +51,18 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
 
 void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
 {
-    NSObject* customizedData = [request.content.userInfo objectForKey: @"data"];
-    if (customizedData == nil)
-        return;
+    NSDictionary* userInfo = request.content.userInfo;
+    NSObject* customizedData = [userInfo objectForKey: @"data"];
 
     // For local notifications, the customzied data is always a string.
-    if (notificationData->triggerType == TIME_TRIGGER || notificationData->triggerType == CALENDAR_TRIGGER)
+    if (notificationData->triggerType == TIME_TRIGGER || notificationData->triggerType == CALENDAR_TRIGGER || customizedData == nil)
     {
-        notificationData->data = strdup([[customizedData description] UTF8String]);
+        notificationData->userInfo = (__bridge_retained void*)userInfo;
         return;
     }
 
     // For push notifications, we have to handle more cases.
+    NSString* strData;
     if ([NSJSONSerialization isValidJSONObject: customizedData])
     {
         NSError* error;
@@ -73,10 +73,7 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
             return;
         }
 
-        // Cannot promise NSData:bytes is a C style string.
-        notificationData->data = malloc(data.length + 1);
-        [data getBytes: notificationData->data length: data.length];
-        notificationData->data[data.length] = '\0';
+        strData = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
     }
     else
     {
@@ -84,13 +81,17 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
         if ([customizedData isKindOfClass: [NSNumber class]] && CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(customizedData)))
         {
             NSNumber* number = (NSNumber*)customizedData;
-            notificationData->data = strdup([number boolValue] ? "true" : "false");
+            strData = number.boolValue ? @"true" : @"false";
         }
         else
         {
-            notificationData->data = strdup([[customizedData description] UTF8String]);
+            strData = customizedData.description;
         }
     }
+
+    NSMutableDictionary* parsedUserInfo = [NSMutableDictionary dictionaryWithDictionary: userInfo];
+    [parsedUserInfo setValue: strData forKey: @"data"];
+    notificationData->userInfo = (__bridge_retained void*)parsedUserInfo;
 }
 
 iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationRequest* request)
@@ -186,8 +187,38 @@ void freeiOSNotificationData(iOSNotificationData* notificationData)
     if (notificationData->threadIdentifier != NULL)
         free(notificationData->threadIdentifier);
 
-    if (notificationData->data != NULL)
-        free(notificationData->data);
+    if (notificationData->userInfo != NULL)
+    {
+        NSDictionary* userInfo = (__bridge_transfer NSDictionary*)notificationData->userInfo;
+        userInfo = nil;
+    }
+}
+
+void* _AddItemToNSDictionary(void* dict, const char* key, const char* value)
+{
+    NSDictionary* dictionary;
+    if (dict != NULL)
+        dictionary = (__bridge NSDictionary*)dict;
+    else
+    {
+        dictionary = [[NSMutableDictionary alloc] init];
+        dict = (__bridge_retained void*)dictionary;
+    }
+
+    NSString* k = [NSString stringWithUTF8String: key];
+    NSString* v = value ? [NSString stringWithUTF8String: value] : @"";
+    [dictionary setValue: v forKey: k];
+    return dict;
+}
+
+void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit, const char*, const char*))
+{
+    NSDictionary* dict = (__bridge NSDictionary*)nsDict;
+    [dict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        NSString* k = key;
+        NSString* v = obj;
+        callback(csDict, k.UTF8String, v.UTF8String);
+    }];
 }
 
 #endif

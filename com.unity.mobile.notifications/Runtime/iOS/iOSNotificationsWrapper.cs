@@ -72,8 +72,15 @@ namespace Unity.Notifications.iOS
         [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationDataArray(IntPtr ptr, int count);
 
+        [DllImport("__Internal")]
+        internal static extern IntPtr _AddItemToNSDictionary(IntPtr dict, string key, string value);
+
+        [DllImport("__Internal")]
+        private static extern void _ReadNSDictionary(IntPtr handle, IntPtr nsDict, ReceiveNSDictionaryKeyValueCallback callback);
+
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(iOSNotificationData notificationData);
+        private delegate void ReceiveNSDictionaryKeyValueCallback(IntPtr dict, string key, string value);
 
 #if UNITY_IOS && !UNITY_EDITOR && DEVELOPMENT_BUILD
         static iOSNotificationsWrapper()
@@ -135,6 +142,16 @@ namespace Unity.Notifications.iOS
 #if UNITY_IOS && !UNITY_EDITOR
             iOSNotificationCenter.OnSentNotification(data);
 #endif
+        }
+
+        [MonoPInvokeCallback(typeof(ReceiveNSDictionaryKeyValueCallback))]
+        private static void ReceiveNSDictionaryKeyValue(IntPtr dict, string key, string value)
+        {
+            GCHandle handle = GCHandle.FromIntPtr(dict);
+            var dictionary = (Dictionary<string, string>)handle.Target;
+            if (dictionary == null)
+                return;
+            dictionary[key] = value;
         }
 
         public static void RequestAuthorization(IntPtr request, int options, bool registerRemote)
@@ -202,6 +219,34 @@ namespace Unity.Notifications.iOS
         }
 
 #endif
+
+        public static IntPtr CsDictionaryToObjC(Dictionary<string, string> userInfo)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            if (userInfo == null)
+                return IntPtr.Zero;
+
+            IntPtr dict = IntPtr.Zero;
+            foreach (var item in userInfo)
+                dict = _AddItemToNSDictionary(dict, item.Key, item.Value);
+            return dict;
+#else
+            return IntPtr.Zero;
+#endif
+        }
+
+        public static Dictionary<string, string> NSDictionaryToCs(IntPtr dict)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            var ret = new Dictionary<string, string>();
+            var handle = GCHandle.Alloc(ret);
+            _ReadNSDictionary(GCHandle.ToIntPtr(handle), dict, ReceiveNSDictionaryKeyValue);
+            handle.Free();
+            return ret;
+#else
+            return new Dictionary<string, string>();
+#endif
+        }
 
         public static void SetApplicationBadge(int badge)
         {

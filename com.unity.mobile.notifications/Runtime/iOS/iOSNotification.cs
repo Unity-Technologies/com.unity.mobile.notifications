@@ -342,6 +342,7 @@ namespace Unity.Notifications.iOS
         internal iOSNotification(iOSNotificationData data)
         {
             this.data = data;
+            userInfo = iOSNotificationsWrapper.NSDictionaryToCs(data.userInfo);
         }
 
         iOSNotificationData data;
@@ -351,6 +352,7 @@ namespace Unity.Notifications.iOS
         {
             if (data.identifier == null)
                 data.identifier = GenerateUniqueID();
+            data.userInfo = iOSNotificationsWrapper.CsDictionaryToObjC(userInfo);
             return data;
         }
     }
