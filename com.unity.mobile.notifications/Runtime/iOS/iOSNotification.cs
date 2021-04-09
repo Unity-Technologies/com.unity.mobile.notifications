@@ -147,8 +147,8 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public bool ShowInForeground
         {
-            get { return Boolean.Parse(userInfo["showInForeground"]); }
-            set { userInfo["showInForeground"] = value.ToString(); }
+            get { return userInfo["showInForeground"] == "YES"; }
+            set { userInfo["showInForeground"] = value ? "YES" : "NO"; }
         }
 
 
