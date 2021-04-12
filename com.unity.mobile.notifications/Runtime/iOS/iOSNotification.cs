@@ -183,6 +183,10 @@ namespace Unity.Notifications.iOS
             set { userInfo["data"] = value; }
         }
 
+        /// <summary>
+        /// Key-value collection sent or received with the notification.
+        /// Note, that some of the other notification properties are transfered using this collection, it is not recommended to modify existing items.
+        /// </summary>
         public Dictionary<string, string> UserInfo
         {
             get { return userInfo; }
