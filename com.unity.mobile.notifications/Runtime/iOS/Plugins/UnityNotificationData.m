@@ -216,8 +216,21 @@ void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit
     NSDictionary* dict = (__bridge NSDictionary*)nsDict;
     [dict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         NSString* k = key;
-        NSString* v = obj;
-        callback(csDict, k.UTF8String, v.UTF8String);
+        if ([obj isKindOfClass: [NSString class]])
+        {
+            NSString* v = obj;
+            callback(csDict, k.UTF8String, v.UTF8String);
+        }
+        else
+        {
+            NSError* error;
+            NSData* data = [NSJSONSerialization dataWithJSONObject: obj options: NSJSONWritingPrettyPrinted error: &error];
+            if (data)
+            {
+                NSString* v = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+                callback(csDict, k.UTF8String, v.UTF8String);
+            }
+        }
     }];
 }
 
