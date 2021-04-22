@@ -147,7 +147,13 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public bool ShowInForeground
         {
-            get { return userInfo["showInForeground"] == "YES"; }
+            get
+            {
+                string value;
+                if (userInfo.TryGetValue("showInForeground", out value))
+                    return value == "YES";
+                return false;
+            }
             set { userInfo["showInForeground"] = value ? "YES" : "NO"; }
         }
 
@@ -159,7 +165,17 @@ namespace Unity.Notifications.iOS
         {
             get
             {
-                return (PresentationOption)Int32.Parse(userInfo["showInForegroundPresentationOptions"]);
+                try
+                {
+                    string value;
+                    if (userInfo.TryGetValue("showInForegroundPresentationOptions", out value))
+                        return (PresentationOption)Int32.Parse(value);
+                    return default;
+                }
+                catch (Exception)
+                {
+                    return default;
+                }
             }
             set { userInfo["showInForegroundPresentationOptions"] = ((int)value).ToString(); }
         }
@@ -179,7 +195,12 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string Data
         {
-            get { return userInfo["data"]; }
+            get
+            {
+                string value;
+                userInfo.TryGetValue("data", out value);
+                return value;
+            }
             set { userInfo["data"] = value; }
         }
 
