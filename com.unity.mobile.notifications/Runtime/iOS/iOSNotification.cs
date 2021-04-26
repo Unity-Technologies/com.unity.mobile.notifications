@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -42,10 +43,7 @@ namespace Unity.Notifications.iOS
         public string categoryIdentifier;
         public string threadIdentifier;
 
-        //Custom information
-        public string data;
-        public bool showInForeground;
-        public Int32 showInForegroundPresentationOptions;
+        public IntPtr userInfo;
 
         // Trigger
         public Int32 triggerType;
@@ -149,8 +147,14 @@ namespace Unity.Notifications.iOS
         /// </remarks>
         public bool ShowInForeground
         {
-            get { return data.showInForeground; }
-            set { data.showInForeground = value; }
+            get
+            {
+                string value;
+                if (userInfo.TryGetValue("showInForeground", out value))
+                    return value == "YES";
+                return false;
+            }
+            set { userInfo["showInForeground"] = value ? "YES" : "NO"; }
         }
 
 
@@ -161,9 +165,19 @@ namespace Unity.Notifications.iOS
         {
             get
             {
-                return (PresentationOption)data.showInForegroundPresentationOptions;
+                try
+                {
+                    string value;
+                    if (userInfo.TryGetValue("showInForegroundPresentationOptions", out value))
+                        return (PresentationOption)Int32.Parse(value);
+                    return default;
+                }
+                catch (Exception)
+                {
+                    return default;
+                }
             }
-            set { data.showInForegroundPresentationOptions = (int)value; }
+            set { userInfo["showInForegroundPresentationOptions"] = ((int)value).ToString(); }
         }
 
 
@@ -181,8 +195,22 @@ namespace Unity.Notifications.iOS
         /// </summary>
         public string Data
         {
-            get { return data.data; }
-            set { data.data = value; }
+            get
+            {
+                string value;
+                userInfo.TryGetValue("data", out value);
+                return value;
+            }
+            set { userInfo["data"] = value; }
+        }
+
+        /// <summary>
+        /// Key-value collection sent or received with the notification.
+        /// Note, that some of the other notification properties are transfered using this collection, it is not recommended to modify existing items.
+        /// </summary>
+        public Dictionary<string, string> UserInfo
+        {
+            get { return userInfo; }
         }
 
         /// <summary>
@@ -308,11 +336,6 @@ namespace Unity.Notifications.iOS
             data.categoryIdentifier = "";
             data.threadIdentifier = "";
 
-            data.data = "";
-            data.showInForeground = false;
-            data.showInForegroundPresentationOptions = (int)(PresentationOption.Alert |
-                PresentationOption.Sound);
-
             data.triggerType = -1;
             data.repeats = false;
 
@@ -333,21 +356,29 @@ namespace Unity.Notifications.iOS
             data.locationTriggerRadius = 2f;
             data.locationTriggerNotifyOnEntry = true;
             data.locationTriggerNotifyOnExit = false;
+
+            data.userInfo = IntPtr.Zero;
+            userInfo = new Dictionary<string, string>();
+            Data = "";
+            ShowInForeground = false;
+            ForegroundPresentationOption = PresentationOption.Alert | PresentationOption.Sound;
         }
 
         internal iOSNotification(iOSNotificationData data)
         {
             this.data = data;
+            userInfo = iOSNotificationsWrapper.NSDictionaryToCs(data.userInfo);
         }
 
-        internal iOSNotificationData data;
+        iOSNotificationData data;
+        Dictionary<string, string> userInfo;
 
-        internal void Verify()
+        internal iOSNotificationData GetDataForSending()
         {
             if (data.identifier == null)
-            {
                 data.identifier = GenerateUniqueID();
-            }
+            data.userInfo = iOSNotificationsWrapper.CsDictionaryToObjC(userInfo);
+            return data;
         }
     }
 }

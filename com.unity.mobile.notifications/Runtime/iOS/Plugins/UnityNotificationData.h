@@ -26,10 +26,7 @@ typedef struct iOSNotificationData
     char* categoryIdentifier;
     char* threadIdentifier;
 
-    //Custom data
-    char* data;
-    int showInForeground;
-    int showInForegroundPresentationOptions;
+    void* userInfo;
 
     // Trigger
     int triggerType;  //0 - time, 1 - calendar, 2 - location, 3 - push.

@@ -46,6 +46,16 @@ namespace Unity.Notifications.Tests.Sample
                 .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received a notification")
                 .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
                 .Properties(notification, 1);
+
+            if (notification.UserInfo.Count > 3)
+            {
+                m_LOGGER.Orange("Received user info:");
+                foreach (var item in notification.UserInfo)
+                {
+                    m_LOGGER.Gray($"{item.Key}: {item.Value}");
+                }
+            }
+
             // Update badge
             iOSNotificationCenter.ApplicationBadge = iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
         }
@@ -172,26 +182,27 @@ namespace Unity.Notifications.Tests.Sample
                 if (template == null) continue;
                 m_groups["Schedule"][$"[{template.TimeTriggerInterval}s] {template.ButtonName}"] = new Action(() =>
                 {
-                    ScheduleNotification(
-                        new iOSNotification()
+                    var notification = new iOSNotification()
+                    {
+                        Identifier = template.Identifier == "" ? null : template.Identifier,
+                        CategoryIdentifier = template.CategoryIdentifier,
+                        ThreadIdentifier = template.ThreadIdentifier,
+                        Title = template.Title,
+                        Subtitle = template.Subtitle,
+                        Body = template.Body,
+                        ShowInForeground = template.ShowInForeground,
+                        ForegroundPresentationOption = template.PresentationOptions,
+                        Badge = template.Badge,
+                        Data = template.Data,
+                        Trigger = new iOSNotificationTimeIntervalTrigger()
                         {
-                            Identifier = template.Identifier == "" ? null : template.Identifier,
-                            CategoryIdentifier = template.CategoryIdentifier,
-                            ThreadIdentifier = template.ThreadIdentifier,
-                            Title = template.Title,
-                            Subtitle = template.Subtitle,
-                            Body = template.Body,
-                            ShowInForeground = template.ShowInForeground,
-                            ForegroundPresentationOption = template.PresentationOptions,
-                            Badge = template.Badge,
-                            Data = template.Data,
-                            Trigger = new iOSNotificationTimeIntervalTrigger()
-                            {
-                                TimeInterval = TimeSpan.FromSeconds(template.TimeTriggerInterval),
-                                Repeats = template.Repeats
-                            }
+                            TimeInterval = TimeSpan.FromSeconds(template.TimeTriggerInterval),
+                            Repeats = template.Repeats
                         }
-                    );
+                    };
+                    foreach (var item in template.UserInfo)
+                        notification.UserInfo[item.Key] = item.Value;
+                    ScheduleNotification(notification);
                 });
             }
             foreach (iOSNotificationTemplateCalendarTrigger template in Resources.LoadAll("iOSNotifications/CalendarTrigger", typeof(iOSNotificationTemplateCalendarTrigger)))
