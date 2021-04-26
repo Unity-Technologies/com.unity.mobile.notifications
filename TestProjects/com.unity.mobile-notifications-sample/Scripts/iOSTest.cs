@@ -72,12 +72,24 @@ namespace Unity.Notifications.Tests.Sample
 
         void Start()
         {
+            // in case a killed app was launched by clicking a notification
+            iOSNotification notification = iOSNotificationCenter.GetLastRespondedNotification();
             InstantiateAllTestButtons();
             ClearBadge();
             RemoveAllNotifications();
             m_LOGGER
                 .Clear()
                 .White("Welcome!");
+            if (notification != null)
+            {
+                m_LOGGER.Green("Application launched via notification");
+                if (notification.Data != "IGNORE")
+                {
+                    m_LOGGER
+                        .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
+                        .Properties(notification, 1);
+                }
+            }
         }
 
         void OnApplicationPause(bool isPaused)
