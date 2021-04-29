@@ -2,10 +2,19 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.4.0] - 2020-11-26
+## [1.4.0] - 2021-04-29
+
+### Changes & Improvements:
+- [iOS] Less memory allocations when scheduling and retrieving notifications.
+- [iOS] Exposed notification UserInfo in API.
+- [Samples] Various small improvements to test project.
 
 ### Fixes:
+- [Editor] Improve layout of elements in settings.
+- [Editor] Do not copy iOS header files when building for other platforms.
 - [iOS] Multiple authorization requests now can be performed simultaneously.
+- [iOS] [[1315365](https://issuetracker.unity3d.com/product/unity/issues/guid/1315365)] Fix TimeInterval getter.
+- [iOS] Identifier for location based notifications is no longer hardcoded, allows multiple triggers.
 
 ## [1.3.2] - 2020-11-10
 
