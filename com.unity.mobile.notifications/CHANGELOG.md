@@ -2,25 +2,34 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.4.0] - 2020-11-26
+## [1.4.0] - 2021-04-29
+
+### Changes & Improvements:
+- [iOS] Less memory allocations when scheduling and retrieving notifications.
+- [iOS] Exposed notification UserInfo in API.
+- [Samples] Various small improvements to the test project.
 
 ### Fixes:
-- [iOS] Multiple authorization requests now can be performed simultaneously.
+- [Editor] Improved layout of elements in settings.
+- [Editor] iOS header files are no longer copied when building for other platforms.
+- [iOS] Multiple authorization requests can now be performed simultaneously.
+- [iOS] [[1315365](https://issuetracker.unity3d.com/product/unity/issues/guid/1315365)] Fix TimeInterval getter.
+- [iOS] Identifier for location based notifications is no longer hardcoded and now allows multiple triggers.
 
 ## [1.3.2] - 2020-11-10
 
 ### Changes & Improvements:
 - [Editor] [[1195293](https://issuetracker.unity3d.com/product/unity/issues/guid/1195293)] Improved content scaling in the Mobile Notifications settings UI.
-- [Samples] Add IGameNotification.Data propery, so that notification data could be read in cross-platform fashion.
-- [Samples] Add IGameNotification.GetLastNotification method to retrieve the last opened notification.
-- [Samples] Add retrieval of notification enabled status on Android.
+- [Samples] Added IGameNotification.Data propery, so that notification data could be read in cross-platform fashion.
+- [Samples] Added IGameNotification.GetLastNotification method to retrieve the last opened notification.
+- [Samples] Added retrieval of notification enabled status on Android.
 
 ### Fixes:
 - [Samples] [[1258554](https://issuetracker.unity3d.com/product/unity/issues/guid/1258554)] Fixed errors and warnings on startup in the demo scene.
 - [iOS] [[1259811](https://issuetracker.unity3d.com/product/unity/issues/guid/1259811)] Fixed UNITY_USES_REMOTE_NOTIFICATIONS being falsely set to 1 when Mobile Notifications isn't used.
 - [Android] [[1271866](https://issuetracker.unity3d.com/product/unity/issues/guid/1271866)] Fixed AndroidReceivedNotificationMainThreadDispatcher allocating a new list on every frame.
 - [Editor] [[1254618](https://issuetracker.unity3d.com/product/unity/issues/guid/1254618)] Fixed "SerializedObject target has been destroyed" errors when navigating Mobile Notifications settings.
-- [Android] [[1172850](https://issuetracker.unity3d.com/product/unity/issues/guid/1172850)] Fix Android crash when many notifications are scheduled at once.
+- [Android] [[1172850](https://issuetracker.unity3d.com/product/unity/issues/guid/1172850)] Fixed Android crashing when many notifications are scheduled at once.
 
 ## [1.3.0] - 2020-06-02
 
@@ -32,7 +41,7 @@ All notable changes to this package will be documented in this file.
 ### Fixes:
 - [Android] Supressed the deprecated warnings from Android plugin as some deprecated functions have to be called for Android 7 and below.
 - [Android] Fixed the AndroidJavaException when calling AndroidNotificationCenter.UpdateScheduledNotification().
-- [Android] Fixed the issue that AndroidNotification.Color doesn't work as expected.
+- [Android] Fixed the issue where AndroidNotification.Color doesn't work as expected.
 - [iOS] [[1244642](https://issuetracker.unity3d.com/product/unity/issues/guid/1244642)] Fixed the bug that users can't set the foreground presentation options to "Nothing" in the Notification Settings.
 - [Editor] [[1199310](https://issuetracker.unity3d.com/product/unity/issues/guid/1199310)] Fixed the issue that Mobile Notification icons are gray when project was built from batch mode with -nographics flag.
 
