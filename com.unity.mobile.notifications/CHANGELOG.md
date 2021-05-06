@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.1] - 2021-05-06
+
+### Fixes:
+- Disable warnings and remove leftover .meta file from samples.
+
 ## [1.4.0] - 2021-04-29
 
 ### Changes & Improvements:
