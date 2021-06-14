@@ -106,7 +106,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
         var rootDict = plist.root;
         var needsToWriteChanges = false;
-        
+
         // Add all the settings to the plist.
         foreach (var setting in settings)
         {
@@ -115,12 +115,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 needsToWriteChanges = true;
                 if (setting.Value.GetType() == typeof(bool))
                 {
-                    rootDict.SetBoolean(setting.Key, (bool) setting.Value);
+                    rootDict.SetBoolean(setting.Key, (bool)setting.Value);
                 }
                 else if (setting.Value.GetType() == typeof(PresentationOption) ||
                          setting.Value.GetType() == typeof(AuthorizationOption))
                 {
-                    rootDict.SetInteger(setting.Key, (int) setting.Value);
+                    rootDict.SetInteger(setting.Key, (int)setting.Value);
                 }
             }
         }
