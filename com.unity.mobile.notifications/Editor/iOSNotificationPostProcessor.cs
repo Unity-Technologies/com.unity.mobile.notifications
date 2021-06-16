@@ -55,6 +55,8 @@ public class iOSNotificationPostProcessor : MonoBehaviour
     {
         var pbxProjectPath = PBXProject.GetPBXProjectPath(path);
 
+        var needsToWriteChanges = false;
+
         var pbxProject = new PBXProject();
         pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
 
@@ -76,11 +78,19 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         }
 
         // Add necessary frameworks.
-        pbxProject.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
-        if (needLocationFramework)
+        if (!pbxProject.ContainsFramework(unityFrameworkTarget, "UserNotifications.framework"))
+        {
+            pbxProject.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
+            needsToWriteChanges = true;
+        }
+        if (needLocationFramework && !pbxProject.ContainsFramework(unityFrameworkTarget, "CoreLocation.framework"))
+        {
             pbxProject.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
+            needsToWriteChanges = true;
+        }
 
-        File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
+        if (needsToWriteChanges)
+            File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
 
         // Update the entitlements file.
         if (addPushNotificationCapability)
@@ -140,7 +150,6 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             }
         }
 
-        // only write if there have been changes to prevent unnecessary compilation
         if (needsToWriteChanges)
             File.WriteAllText(plistPath, plist.WriteToString());
     }
@@ -178,7 +187,6 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             needsToWriteChanges = true;
         }
 
-        // only write if there have been changes to prevent unnecessary compilation
         if (needsToWriteChanges)
             File.WriteAllText(preprocessorPath, preprocessor);
     }
