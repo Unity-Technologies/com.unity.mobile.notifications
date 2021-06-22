@@ -250,9 +250,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 UnityNotificationManager.saveNotificationIntent(mContext, data_intent);
             }
 
-            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent notificationIntent = new Intent(mContext, UnityNotificationManager.class);
+            Notification notification = buildNotification(mContext, intent).build();
+            notification.extras.putInt("id", id);
             long repeatInterval = data_intent.getLongExtra("repeatInterval", 0L);
             long fireTime = data_intent.getLongExtra("fireTime", 0L);
+            notification.extras.putLong("repeatInterval", repeatInterval);
+            notification.extras.putLong("fireTime", fireTime);
+            notification.extras.putParcelable("unityNotificationIntent", data_intent);
+            notificationIntent.putExtra("unityNotification", notification);
+            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
         }
     }
@@ -484,7 +491,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            if (!intent.hasExtra("channelID") || !intent.hasExtra("smallIconStr"))
+            if (!intent.hasExtra("unityNotification"))
                 return;
 
             UnityNotificationManager.sendNotification(context, intent);
@@ -495,10 +502,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Send a notification.
     protected static void sendNotification(Context context, Intent intent) {
-        Notification.Builder notificationBuilder = UnityNotificationManager.buildNotification(context, intent);
-        int id = intent.getIntExtra("id", -1);
+        Notification notification = intent.getParcelableExtra("unityNotification");
+        int id = notification.extras.getInt("id", -1);
 
-        UnityNotificationManager.notify(context, id, notificationBuilder.build(), intent);
+        UnityNotificationManager.notify(context, id, notification);
     }
 
     // Create a Notification.Builder from the intent.
@@ -627,16 +634,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Call the system notification service to notify the notification.
-    protected static void notify(Context context, int id, Notification notification, Intent intent) {
+    protected static void notify(Context context, int id, Notification notification) {
         getNotificationManager(context).notify(id, notification);
 
         try {
-            mNotificationCallback.onSentNotification(intent);
+            Intent notificationIntent = notification.extras.getParcelable("unityNotificationIntent");
+            mNotificationCallback.onSentNotification(notificationIntent);
         } catch (RuntimeException ex) {
             Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when the app is not running!");
         }
 
-        boolean isRepeatable = intent.getLongExtra("repeatInterval", 0L) > 0;
+        boolean isRepeatable = notification.extras.getLong("repeatInterval", 0L) > 0;
 
         if (!isRepeatable)
             UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
