@@ -251,7 +251,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
 
             PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, intent, broadcast);
+            long repeatInterval = data_intent.getLongExtra("repeatInterval", 0L);
+            long fireTime = data_intent.getLongExtra("fireTime", 0L);
+            UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
         }
     }
 
@@ -359,10 +361,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Call AlarmManager to set the broadcast intent with fire time and interval.
-    protected static void scheduleNotificationIntentAlarm(Context context, Intent intent, PendingIntent broadcast) {
-        long repeatInterval = intent.getLongExtra("repeatInterval", 0L);
-        long fireTime = intent.getLongExtra("fireTime", 0L);
-
+    protected static void scheduleNotificationIntentAlarm(Context context, long repeatInterval, long fireTime, PendingIntent broadcast) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         if (repeatInterval <= 0) {
