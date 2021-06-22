@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -41,9 +42,14 @@ namespace Unity.Notifications.Android
             }
 
             foreach (var notification in s_ReceivedNotificationList)
-            {
-                AndroidNotificationCenter.ReceivedNotificationCallback(notification);
-            }
+                try
+                {
+                    AndroidNotificationCenter.ReceivedNotificationCallback(notification);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
 
             s_ReceivedNotificationList.Clear();
         }
