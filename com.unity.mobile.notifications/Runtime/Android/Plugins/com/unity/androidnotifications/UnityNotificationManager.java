@@ -638,8 +638,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         getNotificationManager(context).notify(id, notification);
 
         try {
-            Intent notificationIntent = notification.extras.getParcelable("unityNotificationIntent");
-            mNotificationCallback.onSentNotification(notificationIntent);
+            mNotificationCallback.onSentNotification(notification);
         } catch (RuntimeException ex) {
             Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when the app is not running!");
         }
@@ -648,5 +647,22 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (!isRepeatable)
             UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
+    }
+
+    public static Integer getNotificationColor(Notification notification) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            return null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!notification.extras.containsKey(Notification.EXTRA_COLORIZED))
+                return null;
+        }
+
+        return notification.color;
+    }
+
+    public static int getNotificationGroupAlertBehavior(Notification notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            return notification.getGroupAlertBehavior();
+        return 0;
     }
 }
