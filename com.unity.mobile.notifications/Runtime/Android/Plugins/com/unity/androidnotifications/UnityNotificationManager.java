@@ -234,49 +234,45 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
-    public void scheduleNotificationIntent(Intent data_intent_source) {
-        // TODO: why we serialize/deserialize again?
-        String temp = UnityNotificationUtilities.serializeNotificationIntent(data_intent_source);
-        Intent data_intent = UnityNotificationUtilities.deserializeNotificationIntent(mContext, temp);
+    public void scheduleNotificationIntent(Notification.Builder notificationBuilder, int id, long repeatInterval, long fireTime) {
+        Bundle extras = notificationBuilder.getExtras();
+        extras.putInt("id", id);
+        extras.putLong("repeatInterval", repeatInterval);
+        extras.putLong("fireTime", fireTime);
+        Notification notification = notificationBuilder.build();
 
-        int id = data_intent.getIntExtra("id", 0);
-
-        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(data_intent, mContext, mOpenActivity);
+        Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(mContext, mOpenActivity);
+        openAppIntent.putExtra("unityNotification", notification);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
-        Intent intent = buildNotificationIntent(mContext, data_intent, pendingIntent);
+        Intent intent = buildNotificationIntent(mContext, id);
 
         if (intent != null) {
             if (this.mRescheduleOnRestart) {
-                UnityNotificationManager.saveNotificationIntent(mContext, data_intent);
+                intent.putExtra("unityNotification", notification);
+                UnityNotificationManager.saveNotificationIntent(mContext, intent);
             }
 
-            Intent notificationIntent = new Intent(mContext, UnityNotificationManager.class);
-            Notification notification = buildNotification(mContext, intent).build();
-            notification.extras.putInt("id", id);
-            long repeatInterval = data_intent.getLongExtra("repeatInterval", 0L);
-            long fireTime = data_intent.getLongExtra("fireTime", 0L);
-            notification.extras.putLong("repeatInterval", repeatInterval);
-            notification.extras.putLong("fireTime", fireTime);
-            notification.extras.putParcelable("unityNotificationIntent", data_intent);
-            notificationIntent.putExtra("unityNotification", notification);
-            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            // content intent can't and shouldn't be saved, set it now and rebuild
+            notificationBuilder.setContentIntent(pendingIntent);
+            notification = notificationBuilder.build();
+            intent.putExtra("unityNotification", notification);
+
+            PendingIntent broadcast = PendingIntent.getBroadcast(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
         }
     }
 
     // Build an Intent to open the given activity with the data from input Intent.
-    protected static Intent buildOpenAppIntent(Intent data_intent, Context context, Class className) {
+    protected static Intent buildOpenAppIntent(Context context, Class className) {
         Intent openAppIntent = new Intent(context, className);
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        openAppIntent.putExtras(data_intent);
 
         return openAppIntent;
     }
 
     // Build a notification Intent to store the PendingIntent.
-    protected static Intent buildNotificationIntent(Context context, Intent intent, PendingIntent pendingIntent) {
-        Intent data_intent = (Intent) intent.clone();
-        data_intent.putExtra("tapIntent", pendingIntent);
+    protected static Intent buildNotificationIntent(Context context, int notificationId) {
+        Intent intent = new Intent(context, UnityNotificationManager.class);
 
         SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = new HashSet<String>(prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
@@ -297,18 +293,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
             // Attempting to schedule more than that might cause the app to crash.
             Log.w("UnityNotifications", "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
                     " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.");
-            data_intent = null;
+            intent = null;
         } else {
-            int id = data_intent.getIntExtra("id", 0);
-            validNotificationIds.add(Integer.toString(id));
-            data_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            validNotificationIds.add(Integer.toString(notificationId));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
 
         SharedPreferences.Editor editor = prefs.edit().clear();
         editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, validNotificationIds);
         editor.apply();
 
-        return data_intent;
+        return intent;
     }
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
@@ -664,5 +659,112 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             return notification.getGroupAlertBehavior();
         return 0;
+    }
+
+    @SuppressWarnings("deprecation")
+    public Notification.Builder createNotificationBuilder(String channelID) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Notification.Builder notificationBuilder = new Notification.Builder(mContext);
+
+            // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
+            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(mContext, channelID);
+
+            if (fakeNotificationChannel.vibrationPattern != null && fakeNotificationChannel.vibrationPattern.length > 0) {
+                notificationBuilder.setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND);
+                notificationBuilder.setVibrate(fakeNotificationChannel.vibrationPattern);
+            } else {
+                notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                notificationBuilder.setVisibility((int) fakeNotificationChannel.lockscreenVisibility);
+            }
+
+            // Need to convert Oreo channel importance to pre-Oreo priority.
+            int priority;
+            switch (fakeNotificationChannel.importance) {
+                case NotificationManager.IMPORTANCE_HIGH:
+                    priority = Notification.PRIORITY_MAX;
+                    break;
+                case NotificationManager.IMPORTANCE_DEFAULT:
+                    priority = Notification.PRIORITY_DEFAULT;
+                    break;
+                case NotificationManager.IMPORTANCE_LOW:
+                    priority = Notification.PRIORITY_LOW;
+                    break;
+                case NotificationManager.IMPORTANCE_NONE:
+                    priority = Notification.PRIORITY_MIN;
+                    break;
+                default:
+                    priority = Notification.PRIORITY_DEFAULT;
+            }
+            notificationBuilder.setPriority(priority);
+
+            return notificationBuilder;
+        } else {
+            return new Notification.Builder(mContext, channelID);
+        }
+    }
+
+    public void setNotificationSmallIcon(Notification.Builder notificationBuilder, String icon) {
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
+        if (iconId == 0) {
+            iconId = mContext.getApplicationInfo().icon;
+        }
+        notificationBuilder.setSmallIcon(iconId);
+    }
+
+    public void setNotificationLargeIcon(Notification.Builder notificationBuilder, String icon) {
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
+        if (iconId != 0) {
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), iconId));
+        }
+    }
+
+    public static void setNotificationColor(Notification.Builder notificationBuilder, int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (color != 0) {
+                notificationBuilder.setColor(color);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    notificationBuilder.setColorized(true);
+                }
+            }
+        }
+    }
+
+    public static void setNotificationGroup(Notification.Builder notificationBuilder, String group) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (group != null && group.length() > 0) {
+                notificationBuilder.setGroup(group);
+            }
+        }
+    }
+
+    public static void setNotificationGroupSummary(Notification.Builder notificationBuilder, boolean groupSummary) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH)
+            notificationBuilder.setGroupSummary(groupSummary);
+    }
+
+    public static void setNotificationSortKey(Notification.Builder notificationBuilder, String sortKey) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (sortKey != null && sortKey.length() > 0) {
+                notificationBuilder.setSortKey(sortKey);
+            }
+        }
+    }
+
+    public static void setNotificationShowTimestamp(Notification.Builder notificationBuilder, boolean show) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+            notificationBuilder.setShowWhen(show);
+    }
+
+    public static void setNotificationUsesChronometer(Notification.Builder notificationBuilder, boolean usesChrono) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
+            notificationBuilder.setUsesChronometer(usesChrono);
+    }
+
+    public static void setNotificationGroupAlertBehavior(Notification.Builder notificationBuilder, int behavior) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            notificationBuilder.setGroupAlertBehavior(behavior);
     }
 }

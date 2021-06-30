@@ -325,7 +325,10 @@ namespace Unity.Notifications.Android
                 return null;
 
             var intent = s_CurrentActivity.Call<AndroidJavaObject>("getIntent");
-            return ParseNotificationIntentData(intent);
+            var notification = intent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
+            if (notification == null)
+                return null;
+            return GetNotificationData(notification);
         }
 
         internal static void SendNotification(int id, AndroidNotification notification, string channelId)
@@ -336,32 +339,39 @@ namespace Unity.Notifications.Android
                 Debug.LogError("Failed to schedule notification, it did not contain a valid FireTime");
             }
 
-            var notificationIntent = new AndroidJavaObject("android.content.Intent", s_NotificationManagerContext, s_NotificationManagerClass);
-
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "id", id);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", channelId);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", notification.Title);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", notification.Text);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", notification.SmallIcon);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", notification.ShouldAutoCancel);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", notification.UsesStopwatch);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", fireTime);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", notification.RepeatInterval.ToLong());
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIconStr", notification.LargeIcon);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "style", (int)notification.Style);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "color", notification.Color.ToInt());
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "number", notification.Number);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "data", notification.IntentData);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "group", notification.Group);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", notification.GroupSummary);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.SortKey);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", (int)notification.GroupAlertBehaviour);
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.ShowTimestamp);
-
+            var notificationBuilder = s_NotificationManager.Call<AndroidJavaObject>("createNotificationBuilder", channelId);
+            s_NotificationManager.Call("setNotificationSmallIcon", notificationBuilder, notification.SmallIcon);
+            if (!string.IsNullOrEmpty(notification.LargeIcon))
+                s_NotificationManager.Call("setNotificationLargeIcon", notificationBuilder, notification.LargeIcon);
+            notificationBuilder.Call<AndroidJavaObject>("setContentTitle", notification.Title);
+            notificationBuilder.Call<AndroidJavaObject>("setContentText", notification.Text);
+            notificationBuilder.Call<AndroidJavaObject>("setAutoCancel", notification.ShouldAutoCancel);
+            if (notification.Number >= 0)
+                notificationBuilder.Call<AndroidJavaObject>("setNumber", notification.Number);
+            if (notification.Style == NotificationStyle.BigTextStyle)
+            {
+                using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
+                {
+                    style.Call<AndroidJavaObject>("bigText", notification.Text);
+                    notificationBuilder.Call<AndroidJavaObject>("setStyle", style);
+                }
+            }
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
-            notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);
+            notificationBuilder.Call<AndroidJavaObject>("setWhen", timestampValue);
+            if (!string.IsNullOrEmpty(notification.Group))
+                s_NotificationManagerClass.CallStatic("setNotificationGroup", notificationBuilder, notification.Group);
+            if (notification.GroupSummary)
+                s_NotificationManagerClass.CallStatic("setNotificationGroupSummary", notificationBuilder, notification.GroupSummary);
+            if (!string.IsNullOrEmpty(notification.SortKey))
+                s_NotificationManagerClass.CallStatic("setNotificationSortKey", notificationBuilder, notification.SortKey);
+            s_NotificationManagerClass.CallStatic("setNotificationShowTimestamp", notificationBuilder, notification.ShowTimestamp);
+            int color = notification.Color.ToInt();
+            if (color != 0)
+                s_NotificationManagerClass.CallStatic("setNotificationColor", notificationBuilder, color);
+            s_NotificationManagerClass.CallStatic("setNotificationUsesChronometer", notificationBuilder, notification.UsesStopwatch);
+            s_NotificationManagerClass.CallStatic("setNotificationGroupAlertBehavior", notificationBuilder, (int)notification.GroupAlertBehaviour);
 
-            s_NotificationManager.Call("scheduleNotificationIntent", notificationIntent);
+            s_NotificationManager.Call("scheduleNotificationIntent", notificationBuilder, id, notification.RepeatInterval.ToLong(), fireTime);
         }
 
         internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
