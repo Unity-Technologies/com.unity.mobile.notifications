@@ -22,6 +22,7 @@ import android.util.Log;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -244,6 +245,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(mContext, mOpenActivity);
         openAppIntent.putExtra("unityNotification", notification);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, 0);
+
+        // if less than a second in the future, notify right away
+        if (fireTime - Calendar.getInstance().getTime().getTime() < 1000) {
+            notificationBuilder.setContentIntent(pendingIntent);
+            notification = notificationBuilder.build();
+            notify(mContext, id, notification);
+            return;
+        }
+
         Intent intent = buildNotificationIntent(mContext, id);
 
         if (intent != null) {
