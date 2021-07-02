@@ -374,33 +374,6 @@ namespace Unity.Notifications.Android
             s_NotificationManager.Call("scheduleNotificationIntent", notificationBuilder, id, notification.RepeatInterval.ToLong(), fireTime);
         }
 
-        internal static AndroidNotificationIntentData ParseNotificationIntentData(AndroidJavaObject notificationIntent)
-        {
-            var id = notificationIntent.Call<int>("getIntExtra", "id", -1);
-            if (id == -1)
-                return null;
-
-            var channelId = notificationIntent.Call<string>("getStringExtra", "channelID");
-
-            var notification = new AndroidNotification();
-            notification.Title = notificationIntent.Call<string>("getStringExtra", "textTitle");
-            notification.Text = notificationIntent.Call<string>("getStringExtra", "textContent");
-            notification.ShouldAutoCancel = notificationIntent.Call<bool>("getBooleanExtra", "autoCancel", false);
-            notification.UsesStopwatch = notificationIntent.Call<bool>("getBooleanExtra", "usesChronometer", false);
-            notification.FireTime = notificationIntent.Call<long>("getLongExtra", "fireTime", -1L).ToDatetime();
-            notification.RepeatInterval = notificationIntent.Call<long>("getLongExtra", "repeatInterval", -1L).ToTimeSpan();
-            notification.Style = notificationIntent.Call<int>("getIntExtra", "style", 0).ToNotificationStyle();
-            notification.Color = notificationIntent.Call<int>("getIntExtra", "color", 0).ToColor();
-            notification.Number = notificationIntent.Call<int>("getIntExtra", "number", -1);
-            notification.IntentData = notificationIntent.Call<string>("getStringExtra", "data");
-            notification.Group = notificationIntent.Call<string>("getStringExtra", "group");
-            notification.GroupSummary = notificationIntent.Call<bool>("getBooleanExtra", "groupSummary", false);
-            notification.SortKey = notificationIntent.Call<string>("getStringExtra", "sortKey");
-            notification.GroupAlertBehaviour = notificationIntent.Call<int>("getIntExtra", "groupAlertBehaviour", 0).ToGroupAlertBehaviours();
-
-            return new AndroidNotificationIntentData(id, channelId, notification);
-        }
-
         internal static AndroidNotificationIntentData GetNotificationData(AndroidJavaObject notificationObj)
         {
             var extras = notificationObj.Get<AndroidJavaObject>("extras");
