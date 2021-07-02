@@ -15,11 +15,11 @@ namespace Unity.Notifications.Android
 
         private static readonly List<AndroidJavaObject> s_ReceivedNotificationList = new List<AndroidJavaObject>();
 
-        internal static void EnqueueReceivedNotification(AndroidJavaObject intent)
+        internal static void EnqueueReceivedNotification(AndroidJavaObject notification)
         {
             lock (s_ReceivedNotificationQueue)
             {
-                s_ReceivedNotificationQueue.Enqueue(intent);
+                s_ReceivedNotificationQueue.Enqueue(notification);
             }
         }
 
