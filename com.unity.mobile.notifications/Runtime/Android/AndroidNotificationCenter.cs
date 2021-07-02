@@ -371,7 +371,12 @@ namespace Unity.Notifications.Android
             s_NotificationManagerClass.CallStatic("setNotificationUsesChronometer", notificationBuilder, notification.UsesStopwatch);
             s_NotificationManagerClass.CallStatic("setNotificationGroupAlertBehavior", notificationBuilder, (int)notification.GroupAlertBehaviour);
 
-            s_NotificationManager.Call("scheduleNotificationIntent", notificationBuilder, id, notification.RepeatInterval.ToLong(), fireTime);
+            var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras");
+            extras.Call("putInt", "id", id);
+            extras.Call("putLong", "repeatInterval", notification.RepeatInterval.ToLong());
+            extras.Call("putLong", "fireTime", fireTime);
+
+            s_NotificationManager.Call("scheduleNotification", notificationBuilder);
         }
 
         internal static AndroidNotificationIntentData GetNotificationData(AndroidJavaObject notificationObj)

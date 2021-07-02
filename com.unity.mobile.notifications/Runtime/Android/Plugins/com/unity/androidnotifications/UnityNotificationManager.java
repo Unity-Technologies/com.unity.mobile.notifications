@@ -235,11 +235,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
-    public void scheduleNotificationIntent(Notification.Builder notificationBuilder, int id, long repeatInterval, long fireTime) {
+    public void scheduleNotification(Notification.Builder notificationBuilder) {
         Bundle extras = notificationBuilder.getExtras();
-        extras.putInt("id", id);
-        extras.putLong("repeatInterval", repeatInterval);
-        extras.putLong("fireTime", fireTime);
+        int id = extras.getInt("id", -1);
+        long repeatInterval = extras.getLong("repeatInterval", -1);
+        long fireTime = extras.getLong("fireTime", -1);
         Notification notification = notificationBuilder.build();
 
         Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(mContext, mOpenActivity);
