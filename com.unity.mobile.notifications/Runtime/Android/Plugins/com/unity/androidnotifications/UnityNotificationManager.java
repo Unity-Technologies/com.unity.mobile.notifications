@@ -249,6 +249,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         // if less than a second in the future, notify right away
         if (fireTime - Calendar.getInstance().getTime().getTime() < 1000) {
             notificationBuilder.setContentIntent(pendingIntent);
+            finalizeNotificationForDisplay(mContext, notificationBuilder);
             notification = notificationBuilder.build();
             notify(mContext, id, notification);
             return;
@@ -264,6 +265,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             // content intent can't and shouldn't be saved, set it now and rebuild
             notificationBuilder.setContentIntent(pendingIntent);
+            finalizeNotificationForDisplay(mContext, notificationBuilder);
             notification = notificationBuilder.build();
             intent.putExtra("unityNotification", notification);
 
@@ -546,6 +548,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return 0;
     }
 
+    public static void finalizeNotificationForDisplay(Context context, Notification.Builder notificationBuilder) {
+        String icon = notificationBuilder.getExtras().getString("largeIcon");
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
+        if (iconId != 0) {
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), iconId));
+        }
+    }
+
     @SuppressWarnings("deprecation")
     public Notification.Builder createNotificationBuilder(String channelID) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -599,11 +609,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         notificationBuilder.setSmallIcon(iconId);
     }
 
-    public void setNotificationLargeIcon(Notification.Builder notificationBuilder, String icon) {
-        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
-        if (iconId != 0) {
-            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), iconId));
-        }
+    public static void setNotificationLargeIcon(Notification.Builder notificationBuilder, String icon) {
+        if (icon == null || icon.length() == 0 && notificationBuilder.getExtras().getString("largeIcon") != null)
+            notificationBuilder.getExtras().remove("largeIcon");
+        else
+            notificationBuilder.getExtras().putString("largeIcon", icon);
     }
 
     public static void setNotificationColor(Notification.Builder notificationBuilder, int color) {

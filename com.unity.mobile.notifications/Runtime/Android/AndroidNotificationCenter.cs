@@ -342,7 +342,7 @@ namespace Unity.Notifications.Android
             var notificationBuilder = s_NotificationManager.Call<AndroidJavaObject>("createNotificationBuilder", channelId);
             s_NotificationManager.Call("setNotificationSmallIcon", notificationBuilder, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
-                s_NotificationManager.Call("setNotificationLargeIcon", notificationBuilder, notification.LargeIcon);
+                s_NotificationManagerClass.CallStatic("setNotificationLargeIcon", notificationBuilder, notification.LargeIcon);
             notificationBuilder.Call<AndroidJavaObject>("setContentTitle", notification.Title);
             notificationBuilder.Call<AndroidJavaObject>("setContentText", notification.Text);
             notificationBuilder.Call<AndroidJavaObject>("setAutoCancel", notification.ShouldAutoCancel);

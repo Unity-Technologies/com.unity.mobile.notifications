@@ -37,6 +37,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                     Intent intent = UnityNotificationManager.buildNotificationIntent(context, id);
                     Notification.Builder notificationBuilder = Notification.Builder.recoverBuilder(context, notification);
                     notificationBuilder.setContentIntent(pendingIntent);
+                    UnityNotificationManager.finalizeNotificationForDisplay(context, notificationBuilder);
                     notification = notificationBuilder.build();
                     intent.putExtra("unityNotification", notification);
 
