@@ -223,6 +223,10 @@ namespace Unity.Notifications.Android
                     SendNotification(builder);
         }
 
+        /// <summary>
+        /// Schedule a notification created using the provided Notification.Builder object.
+        /// Notification builder should be created by calling CreateNotificationBuilder.
+        /// </summary>
         public static void SendNotification(AndroidJavaObject notificationBuilder)
         {
             if (Initialize())
@@ -340,13 +344,25 @@ namespace Unity.Notifications.Android
             return GetNotificationData(notification);
         }
 
-        internal static AndroidJavaObject CreateNotificationBuilder(AndroidNotification notification, string channelId)
+        /// <summary>
+        /// Create Notification.Builder.
+        /// Will automatically generate the ID for notification.
+        /// <see cref="CreateNotificationBuilder(int, AndroidNotification, string)"/>
+        /// </summary>
+        public static AndroidJavaObject CreateNotificationBuilder(AndroidNotification notification, string channelId)
         {
             int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
             return CreateNotificationBuilder(id, notification, channelId);
         }
 
-        internal static AndroidJavaObject CreateNotificationBuilder(int id, AndroidNotification notification, string channelId)
+        /// <summary>
+        /// Create Notification.Builder object on Java side using privided AndroidNotification.
+        /// </summary>
+        /// <param name="id">ID for the notification</param>
+        /// <param name="notification">Struct with notification data</param>
+        /// <param name="channelId">Channel id</param>
+        /// <returns>A proxy object for created Notification.Builder</returns>
+        public static AndroidJavaObject CreateNotificationBuilder(int id, AndroidNotification notification, string channelId)
         {
             long fireTime = notification.FireTime.ToLong();
             if (fireTime < 0L)
