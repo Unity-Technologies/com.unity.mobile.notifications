@@ -206,7 +206,8 @@ namespace Unity.Notifications.Android
                 return -1;
 
             int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
-            SendNotification(id, notification, channelId);
+            using (var builder = CreateNotificationBuilder(id, notification, channelId))
+                SendNotification(builder);
 
             return id;
         }
@@ -218,7 +219,14 @@ namespace Unity.Notifications.Android
         public static void SendNotificationWithExplicitID(AndroidNotification notification, string channelId, int id)
         {
             if (Initialize())
-                SendNotification(id, notification, channelId);
+                using (var builder = CreateNotificationBuilder(id, notification, channelId))
+                    SendNotification(builder);
+        }
+
+        public static void SendNotification(AndroidJavaObject notificationBuilder)
+        {
+            if (Initialize())
+                s_NotificationManager.Call("scheduleNotification", notificationBuilder);
         }
 
         /// <summary>
@@ -231,7 +239,8 @@ namespace Unity.Notifications.Android
                 return;
 
             if (s_NotificationManager.Call<bool>("checkIfPendingNotificationIsRegistered", id))
-                SendNotification(id, notification, channelId);
+                using (var builder = CreateNotificationBuilder(id, notification, channelId))
+                    SendNotification(builder);
         }
 
         /// <summary>
@@ -331,7 +340,13 @@ namespace Unity.Notifications.Android
             return GetNotificationData(notification);
         }
 
-        internal static void SendNotification(int id, AndroidNotification notification, string channelId)
+        internal static AndroidJavaObject CreateNotificationBuilder(AndroidNotification notification, string channelId)
+        {
+            int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
+            return CreateNotificationBuilder(id, notification, channelId);
+        }
+
+        internal static AndroidJavaObject CreateNotificationBuilder(int id, AndroidNotification notification, string channelId)
         {
             long fireTime = notification.FireTime.ToLong();
             if (fireTime < 0L)
@@ -376,7 +391,7 @@ namespace Unity.Notifications.Android
             extras.Call("putLong", "repeatInterval", notification.RepeatInterval.ToLong());
             extras.Call("putLong", "fireTime", fireTime);
 
-            s_NotificationManager.Call("scheduleNotification", notificationBuilder);
+            return notificationBuilder;
         }
 
         internal static AndroidNotificationIntentData GetNotificationData(AndroidJavaObject notificationObj)
