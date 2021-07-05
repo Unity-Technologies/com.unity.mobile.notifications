@@ -321,7 +321,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
     protected static void saveNotificationIntent(Context context, Intent intent) {
-        String notification_id = Integer.toString(intent.getIntExtra("id", 0));
+        Notification notification = intent.getParcelableExtra("unityNotification");
+        String notification_id = Integer.toString(notification.extras.getInt("id", -1));
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = prefs.edit().clear();
