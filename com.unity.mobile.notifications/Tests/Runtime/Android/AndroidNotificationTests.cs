@@ -85,23 +85,19 @@ class AndroidNotificationTests
     }
 
     [Test]
-    public void DeleteNotificationChannels_NotificationChannelsAreDeleted()
+    public void DeleteNotificationChannel_NotificationChannelIsDeleted()
     {
-        if (AndroidNotificationCenter.GetNotificationChannels().Length < 1)
-        {
-            var ch = new AndroidNotificationChannel();
-            ch.Id = "default_test_channel_0";
-            ch.Name = "Default Channel";
-            ch.Description = "Generic spam";
-            ch.Importance = Importance.Default;
-        }
+        var ch = new AndroidNotificationChannel();
+        ch.Id = "default_test_channel_0";
+        ch.Name = "Default Channel";
+        ch.Description = "Generic spam";
+        ch.Importance = Importance.Default;
+        AndroidNotificationCenter.RegisterNotificationChannel(ch);
 
-        foreach (var ch in AndroidNotificationCenter.GetNotificationChannels())
-        {
-            AndroidNotificationCenter.DeleteNotificationChannel(ch.Id);
-        }
+        int numChannels = AndroidNotificationCenter.GetNotificationChannels().Length;
+        AndroidNotificationCenter.DeleteNotificationChannel(ch.Id);
 
-        Assert.AreEqual(0, AndroidNotificationCenter.GetNotificationChannels().Length);
+        Assert.AreEqual(numChannels - 1, AndroidNotificationCenter.GetNotificationChannels().Length);
     }
 
     [UnityTest]
