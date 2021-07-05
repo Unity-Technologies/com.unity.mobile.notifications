@@ -246,7 +246,8 @@ class AndroidNotificationTests
         chOrig.CanShowBadge = true;
         chOrig.EnableLights = true;
         chOrig.EnableVibration = false;
-        chOrig.LockScreenVisibility = LockScreenVisibility.Private;
+        // this opne should be read-only, it reports the system setting, but can't be set
+        // chOrig.LockScreenVisibility = LockScreenVisibility.Private;
 
         AndroidNotificationCenter.RegisterNotificationChannel(chOrig);
 
@@ -258,7 +259,7 @@ class AndroidNotificationTests
         Assert.AreEqual(chOrig.Importance, ch.Importance);
         Assert.AreEqual(chOrig.EnableLights, ch.EnableLights);
         Assert.AreEqual(chOrig.EnableVibration, ch.EnableVibration);
-        Assert.AreEqual(chOrig.LockScreenVisibility, ch.LockScreenVisibility);
+        //Assert.AreEqual(chOrig.LockScreenVisibility, ch.LockScreenVisibility);
     }
 
     [UnityTest]
