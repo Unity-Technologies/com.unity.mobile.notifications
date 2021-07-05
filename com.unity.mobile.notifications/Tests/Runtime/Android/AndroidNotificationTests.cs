@@ -208,8 +208,7 @@ class AndroidNotificationTests
         Assert.AreEqual(repeatInterval, n.RepeatInterval);
     }
 
-    // TODO FIX
-    //    [UnityTest]
+    [UnityTest]
     public IEnumerator NotificationIsScheduled_NotificationStatusIsCorrectlyReported()
     {
         var n = new AndroidNotification();
@@ -217,23 +216,13 @@ class AndroidNotificationTests
         n.Text = "NotificationStatusIsCorrectlyReported";
         n.FireTime = System.DateTime.Now.AddSeconds(2f);
 
-        var c = new AndroidNotificationChannel();
-        c.Id = "status_test_channel_0";
-        c.Name = "status test channel";
-        c.Description = "NotificationIsScheduled_NotificationStatusIsCorrectlyReported";
-        c.Importance = Importance.High;
-
-        AndroidNotificationCenter.RegisterNotificationChannel(c);
-
-
-        yield return new WaitForSeconds(3.0f);
-        int originalId = AndroidNotificationCenter.SendNotification(n, "status_test_channel");
-        yield return new WaitForSeconds(0.1f);
+        int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
+        yield return null;
 
         var status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Scheduled, status);
 
-        yield return new WaitForSeconds(5f);
+        yield return WaitForNotification(8.0f);
 
         status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Delivered, status);
