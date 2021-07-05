@@ -3,11 +3,67 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using System.Threading;
 using Unity.Notifications.Android;
 
 class AndroidNotificationTests
 {
+    const string kDefaultTestChannel = "default_test_channel";
     private static int receivedNotificationCount = 0;
+
+    class NotificationReceivedHandler
+    {
+        public int receivedNotificationCount = 0;
+        public AndroidNotificationIntentData lastNotification;
+
+        public void OnReceiveNotification(AndroidNotificationIntentData data)
+        {
+            ++receivedNotificationCount;
+            lastNotification = data;
+        }
+    }
+
+    NotificationReceivedHandler currentHandler;
+
+    [OneTimeSetUp]
+    public void BeforeAllTests()
+    {
+        var c = new AndroidNotificationChannel();
+        c.Id = kDefaultTestChannel;
+        c.Name = "Default Channel 5";
+        c.Description = "test_channel 5";
+        c.Importance = Importance.High;
+
+        AndroidNotificationCenter.RegisterNotificationChannel(c);
+    }
+
+    [SetUp]
+    public void BeforeEachTest()
+    {
+        AndroidNotificationCenter.CancelAllNotifications();
+        Thread.Sleep(3000);
+        currentHandler = new NotificationReceivedHandler();
+        AndroidNotificationCenter.OnNotificationReceived += currentHandler.OnReceiveNotification;
+    }
+
+    [TearDown]
+    public void AfterEachTest()
+    {
+        AndroidNotificationCenter.CancelAllNotifications();
+        AndroidNotificationCenter.OnNotificationReceived -= currentHandler.OnReceiveNotification;
+        currentHandler = null;
+    }
+
+    IEnumerator WaitForNotification(float timeout)
+    {
+        float passed = 0.0f;
+        int notificationCound = currentHandler.receivedNotificationCount;
+        while (notificationCound == currentHandler.receivedNotificationCount && passed < timeout)
+        {
+            yield return null;
+            passed += Time.deltaTime;
+        }
+    }
 
     [Test]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
@@ -51,56 +107,25 @@ class AndroidNotificationTests
     [UnityTest]
     public IEnumerator SendNotificationExplicitID_NotificationIsReceived()
     {
-        AndroidNotificationCenter.CancelAllNotifications();
-
-
         int originalId = 456;
-
-        yield return new WaitForSeconds(3.0f);
 
         var n = new AndroidNotification();
         n.Title = "SendNotificationExplicitID_NotificationIsReceived : " + originalId.ToString();
         n.Text = "SendNotificationExplicitID_NotificationIsReceived Text";
-        n.FireTime = System.DateTime.Now.AddSeconds(2.0f);
+        n.FireTime = System.DateTime.Now;
         n.Group = "test.dummy.group";
 
 
-        var current_time = DateTime.Now;
+        Debug.LogWarning("SendNotificationExplicitID_NotificationIsReceived sends notification with ID " + originalId);
+        AndroidNotificationCenter.SendNotificationWithExplicitID(n, kDefaultTestChannel, originalId);
 
-        Debug.LogWarning(string.Format("SendNotification_NotificationIsReceived:::FireTime::: {0}  -> {1}", current_time.ToString(), n.FireTime.ToString()));
+        yield return WaitForNotification(8.0f);
 
+        Debug.LogWarning("SendNotificationExplicitID_NotificationIsReceived completed. Received notifications: "  + currentHandler.receivedNotificationCount);
 
-        var c = new AndroidNotificationChannel();
-        c.Id = "default_test_channel_5";
-        c.Name = "Default Channel 5";
-        c.Description = "test_channel 5";
-        c.Importance = Importance.High;
-
-        AndroidNotificationCenter.RegisterNotificationChannel(c);
-        AndroidNotificationCenter.SendNotificationWithExplicitID(n, "default_test_channel_5", originalId);
-
-
-        AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
-        {
-            receivedNotificationCount += 1;
-            Assert.AreEqual(originalId, data.Id);
-            Assert.AreEqual(n.Group, data.Notification.Group);
-        };
-
-
-        AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
-
-        yield return new WaitForSeconds(8.0f);
-
-        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: "  + receivedNotificationCount.ToString());
-
-        Assert.AreEqual(1, receivedNotificationCount);
-
-        AndroidNotificationCenter.OnNotificationReceived -= receivedNotificationHandler;
-
-        AndroidNotificationCenter.CancelAllNotifications();
-        receivedNotificationCount = 0;
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
+        Assert.AreEqual(n.Group, currentHandler.lastNotification.Notification.Group);
     }
 
     [UnityTest]
