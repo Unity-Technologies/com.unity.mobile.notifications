@@ -168,46 +168,24 @@ class AndroidNotificationTests
         Assert.AreEqual(0, currentHandler.receivedNotificationCount);
     }
 
-//    [UnityTest]
+    [UnityTest]
     public IEnumerator ScheduleRepeatableNotification_NotificationsAreReceived()
     {
-        AndroidNotificationCenter.CancelAllNotifications();
-
-        yield return new WaitForSeconds(2.0f);
-
         var n = new AndroidNotification();
         n.Title = "Repeating Notification Title";
         n.Text = "Repeating Notification Text";
-        n.FireTime = System.DateTime.Now.AddSeconds(0.5f);
+        n.FireTime = System.DateTime.Now.AddSeconds(2.0f);
         n.RepeatInterval = new System.TimeSpan(0, 0, 1);
 
-        var c = new AndroidNotificationChannel();
-        c.Id = "default_test_channel_2";
-        c.Name = "Default Channel";
-        c.Description = "test_channel";
-        c.Importance = Importance.High;
+        int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
 
-        AndroidNotificationCenter.RegisterNotificationChannel(c);
-        int originalId = AndroidNotificationCenter.SendNotification(n, "default_test_channel_2");
+        //The notification should be repeated every second
+        yield return WaitForNotification(8.0f);
+        yield return WaitForNotification(8.0f);
+        yield return WaitForNotification(8.0f);
+        AndroidNotificationCenter.CancelScheduledNotification(originalId);
 
-        AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
-        {
-            receivedNotificationCount += 1;
-            Assert.AreEqual(originalId, data.Id);
-        };
-
-        AndroidNotificationCenter.OnNotificationReceived += receivedNotificationHandler;
-
-        //The notification should be repeated every second, so we should get atleast 3.
-        yield return new WaitForSeconds(5.0f);
-
-        Assert.GreaterOrEqual(3, receivedNotificationCount);
-        receivedNotificationCount = 0;
-
-        AndroidNotificationCenter.OnNotificationReceived -= receivedNotificationHandler;
-
-        AndroidNotificationCenter.CancelAllNotifications();
+        Assert.GreaterOrEqual(3, currentHandler.receivedNotificationCount);
     }
 
     [Test]
