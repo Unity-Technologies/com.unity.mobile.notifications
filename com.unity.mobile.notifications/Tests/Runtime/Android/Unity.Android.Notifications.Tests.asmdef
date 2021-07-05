@@ -1,18 +1,25 @@
 {
     "name": "Unity.Android.Notifications.Tests",
+    "rootNamespace": "",
     "references": [
-        "Unity.Notifications.Android"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Unity.Notifications.Android",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
-        "Android"
+        "Android",
+        "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": []
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
