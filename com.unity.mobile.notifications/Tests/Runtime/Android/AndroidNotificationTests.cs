@@ -41,7 +41,6 @@ class AndroidNotificationTests
     public void BeforeEachTest()
     {
         AndroidNotificationCenter.CancelAllNotifications();
-        Thread.Sleep(3000);
         currentHandler = new NotificationReceivedHandler();
         AndroidNotificationCenter.OnNotificationReceived += currentHandler.OnReceiveNotification;
     }
@@ -49,7 +48,6 @@ class AndroidNotificationTests
     [TearDown]
     public void AfterEachTest()
     {
-        AndroidNotificationCenter.CancelAllNotifications();
         AndroidNotificationCenter.OnNotificationReceived -= currentHandler.OnReceiveNotification;
         currentHandler = null;
     }
