@@ -288,4 +288,35 @@ class AndroidNotificationTests
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
         Assert.IsNotNull(gameObjects[0]);
     }
+
+    [UnityTest]
+    public IEnumerator SendNotification_CanAccessNativeBuilder()
+    {
+        var n = new AndroidNotification();
+        n.Title = "SendNotification_CanAccessNativeBuilder";
+        n.Text = "SendNotification_CanAccessNativeBuilder Text";
+        n.FireTime = System.DateTime.Now;
+
+        Debug.LogWarning("SendNotification_CanAccessNativeBuilder sends notification");
+
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(n, kDefaultTestChannel))
+        {
+            using (var extras = builder.Call<AndroidJavaObject>("getExtras"))
+            {
+                extras.Call("putString", "notification.test.string", "TheTest");
+            }
+
+            AndroidNotificationCenter.SendNotification(builder);
+        }
+
+        yield return WaitForNotification(8.0f);
+
+        Debug.LogWarning("SendNotification_CanAccessNativeBuilder completed");
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        using (var extras = currentHandler.lastNotification.NativeNotification.Get<AndroidJavaObject>("extras"))
+        {
+            Assert.AreEqual("TheTest", extras.Call<string>("getString", "notification.test.string"));
+        }
+    }
 }
