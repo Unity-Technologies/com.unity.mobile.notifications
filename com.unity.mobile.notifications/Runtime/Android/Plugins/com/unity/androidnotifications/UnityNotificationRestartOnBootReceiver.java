@@ -41,7 +41,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
                     notification = notificationBuilder.build();
                     intent.putExtra("unityNotification", notification);
 
-                    PendingIntent broadcast = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent broadcast = UnityNotificationManager.getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     UnityNotificationManager.scheduleNotificationIntentAlarm(context, repeatInterval, fireTime, broadcast);
                 } else {
                     UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
