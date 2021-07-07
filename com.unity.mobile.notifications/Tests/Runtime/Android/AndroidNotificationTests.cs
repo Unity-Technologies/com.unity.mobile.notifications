@@ -9,7 +9,6 @@ using Unity.Notifications.Android;
 class AndroidNotificationTests
 {
     const string kDefaultTestChannel = "default_test_channel";
-    private static int receivedNotificationCount = 0;
 
     class NotificationReceivedHandler
     {
