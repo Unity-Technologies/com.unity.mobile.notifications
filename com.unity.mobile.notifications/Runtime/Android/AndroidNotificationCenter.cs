@@ -411,40 +411,44 @@ namespace Unity.Notifications.Android
 
         internal static AndroidNotificationIntentData GetNotificationData(AndroidJavaObject notificationObj)
         {
-            var extras = notificationObj.Get<AndroidJavaObject>("extras");
-            var id = extras.Call<int>("getInt", "id", -1);
-            if (id == -1)
-                return null;
+            using (var extras = notificationObj.Get<AndroidJavaObject>("extras"))
+            {
+                var id = extras.Call<int>("getInt", "id", -1);
+                if (id == -1)
+                    return null;
 
-            var channelId = notificationObj.Call<string>("getChannelId");
-            int flags = notificationObj.Get<int>("flags");
+                var channelId = notificationObj.Call<string>("getChannelId");
+                int flags = notificationObj.Get<int>("flags");
 
-            var notification = new AndroidNotification();
-            notification.Title = extras.Call<string>("getString", Notification_EXTRA_TITLE);
-            notification.Text = extras.Call<string>("getString", Notification_EXTRA_TEXT);
-            notification.ShouldAutoCancel = 0 != (flags & Notification_FLAG_AUTO_CANCEL);
-            notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
-            notification.FireTime = extras.Call<long>("getLong", "fireTime", -1L).ToDatetime();
-            notification.RepeatInterval = extras.Call<long>("getLong", "repeatInterval", -1L).ToTimeSpan();
-            if (extras.Call<bool>("containsKey", Notification_EXTRA_BIG_TEXT))
-                notification.Style = NotificationStyle.BigTextStyle;
-            else
-                notification.Style = NotificationStyle.None;
-            var color = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationColor", notificationObj);
-            if (color == null)
-                notification.Color = null;
-            else
-                notification.Color = color.Call<int>("intValue").ToColor();
-            notification.Number = notificationObj.Get<int>("number");
-            notification.IntentData = extras.Call<string>("getString", "data");
-            notification.Group = notificationObj.Call<string>("getGroup");
-            notification.GroupSummary = 0 != (flags &  Notification_FLAG_GROUP_SUMMARY);
-            notification.SortKey = notificationObj.Call<string>("getSortKey");
-            notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
+                var notification = new AndroidNotification();
+                notification.Title = extras.Call<string>("getString", Notification_EXTRA_TITLE);
+                notification.Text = extras.Call<string>("getString", Notification_EXTRA_TEXT);
+                notification.ShouldAutoCancel = 0 != (flags & Notification_FLAG_AUTO_CANCEL);
+                notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
+                notification.FireTime = extras.Call<long>("getLong", "fireTime", -1L).ToDatetime();
+                notification.RepeatInterval = extras.Call<long>("getLong", "repeatInterval", -1L).ToTimeSpan();
+                if (extras.Call<bool>("containsKey", Notification_EXTRA_BIG_TEXT))
+                    notification.Style = NotificationStyle.BigTextStyle;
+                else
+                    notification.Style = NotificationStyle.None;
+                using (var color = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationColor", notificationObj))
+                {
+                    if (color == null)
+                        notification.Color = null;
+                    else
+                        notification.Color = color.Call<int>("intValue").ToColor();
+                }
+                notification.Number = notificationObj.Get<int>("number");
+                notification.IntentData = extras.Call<string>("getString", "data");
+                notification.Group = notificationObj.Call<string>("getGroup");
+                notification.GroupSummary = 0 != (flags &  Notification_FLAG_GROUP_SUMMARY);
+                notification.SortKey = notificationObj.Call<string>("getSortKey");
+                notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
 
-            var data = new AndroidNotificationIntentData(id, channelId, notification);
-            data.NativeNotification = notificationObj;
-            return data;
+                var data = new AndroidNotificationIntentData(id, channelId, notification);
+                data.NativeNotification = notificationObj;
+                return data;
+            }
         }
 
         internal static void ReceivedNotificationCallback(AndroidJavaObject notification)
