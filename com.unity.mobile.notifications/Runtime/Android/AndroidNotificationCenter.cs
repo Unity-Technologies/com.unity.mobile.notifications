@@ -443,7 +443,9 @@ namespace Unity.Notifications.Android
             notification.SortKey = notificationObj.Call<string>("getSortKey");
             notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
 
-            return new AndroidNotificationIntentData(id, channelId, notification);
+            var data = new AndroidNotificationIntentData(id, channelId, notification);
+            data.NativeNotification = notificationObj;
+            return data;
         }
 
         internal static void ReceivedNotificationCallback(AndroidJavaObject notification)

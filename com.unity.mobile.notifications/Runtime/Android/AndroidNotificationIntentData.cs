@@ -23,6 +23,11 @@ namespace Unity.Notifications.Android
         public AndroidNotification Notification { get; }
 
         /// <summary>
+        /// Returns the  proxy to the Android Java instance of Notification class.
+        /// </summary>
+        public AndroidJavaObject NativeNotification { get; internal set; }
+
+        /// <summary>
         /// Create an AndroidNotificationIntentData with AndroidNotification, id, and channel id.
         /// </summary>
         public AndroidNotificationIntentData(int id, string channelId, AndroidNotification notification)
