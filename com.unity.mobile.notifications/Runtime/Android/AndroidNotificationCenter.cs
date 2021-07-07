@@ -374,21 +374,21 @@ namespace Unity.Notifications.Android
             s_NotificationManager.Call("setNotificationSmallIcon", notificationBuilder, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
                 s_NotificationManagerClass.CallStatic("setNotificationLargeIcon", notificationBuilder, notification.LargeIcon);
-            notificationBuilder.Call<AndroidJavaObject>("setContentTitle", notification.Title);
-            notificationBuilder.Call<AndroidJavaObject>("setContentText", notification.Text);
-            notificationBuilder.Call<AndroidJavaObject>("setAutoCancel", notification.ShouldAutoCancel);
+            notificationBuilder.Call<AndroidJavaObject>("setContentTitle", notification.Title).Dispose();
+            notificationBuilder.Call<AndroidJavaObject>("setContentText", notification.Text).Dispose();
+            notificationBuilder.Call<AndroidJavaObject>("setAutoCancel", notification.ShouldAutoCancel).Dispose();
             if (notification.Number >= 0)
-                notificationBuilder.Call<AndroidJavaObject>("setNumber", notification.Number);
+                notificationBuilder.Call<AndroidJavaObject>("setNumber", notification.Number).Dispose();
             if (notification.Style == NotificationStyle.BigTextStyle)
             {
                 using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
                 {
-                    style.Call<AndroidJavaObject>("bigText", notification.Text);
-                    notificationBuilder.Call<AndroidJavaObject>("setStyle", style);
+                    style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
+                    notificationBuilder.Call<AndroidJavaObject>("setStyle", style).Dispose();
                 }
             }
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
-            notificationBuilder.Call<AndroidJavaObject>("setWhen", timestampValue);
+            notificationBuilder.Call<AndroidJavaObject>("setWhen", timestampValue).Dispose();
             if (!string.IsNullOrEmpty(notification.Group))
                 s_NotificationManagerClass.CallStatic("setNotificationGroup", notificationBuilder, notification.Group);
             if (notification.GroupSummary)
@@ -402,10 +402,12 @@ namespace Unity.Notifications.Android
             s_NotificationManagerClass.CallStatic("setNotificationUsesChronometer", notificationBuilder, notification.UsesStopwatch);
             s_NotificationManagerClass.CallStatic("setNotificationGroupAlertBehavior", notificationBuilder, (int)notification.GroupAlertBehaviour);
 
-            var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras");
-            extras.Call("putInt", "id", id);
-            extras.Call("putLong", "repeatInterval", notification.RepeatInterval.ToLong());
-            extras.Call("putLong", "fireTime", fireTime);
+            using (var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras"))
+            {
+                extras.Call("putInt", "id", id);
+                extras.Call("putLong", "repeatInterval", notification.RepeatInterval.ToLong());
+                extras.Call("putLong", "fireTime", fireTime);
+            }
 
             return notificationBuilder;
         }
