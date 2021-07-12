@@ -187,7 +187,11 @@ void freeiOSNotificationData(iOSNotificationData* notificationData)
     if (notificationData->threadIdentifier != NULL)
         free(notificationData->threadIdentifier);
 
-    // Do not free notificationData->userInfo here, it's freed in _ReadNSDictionary
+    if (notificationData->userInfo != NULL)
+    {
+        NSDictionary* userInfo = (__bridge_transfer NSDictionary*)notificationData->userInfo;
+        userInfo = nil;
+    }
 }
 
 void* _AddItemToNSDictionary(void* dict, const char* key, const char* value)
@@ -209,7 +213,7 @@ void* _AddItemToNSDictionary(void* dict, const char* key, const char* value)
 
 void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit, const char*, const char*))
 {
-    NSDictionary* dict = (__bridge_transfer NSDictionary*)nsDict;
+    NSDictionary* dict = (__bridge NSDictionary*)nsDict;
     [dict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         NSString* k = key;
         if ([obj isKindOfClass: [NSString class]])
