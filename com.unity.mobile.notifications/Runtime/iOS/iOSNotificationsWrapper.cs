@@ -138,7 +138,7 @@ namespace Unity.Notifications.iOS
         public static void RemoteNotificationReceived(iOSNotificationData data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            iOSNotificationCenter.OnReceivedRemoteNotification(data);
+            iOSNotificationCenter.OnReceivedRemoteNotification(NotificationDataToDataWithUserInfo(data));
 #endif
         }
 
@@ -146,8 +146,17 @@ namespace Unity.Notifications.iOS
         public static void NotificationReceived(iOSNotificationData data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            iOSNotificationCenter.OnSentNotification(data);
+            iOSNotificationCenter.OnSentNotification(NotificationDataToDataWithUserInfo(data));
 #endif
+        }
+
+        static iOSNotificationWithUserInfo NotificationDataToDataWithUserInfo(iOSNotificationData data)
+        {
+            iOSNotificationWithUserInfo ret;
+            ret.data = data;
+            ret.data.userInfo = IntPtr.Zero;
+            ret.userInfo = NSDictionaryToCs(data.userInfo);
+            return ret;
         }
 
         [MonoPInvokeCallback(typeof(ReceiveNSDictionaryKeyValueCallback))]
@@ -184,7 +193,7 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
-        public static iOSNotificationData[] GetDeliveredNotificationData()
+        public static iOSNotificationWithUserInfo[] GetDeliveredNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
             int count;
@@ -195,7 +204,7 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
-        public static iOSNotificationData[] GetScheduledNotificationData()
+        public static iOSNotificationWithUserInfo[] GetScheduledNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
             int count;
@@ -207,17 +216,19 @@ namespace Unity.Notifications.iOS
         }
 
 #if UNITY_IOS && !UNITY_EDITOR
-        static iOSNotificationData[] MarshalAndFreeNotificationDataArray(IntPtr ptr, int count)
+        static iOSNotificationWithUserInfo[] MarshalAndFreeNotificationDataArray(IntPtr ptr, int count)
         {
             if (count == 0 || ptr == IntPtr.Zero)
                 return null;
 
-            var dataArray = new iOSNotificationData[count];
+            var dataArray = new iOSNotificationWithUserInfo[count];
             var structSize = Marshal.SizeOf(typeof(iOSNotificationData));
             var next = ptr;
             for (var i = 0; i < count; ++i)
             {
-                dataArray[i] = (iOSNotificationData)Marshal.PtrToStructure(next, typeof(iOSNotificationData));
+                dataArray[i].data = (iOSNotificationData)Marshal.PtrToStructure(next, typeof(iOSNotificationData));
+                dataArray[i].userInfo = NSDictionaryToCs(dataArray[i].data.userInfo);
+                dataArray[i].data.userInfo = IntPtr.Zero;
                 next = next + structSize;
             }
             _FreeUnmanagediOSNotificationDataArray(ptr, count);
@@ -280,7 +291,7 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
-        public static iOSNotificationData? GetLastNotificationData()
+        public static iOSNotificationWithUserInfo? GetLastNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
             if (_GetAppOpenedUsingNotification())
@@ -289,7 +300,10 @@ namespace Unity.Notifications.iOS
 
                 if (ptr != IntPtr.Zero)
                 {
-                    iOSNotificationData data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
+                    iOSNotificationWithUserInfo data;
+                    data.data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
+                    data.userInfo = NSDictionaryToCs(data.data.userInfo);
+                    data.data.userInfo = IntPtr.Zero;
                     _FreeUnmanagediOSNotificationDataArray(ptr, 1);
                     return data;
                 }

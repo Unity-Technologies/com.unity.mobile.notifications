@@ -364,10 +364,10 @@ namespace Unity.Notifications.iOS
             ForegroundPresentationOption = PresentationOption.Alert | PresentationOption.Sound;
         }
 
-        internal iOSNotification(iOSNotificationData data)
+        internal iOSNotification(iOSNotificationWithUserInfo data)
         {
-            this.data = data;
-            userInfo = iOSNotificationsWrapper.NSDictionaryToCs(data.userInfo);
+            this.data = data.data;
+            userInfo = data.userInfo;
         }
 
         iOSNotificationData data;
