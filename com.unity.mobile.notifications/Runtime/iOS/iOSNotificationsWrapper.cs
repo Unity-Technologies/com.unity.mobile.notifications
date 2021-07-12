@@ -8,6 +8,12 @@ using UnityEngine;
 
 namespace Unity.Notifications.iOS
 {
+    internal struct iOSNotificationWithUserInfo
+    {
+        internal iOSNotificationData data;
+        internal Dictionary<string, string> userInfo;
+    }
+
     internal class iOSNotificationsWrapper : MonoBehaviour
     {
 #if DEVELOPMENT_BUILD
@@ -170,10 +176,11 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
-        public static void ScheduleLocalNotification(iOSNotificationData data)
+        public static void ScheduleLocalNotification(iOSNotificationWithUserInfo data)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            _ScheduleLocalNotification(data);
+            data.data.userInfo = iOSNotificationsWrapper.CsDictionaryToObjC(data.userInfo);
+            _ScheduleLocalNotification(data.data);
 #endif
         }
 
