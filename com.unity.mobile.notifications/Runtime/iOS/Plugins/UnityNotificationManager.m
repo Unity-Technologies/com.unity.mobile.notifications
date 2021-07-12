@@ -148,15 +148,12 @@
     withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
     iOSNotificationData notificationData;
-    NSDictionary* notificationUserInfo = nil;
     BOOL haveNotificationData = NO;
     if (self.onNotificationReceivedCallback != NULL)
     {
         notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
-        notificationUserInfo = (__bridge NSDictionary*)notificationData.userInfo;
         haveNotificationData = YES;
         self.onNotificationReceivedCallback(notificationData);
-        notificationData.userInfo = NULL; // freed by callback
     }
 
     BOOL showInForeground;
@@ -171,12 +168,9 @@
                 notificationData = UNNotificationRequestToiOSNotificationData(notification.request);
                 haveNotificationData = YES;
             }
-            else if (notificationData.userInfo == NULL)
-                notificationData.userInfo = (__bridge_retained void*)notificationUserInfo;
 
             showInForeground = NO;
             self.onRemoteNotificationReceivedCallback(notificationData);
-            notificationData.userInfo = NULL;
         }
         else
         {
@@ -191,11 +185,7 @@
     }
 
     if (haveNotificationData)
-    {
-        if (notificationData.userInfo != NULL) // no callback, release user info
-            notificationUserInfo = (__bridge_transfer NSDictionary*)notificationData.userInfo;
         freeiOSNotificationData(&notificationData);
-    }
 
     if (showInForeground)
         completionHandler(presentationOptions);
