@@ -36,6 +36,8 @@ namespace Unity.Notifications.Android
             //       that callback might introduce an operations which would create a deadlock
             lock (this)
             {
+                if (m_ReceivedNotificationQueue.Count == 0)
+                    return;
                 var temp = m_ReceivedNotificationQueue;
                 m_ReceivedNotificationQueue = m_ReceivedNotificationList;
                 m_ReceivedNotificationList = temp;
