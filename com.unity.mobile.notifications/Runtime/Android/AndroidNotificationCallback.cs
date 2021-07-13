@@ -10,7 +10,7 @@ namespace Unity.Notifications.Android
 
         public void onSentNotification(AndroidJavaObject notificationIntent)
         {
-            AndroidReceivedNotificationMainThreadDispatcher.EnqueueReceivedNotification(notificationIntent);
+            AndroidReceivedNotificationMainThreadDispatcher.GetInstance().EnqueueReceivedNotification(notificationIntent);
         }
     }
 }
