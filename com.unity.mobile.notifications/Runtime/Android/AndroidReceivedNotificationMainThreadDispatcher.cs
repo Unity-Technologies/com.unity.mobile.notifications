@@ -10,15 +10,15 @@ namespace Unity.Notifications.Android
     {
         private static AndroidReceivedNotificationMainThreadDispatcher instance = null;
 
-        private static List<AndroidJavaObject> s_ReceivedNotificationQueue = new List<AndroidJavaObject>();
+        private List<AndroidJavaObject> m_ReceivedNotificationQueue = new List<AndroidJavaObject>();
 
-        private static List<AndroidJavaObject> s_ReceivedNotificationList = new List<AndroidJavaObject>();
+        private List<AndroidJavaObject> m_ReceivedNotificationList = new List<AndroidJavaObject>();
 
-        internal static void EnqueueReceivedNotification(AndroidJavaObject intent)
+        internal void EnqueueReceivedNotification(AndroidJavaObject intent)
         {
-            lock (instance)
+            lock (this)
             {
-                s_ReceivedNotificationQueue.Add(intent);
+                m_ReceivedNotificationQueue.Add(intent);
             }
         }
 
@@ -34,19 +34,19 @@ namespace Unity.Notifications.Android
         {
             // Note: Don't call callbacks while locking receivedNotificationQueue, otherwise there's a risk
             //       that callback might introduce an operations which would create a deadlock
-            lock (instance)
+            lock (this)
             {
-                var temp = s_ReceivedNotificationQueue;
-                s_ReceivedNotificationQueue = s_ReceivedNotificationList;
-                s_ReceivedNotificationList = temp;
+                var temp = m_ReceivedNotificationQueue;
+                m_ReceivedNotificationQueue = m_ReceivedNotificationList;
+                m_ReceivedNotificationList = temp;
             }
 
-            foreach (var notification in s_ReceivedNotificationList)
+            foreach (var notification in m_ReceivedNotificationList)
             {
                 AndroidNotificationCenter.ReceivedNotificationCallback(notification);
             }
 
-            s_ReceivedNotificationList.Clear();
+            m_ReceivedNotificationList.Clear();
         }
 
         void Awake()
