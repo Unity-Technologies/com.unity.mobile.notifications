@@ -162,8 +162,14 @@ bool _GetAppOpenedUsingNotification()
 iOSNotificationData* _GetLastNotificationData()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+    UNNotification* notification = manager.lastReceivedNotification;
+    if (notification == nil)
+        return NULL;
+    UNNotificationRequest* request = notification.request;
+    if (request == nil)
+        return NULL;
     iOSNotificationData* ret = (iOSNotificationData*)malloc(sizeof(iOSNotificationData));
-    *ret = UNNotificationRequestToiOSNotificationData(manager.lastReceivedNotification.request);
+    *ret = UNNotificationRequestToiOSNotificationData(request);
     return ret;
 }
 
