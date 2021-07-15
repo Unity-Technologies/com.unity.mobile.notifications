@@ -118,7 +118,7 @@ namespace Unity.Notifications.iOS
             return NotificationDataToNotifications(iOSNotificationsWrapper.GetDeliveredNotificationData());
         }
 
-        private static iOSNotification[] NotificationDataToNotifications(iOSNotificationData[] notificationData)
+        private static iOSNotification[] NotificationDataToNotifications(iOSNotificationWithUserInfo[] notificationData)
         {
             var iOSNotifications = new iOSNotification[notificationData == null ? 0 : notificationData.Length];
 
@@ -188,13 +188,13 @@ namespace Unity.Notifications.iOS
             return iOSNotificationsWrapper.GetNotificationSettings();
         }
 
-        internal static void OnReceivedRemoteNotification(iOSNotificationData data)
+        internal static void OnReceivedRemoteNotification(iOSNotificationWithUserInfo data)
         {
             var notification = new iOSNotification(data);
             s_OnRemoteNotificationReceived(notification);
         }
 
-        internal static void OnSentNotification(iOSNotificationData data)
+        internal static void OnSentNotification(iOSNotificationWithUserInfo data)
         {
             var notification = new iOSNotification(data);
             s_OnNotificationReceived(notification);

@@ -252,7 +252,6 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         return;
 
     assert(self.onNotificationReceivedCallback != NULL);
-    assert(data->userInfo != NULL);
 
     NSDictionary* userInfo = (__bridge_transfer NSDictionary*)data->userInfo;
     data->userInfo = NULL;
