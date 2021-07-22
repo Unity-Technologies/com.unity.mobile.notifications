@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.4.2] - TBD
+## [1.4.2] - 2021-07-22
 
 ### Fixes:
 - [Android] [issue 99](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/99) Use FLAG_IMMUTABLE for PendingIntent
