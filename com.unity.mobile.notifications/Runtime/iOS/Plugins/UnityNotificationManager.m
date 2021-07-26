@@ -277,6 +277,21 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     content.title = [NSString localizedUserNotificationStringForKey: dataTitle arguments: nil];
     content.body  = [NSString localizedUserNotificationStringForKey: dataBody arguments: nil];
     content.userInfo = userInfo;
+    
+    if ([userInfo valueForKey:@"image_url"]) {
+        NSURL *imageURL = [NSURL URLWithString:[userInfo valueForKey:@"image_url"]];
+        NSLog(@"imageURL = %@", imageURL);
+        NSError *error;
+        UNNotificationAttachment *icon = [UNNotificationAttachment attachmentWithIdentifier:@"image" URL:imageURL options:nil error:&error];
+        if (icon)
+        {
+            content.attachments = @[icon];
+        }
+        if (error)
+        {
+            NSLog(@"error while attaching image to notification: %@", error);
+        }
+    }
 
     if (data->badge >= 0)
         content.badge = [NSNumber numberWithInt: data->badge];
