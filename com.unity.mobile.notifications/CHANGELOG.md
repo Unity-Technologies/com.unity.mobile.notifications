@@ -2,6 +2,13 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.2] - 2021-07-22
+
+### Fixes:
+- [Android] [issue 99](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/99) Use FLAG_IMMUTABLE for PendingIntent
+- [iOS] Do not touch Plist file unless modifications are required
+- [iOS] [1348518](https://issuetracker.unity3d.com/product/unity/issues/guid/1348518) Fix crash in push notification (case )
+
 ## [1.4.1] - 2021-05-06
 
 ### Fixes:
