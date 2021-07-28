@@ -1,3 +1,4 @@
-Mobile Notifications Package
+This project is forked from https://github.com/Unity-Technologies/com.unity.mobile.notifications to customize it for our needs in the Core Notifications module.
 
-Note: Please report issues via Unity bug tracker rather than creating issues on github, then we can have QA to follow and verify the bugs and fixes. To see how to use Unity bug tracker, read [this](https://unity3d.com/unity/qa/bug-reporting).
+Current forked version is 1.4.2.
+`com.unity.mobile.notifications` folder can be replaced with the `notifications/Assets/Package/Engine/com.unity.mobile.notifications` folder in the Core Notifications module.
