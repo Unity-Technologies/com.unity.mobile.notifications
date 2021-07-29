@@ -37,6 +37,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
         var needLocationFramework = (bool)settings.Find(i => i.Key == "UnityUseLocationNotificationTrigger").Value;
         var addPushNotificationCapability = (bool)settings.Find(i => i.Key == "UnityAddRemoteNotificationCapability").Value;
+
         var useReleaseAPSEnv = false;
         if (addPushNotificationCapability)
         {
@@ -53,6 +54,8 @@ public class iOSNotificationPostProcessor : MonoBehaviour
     private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv)
     {
         var pbxProjectPath = PBXProject.GetPBXProjectPath(path);
+
+        var needsToWriteChanges = false;
 
         var pbxProject = new PBXProject();
         pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
@@ -75,11 +78,19 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         }
 
         // Add necessary frameworks.
-        pbxProject.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
-        if (needLocationFramework)
+        if (!pbxProject.ContainsFramework(unityFrameworkTarget, "UserNotifications.framework"))
+        {
+            pbxProject.AddFrameworkToProject(unityFrameworkTarget, "UserNotifications.framework", true);
+            needsToWriteChanges = true;
+        }
+        if (needLocationFramework && !pbxProject.ContainsFramework(unityFrameworkTarget, "CoreLocation.framework"))
+        {
             pbxProject.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
+            needsToWriteChanges = true;
+        }
 
-        File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
+        if (needsToWriteChanges)
+            File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
 
         // Update the entitlements file.
         if (addPushNotificationCapability)
@@ -100,46 +111,84 @@ public class iOSNotificationPostProcessor : MonoBehaviour
     private static void PatchPlist(string path, List<Unity.Notifications.NotificationSetting> settings, bool addPushNotificationCapability)
     {
         var plistPath = path + "/Info.plist";
-
         var plist = new PlistDocument();
         plist.ReadFromString(File.ReadAllText(plistPath));
 
         var rootDict = plist.root;
+        var needsToWriteChanges = false;
 
         // Add all the settings to the plist.
         foreach (var setting in settings)
         {
-            if (setting.Value.GetType() == typeof(bool))
-                rootDict.SetBoolean(setting.Key, (bool)setting.Value);
-            else if (setting.Value.GetType() == typeof(PresentationOption) || setting.Value.GetType() == typeof(AuthorizationOption))
-                rootDict.SetInteger(setting.Key, (int)setting.Value);
+            if (ShouldAddSettingToPlist(setting, rootDict))
+            {
+                needsToWriteChanges = true;
+                if (setting.Value.GetType() == typeof(bool))
+                {
+                    rootDict.SetBoolean(setting.Key, (bool)setting.Value);
+                }
+                else if (setting.Value.GetType() == typeof(PresentationOption) ||
+                         setting.Value.GetType() == typeof(AuthorizationOption))
+                {
+                    rootDict.SetInteger(setting.Key, (int)setting.Value);
+                }
+            }
         }
 
         // Add "remote-notification" to the list of supported UIBackgroundModes.
         if (addPushNotificationCapability)
         {
-            PlistElementArray currentBacgkgroundModes = (PlistElementArray)rootDict["UIBackgroundModes"];
-            if (currentBacgkgroundModes == null)
-                currentBacgkgroundModes = rootDict.CreateArray("UIBackgroundModes");
+            PlistElementArray currentBackgroundModes = (PlistElementArray)rootDict["UIBackgroundModes"];
+            if (currentBackgroundModes == null)
+                currentBackgroundModes = rootDict.CreateArray("UIBackgroundModes");
 
-            currentBacgkgroundModes.AddString("remote-notification");
+            var remoteNotificationElement = new PlistElementString("remote-notification");
+            if (!currentBackgroundModes.values.Contains(remoteNotificationElement))
+            {
+                currentBackgroundModes.values.Add(remoteNotificationElement);
+                needsToWriteChanges = true;
+            }
         }
 
-        File.WriteAllText(plistPath, plist.WriteToString());
+        if (needsToWriteChanges)
+            File.WriteAllText(plistPath, plist.WriteToString());
+    }
+
+    // If the plist doesn't contain the key, or it's value is different, we should add/overwrite it.
+    private static bool ShouldAddSettingToPlist(Unity.Notifications.NotificationSetting setting,
+        PlistElementDict rootDict)
+    {
+        if (!rootDict.values.ContainsKey(setting.Key))
+            return true;
+        else if (setting.Value.GetType() == typeof(bool))
+            return !rootDict.values[setting.Key].AsBoolean().Equals((bool)setting.Value);
+        else if (setting.Value.GetType() == typeof(PresentationOption) || setting.Value.GetType() == typeof(AuthorizationOption))
+            return !rootDict.values[setting.Key].AsInteger().Equals((int)setting.Value);
+        else
+            return false;
     }
 
     private static void PatchPreprocessor(string path, bool needLocationFramework, bool addPushNotificationCapability)
     {
         var preprocessorPath = path + "/Classes/Preprocessor.h";
         var preprocessor = File.ReadAllText(preprocessorPath);
+        var needsToWriteChanges = false;
 
         if (needLocationFramework && preprocessor.Contains("UNITY_USES_LOCATION"))
+        {
             preprocessor = preprocessor.Replace("UNITY_USES_LOCATION 0", "UNITY_USES_LOCATION 1");
+            needsToWriteChanges = true;
+        }
 
         if (addPushNotificationCapability && preprocessor.Contains("UNITY_USES_REMOTE_NOTIFICATIONS"))
-            preprocessor = preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
+        {
+            preprocessor =
+                preprocessor.Replace("UNITY_USES_REMOTE_NOTIFICATIONS 0", "UNITY_USES_REMOTE_NOTIFICATIONS 1");
+            needsToWriteChanges = true;
+        }
 
-        File.WriteAllText(preprocessorPath, preprocessor);
+        if (needsToWriteChanges)
+            File.WriteAllText(preprocessorPath, preprocessor);
     }
 }
 #endif

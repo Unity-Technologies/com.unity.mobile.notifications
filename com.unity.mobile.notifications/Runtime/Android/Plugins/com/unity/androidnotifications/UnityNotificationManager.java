@@ -332,6 +332,20 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return PendingIntent.getBroadcast(context, id, intent, flags);
     }
 
+    public static PendingIntent getActivityPendingIntent(Context context, int id, Intent intent, int flags) {
+        if (Build.VERSION.SDK_INT >= 23)
+            return PendingIntent.getActivity(context, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
+        else
+            return PendingIntent.getActivity(context, id, intent, flags);
+    }
+
+    public static PendingIntent getBroadcastPendingIntent(Context context, int id, Intent intent, int flags) {
+        if (Build.VERSION.SDK_INT >= 23)
+            return PendingIntent.getBroadcast(context, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
+        else
+            return PendingIntent.getBroadcast(context, id, intent, flags);
+    }
+
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
     protected static void saveNotificationIntent(Context context, Intent intent) {
