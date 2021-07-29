@@ -27,6 +27,7 @@ class AndroidNotificationTests
     [OneTimeSetUp]
     public void BeforeAllTests()
     {
+#if !UNITY_EDITOR
         var c = new AndroidNotificationChannel();
         c.Id = kDefaultTestChannel;
         c.Name = "Default Channel 5";
@@ -34,21 +35,26 @@ class AndroidNotificationTests
         c.Importance = Importance.High;
 
         AndroidNotificationCenter.RegisterNotificationChannel(c);
+#endif
     }
 
     [SetUp]
     public void BeforeEachTest()
     {
+#if !UNITY_EDITOR
         AndroidNotificationCenter.CancelAllNotifications();
         currentHandler = new NotificationReceivedHandler();
         AndroidNotificationCenter.OnNotificationReceived += currentHandler.OnReceiveNotification;
+#endif
     }
 
     [TearDown]
     public void AfterEachTest()
     {
+#if !UNITY_EDITOR
         AndroidNotificationCenter.OnNotificationReceived -= currentHandler.OnReceiveNotification;
         currentHandler = null;
+#endif
     }
 
     IEnumerator WaitForNotification(float timeout)
@@ -65,6 +71,7 @@ class AndroidNotificationTests
     [Test]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
     {
+#if !UNITY_EDITOR
         var testChannelId = "default_test_channel_10";
         AndroidNotificationCenter.DeleteNotificationChannel(testChannelId);
         Assert.AreNotEqual("default_test_channel_10", AndroidNotificationCenter.GetNotificationChannel(testChannelId).Id);
@@ -79,11 +86,13 @@ class AndroidNotificationTests
         currentChannelCount++;
 
         Assert.AreEqual(currentChannelCount, AndroidNotificationCenter.GetNotificationChannels().Length);
+#endif
     }
 
     [Test]
     public void DeleteNotificationChannel_NotificationChannelIsDeleted()
     {
+#if !UNITY_EDITOR
         var ch = new AndroidNotificationChannel();
         ch.Id = "default_test_channel_0";
         ch.Name = "Default Channel";
@@ -95,11 +104,13 @@ class AndroidNotificationTests
         AndroidNotificationCenter.DeleteNotificationChannel(ch.Id);
 
         Assert.AreEqual(numChannels - 1, AndroidNotificationCenter.GetNotificationChannels().Length);
+#endif
     }
 
     [UnityTest]
     public IEnumerator SendNotificationExplicitID_NotificationIsReceived()
     {
+#if !UNITY_EDITOR
         int originalId = 456;
 
         var n = new AndroidNotification();
@@ -119,11 +130,15 @@ class AndroidNotificationTests
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
         Assert.AreEqual(n.Group, currentHandler.lastNotification.Notification.Group);
+#else
+        yield break;
+#endif
     }
 
     [UnityTest]
     public IEnumerator SendNotification_NotificationIsReceived()
     {
+#if !UNITY_EDITOR
         var n = new AndroidNotification();
         n.Title = "SendNotification_NotificationIsReceived";
         n.Text = "SendNotification_NotificationIsReceived Text";
@@ -138,11 +153,15 @@ class AndroidNotificationTests
 
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
+#else
+        yield break;
+#endif
     }
 
     [UnityTest]
     public IEnumerator SendNotificationAndCancelNotification_NotificationIsNotReceived()
     {
+#if !UNITY_EDITOR
         var n = new AndroidNotification();
         n.Title = "SendNotificationAndCancelNotification_NotificationIsNotReceived";
         n.Text = "SendNotificationAndCancelNotification_NotificationIsNotReceived Text";
@@ -159,11 +178,15 @@ class AndroidNotificationTests
         Debug.LogWarning("SendNotificationAndCancelNotification_NotificationIsNotReceived completed.");
 
         Assert.AreEqual(0, currentHandler.receivedNotificationCount);
+#else
+        yield break;
+#endif
     }
 
     [UnityTest]
     public IEnumerator ScheduleRepeatableNotification_NotificationsAreReceived()
     {
+#if !UNITY_EDITOR
         var n = new AndroidNotification();
         n.Title = "Repeating Notification Title";
         n.Text = "Repeating Notification Text";
@@ -179,6 +202,9 @@ class AndroidNotificationTests
         AndroidNotificationCenter.CancelScheduledNotification(originalId);
 
         Assert.GreaterOrEqual(3, currentHandler.receivedNotificationCount);
+#else
+        yield break;
+#endif
     }
 
     [Test]
@@ -204,6 +230,7 @@ class AndroidNotificationTests
     [UnityTest]
     public IEnumerator NotificationIsScheduled_NotificationStatusIsCorrectlyReported()
     {
+#if !UNITY_EDITOR
         var n = new AndroidNotification();
         n.Title = "NotificationStatusIsCorrectlyReported";
         n.Text = "NotificationStatusIsCorrectlyReported";
@@ -225,11 +252,15 @@ class AndroidNotificationTests
 
         status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Unknown, status);
+#else
+        yield break;
+#endif
     }
 
     [Test]
     public void CreateNotificationChannelWithInitializedSettings_ChannelSettingsAreSaved()
     {
+#if !UNITY_EDITOR
         var chOrig = new AndroidNotificationChannel();
         chOrig.Id = "test_channel_settings_are_saved_0";
         chOrig.Name = "spam Channel";
@@ -253,11 +284,13 @@ class AndroidNotificationTests
         Assert.AreEqual(chOrig.EnableLights, ch.EnableLights);
         Assert.AreEqual(chOrig.EnableVibration, ch.EnableVibration);
         //Assert.AreEqual(chOrig.LockScreenVisibility, ch.LockScreenVisibility);
+#endif
     }
 
     [UnityTest]
     public IEnumerator SendNotification_NotificationIsReceived_CallMainThread()
     {
+#if !UNITY_EDITOR
         var gameObjects = new GameObject[1];
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
@@ -287,11 +320,15 @@ class AndroidNotificationTests
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
         Assert.IsNotNull(gameObjects[0]);
+#else
+        yield break;
+#endif
     }
 
     [UnityTest]
     public IEnumerator SendNotification_CanAccessNativeBuilder()
     {
+#if !UNITY_EDITOR
         var n = new AndroidNotification();
         n.Title = "SendNotification_CanAccessNativeBuilder";
         n.Text = "SendNotification_CanAccessNativeBuilder Text";
@@ -318,5 +355,8 @@ class AndroidNotificationTests
         {
             Assert.AreEqual("TheTest", extras.Call<string>("getString", "notification.test.string"));
         }
+#else
+        yield break;
+#endif
     }
 }
