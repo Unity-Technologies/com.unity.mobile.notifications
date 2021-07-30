@@ -193,6 +193,8 @@ class AndroidNotificationTests
         n.FireTime = System.DateTime.Now.AddSeconds(2.0f);
         n.RepeatInterval = new System.TimeSpan(0, 0, 1);
 
+        Debug.LogWarning("ScheduleRepeatableNotification_NotificationsAreReceived sends notification");
+
         int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
 
         //The notification should be repeated every second
@@ -200,6 +202,8 @@ class AndroidNotificationTests
         yield return WaitForNotification(8.0f);
         yield return WaitForNotification(8.0f);
         AndroidNotificationCenter.CancelScheduledNotification(originalId);
+
+        Debug.LogWarning("ScheduleRepeatableNotification_NotificationsAreReceived completed");
 
         Assert.GreaterOrEqual(3, currentHandler.receivedNotificationCount);
 #else
@@ -236,6 +240,8 @@ class AndroidNotificationTests
         n.Text = "NotificationStatusIsCorrectlyReported";
         n.FireTime = System.DateTime.Now.AddSeconds(2f);
 
+        Debug.LogWarning("NotificationIsScheduled_NotificationStatusIsCorrectlyReported sends notification");
+
         int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
         yield return null;
 
@@ -243,7 +249,6 @@ class AndroidNotificationTests
         Assert.AreEqual(NotificationStatus.Scheduled, status);
 
         yield return WaitForNotification(8.0f);
-
         status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Delivered, status);
 
@@ -252,6 +257,8 @@ class AndroidNotificationTests
 
         status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Unknown, status);
+
+        Debug.LogWarning("NotificationIsScheduled_NotificationStatusIsCorrectlyReported completed");
 #else
         yield break;
 #endif
