@@ -283,7 +283,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Build a notification Intent to store the PendingIntent.
-    protected static Intent buildNotificationIntent(Context context, int notificationId) {
+    protected static synchronized Intent buildNotificationIntent(Context context, int notificationId) {
         Intent intent = new Intent(context, UnityNotificationManager.class);
 
         SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -334,7 +334,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
-    protected static void saveNotificationIntent(Context context, Intent intent) {
+    protected static synchronized void saveNotificationIntent(Context context, Intent intent) {
         Notification notification = intent.getParcelableExtra("unityNotification");
         String notification_id = Integer.toString(notification.extras.getInt("id", -1));
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
@@ -363,7 +363,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Load all the notification intents from SharedPreferences.
-    protected static List<Intent> loadNotificationIntents(Context context) {
+    protected static synchronized List<Intent> loadNotificationIntents(Context context) {
         SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
 
@@ -438,28 +438,32 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Get all notification ids from SharedPreferences.
     protected int[] getScheduledNotificationIDs() {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
+        synchronized (UnityNotificationManager.class) {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
 
-        // Convert the string array ids to int array ids.
-        int[] intIds = new int[ids.size()];
-        int index = 0;
-        for (String id : ids) {
-            intIds[index++] = Integer.valueOf(id);
+            // Convert the string array ids to int array ids.
+            int[] intIds = new int[ids.size()];
+            int index = 0;
+            for (String id : ids) {
+                intIds[index++] = Integer.valueOf(id);
+            }
+            return intIds;
         }
-        return intIds;
     }
 
     // Cancel a pending notification by id.
     public void cancelPendingNotificationIntent(int id) {
-        UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
-        if (this.mRescheduleOnRestart) {
-            UnityNotificationManager.deleteExpiredNotificationIntent(mContext, Integer.toString(id));
+        synchronized (UnityNotificationManager.class) {
+            UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
+            if (this.mRescheduleOnRestart) {
+                UnityNotificationManager.deleteExpiredNotificationIntent(mContext, Integer.toString(id));
+            }
         }
     }
 
     // Cancel a pending notification by id.
-    protected static void cancelPendingNotificationIntent(Context context, int id) {
+    protected static synchronized void cancelPendingNotificationIntent(Context context, int id) {
         Intent intent = new Intent(context, UnityNotificationManager.class);
         PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_NO_CREATE);
 
@@ -485,7 +489,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Delete the notification intent from SharedPreferences by id.
-    protected static void deleteExpiredNotificationIntent(Context context, String id) {
+    protected static synchronized void deleteExpiredNotificationIntent(Context context, String id) {
         SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
 
