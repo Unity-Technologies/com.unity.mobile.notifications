@@ -38,6 +38,12 @@ class AndroidNotificationTests
 #endif
     }
 
+    [OneTimeTearDown]
+    public void AfterAllTests()
+    {
+        AndroidNotificationCenter.CancelAllNotifications();
+    }
+
     [SetUp]
     public void BeforeEachTest()
     {
