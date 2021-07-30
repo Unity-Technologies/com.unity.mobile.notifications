@@ -6,7 +6,7 @@ using System.Collections;
 using System.Threading;
 using Unity.Notifications.Android;
 
-class AndroidNotificationTests
+class AndroidNotificationSendingTests
 {
     const string kDefaultTestChannel = "default_test_channel";
 
