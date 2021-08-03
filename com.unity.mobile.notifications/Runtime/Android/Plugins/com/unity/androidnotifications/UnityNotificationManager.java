@@ -252,7 +252,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
             finalizeNotificationForDisplay(mContext, notificationBuilder);
             notification = notificationBuilder.build();
             notify(mContext, id, notification);
-            return;
+            if (repeatInterval <= 0)
+                return;
+            // schedule at next repetition
+            fireTime += repeatInterval;
         }
 
         Intent intent = buildNotificationIntent(mContext, id);
