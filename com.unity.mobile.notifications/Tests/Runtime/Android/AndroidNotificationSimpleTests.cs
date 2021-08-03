@@ -102,7 +102,16 @@ class AndroidNotificationSimpleTests
         original.ShowTimestamp = true;
         original.CustomTimestamp = new DateTime(2018, 5, 24, 12, 41, 30, 122);
 
-        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, channelId);
+        var deserializedData = SerializeDeserializeNotification(original, notificationId);
+
+        Assert.AreEqual(notificationId, deserializedData.Id);
+        Assert.AreEqual(kChannelId, deserializedData.Channel);
+        CheckNotificationsMatch(original, deserializedData.Notification);
+    }
+
+    AndroidNotificationIntentData SerializeDeserializeNotification(AndroidNotification original, int notificationId)
+    {
+        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
         using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
         using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
@@ -116,29 +125,31 @@ class AndroidNotificationSimpleTests
         Assert.IsNotEmpty(serializedString);
 
         using var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
+        Assert.IsNotNull(deserializedIntent);
         using var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
-        var deserializedData = AndroidNotificationCenter.GetNotificationData(deserializedNotification);
-        var deserialized = deserializedData.Notification;
+        Assert.IsNotNull(deserializedNotification);
+        return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+    }
 
-        Assert.AreEqual(notificationId, deserializedData.Id);
-        Assert.AreEqual(channelId, deserializedData.Channel);
-        Assert.AreEqual(original.Title, deserialized.Title);
-        Assert.AreEqual(original.Text, deserialized.Text);
-        Assert.AreEqual(original.SmallIcon, deserialized.SmallIcon);
-        Assert.AreEqual(original.FireTime.ToString(), deserialized.FireTime.ToString());
-        Assert.AreEqual(original.RepeatInterval, deserialized.RepeatInterval);
-        Assert.AreEqual(original.LargeIcon, deserialized.LargeIcon);
-        Assert.AreEqual(original.Style, deserialized.Style);
-        Assert.AreEqual(original.Color, deserialized.Color);
-        Assert.AreEqual(original.Number, deserialized.Number);
-        Assert.AreEqual(original.ShouldAutoCancel, deserialized.ShouldAutoCancel);
-        Assert.AreEqual(original.UsesStopwatch, deserialized.UsesStopwatch);
-        Assert.AreEqual(original.Group, deserialized.Group);
-        Assert.AreEqual(original.GroupSummary, deserialized.GroupSummary);
-        Assert.AreEqual(original.GroupAlertBehaviour, deserialized.GroupAlertBehaviour);
-        Assert.AreEqual(original.SortKey, deserialized.SortKey);
-        Assert.AreEqual(original.IntentData, deserialized.IntentData);
-        Assert.AreEqual(original.ShowTimestamp, deserialized.ShowTimestamp);
-        Assert.AreEqual(original.CustomTimestamp, deserialized.CustomTimestamp);
+    void CheckNotificationsMatch(AndroidNotification original, AndroidNotification other)
+    {
+        Assert.AreEqual(original.Title, other.Title);
+        Assert.AreEqual(original.Text, other.Text);
+        Assert.AreEqual(original.SmallIcon, other.SmallIcon);
+        Assert.AreEqual(original.FireTime.ToString(), other.FireTime.ToString());
+        Assert.AreEqual(original.RepeatInterval, other.RepeatInterval);
+        Assert.AreEqual(original.LargeIcon, other.LargeIcon);
+        Assert.AreEqual(original.Style, other.Style);
+        Assert.AreEqual(original.Color, other.Color);
+        Assert.AreEqual(original.Number, other.Number);
+        Assert.AreEqual(original.ShouldAutoCancel, other.ShouldAutoCancel);
+        Assert.AreEqual(original.UsesStopwatch, other.UsesStopwatch);
+        Assert.AreEqual(original.Group, other.Group);
+        Assert.AreEqual(original.GroupSummary, other.GroupSummary);
+        Assert.AreEqual(original.GroupAlertBehaviour, other.GroupAlertBehaviour);
+        Assert.AreEqual(original.SortKey, other.SortKey);
+        Assert.AreEqual(original.IntentData, other.IntentData);
+        Assert.AreEqual(original.ShowTimestamp, other.ShowTimestamp);
+        Assert.AreEqual(original.CustomTimestamp, other.CustomTimestamp);
     }
 }
