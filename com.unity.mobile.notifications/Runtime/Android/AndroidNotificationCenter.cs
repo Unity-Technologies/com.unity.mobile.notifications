@@ -423,6 +423,8 @@ namespace Unity.Notifications.Android
                 var notification = new AndroidNotification();
                 notification.Title = extras.Call<string>("getString", Notification_EXTRA_TITLE);
                 notification.Text = extras.Call<string>("getString", Notification_EXTRA_TEXT);
+                notification.SmallIcon = extras.Call<string>("getString", "smallIcon");
+                notification.LargeIcon = extras.Call<string>("getString", "largeIcon");
                 notification.ShouldAutoCancel = 0 != (flags & Notification_FLAG_AUTO_CANCEL);
                 notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
                 notification.FireTime = extras.Call<long>("getLong", "fireTime", -1L).ToDatetime();
