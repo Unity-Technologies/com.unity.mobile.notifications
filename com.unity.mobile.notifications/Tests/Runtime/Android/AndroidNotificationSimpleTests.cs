@@ -152,4 +152,19 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(original.ShowTimestamp, other.ShowTimestamp);
         Assert.AreEqual(original.CustomTimestamp, other.CustomTimestamp);
     }
+
+    [Test]
+    public void SerializeDeserializeNotificationIntent_MinimumParameters()
+    {
+        const int notificationId = 124;
+
+        var original = new AndroidNotification();
+        original.FireTime = DateTime.Now;
+
+        var deserializedData = SerializeDeserializeNotification(original, notificationId);
+
+        Assert.AreEqual(notificationId, deserializedData.Id);
+        Assert.AreEqual(kChannelId, deserializedData.Channel);
+        CheckNotificationsMatch(original, deserializedData.Notification);
+    }
 }
