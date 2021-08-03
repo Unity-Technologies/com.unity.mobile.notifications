@@ -404,6 +404,8 @@ namespace Unity.Notifications.Android
                 extras.Call("putInt", "id", id);
                 extras.Call("putLong", "repeatInterval", notification.RepeatInterval.ToLong());
                 extras.Call("putLong", "fireTime", fireTime);
+                if (!string.IsNullOrEmpty(notification.IntentData))
+                    extras.Call("putString", "data", notification.IntentData);
             }
 
             return notificationBuilder;
