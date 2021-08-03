@@ -4,7 +4,7 @@ using Unity.Notifications.Android;
 
 class AndroidNotificationSimpleTests
 {
-	[Test]
+    [Test]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
     {
 #if !UNITY_EDITOR
