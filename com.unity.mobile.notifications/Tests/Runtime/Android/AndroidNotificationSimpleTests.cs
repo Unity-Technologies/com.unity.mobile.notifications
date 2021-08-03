@@ -5,6 +5,19 @@ using Unity.Notifications.Android;
 
 class AndroidNotificationSimpleTests
 {
+    const string kChannelId = "SerializeDeserializeNotificationIntentChannel";
+
+    [OneTimeSetUp]
+    public void BeforeAllTests()
+    {
+        var c = new AndroidNotificationChannel();
+        c.Id = kChannelId;
+        c.Name = "SerializeDeserializeNotificationIntent channel";
+        c.Description = "SerializeDeserializeNotificationIntent channel";
+        c.Importance = Importance.High;
+        AndroidNotificationCenter.RegisterNotificationChannel(c);
+    }
+
     [Test]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
     {
@@ -68,14 +81,6 @@ class AndroidNotificationSimpleTests
     public void SerializeDeserializeNotificationIntent_AllParameters()
     {
         const int notificationId = 123;
-        const string channelId = "SerializeDeserializeNotificationIntentChannel";
-
-        var c = new AndroidNotificationChannel();
-        c.Id = channelId;
-        c.Name = "SerializeDeserializeNotificationIntent channel";
-        c.Description = "SerializeDeserializeNotificationIntent channel";
-        c.Importance = Importance.High;
-        AndroidNotificationCenter.RegisterNotificationChannel(c);
 
         var original = new AndroidNotification();
         original.Title = "title";
