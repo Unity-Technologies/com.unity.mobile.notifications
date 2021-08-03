@@ -65,12 +65,14 @@ class AndroidNotificationSendingTests
     IEnumerator WaitForNotification(float timeout)
     {
         float passed = 0.0f;
-        int notificationCound = currentHandler.receivedNotificationCount;
-        while (notificationCound == currentHandler.receivedNotificationCount && passed < timeout)
+        int notificationCount = currentHandler.receivedNotificationCount;
+        while (notificationCount == currentHandler.receivedNotificationCount && passed < timeout)
         {
             yield return null;
             passed += Time.deltaTime;
         }
+        if (passed > timeout)
+            Debug.LogWarning("Timeout waiting for notification");
     }
 
     [UnityTest]
