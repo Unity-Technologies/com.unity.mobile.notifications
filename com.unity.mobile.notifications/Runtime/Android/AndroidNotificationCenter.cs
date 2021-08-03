@@ -448,6 +448,10 @@ namespace Unity.Notifications.Android
                 notification.GroupSummary = 0 != (flags &  Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
                 notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
+                var showTimestamp = extras.Call<bool>("getBoolean", "android.showWhen", false);
+                notification.ShowTimestamp = showTimestamp;
+                if (showTimestamp)
+                    notification.CustomTimestamp = notificationObj.Get<long>("when").ToDatetime();
 
                 var data = new AndroidNotificationIntentData(id, channelId, notification);
                 data.NativeNotification = notificationObj;
