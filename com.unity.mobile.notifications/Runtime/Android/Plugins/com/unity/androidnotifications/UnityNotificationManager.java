@@ -568,8 +568,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static void finalizeNotificationForDisplay(Context context, Notification.Builder notificationBuilder) {
-        String icon = notificationBuilder.getExtras().getString("largeIcon");
+        String icon = notificationBuilder.getExtras().getString("smallIcon");
         int iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
+        if (iconId == 0) {
+            iconId = context.getApplicationInfo().icon;
+        }
+        notificationBuilder.setSmallIcon(iconId);
+        icon = notificationBuilder.getExtras().getString("largeIcon");
+        iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
         if (iconId != 0) {
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), iconId));
         }
@@ -620,19 +626,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    public void setNotificationSmallIcon(Notification.Builder notificationBuilder, String icon) {
-        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
-        if (iconId == 0) {
-            iconId = mContext.getApplicationInfo().icon;
-        }
-        notificationBuilder.setSmallIcon(iconId);
-    }
-
-    public static void setNotificationLargeIcon(Notification.Builder notificationBuilder, String icon) {
-        if (icon == null || icon.length() == 0 && notificationBuilder.getExtras().getString("largeIcon") != null)
-            notificationBuilder.getExtras().remove("largeIcon");
+    public static void setNotificationIcon(Notification.Builder notificationBuilder, String keyName, String icon) {
+        if (icon == null || icon.length() == 0 && notificationBuilder.getExtras().getString(keyName) != null)
+            notificationBuilder.getExtras().remove(keyName);
         else
-            notificationBuilder.getExtras().putString("largeIcon", icon);
+            notificationBuilder.getExtras().putString(keyName, icon);
     }
 
     public static void setNotificationColor(Notification.Builder notificationBuilder, int color) {
