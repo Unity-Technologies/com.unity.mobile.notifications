@@ -134,7 +134,7 @@ public class UnityNotificationUtilities {
             int groupAlertBehavior = in.readInt();
             String sortKey = deserializeString(in);
             boolean showWhen = in.readBoolean();
-            long when = in.readLong();
+            long when = showWhen ? in.readLong() : 0;
             String intentData = deserializeString(in);
 
             Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
@@ -178,6 +178,7 @@ public class UnityNotificationUtilities {
 
             return intent;
         } catch (Exception e) {
+            Log.e("Unity", "Failed to deserialize notification", e);
             return null;
         }
     }
