@@ -68,18 +68,25 @@ public class UnityNotificationUtilities {
             out.writeInt(INTENT_SERIALIZATION_VERSION);
 
             // serialize extras
-            out.writeInt(notification.extras.getInt("id"));
-            serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
-            serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
-            serializeString(out, notification.extras.getString("smallIcon"));
-            serializeString(out, notification.extras.getString("largeIcon"));
-            out.writeLong(notification.extras.getLong("fireTime", -1));
-            out.writeLong(notification.extras.getLong("repeatInterval", -1));
-            serializeString(out, notification.extras.getString(Notification.EXTRA_BIG_TEXT));
-            out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
             boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
-            out.writeBoolean(showWhen);
-            serializeString(out, notification.extras.getString("data"));
+            byte[] extras = serializeParcelable(notification.extras);
+            out.writeInt(extras == null ? 0 : extras.length);
+            if (extras != null && extras.length > 0)
+                out.write(extras);
+            else {
+                // parcelling may fail in case it contains binder object, when that happens serialize manually what we care about
+                out.writeInt(notification.extras.getInt("id"));
+                serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
+                serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
+                serializeString(out, notification.extras.getString("smallIcon"));
+                serializeString(out, notification.extras.getString("largeIcon"));
+                out.writeLong(notification.extras.getLong("fireTime", -1));
+                out.writeLong(notification.extras.getLong("repeatInterval", -1));
+                serializeString(out, notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+                out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
+                out.writeBoolean(showWhen);
+                serializeString(out, notification.extras.getString("data"));
+            }
 
             serializeString(out, notification.getChannelId()); // TODO API 26
             Integer color = UnityNotificationManager.getNotificationColor(notification);
@@ -95,10 +102,6 @@ public class UnityNotificationUtilities {
             if (showWhen)
                 out.writeLong(notification.when);
 
-            byte[] extras = serializeParcelable(notification.extras);
-            out.writeInt(extras == null ? 0 : extras.length);
-            if (extras != null && extras.length > 0)
-                out.write(extras);
             return true;
         } catch (Exception e) {
             Log.e("Unity", "Failed to serialize notification", e);
@@ -156,17 +159,42 @@ public class UnityNotificationUtilities {
                 return null;
 
             // deserialize extras
-            int id = in.readInt();
-            String title = deserializeString(in);
-            String text = deserializeString(in);
-            String smallIcon = deserializeString(in);
-            String largeIcon = deserializeString(in);
-            long fireTime = in.readLong();
-            long repeatInterval = in.readLong();
-            String bigText = deserializeString(in);
-            boolean usesStopWatch = in.readBoolean();
-            boolean showWhen = in.readBoolean();
-            String intentData = deserializeString(in);
+            int id = 0;
+            String title, text, smallIcon, largeIcon, bigText, intentData;
+            long fireTime, repeatInterval;
+            boolean usesStopWatch, showWhen;
+            Bundle extras = null;
+            try {
+                extras = deserializeParcelable(in);
+            } catch (ClassCastException cce) {
+                Log.e("Unity", "Unexpect type of deserialized object", cce);
+            }
+
+            if (extras == null) {
+                // extras serialized manually
+                id = in.readInt();
+                title = deserializeString(in);
+                text = deserializeString(in);
+                smallIcon = deserializeString(in);
+                largeIcon = deserializeString(in);
+                fireTime = in.readLong();
+                repeatInterval = in.readLong();
+                bigText = deserializeString(in);
+                usesStopWatch = in.readBoolean();
+                showWhen = in.readBoolean();
+                intentData = deserializeString(in);
+            } else {
+                title = extras.getString(Notification.EXTRA_TITLE);
+                text = extras.getString(Notification.EXTRA_TEXT);
+                smallIcon = extras.getString("smallIcon");
+                largeIcon = extras.getString("largeIcon");
+                fireTime = extras.getLong("fireTime", -1);
+                repeatInterval = extras.getLong("repeatInterval", -1);
+                bigText = extras.getString(Notification.EXTRA_BIG_TEXT);
+                usesStopWatch = extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false);
+                showWhen = extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
+                intentData = extras.getString("data");
+            }
 
             String channelId = deserializeString(in);
             boolean haveColor = in.readBoolean();
@@ -181,25 +209,24 @@ public class UnityNotificationUtilities {
             String sortKey = deserializeString(in);
             long when = showWhen ? in.readLong() : 0;
 
-            Bundle extras = null;
-            try {
-                extras = deserializeParcelable(in);
-            } catch (ClassCastException cce) {
-                Log.e("Unity", "Unexpect type of deserialized object", cce);
-            }
-
             Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
-            builder.getExtras().putInt("id", id);
+            if (extras != null)
+                builder.setExtras(extras);
+            else {
+                builder.getExtras().putInt("id", id);
+                UnityNotificationManager.setNotificationIcon(builder, "smallIcon", smallIcon);
+                UnityNotificationManager.setNotificationIcon(builder, "largeIcon", largeIcon);
+                if (fireTime != -1)
+                    builder.getExtras().putLong("fireTime", fireTime);
+                if (repeatInterval != -1)
+                    builder.getExtras().putLong("repeatInterval", repeatInterval);
+                if (intentData != null)
+                    builder.getExtras().putString("data", intentData);
+            }
             if (title != null)
                 builder.setContentTitle(title);
             if (text != null)
                 builder.setContentText(text);
-            UnityNotificationManager.setNotificationIcon(builder, "smallIcon", smallIcon);
-            UnityNotificationManager.setNotificationIcon(builder, "largeIcon", largeIcon);
-            if (fireTime != -1)
-                builder.getExtras().putLong("fireTime", fireTime);
-            if (repeatInterval != -1)
-                builder.getExtras().putLong("repeatInterval", repeatInterval);
             if (bigText != null)
                 builder.setStyle(new Notification.BigTextStyle().bigText(bigText));
             if (haveColor)
@@ -219,10 +246,6 @@ public class UnityNotificationUtilities {
                 builder.setShowWhen(true);
                 builder.setWhen(when);
             }
-            if (intentData != null)
-                builder.getExtras().putString("data", intentData);
-            if (extras != null)
-                builder.setExtras(extras);
 
             return builder.build();
         } catch (Exception e) {
