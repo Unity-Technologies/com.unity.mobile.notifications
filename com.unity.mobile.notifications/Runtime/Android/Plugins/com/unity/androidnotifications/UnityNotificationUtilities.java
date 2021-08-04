@@ -14,6 +14,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Base64;
 import android.util.Log;
 
@@ -75,6 +77,10 @@ public class UnityNotificationUtilities {
             if (showWhen)
                 out.writeLong(notification.when);
             serializeString(out, notification.extras.getString("data"));
+            byte[] extras = serializeParcelable(notification.extras);
+            out.writeInt(extras == null ? 0 : extras.length);
+            if (extras != null && extras.length > 0)
+                out.write(extras);
 
             out.close();
             byte[] bytes = data.toByteArray();
@@ -92,6 +98,19 @@ public class UnityNotificationUtilities {
             byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
             out.writeInt(bytes.length);
             out.write(bytes);
+        }
+    }
+
+    private static byte[] serializeParcelable(Parcelable obj) {
+        try {
+            Parcel p = Parcel.obtain();
+            Bundle b = new Bundle();
+            b.putParcelable("obj", obj);
+            p.writeParcelable(b, 0);
+            return p.marshall();
+        } catch (Exception e) {
+            Log.e("Unity", "Failed to serialize Parcelable", e);
+            return null;
         }
     }
 
@@ -136,6 +155,12 @@ public class UnityNotificationUtilities {
             boolean showWhen = in.readBoolean();
             long when = showWhen ? in.readLong() : 0;
             String intentData = deserializeString(in);
+            Bundle extras = null;
+            try {
+                extras = deserializeParcelable(in);
+            } catch (ClassCastException cce) {
+                Log.e("Unity", "Unexpect type of deserialized object", cce);
+            }
 
             Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
             builder.getExtras().putInt("id", id);
@@ -170,6 +195,8 @@ public class UnityNotificationUtilities {
             }
             if (intentData != null)
                 builder.getExtras().putString("data", intentData);
+            if (extras != null)
+                builder.setExtras(extras);
 
             Notification notification = builder.build();
 
@@ -190,6 +217,28 @@ public class UnityNotificationUtilities {
         byte[] bytes = new byte[length];
         in.read(bytes);
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private static <T> T deserializeParcelable(DataInputStream in) throws IOException {
+        int length = in.readInt();
+        if (length <= 0)
+            return null;
+        byte[] bytes = new byte[length];
+        in.read(bytes);
+
+        try {
+            Parcel p = Parcel.obtain();
+            p.unmarshall(bytes, 0, bytes.length);
+            p.setDataPosition(0);
+            Bundle b = p.readParcelable(null);
+            if (b != null) {
+                return b.getParcelable("obj");
+            }
+        } catch (Exception e) {
+            Log.e("Unity", "Failed to deserialize parcelable", e);
+        }
+
+        return null;
     }
 
     protected static Class<?> getOpenAppActivity(Context context, boolean fallbackToDefault) {
