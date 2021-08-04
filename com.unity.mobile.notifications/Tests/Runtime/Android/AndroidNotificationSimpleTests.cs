@@ -173,4 +173,27 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(kChannelId, deserializedData.Channel);
         CheckNotificationsMatch(original, deserializedData.Notification);
     }
+
+    [Test]
+    public void SerializeDeserializeNotificationIntent_CanPutSimpleExtras()
+    {
+        const int notificationId = 125;
+
+        var original = new AndroidNotification();
+        original.FireTime = DateTime.Now;
+
+        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        using var extras = builder.Call<AndroidJavaObject>("getExtras");
+        extras.Call("putInt", "testInt", 5);
+        extras.Call("putBoolean", "testBool", true);
+        extras.Call("putString", "testString", "the_test");
+
+        var deserializedData = SerializeDeserializeNotification(builder);
+
+        using var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
+        Assert.IsNotNull(deserializedExtras);
+        Assert.AreEqual(5, deserializedExtras.Call<int>("getInt", "testInt"));
+        Assert.AreEqual(true, deserializedExtras.Call<bool>("getBoolean", "testBool"));
+        Assert.AreEqual("the_test", deserializedExtras.Call<string>("getString", "testString"));
+    }
 }
