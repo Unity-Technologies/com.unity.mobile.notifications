@@ -126,7 +126,8 @@ class AndroidNotificationSimpleTests
 
         using var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
         Assert.IsNotNull(deserializedIntent);
-        using var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
+        // don't dispose notification, it is kept in AndroidNotificationIntentData
+        var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
         Assert.IsNotNull(deserializedNotification);
         return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
     }
