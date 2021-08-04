@@ -66,8 +66,9 @@ public class UnityNotificationUtilities {
         try {
             out.write(UNITY_MAGIC_NUMBER);
             out.writeInt(INTENT_SERIALIZATION_VERSION);
+
+            // serialize extras
             out.writeInt(notification.extras.getInt("id"));
-            serializeString(out, notification.getChannelId());
             serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
             serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
             serializeString(out, notification.extras.getString("smallIcon"));
@@ -75,22 +76,25 @@ public class UnityNotificationUtilities {
             out.writeLong(notification.extras.getLong("fireTime", -1));
             out.writeLong(notification.extras.getLong("repeatInterval", -1));
             serializeString(out, notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+            out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
+            boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
+            out.writeBoolean(showWhen);
+            serializeString(out, notification.extras.getString("data"));
+
+            serializeString(out, notification.getChannelId()); // TODO API 26
             Integer color = UnityNotificationManager.getNotificationColor(notification);
             out.writeBoolean(color != null);
             if (color != null)
                 out.writeInt(color);
             out.writeInt(notification.number);
             out.writeBoolean(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
-            out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
             serializeString(out, notification.getGroup()); //TODO Added in API 20
             out.writeBoolean(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));  // TODO added in API 20
             out.writeInt(UnityNotificationManager.getNotificationGroupAlertBehavior(notification));
             serializeString(out, notification.getSortKey()); // TODO added in API 20
-            boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
-            out.writeBoolean(showWhen);
             if (showWhen)
                 out.writeLong(notification.when);
-            serializeString(out, notification.extras.getString("data"));
+
             byte[] extras = serializeParcelable(notification.extras);
             out.writeInt(extras == null ? 0 : extras.length);
             if (extras != null && extras.length > 0)
@@ -150,8 +154,9 @@ public class UnityNotificationUtilities {
             int version = in.readInt();
             if (version < 0 || version > INTENT_SERIALIZATION_VERSION)
                 return null;
+
+            // deserialize extras
             int id = in.readInt();
-            String channelId = deserializeString(in);
             String title = deserializeString(in);
             String text = deserializeString(in);
             String smallIcon = deserializeString(in);
@@ -159,20 +164,23 @@ public class UnityNotificationUtilities {
             long fireTime = in.readLong();
             long repeatInterval = in.readLong();
             String bigText = deserializeString(in);
+            boolean usesStopWatch = in.readBoolean();
+            boolean showWhen = in.readBoolean();
+            String intentData = deserializeString(in);
+
+            String channelId = deserializeString(in);
             boolean haveColor = in.readBoolean();
             int color = 0;
             if (haveColor)
                 color = in.readInt();
             int number = in.readInt();
             boolean shouldAutoCancel = in.readBoolean();
-            boolean usesStopWatch = in.readBoolean();
             String group = deserializeString(in);
             boolean groupSummary = in.readBoolean();
             int groupAlertBehavior = in.readInt();
             String sortKey = deserializeString(in);
-            boolean showWhen = in.readBoolean();
             long when = showWhen ? in.readLong() : 0;
-            String intentData = deserializeString(in);
+
             Bundle extras = null;
             try {
                 extras = deserializeParcelable(in);
