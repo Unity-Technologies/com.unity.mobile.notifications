@@ -50,6 +50,20 @@ public class UnityNotificationUtilities {
                 return null;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
+            if (serializeNotificationCustom(notification, out)) {
+                out.close();
+                byte[] bytes = data.toByteArray();
+                return Base64.encodeToString(bytes, 0, bytes.length, 0);
+            }
+        } catch (Exception e) {
+            Log.e("Unity", "Failed to serialize notification", e);
+        }
+
+        return null;
+    }
+
+    private static boolean serializeNotificationCustom(Notification notification, DataOutputStream out) {
+        try {
             out.write(UNITY_MAGIC_NUMBER);
             out.writeInt(INTENT_SERIALIZATION_VERSION);
             out.writeInt(notification.extras.getInt("id"));
@@ -81,13 +95,10 @@ public class UnityNotificationUtilities {
             out.writeInt(extras == null ? 0 : extras.length);
             if (extras != null && extras.length > 0)
                 out.write(extras);
-
-            out.close();
-            byte[] bytes = data.toByteArray();
-
-            return Base64.encodeToString(bytes, 0, bytes.length, 0);
+            return true;
         } catch (Exception e) {
-            return null;
+            Log.e("Unity", "Failed to serialize notification", e);
+            return false;
         }
     }
 
@@ -115,10 +126,17 @@ public class UnityNotificationUtilities {
     }
 
     protected static Intent deserializeNotificationIntent(Context context, String src) {
+        byte[] newByt = Base64.decode(src, 0);
+        ByteArrayInputStream data = new ByteArrayInputStream(newByt);
+        DataInputStream in = new DataInputStream(data);
+        Notification notification = deserializeNotificationCustom(in);
+        Intent intent = new Intent(context, UnityNotificationManager.class);
+        intent.putExtra("unityNotification", notification);
+        return intent;
+    }
+
+    private static Notification deserializeNotificationCustom(DataInputStream in) {
         try {
-            byte[] newByt = Base64.decode(src, 0);
-            ByteArrayInputStream data = new ByteArrayInputStream(newByt);
-            DataInputStream in = new DataInputStream(data);
             boolean magicNumberMatch = true;
             for (int i = 0; i < UNITY_MAGIC_NUMBER.length; ++i) {
                 byte b = in.readByte();
@@ -198,12 +216,7 @@ public class UnityNotificationUtilities {
             if (extras != null)
                 builder.setExtras(extras);
 
-            Notification notification = builder.build();
-
-            Intent intent = new Intent(context, UnityNotificationManager.class);
-            intent.putExtra("unityNotification", notification);
-
-            return intent;
+            return builder.build();
         } catch (Exception e) {
             Log.e("Unity", "Failed to deserialize notification", e);
             return null;
