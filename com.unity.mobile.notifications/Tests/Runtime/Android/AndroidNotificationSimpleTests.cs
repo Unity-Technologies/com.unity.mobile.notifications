@@ -78,7 +78,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
-    public void SerializeDeserializeNotificationIntent_AllParameters()
+    public void BasicSerializeDeserializeNotification_AllParameters()
     {
         const int notificationId = 123;
 
@@ -117,24 +117,27 @@ class AndroidNotificationSimpleTests
 
     AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder)
     {
-        using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-        using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-        using var context = activity.Call<AndroidJavaObject>("getApplicationContext");
-        using var intent = new AndroidJavaObject("android.content.Intent", context, managerClass);
         using var javaNotif = builder.Call<AndroidJavaObject>("build");
-        intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
         using var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        AndroidJavaObject serializedBytes;  // use java object, since we don't need the bytes, so don't waste time on marshalling
+        using (var byteStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
+        {
+            using var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream);
+            var didSerialize = utilsClass.CallStatic<bool>("serializeNotificationCustom", javaNotif, dataStream);
+            Assert.IsTrue(didSerialize);
+            dataStream.Call("close");
+            serializedBytes = byteStream.Call<AndroidJavaObject>("toByteArray");
+        }
+        Assert.IsNotNull(serializedBytes);
 
-        var serializedString = utilsClass.CallStatic<string>("serializeNotificationIntent", intent);
-        Assert.IsNotEmpty(serializedString);
-
-        using var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
-        Assert.IsNotNull(deserializedIntent);
-        // don't dispose notification, it is kept in AndroidNotificationIntentData
-        var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
-        Assert.IsNotNull(deserializedNotification);
-        return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+        using (var byteStream = new AndroidJavaObject("java.io.ByteArrayInputStream", serializedBytes))
+        {
+            using var dataStream = new AndroidJavaObject("java.io.DataInputStream", byteStream);
+            // don't dispose notification, it is kept in AndroidNotificationIntentData
+            var deserializedNotification = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", dataStream);
+            Assert.IsNotNull(deserializedNotification);
+            return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+        }
     }
 
     void CheckNotificationsMatch(AndroidNotification original, AndroidNotification other)
@@ -160,7 +163,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
-    public void SerializeDeserializeNotificationIntent_MinimumParameters()
+    public void BasicSerializeDeserializeNotification_MinimumParameters()
     {
         const int notificationId = 124;
 
@@ -175,7 +178,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
-    public void SerializeDeserializeNotificationIntent_CanPutSimpleExtras()
+    public void BasicSerializeDeserializeNotification_CanPutSimpleExtras()
     {
         const int notificationId = 125;
 
