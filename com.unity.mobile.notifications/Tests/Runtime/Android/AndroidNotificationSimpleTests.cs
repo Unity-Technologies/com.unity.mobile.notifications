@@ -112,6 +112,11 @@ class AndroidNotificationSimpleTests
     AndroidNotificationIntentData SerializeDeserializeNotification(AndroidNotification original, int notificationId)
     {
         using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        return SerializeDeserializeNotification(builder);
+    }
+
+    AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder)
+    {
         using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
         using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
