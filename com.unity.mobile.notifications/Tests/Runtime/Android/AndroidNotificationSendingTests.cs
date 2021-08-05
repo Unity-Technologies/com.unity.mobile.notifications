@@ -159,7 +159,7 @@ class AndroidNotificationSendingTests
         n.Title = "Repeating Notification Title";
         n.Text = "Repeating Notification Text";
         n.FireTime = System.DateTime.Now;
-        n.RepeatInterval = new System.TimeSpan(0, 0, 1);
+        n.RepeatInterval = new System.TimeSpan(0, 0, 5); // interval needs to be quite big for test to be reliable
 
         Debug.LogWarning("ScheduleRepeatableNotification_NotificationsAreReceived sends notification");
 
@@ -168,7 +168,7 @@ class AndroidNotificationSendingTests
         // we use inexact scheduling, so repeated notification may take a while to appear
         // inexact also can group, so for test purposes we only check that it repeats at least once
         yield return WaitForNotification(8.0f);
-        yield return WaitForNotification(8.0f);
+        yield return WaitForNotification(30.0f);
         AndroidNotificationCenter.CancelScheduledNotification(originalId);
 
         Debug.LogWarning("ScheduleRepeatableNotification_NotificationsAreReceived completed");
