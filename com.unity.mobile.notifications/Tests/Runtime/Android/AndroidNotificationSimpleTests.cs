@@ -234,4 +234,44 @@ class AndroidNotificationSimpleTests
         Assert.IsNull(bitmapAfterSerialization);
         Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
     }
+
+    AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidNotification original, int notificationId)
+    {
+        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        return SerializeDeserializeNotificationIntent(builder);
+    }
+
+    AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidJavaObject builder)
+    {
+        using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        using var context = activity.Call<AndroidJavaObject>("getApplicationContext");
+        using var intent = new AndroidJavaObject("android.content.Intent", context, managerClass);
+        using var javaNotif = builder.Call<AndroidJavaObject>("build");
+        intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
+        using var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+
+        var serializedString = utilsClass.CallStatic<AndroidJavaObject>("serializeNotificationIntent", intent);
+        Assert.IsNotNull(serializedString);
+
+        using var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
+        Assert.IsNotNull(deserializedIntent);
+        // don't dispose notification, it is kept in AndroidNotificationIntentData
+        var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
+        Assert.IsNotNull(deserializedNotification);
+        return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+    }
+
+    [Test]
+    public void NotificationIntentSerialization_SimpleNotification()
+    {
+        const int notificationId = 1234;
+
+        var original = new AndroidNotification();
+        original.FireTime = DateTime.Now.AddSeconds(2);
+
+        var deserializedData = SerializeDeserializeNotificationIntent(original, notificationId);
+        Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
+    }
 }
