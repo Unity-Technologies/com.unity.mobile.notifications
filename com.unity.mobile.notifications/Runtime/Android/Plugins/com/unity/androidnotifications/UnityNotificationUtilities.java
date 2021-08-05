@@ -22,7 +22,7 @@ import android.util.Log;
 public class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
     private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
-    private static final int INTENT_SERIALIZATION_VERSION = 0;
+    private static final int NOTIFICATION_SERIALIZATION_VERSION = 0;
 
     protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
@@ -65,7 +65,7 @@ public class UnityNotificationUtilities {
     private static boolean serializeNotificationCustom(Notification notification, DataOutputStream out) {
         try {
             out.write(UNITY_MAGIC_NUMBER);
-            out.writeInt(INTENT_SERIALIZATION_VERSION);
+            out.writeInt(NOTIFICATION_SERIALIZATION_VERSION);
 
             // serialize extras
             boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
@@ -142,20 +142,29 @@ public class UnityNotificationUtilities {
         return intent;
     }
 
-    private static Notification deserializeNotificationCustom(DataInputStream in) {
+    private static boolean readAndCheckMagicNumber(DataInputStream in, byte[] magic) {
         try {
             boolean magicNumberMatch = true;
-            for (int i = 0; i < UNITY_MAGIC_NUMBER.length; ++i) {
+            for (int i = 0; i < magic.length; ++i) {
                 byte b = in.readByte();
-                if (b != UNITY_MAGIC_NUMBER[i]) {
+                if (b != magic[i]) {
                     magicNumberMatch = false;
                     break;
                 }
             }
-            if (!magicNumberMatch)
+
+            return magicNumberMatch;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static Notification deserializeNotificationCustom(DataInputStream in) {
+        try {
+            if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER))
                 return null;
             int version = in.readInt();
-            if (version < 0 || version > INTENT_SERIALIZATION_VERSION)
+            if (version < 0 || version > NOTIFICATION_SERIALIZATION_VERSION)
                 return null;
 
             // deserialize extras
