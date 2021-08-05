@@ -22,7 +22,9 @@ import android.util.Log;
 public class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
     private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
+    private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
     private static final int NOTIFICATION_SERIALIZATION_VERSION = 0;
+    private static final int INTENT_SERIALIZATION_VERSION = 0;
 
     protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
@@ -50,7 +52,12 @@ public class UnityNotificationUtilities {
                 return null;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
-            if (serializeNotificationCustom(notification, out)) {
+            boolean success = serializeNotificationParcel(intent, out);
+            if (!success) {
+                data.reset();
+                success = serializeNotificationCustom(notification, out);
+            }
+            if (success) {
                 out.close();
                 byte[] bytes = data.toByteArray();
                 return Base64.encodeToString(bytes, 0, bytes.length, 0);
@@ -60,6 +67,23 @@ public class UnityNotificationUtilities {
         }
 
         return null;
+    }
+
+    private static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
+        try {
+            byte[] bytes = serializeParcelable(intent);
+            if (bytes == null || bytes.length == 0)
+                return false;
+            out.write(UNITY_MAGIC_NUMBER_PARCELLED);
+            out.writeInt(INTENT_SERIALIZATION_VERSION);
+            out.writeInt(bytes.length);
+            out.write(bytes);
+            return true;
+        } catch (Exception e) {
+            Log.e("Unity", "Failed to serialize notification as Parcel", e);
+        }
+
+        return false;
     }
 
     private static boolean serializeNotificationCustom(Notification notification, DataOutputStream out) {
@@ -136,8 +160,12 @@ public class UnityNotificationUtilities {
         byte[] newByt = Base64.decode(src, 0);
         ByteArrayInputStream data = new ByteArrayInputStream(newByt);
         DataInputStream in = new DataInputStream(data);
+        Intent intent = deserializeNotificationIntent(in);
+        if (intent != null)
+            return intent;
+        data.reset();
         Notification notification = deserializeNotificationCustom(in);
-        Intent intent = new Intent(context, UnityNotificationManager.class);
+        intent = new Intent(context, UnityNotificationManager.class);
         intent.putExtra("unityNotification", notification);
         return intent;
     }
@@ -156,6 +184,20 @@ public class UnityNotificationUtilities {
             return magicNumberMatch;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    private static Intent deserializeNotificationIntent(DataInputStream in) {
+        try {
+            if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER_PARCELLED))
+                return null;
+            int version = in.readInt();
+            if (version <0 || version > INTENT_SERIALIZATION_VERSION)
+                return null;
+            return deserializeParcelable(in);
+        } catch (Exception e) {
+            Log.e("Unity", "Failed to deserialize notification intent", e);
+            return null;
         }
     }
 
