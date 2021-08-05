@@ -199,4 +199,39 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(true, deserializedExtras.Call<bool>("getBoolean", "testBool"));
         Assert.AreEqual("the_test", deserializedExtras.Call<string>("getString", "testString"));
     }
+
+    AndroidJavaObject CreateBitmap()
+    {
+        using var configClass = new AndroidJavaClass("android.graphics.Bitmap$Config");
+        var ARGB_8888 = configClass.GetStatic<AndroidJavaObject>("ARGB_8888");
+        using var bitmapClass = new AndroidJavaClass("android.graphics.Bitmap");
+        return bitmapClass.CallStatic<AndroidJavaObject>("createBitmap", 10000, 10000, ARGB_8888);
+    }
+
+    [Test]
+    public void BasicSerializeDeserializeNotification_WorksWithBinderExtras()
+    {
+        const int notificationId = 126;
+
+        var original = new AndroidNotification();
+        original.FireTime = DateTime.Now.AddSeconds(2);
+
+        using var bitmap = CreateBitmap();
+        Assert.IsNotNull(bitmap);
+
+        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        using var extras = builder.Call<AndroidJavaObject>("getExtras");
+
+        extras.Call("putParcelable", "binder_item", bitmap);
+
+        var deserializedData = SerializeDeserializeNotification(builder);
+
+        using var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
+        using var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
+
+        // both these are in extras, so we should have lost bitmap, but preserved fire time
+        // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
+        Assert.IsNull(bitmapAfterSerialization);
+        Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
+    }
 }
