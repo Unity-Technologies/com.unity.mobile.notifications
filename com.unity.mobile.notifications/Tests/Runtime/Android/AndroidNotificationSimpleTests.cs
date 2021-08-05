@@ -274,4 +274,27 @@ class AndroidNotificationSimpleTests
         var deserializedData = SerializeDeserializeNotificationIntent(original, notificationId);
         Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
     }
+
+    [Test]
+    public void NotificationIntentSerialization_NotificationWithBinderObject()
+    {
+        const int notificationId = 1234;
+
+        var original = new AndroidNotification();
+        original.FireTime = DateTime.Now.AddSeconds(2);
+
+        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        using var extras = builder.Call<AndroidJavaObject>("getExtras");
+        using var bitmap = CreateBitmap();
+        Assert.IsNotNull(bitmap);
+        extras.Call("putParcelable", "binder_item", bitmap);
+
+        var deserializedData = SerializeDeserializeNotificationIntent(builder);
+
+        Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
+        using var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
+        using var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
+        // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
+        Assert.IsNull(bitmapAfterSerialization);
+    }
 }
