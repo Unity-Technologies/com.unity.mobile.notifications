@@ -387,7 +387,7 @@ namespace Unity.Notifications.Android
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
             notificationBuilder.Call<AndroidJavaObject>("setWhen", timestampValue).Dispose();
             if (!string.IsNullOrEmpty(notification.Group))
-                s_NotificationManagerClass.CallStatic("setNotificationGroup", notificationBuilder, notification.Group);
+                notificationBuilder.Call<AndroidJavaObject>("setGroup", notification.Group).Dispose();
             if (notification.GroupSummary)
                 s_NotificationManagerClass.CallStatic("setNotificationGroupSummary", notificationBuilder, notification.GroupSummary);
             if (!string.IsNullOrEmpty(notification.SortKey))

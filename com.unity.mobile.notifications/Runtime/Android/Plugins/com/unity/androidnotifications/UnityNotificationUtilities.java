@@ -298,8 +298,8 @@ public class UnityNotificationUtilities {
                 builder.setNumber(number);
             builder.setAutoCancel(shouldAutoCancel);
             UnityNotificationManager.setNotificationUsesChronometer(builder, usesStopWatch);
-            if (group != null)
-                UnityNotificationManager.setNotificationGroup(builder, group);
+            if (group != null && group.length() > 0)
+                builder.setGroup(group);
             UnityNotificationManager.setNotificationGroupSummary(builder, groupSummary);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehavior);
             if (sortKey != null && sortKey.length() > 0)
@@ -362,7 +362,8 @@ public class UnityNotificationUtilities {
                 builder.setNumber(number);
             if (intentData != null)
                 builder.getExtras().putString("data", intentData);
-            UnityNotificationManager.setNotificationGroup(builder, group);
+            if (null != group && group.length() > 0)
+                builder.setGroup(group);
             UnityNotificationManager.setNotificationGroupSummary(builder, groupSummary);
             UnityNotificationManager.setNotificationSortKey(builder, sortKey);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehaviour);
