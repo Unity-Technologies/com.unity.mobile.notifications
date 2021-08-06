@@ -111,18 +111,20 @@ class AndroidNotificationSimpleTests
 
     AndroidNotificationIntentData SerializeDeserializeNotification(AndroidNotification original, int notificationId)
     {
-        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        return SerializeDeserializeNotification(builder);
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            return SerializeDeserializeNotification(builder);
+        }
     }
 
     AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder)
     {
-        using var javaNotif = builder.Call<AndroidJavaObject>("build");
-        using var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        var javaNotif = builder.Call<AndroidJavaObject>("build");
+        var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
         AndroidJavaObject serializedBytes;  // use java object, since we don't need the bytes, so don't waste time on marshalling
         using (var byteStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
         {
-            using var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream);
+            var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream);
             var didSerialize = utilsClass.CallStatic<bool>("serializeNotificationCustom", javaNotif, dataStream);
             Assert.IsTrue(didSerialize);
             dataStream.Call("close");
@@ -132,7 +134,7 @@ class AndroidNotificationSimpleTests
 
         using (var byteStream = new AndroidJavaObject("java.io.ByteArrayInputStream", serializedBytes))
         {
-            using var dataStream = new AndroidJavaObject("java.io.DataInputStream", byteStream);
+            var dataStream = new AndroidJavaObject("java.io.DataInputStream", byteStream);
             // don't dispose notification, it is kept in AndroidNotificationIntentData
             var deserializedNotification = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", dataStream);
             Assert.IsNotNull(deserializedNotification);
@@ -185,15 +187,15 @@ class AndroidNotificationSimpleTests
         var original = new AndroidNotification();
         original.FireTime = DateTime.Now;
 
-        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        using var extras = builder.Call<AndroidJavaObject>("getExtras");
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var extras = builder.Call<AndroidJavaObject>("getExtras");
         extras.Call("putInt", "testInt", 5);
         extras.Call("putBoolean", "testBool", true);
         extras.Call("putString", "testString", "the_test");
 
         var deserializedData = SerializeDeserializeNotification(builder);
 
-        using var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
+        var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
         Assert.IsNotNull(deserializedExtras);
         Assert.AreEqual(5, deserializedExtras.Call<int>("getInt", "testInt"));
         Assert.AreEqual(true, deserializedExtras.Call<bool>("getBoolean", "testBool"));
@@ -202,9 +204,9 @@ class AndroidNotificationSimpleTests
 
     AndroidJavaObject CreateBitmap()
     {
-        using var configClass = new AndroidJavaClass("android.graphics.Bitmap$Config");
+        var configClass = new AndroidJavaClass("android.graphics.Bitmap$Config");
         var ARGB_8888 = configClass.GetStatic<AndroidJavaObject>("ARGB_8888");
-        using var bitmapClass = new AndroidJavaClass("android.graphics.Bitmap");
+        var bitmapClass = new AndroidJavaClass("android.graphics.Bitmap");
         return bitmapClass.CallStatic<AndroidJavaObject>("createBitmap", 10000, 10000, ARGB_8888);
     }
 
@@ -216,18 +218,18 @@ class AndroidNotificationSimpleTests
         var original = new AndroidNotification();
         original.FireTime = DateTime.Now.AddSeconds(2);
 
-        using var bitmap = CreateBitmap();
+        var bitmap = CreateBitmap();
         Assert.IsNotNull(bitmap);
 
-        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        using var extras = builder.Call<AndroidJavaObject>("getExtras");
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var extras = builder.Call<AndroidJavaObject>("getExtras");
 
         extras.Call("putParcelable", "binder_item", bitmap);
 
         var deserializedData = SerializeDeserializeNotification(builder);
 
-        using var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
-        using var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
+        var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
+        var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
 
         // both these are in extras, so we should have lost bitmap, but preserved fire time
         // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
@@ -237,25 +239,27 @@ class AndroidNotificationSimpleTests
 
     AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidNotification original, int notificationId)
     {
-        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        return SerializeDeserializeNotificationIntent(builder);
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            return SerializeDeserializeNotificationIntent(builder);
+        }
     }
 
     AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidJavaObject builder)
     {
-        using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-        using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-        using var context = activity.Call<AndroidJavaObject>("getApplicationContext");
-        using var intent = new AndroidJavaObject("android.content.Intent", context, managerClass);
-        using var javaNotif = builder.Call<AndroidJavaObject>("build");
+        var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        var context = activity.Call<AndroidJavaObject>("getApplicationContext");
+        var intent = new AndroidJavaObject("android.content.Intent", context, managerClass);
+        var javaNotif = builder.Call<AndroidJavaObject>("build");
         intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
-        using var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
 
         var serializedString = utilsClass.CallStatic<AndroidJavaObject>("serializeNotificationIntent", intent);
         Assert.IsNotNull(serializedString);
 
-        using var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
+        var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
         Assert.IsNotNull(deserializedIntent);
         // don't dispose notification, it is kept in AndroidNotificationIntentData
         var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
@@ -283,17 +287,17 @@ class AndroidNotificationSimpleTests
         var original = new AndroidNotification();
         original.FireTime = DateTime.Now.AddSeconds(2);
 
-        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        using var extras = builder.Call<AndroidJavaObject>("getExtras");
-        using var bitmap = CreateBitmap();
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var extras = builder.Call<AndroidJavaObject>("getExtras");
+        var bitmap = CreateBitmap();
         Assert.IsNotNull(bitmap);
         extras.Call("putParcelable", "binder_item", bitmap);
 
         var deserializedData = SerializeDeserializeNotificationIntent(builder);
 
         Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
-        using var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
-        using var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
+        var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
+        var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
         // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
         Assert.IsNull(bitmapAfterSerialization);
     }
@@ -303,11 +307,11 @@ class AndroidNotificationSimpleTests
     {
         const int notificationId = 12345;
 
-        using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-        using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-        using var context = activity.Call<AndroidJavaObject>("getApplicationContext");
-        using var notificationIntent = new AndroidJavaObject("android.content.Intent", context, managerClass);
+        var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        var context = activity.Call<AndroidJavaObject>("getApplicationContext");
+        var notificationIntent = new AndroidJavaObject("android.content.Intent", context, managerClass);
 
         var fireTime = DateTime.Now.AddSeconds(3);
         var repeatInterval = new TimeSpan(0, 0, 5);
@@ -333,15 +337,15 @@ class AndroidNotificationSimpleTests
         notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", (int)GroupAlertBehaviours.GroupAlertChildren);
         notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", true);
 
-        using var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
-        using var bundle = notificationIntent.Call<AndroidJavaObject>("getExtras");
-        using var parcelClass = new AndroidJavaClass("android.os.Parcel");
-        using var parcel = parcelClass.CallStatic<AndroidJavaObject>("obtain");
+        var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        var bundle = notificationIntent.Call<AndroidJavaObject>("getExtras");
+        var parcelClass = new AndroidJavaClass("android.os.Parcel");
+        var parcel = parcelClass.CallStatic<AndroidJavaObject>("obtain");
         bundle.Call("writeToParcel", parcel, 0);
         var serialized = parcel.Call<AndroidJavaObject>("marshall");
         Assert.IsNotNull(serialized);
 
-        using var deserialized = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serialized);
+        var deserialized = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serialized);
         Assert.IsNotNull(deserialized);
         var deserializedNotification = deserialized.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
         Assert.IsNotNull(deserializedNotification);
