@@ -157,14 +157,23 @@ public class UnityNotificationUtilities {
     }
 
     protected static Intent deserializeNotificationIntent(Context context, String src) {
-        byte[] newByt = Base64.decode(src, 0);
-        ByteArrayInputStream data = new ByteArrayInputStream(newByt);
+        byte[] bytes = Base64.decode(src, 0);
+        return deserializeNotificationIntent(context, bytes);
+    }
+
+    private static Intent deserializeNotificationIntent(Context context, byte[] bytes) {
+        ByteArrayInputStream data = new ByteArrayInputStream(bytes);
         DataInputStream in = new DataInputStream(data);
         Intent intent = deserializeNotificationIntent(in);
         if (intent != null)
             return intent;
         data.reset();
         Notification notification = deserializeNotificationCustom(in);
+        if (notification == null) {
+            notification = deserializedFromOldIntent(bytes);
+        }
+        if (notification == null)
+            return null;
         intent = new Intent(context, UnityNotificationManager.class);
         intent.putExtra("unityNotification", notification);
         return intent;
@@ -301,6 +310,64 @@ public class UnityNotificationUtilities {
             return builder.build();
         } catch (Exception e) {
             Log.e("Unity", "Failed to deserialize notification", e);
+            return null;
+        }
+    }
+
+    private static Notification deserializedFromOldIntent(byte[] bytes) {
+        try {
+            Parcel p = Parcel.obtain();
+            p.unmarshall(bytes, 0, bytes.length);
+            p.setDataPosition(0);
+            Bundle bundle = new Bundle();
+            bundle.readFromParcel(p);
+
+            int id = bundle.getInt("id", -1);
+            String channelId = bundle.getString("channelID");
+            String textTitle = bundle.getString("textTitle");
+            String textContent = bundle.getString("textContent");
+            String smallIcon = bundle.getString("smallIconStr");
+            boolean autoCancel = bundle.getBoolean("autoCancel", false);
+            boolean usesChronometer = bundle.getBoolean("usesChronometer", false);
+            long fireTime = bundle.getLong("fireTime", -1);
+            long repeatInterval = bundle.getLong("repeatInterval", -1);
+            String largeIcon = bundle.getString("largeIconStr");
+            int style = bundle.getInt("style", -1);
+            int color = bundle.getInt("color", 0);
+            int number = bundle.getInt("number", 0);
+            String intentData = bundle.getString("data");
+            String group = bundle.getString("group");
+            boolean groupSummary = bundle.getBoolean("groupSummary", false);
+            String sortKey = bundle.getString("sortKey");
+            int groupAlertBehaviour = bundle.getInt("groupAlertBehaviour", -1);
+            boolean showTimestamp = bundle.getBoolean("showTimestamp", false);
+
+            Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
+            builder.getExtras().putInt("id", id);
+            builder.setContentTitle(textTitle);
+            builder.setContentText(textContent);
+            UnityNotificationManager.setNotificationIcon(builder, "smallIcon", smallIcon);
+            builder.setAutoCancel(autoCancel);
+            builder.setUsesChronometer(usesChronometer);
+            builder.getExtras().putLong("fireTime", fireTime);
+            builder.getExtras().putLong("repeatInterval", repeatInterval);
+            UnityNotificationManager.setNotificationIcon(builder, "largeIcon", largeIcon);
+            if (style == 2)
+                builder.setStyle(new Notification.BigTextStyle().bigText(textContent));
+            if (color != 0)
+                UnityNotificationManager.setNotificationColor(builder, color);
+            if (number >= 0)
+                builder.setNumber(number);
+            if (intentData != null)
+                builder.getExtras().putString("data", intentData);
+            UnityNotificationManager.setNotificationGroup(builder, group);
+            UnityNotificationManager.setNotificationGroupSummary(builder, groupSummary);
+            UnityNotificationManager.setNotificationSortKey(builder, sortKey);
+            UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehaviour);
+            UnityNotificationManager.setNotificationShowTimestamp(builder, showTimestamp);
+            return builder.build();
+        } catch (Exception e) {
+            Log.e("Unity", "Failed to deserialize old style notification", e);
             return null;
         }
     }
