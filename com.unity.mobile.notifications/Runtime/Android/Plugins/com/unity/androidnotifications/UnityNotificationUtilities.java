@@ -303,7 +303,7 @@ public class UnityNotificationUtilities {
             builder.setGroupSummary(groupSummary);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehavior);
             if (sortKey != null && sortKey.length() > 0)
-                UnityNotificationManager.setNotificationSortKey(builder, sortKey);
+                builder.setSortKey(sortKey);
             if (showWhen) {
                 builder.setShowWhen(true);
                 builder.setWhen(when);
@@ -365,7 +365,8 @@ public class UnityNotificationUtilities {
             if (null != group && group.length() > 0)
                 builder.setGroup(group);
             builder.setGroupSummary(groupSummary);
-            UnityNotificationManager.setNotificationSortKey(builder, sortKey);
+            if (null != sortKey && sortKey.length() > 0)
+                builder.setSortKey(sortKey);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehaviour);
             UnityNotificationManager.setNotificationShowTimestamp(builder, showTimestamp);
             return builder.build();
