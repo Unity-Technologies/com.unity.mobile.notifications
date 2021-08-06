@@ -377,7 +377,9 @@ public class UnityNotificationUtilities {
         if (length <= 0)
             return null;
         byte[] bytes = new byte[length];
-        in.read(bytes);
+        int didRead = in.read(bytes);
+        if (didRead != bytes.length)
+            throw new IOException("Insufficient amount of bytes read");
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
@@ -386,7 +388,9 @@ public class UnityNotificationUtilities {
         if (length <= 0)
             return null;
         byte[] bytes = new byte[length];
-        in.read(bytes);
+        int didRead = in.read(bytes);
+        if (didRead != bytes.length)
+            throw new IOException("Insufficient amount of bytes read");
 
         try {
             Parcel p = Parcel.obtain();
