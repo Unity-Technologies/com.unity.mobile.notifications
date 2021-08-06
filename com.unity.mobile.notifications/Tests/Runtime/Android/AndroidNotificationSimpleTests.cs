@@ -297,4 +297,74 @@ class AndroidNotificationSimpleTests
         // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
         Assert.IsNull(bitmapAfterSerialization);
     }
+
+    [Test]
+    public void OldTypeSerializedNotificationCanBedeserialized()
+    {
+        const int notificationId = 12345;
+
+        using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        using var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        using var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        using var context = activity.Call<AndroidJavaObject>("getApplicationContext");
+        using var notificationIntent = new AndroidJavaObject("android.content.Intent", context, managerClass);
+
+        var fireTime = DateTime.Now.AddSeconds(3);
+        var repeatInterval = new TimeSpan(0, 0, 5);
+        Color? color = new Color(0.2f, 0.4f, 0.6f, 1.0f);
+
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "id", notificationId);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "channelID", kChannelId);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "textTitle", "notification.Title");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "textContent", "notification.Text");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "smallIconStr", "notification.SmallIcon");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "autoCancel", true);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "usesChronometer", true);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "fireTime", fireTime.ToLong());
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "repeatInterval", (long)repeatInterval.TotalMilliseconds);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "largeIconStr", "notification.LargeIcon");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "style", (int)NotificationStyle.BigTextStyle);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "color", color.ToInt());
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "number", 25);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "data", "notification.IntentData");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "group", "notification.Group");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "groupSummary", true);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", "notification.SortKey");
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", (int)GroupAlertBehaviours.GroupAlertChildren);
+        notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", true);
+
+        using var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        using var bundle = notificationIntent.Call<AndroidJavaObject>("getExtras");
+        using var parcelClass = new AndroidJavaClass("android.os.Parcel");
+        using var parcel = parcelClass.CallStatic<AndroidJavaObject>("obtain");
+        bundle.Call("writeToParcel", parcel, 0);
+        var serialized = parcel.Call<AndroidJavaObject>("marshall");
+        Assert.IsNotNull(serialized);
+
+        using var deserialized = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serialized);
+        Assert.IsNotNull(deserialized);
+        var deserializedNotification = deserialized.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
+        Assert.IsNotNull(deserializedNotification);
+        var notificationData = AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+        Assert.IsNotNull(notificationData);
+        Assert.AreEqual(notificationId, notificationData.Id);
+        Assert.AreEqual(kChannelId, notificationData.Channel);
+        Assert.AreEqual("notification.Title", notificationData.Notification.Title);
+        Assert.AreEqual("notification.Text", notificationData.Notification.Text);
+        Assert.AreEqual("notification.SmallIcon", notificationData.Notification.SmallIcon);
+        Assert.AreEqual(true, notificationData.Notification.ShouldAutoCancel);
+        Assert.AreEqual(true, notificationData.Notification.UsesStopwatch);
+        Assert.AreEqual(fireTime.ToString(), notificationData.Notification.FireTime.ToString());
+        Assert.AreEqual(repeatInterval.TotalMilliseconds, notificationData.Notification.RepeatInterval.Value.TotalMilliseconds);
+        Assert.AreEqual("notification.LargeIcon", notificationData.Notification.LargeIcon);
+        Assert.AreEqual(NotificationStyle.BigTextStyle, notificationData.Notification.Style);
+        Assert.AreEqual(color.ToInt(), notificationData.Notification.Color.ToInt());
+        Assert.AreEqual(25, notificationData.Notification.Number);
+        Assert.AreEqual("notification.IntentData", notificationData.Notification.IntentData);
+        Assert.AreEqual("notification.Group", notificationData.Notification.Group);
+        Assert.AreEqual(true, notificationData.Notification.GroupSummary);
+        Assert.AreEqual("notification.SortKey", notificationData.Notification.SortKey);
+        Assert.AreEqual(GroupAlertBehaviours.GroupAlertChildren, notificationData.Notification.GroupAlertBehaviour);
+        Assert.AreEqual(true, notificationData.Notification.ShowTimestamp);
+    }
 }
