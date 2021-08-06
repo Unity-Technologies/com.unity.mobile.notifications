@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -106,23 +107,23 @@ public class UnityNotificationUtilities {
                 serializeString(out, notification.extras.getString("largeIcon"));
                 out.writeLong(notification.extras.getLong("fireTime", -1));
                 out.writeLong(notification.extras.getLong("repeatInterval", -1));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+                serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
                 out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
                 out.writeBoolean(showWhen);
                 serializeString(out, notification.extras.getString("data"));
             }
 
-            serializeString(out, notification.getChannelId()); // TODO API 26
+            serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
             Integer color = UnityNotificationManager.getNotificationColor(notification);
             out.writeBoolean(color != null);
             if (color != null)
                 out.writeInt(color);
             out.writeInt(notification.number);
             out.writeBoolean(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
-            serializeString(out, notification.getGroup()); //TODO Added in API 20
-            out.writeBoolean(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));  // TODO added in API 20
+            serializeString(out, notification.getGroup());
+            out.writeBoolean(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));
             out.writeInt(UnityNotificationManager.getNotificationGroupAlertBehavior(notification));
-            serializeString(out, notification.getSortKey()); // TODO added in API 20
+            serializeString(out, notification.getSortKey());
             if (showWhen)
                 out.writeLong(notification.when);
 
@@ -250,7 +251,7 @@ public class UnityNotificationUtilities {
                 largeIcon = extras.getString("largeIcon");
                 fireTime = extras.getLong("fireTime", -1);
                 repeatInterval = extras.getLong("repeatInterval", -1);
-                bigText = extras.getString(Notification.EXTRA_BIG_TEXT);
+                bigText = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : extras.getString(Notification.EXTRA_BIG_TEXT);
                 usesStopWatch = extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false);
                 showWhen = extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
                 intentData = extras.getString("data");
@@ -297,8 +298,7 @@ public class UnityNotificationUtilities {
             UnityNotificationManager.setNotificationUsesChronometer(builder, usesStopWatch);
             if (group != null)
                 UnityNotificationManager.setNotificationGroup(builder, group);
-            if (groupSummary)
-                UnityNotificationManager.setNotificationGroupSummary(builder, groupSummary);
+            UnityNotificationManager.setNotificationGroupSummary(builder, groupSummary);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehavior);
             if (sortKey != null && sortKey.length() > 0)
                 UnityNotificationManager.setNotificationSortKey(builder, sortKey);
