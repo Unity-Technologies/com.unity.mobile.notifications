@@ -150,7 +150,9 @@ public class UnityNotificationUtilities {
             Bundle b = new Bundle();
             b.putParcelable("obj", obj);
             p.writeParcelable(b, 0);
-            return p.marshall();
+            byte[] result = p.marshall();
+            p.recycle();
+            return result;
         } catch (Exception e) {
             Log.e("Unity", "Failed to serialize Parcelable", e);
             return null;
@@ -383,7 +385,7 @@ public class UnityNotificationUtilities {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    private static <T> T deserializeParcelable(DataInputStream in) throws IOException {
+    private static <T extends Parcelable> T deserializeParcelable(DataInputStream in) throws IOException {
         int length = in.readInt();
         if (length <= 0)
             return null;
@@ -396,7 +398,8 @@ public class UnityNotificationUtilities {
             Parcel p = Parcel.obtain();
             p.unmarshall(bytes, 0, bytes.length);
             p.setDataPosition(0);
-            Bundle b = p.readParcelable(null);
+            Bundle b = p.readParcelable(UnityNotificationUtilities.class.getClassLoader());
+            p.recycle();
             if (b != null) {
                 return b.getParcelable("obj");
             }
