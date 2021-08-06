@@ -368,7 +368,7 @@ public class UnityNotificationUtilities {
             if (null != sortKey && sortKey.length() > 0)
                 builder.setSortKey(sortKey);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehaviour);
-            UnityNotificationManager.setNotificationShowTimestamp(builder, showTimestamp);
+            builder.setShowWhen(showTimestamp);
             return builder.build();
         } catch (Exception e) {
             Log.e("Unity", "Failed to deserialize old style notification", e);

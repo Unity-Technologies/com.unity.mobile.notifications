@@ -392,7 +392,7 @@ namespace Unity.Notifications.Android
                 notificationBuilder.Call<AndroidJavaObject>("setGroupSummary", notification.GroupSummary).Dispose();
             if (!string.IsNullOrEmpty(notification.SortKey))
                 notificationBuilder.Call<AndroidJavaObject>("setSortKey", notification.SortKey).Dispose();
-            s_NotificationManagerClass.CallStatic("setNotificationShowTimestamp", notificationBuilder, notification.ShowTimestamp);
+            notificationBuilder.Call<AndroidJavaObject>("setShowWhen", notification.ShowTimestamp).Dispose();
             int color = notification.Color.ToInt();
             if (color != 0)
                 s_NotificationManagerClass.CallStatic("setNotificationColor", notificationBuilder, color);

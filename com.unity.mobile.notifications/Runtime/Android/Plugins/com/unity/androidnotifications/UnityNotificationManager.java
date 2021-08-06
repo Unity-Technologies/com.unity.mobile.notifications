@@ -647,11 +647,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    public static void setNotificationShowTimestamp(Notification.Builder notificationBuilder, boolean show) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-            notificationBuilder.setShowWhen(show);
-    }
-
     public static void setNotificationUsesChronometer(Notification.Builder notificationBuilder, boolean usesChrono) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
             notificationBuilder.setUsesChronometer(usesChrono);
