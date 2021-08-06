@@ -647,11 +647,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    public static void setNotificationGroupSummary(Notification.Builder notificationBuilder, boolean groupSummary) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH)
-            notificationBuilder.setGroupSummary(groupSummary);
-    }
-
     public static void setNotificationSortKey(Notification.Builder notificationBuilder, String sortKey) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             if (sortKey != null && sortKey.length() > 0) {
