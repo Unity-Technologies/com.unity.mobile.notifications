@@ -54,7 +54,9 @@ namespace Unity.Notifications.Android
 
         /// <summary>
         /// Initialize the AndroidNotificationCenter class.
+        /// Can be safely called multiple times
         /// </summary>
+        /// <returns>True if has been successfully initialized</returns>
         public static bool Initialize()
         {
             if (s_Initialized)
@@ -93,6 +95,7 @@ namespace Unity.Notifications.Android
         ///  On older Android versions settings set on the notification channel struct will still be applied to the notification
         ///  if they are supported to by the Android version the app is running on.
         /// </summary>
+        /// <param name="channel">Channel parameters</param>
         /// <remarks>
         ///  When a channel is deleted and recreated, all of the previous settings are restored. In order to change any settings
         ///  besides the name or description an entirely new channel (with a different channel ID) must be created.
@@ -133,6 +136,8 @@ namespace Unity.Notifications.Android
         /// Returns the notification channel with the specified id.
         /// The notification channel struct fields might not be identical to the channel struct used to initially register the channel if they were changed by the user.
         /// </summary>
+        /// <param name="channelId">ID of the channel to retrieve</param>
+        /// <returns>Channel with given ID or empty struct if such channel does not exist</returns>
         public static AndroidNotificationChannel GetNotificationChannel(string channelId)
         {
             return GetNotificationChannels().SingleOrDefault(channel => channel.Id == channelId);
@@ -141,6 +146,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Returns all notification channels that were created by the app.
         /// </summary>
+        /// <returns>All existing channels</returns>
         public static AndroidNotificationChannel[] GetNotificationChannels()
         {
             if (!Initialize())
@@ -173,6 +179,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Delete the specified notification channel.
         /// </summary>
+        /// <param name="channelId">ID of the channel to delete</param>
         public static void DeleteNotificationChannel(string channelId)
         {
             if (Initialize())
@@ -183,6 +190,9 @@ namespace Unity.Notifications.Android
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The returned id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
         /// </summary>
+        /// <param name="notification">Data for the notification</param>
+        /// <param name="channelId">ID of the channel to send notification to</param>
+        /// <returns>The generated ID for the notification</returns>
         public static int SendNotification(AndroidNotification notification, string channelId)
         {
             if (!Initialize())
@@ -198,6 +208,9 @@ namespace Unity.Notifications.Android
         /// Schedule a notification which will be shown at the time specified in the notification struct.
         /// The specified id can later be used to update the notification before it's triggered, it's current status can be tracked using CheckScheduledNotificationStatus.
         /// </summary>
+        /// <param name="notification">Data for the notification</param>
+        /// <param name="channelId">ID of the channel to send notification to</param>
+        /// <param name="id">A unique ID for the notification</param>
         public static void SendNotificationWithExplicitID(AndroidNotification notification, string channelId, int id)
         {
             if (Initialize())
@@ -208,6 +221,9 @@ namespace Unity.Notifications.Android
         /// Update an already scheduled notification.
         /// If a notification with the specified id was already scheduled it will be overridden with the information from the passed notification struct.
         /// </summary>
+        /// <param name="id">ID of the notification to update</param>
+        /// <param name="notification">Data for the notification</param>
+        /// <param name="channelId">ID of the channel to send notification to</param>
         public static void UpdateScheduledNotification(int id, AndroidNotification notification, string channelId)
         {
             if (!Initialize())
@@ -221,6 +237,7 @@ namespace Unity.Notifications.Android
         /// Cancel a scheduled or previously shown notification.
         /// The notification will no longer be displayed on it's scheduled time. If it's already delivered it will be removed from the status bar.
         /// </summary>
+        /// <param name="id">ID of the notification to cancel</param>
         public static void CancelNotification(int id)
         {
             if (!Initialize())
@@ -234,6 +251,7 @@ namespace Unity.Notifications.Android
         /// Cancel a scheduled notification.
         /// The notification will no longer be displayed on it's scheduled time. It it will not be removed from the status bar if it's already delivered.
         /// </summary>
+        /// <param name="id">ID of the notification to cancel</param>
         public static void CancelScheduledNotification(int id)
         {
             if (Initialize())
@@ -244,6 +262,7 @@ namespace Unity.Notifications.Android
         /// Cancel a previously shown notification.
         /// The notification will be removed from the status bar.
         /// </summary>
+        /// <param name="id">ID of the notification to cancel</param>
         public static void CancelDisplayedNotification(int id)
         {
             if (Initialize())
@@ -287,6 +306,8 @@ namespace Unity.Notifications.Android
         /// Return the status of a scheduled notification.
         /// Only available in API  23 and above.
         /// </summary>
+        /// <param name="id">ID of the notification to check</param>
+        /// <returns>The status of the notification</returns>
         public static NotificationStatus CheckScheduledNotificationStatus(int id)
         {
             if (!Initialize())
