@@ -25,6 +25,9 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create an AndroidNotificationIntentData with AndroidNotification, id, and channel id.
         /// </summary>
+        /// <param name="id">Notification id</param>
+        /// <param name="channelId">ID of the notification channel</param>
+        /// <param name="notification">Data of the received notification</param>
         public AndroidNotificationIntentData(int id, string channelId, AndroidNotification notification)
         {
             Id = id;
