@@ -27,5 +27,14 @@ namespace Unity.Notifications.iOS
             Title = title;
             Options = options;
         }
+
+        internal virtual IntPtr CreateUNNotificationAction()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return iOSNotificationsWrapper._CreateUNNotificationAction(Id, Title, (int)Options);
+#else
+            return IntPtr.Zero;
+#endif
+        }
     }
 }

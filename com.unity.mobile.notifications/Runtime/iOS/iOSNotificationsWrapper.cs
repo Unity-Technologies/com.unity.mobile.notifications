@@ -88,7 +88,7 @@ namespace Unity.Notifications.iOS
         private static extern void _ReadNSDictionary(IntPtr handle, IntPtr nsDict, ReceiveNSDictionaryKeyValueCallback callback);
 
         [DllImport("__Internal")]
-        private static extern IntPtr _CreateUNNotificationAction(string id, string title, int options);
+        internal static extern IntPtr _CreateUNNotificationAction(string id, string title, int options);
 
         [DllImport("__Internal")]
         private static extern void _ReleaseUNNotificationAction(IntPtr action);
@@ -345,15 +345,6 @@ namespace Unity.Notifications.iOS
             return null;
         }
 
-        private static IntPtr CreateUNNotificationAction(iOSNotificationAction action)
-        {
-#if UNITY_IOS && !UNITY_EDITOR
-            return _CreateUNNotificationAction(action.Id, action.Title, (int)action.Options);
-#else
-            return IntPtr.Zero;
-#endif
-        }
-
         public static void SetNotificationCategories(IEnumerable<iOSNotificationCategory> categories)
         {
             var allActions = new Dictionary<string, IntPtr>();
@@ -363,7 +354,7 @@ namespace Unity.Notifications.iOS
                 {
                     if (string.IsNullOrEmpty(action.Id) || allActions.ContainsKey(action.Id))
                         throw new ArgumentException("Action must have a valid and unique ID");
-                    allActions[action.Id] = CreateUNNotificationAction(action);
+                    allActions[action.Id] = action.CreateUNNotificationAction();
                 }
             }
 
