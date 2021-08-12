@@ -24,6 +24,7 @@
 @property NSArray<UNNotification *> * cachedDeliveredNotifications;
 
 @property (nonatomic) UNNotification* lastReceivedNotification;
+@property NSString* lastRespondedNotificationAction;
 
 @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 

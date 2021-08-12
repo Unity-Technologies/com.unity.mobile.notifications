@@ -173,4 +173,107 @@ iOSNotificationData* _GetLastNotificationData()
     return ret;
 }
 
+const char* _GetLastRespondedNotificationAction()
+{
+    UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+    NSString* action = manager.lastRespondedNotificationAction;
+    if (action == nil)
+        return NULL;
+    return strdup(action.UTF8String);
+}
+
+void* _CreateUNNotificationAction(const char* identifier, const char* title, int options)
+{
+    UNNotificationActionOptions opts = (UNNotificationActionOptions)options;
+    NSString* idr = [NSString stringWithUTF8String: identifier];
+    NSString* titl = [NSString stringWithUTF8String: title];
+    UNNotificationAction* action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts];
+    return (__bridge_retained void*)action;
+}
+
+void _ReleaseUNNotificationAction(void* action)
+{
+    UNNotificationAction* a = (__bridge_transfer UNNotificationAction*)action;
+    a = nil;
+}
+
+void* _AddActionToNSArray(void* actions, void* action, int capacity)
+{
+    NSMutableArray<UNNotificationAction*>* array;
+    void* ret = actions;
+    if (actions == NULL)
+    {
+        array = [NSMutableArray arrayWithCapacity: capacity];
+        ret = (__bridge_retained void*)array;
+    }
+    else
+        array = (__bridge NSMutableArray<UNNotificationAction*>*)actions;
+    UNNotificationAction* a = (__bridge UNNotificationAction*)action;
+    [array addObject: a];
+    return ret;
+}
+
+void* _AddStringToNSArray(void* array, const char* str, int capacity)
+{
+    NSMutableArray<NSString*>* arr;
+    void* ret = array;
+    if (array == NULL)
+    {
+        arr = [NSMutableArray arrayWithCapacity: capacity];
+        ret = (__bridge_retained void*)arr;
+    }
+    else
+        arr = (__bridge NSMutableArray<NSString*>*)array;
+    NSString* s = [NSString stringWithUTF8String: str];
+    [arr addObject: s];
+    return ret;
+}
+
+void* _CreateUNNotificationCategory(const char* identifier, const char* hiddenPreviewsBodyPlaceholder, const char* summaryFormat,
+    int options, void* actions, void* intentIdentifiers)
+{
+    NSString* idr = [NSString stringWithUTF8String: identifier];
+    NSString* placeholder = hiddenPreviewsBodyPlaceholder ? [NSString stringWithUTF8String: hiddenPreviewsBodyPlaceholder] : nil;
+    NSString* summary = summaryFormat ? [NSString stringWithUTF8String: summaryFormat] : nil;
+    NSArray<UNNotificationAction*>* acts = (__bridge_transfer NSArray<UNNotificationAction*>*)actions;
+    NSArray<NSString*>* intents = (__bridge_transfer NSArray<NSString*>*)intentIdentifiers;
+    UNNotificationCategoryOptions opts = (UNNotificationCategoryOptions)options;
+
+    UNNotificationCategory* category;
+    if (@available(iOS 12.0, *))
+    {
+        category = [UNNotificationCategory categoryWithIdentifier: idr actions: acts intentIdentifiers: intents hiddenPreviewsBodyPlaceholder: placeholder categorySummaryFormat: summary options: opts];
+    }
+    else if (@available(iOS 11.0, *))
+    {
+        category = [UNNotificationCategory categoryWithIdentifier: idr actions: acts intentIdentifiers: intents hiddenPreviewsBodyPlaceholder: placeholder options: opts];
+    }
+    else
+    {
+        category = [UNNotificationCategory categoryWithIdentifier: idr actions: acts intentIdentifiers: intents options: opts];
+    }
+    return (__bridge_retained void*)category;
+}
+
+void* _AddCategoryToCategorySet(void* categorySet, void* category)
+{
+    UNNotificationCategory* cat = (__bridge_transfer UNNotificationCategory*)category;
+    NSMutableSet<UNNotificationCategory*>* categories;
+    if (categorySet == NULL)
+    {
+        categories = [NSMutableSet setWithObject: cat];
+        return (__bridge_retained void*)categories;
+    }
+
+    categories = (__bridge NSMutableSet<UNNotificationCategory*>*)categorySet;
+    [categories addObject: cat];
+    return categorySet;
+}
+
+void _SetNotificationCategories(void* categorySet)
+{
+    NSMutableSet<UNNotificationCategory*>* categories = (__bridge_transfer NSMutableSet<UNNotificationCategory*>*)categorySet;
+    [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories: categories];
+}
+
 #endif

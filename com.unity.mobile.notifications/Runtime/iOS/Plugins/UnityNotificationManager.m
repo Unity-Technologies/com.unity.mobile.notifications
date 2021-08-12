@@ -200,6 +200,7 @@
     withCompletionHandler:(nonnull void(^)(void))completionHandler
 {
     self.lastReceivedNotification = response.notification;
+    self.lastRespondedNotificationAction = response.actionIdentifier;
     completionHandler();
     [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
 }

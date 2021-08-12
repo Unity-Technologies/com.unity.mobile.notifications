@@ -144,6 +144,11 @@ namespace Unity.Notifications.iOS
             return new iOSNotification(data.Value);
         }
 
+        public static string GetLastRespondedNotificationAction()
+        {
+            return iOSNotificationsWrapper.GetLastRespondedNotificationAction();
+        }
+
         /// <summary>
         /// Unschedules the specified notification.
         /// </summary>
@@ -186,6 +191,11 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationSettings GetNotificationSettings()
         {
             return iOSNotificationsWrapper.GetNotificationSettings();
+        }
+
+        public static void SetNotificationCategories(IEnumerable<iOSNotificationCategory> categories)
+        {
+            iOSNotificationsWrapper.SetNotificationCategories(categories);
         }
 
         internal static void OnReceivedRemoteNotification(iOSNotificationWithUserInfo data)

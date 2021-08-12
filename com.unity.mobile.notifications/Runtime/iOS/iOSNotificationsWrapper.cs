@@ -76,6 +76,9 @@ namespace Unity.Notifications.iOS
         private static extern IntPtr _GetLastNotificationData();
 
         [DllImport("__Internal")]
+        private static extern string _GetLastRespondedNotificationAction();
+
+        [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationDataArray(IntPtr ptr, int count);
 
         [DllImport("__Internal")]
@@ -83,6 +86,27 @@ namespace Unity.Notifications.iOS
 
         [DllImport("__Internal")]
         private static extern void _ReadNSDictionary(IntPtr handle, IntPtr nsDict, ReceiveNSDictionaryKeyValueCallback callback);
+
+        [DllImport("__Internal")]
+        private static extern IntPtr _CreateUNNotificationAction(string id, string title, int options);
+
+        [DllImport("__Internal")]
+        private static extern void _ReleaseUNNotificationAction(IntPtr action);
+
+        [DllImport("__Internal")]
+        private static extern IntPtr _AddActionToNSArray(IntPtr actions, IntPtr action, int capacity);
+
+        [DllImport("__Internal")]
+        private static extern IntPtr _CreateUNNotificationCategory(string id, string hiddenPreviewsBodyPlaceholder, string summaryFormat, int options, IntPtr actions, IntPtr intentIdentifiers);
+
+        [DllImport("__Internal")]
+        private static extern IntPtr _AddCategoryToCategorySet(IntPtr categorySet, IntPtr category);
+
+        [DllImport("__Internal")]
+        private static extern void _SetNotificationCategories(IntPtr categorySet);
+
+        [DllImport("__Internal")]
+        private static extern IntPtr _AddStringToNSArray(IntPtr array, string str, int capacity);
 
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(iOSNotificationData notificationData);
@@ -204,6 +228,15 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
+        public static string GetLastRespondedNotificationAction()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return _GetLastRespondedNotificationAction();
+#else
+            return null;
+#endif
+        }
+
         public static iOSNotificationWithUserInfo[] GetScheduledNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
@@ -310,6 +343,52 @@ namespace Unity.Notifications.iOS
             }
 #endif
             return null;
+        }
+
+        private static IntPtr CreateUNNotificationAction(iOSNotificationAction action)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return _CreateUNNotificationAction(action.Id, action.Title, (int)action.Options);
+#else
+            return IntPtr.Zero;
+#endif
+        }
+
+        public static void SetNotificationCategories(IEnumerable<iOSNotificationCategory> categories)
+        {
+            var allActions = new Dictionary<string, IntPtr>();
+            foreach (var category in categories)
+            {
+                foreach (var action in category.Actions)
+                {
+                    if (string.IsNullOrEmpty(action.Id) || allActions.ContainsKey(action.Id))
+                        throw new ArgumentException("Action must have a valid and unique ID");
+                    allActions[action.Id] = CreateUNNotificationAction(action);
+                }
+            }
+
+#if UNITY_IOS && !UNITY_EDITOR
+            IntPtr categorySet = IntPtr.Zero;
+            foreach (var category in categories)
+            {
+                IntPtr actions = IntPtr.Zero;
+                int count = category.Actions.Length;
+                foreach (var action in category.Actions)
+                    actions = _AddActionToNSArray(actions, allActions[action.Id], count);
+                IntPtr intentIdentifiers = IntPtr.Zero;
+                count = category.IntentIdentifiers.Length;
+                foreach (var idr in category.IntentIdentifiers)
+                    intentIdentifiers = _AddStringToNSArray(intentIdentifiers, idr, count);
+                var cat = _CreateUNNotificationCategory(category.Id, category.HiddenPreviewsBodyPlaceholder, category.SummaryFormat, (int)category.Options,
+                    actions, intentIdentifiers);
+                categorySet = _AddCategoryToCategorySet(categorySet, cat);
+            }
+
+            _SetNotificationCategories(categorySet);
+
+            foreach (var act in allActions)
+                _ReleaseUNNotificationAction(act.Value);
+#endif
         }
     }
 }
