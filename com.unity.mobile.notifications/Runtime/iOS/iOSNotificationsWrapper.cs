@@ -79,6 +79,9 @@ namespace Unity.Notifications.iOS
         private static extern string _GetLastRespondedNotificationAction();
 
         [DllImport("__Internal")]
+        private static extern string _GetLastRespondedNotificationUserText();
+
+        [DllImport("__Internal")]
         private static extern void _FreeUnmanagediOSNotificationDataArray(IntPtr ptr, int count);
 
         [DllImport("__Internal")]
@@ -235,6 +238,15 @@ namespace Unity.Notifications.iOS
         {
 #if UNITY_IOS && !UNITY_EDITOR
             return _GetLastRespondedNotificationAction();
+#else
+            return null;
+#endif
+        }
+
+        public static string GetLastRespondedNotificationUserText()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return _GetLastRespondedNotificationUserText();
 #else
             return null;
 #endif

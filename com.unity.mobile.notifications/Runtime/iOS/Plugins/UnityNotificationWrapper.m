@@ -182,6 +182,15 @@ const char* _GetLastRespondedNotificationAction()
     return strdup(action.UTF8String);
 }
 
+const char* _GetLastRespondedNotificationUserText()
+{
+    UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+    NSString* userText = manager.lastRespondedNotificationUserText;
+    if (userText == nil)
+        return NULL;
+    return strdup(userText.UTF8String);
+}
+
 void* _CreateUNNotificationAction(const char* identifier, const char* title, int options)
 {
     UNNotificationActionOptions opts = (UNNotificationActionOptions)options;

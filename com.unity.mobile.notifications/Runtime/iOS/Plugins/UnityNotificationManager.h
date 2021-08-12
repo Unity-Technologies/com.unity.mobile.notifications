@@ -25,6 +25,7 @@
 
 @property (nonatomic) UNNotification* lastReceivedNotification;
 @property NSString* lastRespondedNotificationAction;
+@property NSString* lastRespondedNotificationUserText;
 
 @property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
 

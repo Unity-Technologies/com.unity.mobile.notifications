@@ -149,6 +149,11 @@ namespace Unity.Notifications.iOS
             return iOSNotificationsWrapper.GetLastRespondedNotificationAction();
         }
 
+        public static string GetLastRespondedNotificationUserText()
+        {
+            return iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
+        }
+
         /// <summary>
         /// Unschedules the specified notification.
         /// </summary>
