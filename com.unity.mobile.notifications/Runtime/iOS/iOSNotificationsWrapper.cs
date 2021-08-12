@@ -355,9 +355,10 @@ namespace Unity.Notifications.iOS
             {
                 foreach (var action in category.Actions)
                 {
-                    if (string.IsNullOrEmpty(action.Id) || allActions.ContainsKey(action.Id))
+                    if (string.IsNullOrEmpty(action.Id))
                         throw new ArgumentException("Action must have a valid and unique ID");
-                    allActions[action.Id] = action.CreateUNNotificationAction();
+                    if (!allActions.ContainsKey(action.Id))
+                        allActions[action.Id] = action.CreateUNNotificationAction();
                 }
             }
 
