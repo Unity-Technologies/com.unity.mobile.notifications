@@ -91,6 +91,9 @@ namespace Unity.Notifications.iOS
         internal static extern IntPtr _CreateUNNotificationAction(string id, string title, int options);
 
         [DllImport("__Internal")]
+        internal static extern IntPtr _CreateUNTextInputNotificationAction(string id, string title, int options, string buttonTitle, string placeholder);
+
+        [DllImport("__Internal")]
         private static extern void _ReleaseUNNotificationAction(IntPtr action);
 
         [DllImport("__Internal")]

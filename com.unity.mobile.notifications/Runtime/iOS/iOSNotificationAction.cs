@@ -37,4 +37,32 @@ namespace Unity.Notifications.iOS
 #endif
         }
     }
+
+    public class iOSTextInputNotificationAction
+        : iOSNotificationAction
+    {
+        public string TextInputButtonTitle { get; set; }
+        public string TextInputPlaceholder { get; set; }
+
+        public iOSTextInputNotificationAction(string id, string title, string buttonTitle)
+            : base(id, title)
+        {
+            TextInputButtonTitle = buttonTitle;
+        }
+
+        public iOSTextInputNotificationAction(string id, string title, iOSNotificationActionOptions options, string buttonTitle)
+            : base(id, title, options)
+        {
+            TextInputButtonTitle = buttonTitle;
+        }
+
+        internal override IntPtr CreateUNNotificationAction()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return iOSNotificationsWrapper._CreateUNTextInputNotificationAction(Id, Title, (int)Options, TextInputButtonTitle, TextInputPlaceholder);
+#else
+            return IntPtr.Zero;
+#endif
+        }
+    }
 }

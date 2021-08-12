@@ -191,6 +191,17 @@ void* _CreateUNNotificationAction(const char* identifier, const char* title, int
     return (__bridge_retained void*)action;
 }
 
+void* _CreateUNTextInputNotificationAction(const char* identifier, const char* title, int options, const char* buttonTitle, const char* placeholder)
+{
+    UNNotificationActionOptions opts = (UNNotificationActionOptions)options;
+    NSString* idr = [NSString stringWithUTF8String: identifier];
+    NSString* titl = [NSString stringWithUTF8String: title];
+    NSString* btnTitle = [NSString stringWithUTF8String: buttonTitle];
+    NSString* placeHolder = placeholder ? [NSString stringWithUTF8String: placeholder] : NULL;
+    UNTextInputNotificationAction* action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+    return (__bridge_retained void*)action;
+}
+
 void _ReleaseUNNotificationAction(void* action)
 {
     UNNotificationAction* a = (__bridge_transfer UNNotificationAction*)action;
