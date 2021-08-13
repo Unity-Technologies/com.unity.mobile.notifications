@@ -45,6 +45,7 @@ namespace Unity.Notifications.Android
             }
 
             foreach (var notification in m_ReceivedNotificationList)
+            {
                 try
                 {
                     AndroidNotificationCenter.ReceivedNotificationCallback(notification);
@@ -53,6 +54,7 @@ namespace Unity.Notifications.Android
                 {
                     Debug.LogException(e);
                 }
+            }
 
             m_ReceivedNotificationList.Clear();
         }

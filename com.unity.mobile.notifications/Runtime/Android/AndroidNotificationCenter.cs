@@ -217,7 +217,9 @@ namespace Unity.Notifications.Android
         {
             if (Initialize())
                 using (var builder = CreateNotificationBuilder(id, notification, channelId))
+                {
                     SendNotification(builder);
+                }
         }
 
         /// <summary>
@@ -240,8 +242,12 @@ namespace Unity.Notifications.Android
                 return;
 
             if (s_NotificationManager.Call<bool>("checkIfPendingNotificationIsRegistered", id))
+            {
                 using (var builder = CreateNotificationBuilder(id, notification, channelId))
+                {
                     SendNotification(builder);
+                }
+            }
         }
 
         /// <summary>
@@ -431,10 +437,12 @@ namespace Unity.Notifications.Android
                 notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
                 notification.FireTime = extras.Call<long>("getLong", "fireTime", -1L).ToDatetime();
                 notification.RepeatInterval = extras.Call<long>("getLong", "repeatInterval", -1L).ToTimeSpan();
+
                 if (extras.Call<bool>("containsKey", Notification_EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
                 else
                     notification.Style = NotificationStyle.None;
+
                 using (var color = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationColor", notificationObj))
                 {
                     if (color == null)
