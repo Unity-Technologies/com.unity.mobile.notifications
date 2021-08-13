@@ -84,6 +84,9 @@ namespace Unity.Notifications.Tests.Sample
         {
             // in case a killed app was launched by clicking a notification
             iOSNotification notification = iOSNotificationCenter.GetLastRespondedNotification();
+            string lastAction = iOSNotificationCenter.GetLastRespondedNotificationAction();
+            string lastTextInput = iOSNotificationCenter.GetLastRespondedNotificationUserText();
+            RegisterCategories();
             InstantiateAllTestButtons();
             ClearBadge();
             RemoveAllNotifications();
@@ -98,6 +101,12 @@ namespace Unity.Notifications.Tests.Sample
                     m_LOGGER
                         .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
                         .Properties(notification, 1);
+                    if (lastAction != null)
+                    {
+                        string output = lastTextInput != null ? $"Used action {lastAction} with input '{lastTextInput}'" : $"Used action {lastAction}";
+                        m_LOGGER
+                            .Orange(output);
+                    }
                 }
             }
         }
@@ -119,6 +128,14 @@ namespace Unity.Notifications.Tests.Sample
                             .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
                             .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
                             .Properties(notification, 1);
+                        string lastAction = iOSNotificationCenter.GetLastRespondedNotificationAction();
+                        string lastTextInput = iOSNotificationCenter.GetLastRespondedNotificationUserText();
+                        if (lastAction != null)
+                        {
+                            string output = lastTextInput != null ? $"Used action {lastAction} with input '{lastTextInput}'" : $"Used action {lastAction}";
+                            m_LOGGER
+                                .Orange(output);
+                        }
                         iOSNotificationCenter.ApplicationBadge =
                             iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
                     }
@@ -128,6 +145,18 @@ namespace Unity.Notifications.Tests.Sample
                     m_LOGGER.Red("Notification not found!", 1);
                 }
             }
+        }
+
+        private void RegisterCategories()
+        {
+            var actionConfirm = new iOSNotificationAction("ACTION_CONFIRM", "Confirm", iOSNotificationActionOptions.Foreground);
+            var actionReject = new iOSNotificationAction("ACTION_REJECT", "Reject");
+            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Response", iOSNotificationActionOptions.Foreground, "Respond");
+            var twoActions = new iOSNotificationCategory("TWO_ACTIONS");
+            twoActions.AddActions(new[] { actionConfirm, actionReject });
+            var withInput = new iOSNotificationCategory("WITH_INPUT");
+            withInput.AddActions(new[] { actionInput, actionReject });
+            iOSNotificationCenter.SetNotificationCategories(new[] { twoActions, withInput });
         }
 
         private void InstantiateAllTestButtons()
