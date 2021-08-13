@@ -46,6 +46,15 @@ public class UnityNotificationUtilities {
         }
     }
 
+    /* Originally we used to serialize a bundle with predefined list of values.
+       After we exposed entire Notification.Builder to users, this is not sufficient anymore.
+       Unfortunately, while Notification itself is Parcelable and can be marshalled to bytes,
+       it's contents are not guaranteed to be (Binder objects).
+       Hence what we try to do here is:
+       - serialize as is
+       - fallback 1: serialize our known properties + serialize extras as is
+       - fallback 2: serialize our known stuff
+    */
     protected static String serializeNotificationIntent(Intent intent) {
         try {
             Notification notification = intent.getParcelableExtra("unityNotification");
@@ -164,6 +173,9 @@ public class UnityNotificationUtilities {
         return deserializeNotificationIntent(context, bytes);
     }
 
+    /* See serialization method above for explaination of fallbacks.
+       This one matches it with one additional fallback: support for "old" bundle serialization.
+    */
     private static Intent deserializeNotificationIntent(Context context, byte[] bytes) {
         ByteArrayInputStream data = new ByteArrayInputStream(bytes);
         DataInputStream in = new DataInputStream(data);
