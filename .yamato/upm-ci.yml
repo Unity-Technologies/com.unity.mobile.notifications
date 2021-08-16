@@ -10,6 +10,20 @@ test_platforms:
     image: package-ci/mac:stable
     flavor: m1.mac
 
+artifactory:
+  production: https://artifactory.prd.it.unity3d.com/artifactory/api/
+
+mobile_dependencies:
+  - unity_test_framework:
+    name: com.unity.test-framework.build
+    version: 0.0.1-preview.12
+  - performance_test_framework:
+    name: com.unity.test-framework.utp-reporter
+    version: 1.0.0-preview
+  - mobile_notifications:
+    name: com.unity.mobile.notifications
+    version: file:../../com.unity.mobile.notifications
+
 ---
 pack:
   name: Pack
