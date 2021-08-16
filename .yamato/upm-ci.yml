@@ -24,6 +24,10 @@ mobile_dependencies:
     name: com.unity.mobile.notifications
     version: file:../../com.unity.mobile.notifications
 
+utr:
+  url_win: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat
+  url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
+
 ---
 pack:
   name: Pack
