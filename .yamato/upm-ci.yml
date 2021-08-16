@@ -53,6 +53,24 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
+{% for editor in test_editors %}
+test_iOS_{{ editor.version }}:
+  name: Test {{ editor.version }} on iOS
+  agent:
+    type: Unity::mobile::iPhone
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.medium
+  commands:
+    - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
+    - upm-ci package test --package-path com.unity.mobile.notifications --unity-version {{ editor.version }} --platform iOS --type package-tests
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/upm-ci.yml#pack
+{% endfor %}
+
 test_trigger:
   name: Tests Trigger
   agent:
