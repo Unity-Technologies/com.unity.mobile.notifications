@@ -79,7 +79,7 @@ test_iOS_{{ editor.version }}:
     image: mobile/macos-10.13-testing:stable
     flavor: b1.medium
   variables:
-    IOS_SIMULATOR_SDK=1
+    IOS_SIMULATOR_SDK: 1
   commands:
     - brew tap --force-auto-update unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
     - brew install unity-config
