@@ -10,6 +10,7 @@ class iOSNotificationTests
     private static int receivedNotificationCount = 0;
     private static iOSNotification lastReceivedNotification = null;
 
+#if !UNITY_EDITOR
     [OneTimeSetUp]
     public void BeforeTests()
     {
@@ -34,10 +35,14 @@ class iOSNotificationTests
         receivedNotificationCount = 0;
         lastReceivedNotification = null;
     }
+#endif
 
     [UnityTest]
     public IEnumerator SendSimpleNotification_NotificationIsReceived()
     {
+#if UNITY_EDITOR
+        yield break;
+#else
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
         {
             TimeInterval = new TimeSpan(0, 0, 5),
@@ -65,11 +70,15 @@ class iOSNotificationTests
 
         yield return new WaitForSeconds(6.0f);
         Assert.AreEqual(1, receivedNotificationCount);
+#endif
     }
 
     [UnityTest]
     public IEnumerator SendNotificationWithUserInfo_NotificationIsReceivedWithSameUserInfo()
     {
+#if UNITY_EDITOR
+        yield break;
+#else
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
         {
             TimeInterval = new TimeSpan(0, 0, 5),
@@ -98,5 +107,6 @@ class iOSNotificationTests
         Assert.IsNotNull(lastReceivedNotification);
         Assert.IsTrue(lastReceivedNotification.UserInfo.ContainsKey("key1"));
         Assert.AreEqual("value1", lastReceivedNotification.UserInfo["key1"]);
+#endif
     }
 }
