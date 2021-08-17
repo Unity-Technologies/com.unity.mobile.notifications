@@ -4,11 +4,33 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using Unity.Notifications.iOS;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 class iOSNotificationTests
+    : IPrebuildSetup, IPostBuildCleanup
 {
     private static int receivedNotificationCount = 0;
     private static iOSNotification lastReceivedNotification = null;
+#if UNITY_EDITOR
+    private static iOSSdkVersion originaliOSSDK;
+#endif
+
+    public void Setup()
+    {
+#if UNITY_EDITOR
+        originaliOSSDK = PlayerSettings.iOS.sdkVersion;
+        PlayerSettings.iOS.sdkVersion = iOSSdkVersion.SimulatorSDK;
+#endif
+    }
+
+    public void Cleanup()
+    {
+#if UNITY_EDITOR
+        PlayerSettings.iOS.sdkVersion = originaliOSSDK;
+#endif
+    }
 
 #if !UNITY_EDITOR
     [OneTimeSetUp]
