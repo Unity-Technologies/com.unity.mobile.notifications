@@ -4,7 +4,8 @@
     "references": [
         "Unity.Notifications.iOS",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Unity.Notifications"
     ],
     "includePlatforms": [
         "Editor",
