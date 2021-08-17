@@ -117,15 +117,15 @@ namespace Unity.Notifications
             /// <summary>
             /// Configure the notification interaction types your app will include in the authorisation request if RequestAuthorizationOnAppLaunch is enabled. Alternatively you can specify them when creating a `AuthorizationRequest` from a script.
             /// </summary>
-            public static PresentationOption DefaultAuthorizationOptions
+            public static AuthorizationOption DefaultAuthorizationOptions
             {
                 get
                 {
-                    return GetSettingValue<PresentationOption>(BuildTargetGroup.iOS, "UnityNotificationDefaultAuthorizationOptions");
+                    return GetSettingValue<AuthorizationOption>(BuildTargetGroup.iOS, "UnityNotificationDefaultAuthorizationOptions");
                 }
                 set
                 {
-                    SetSettingValue<PresentationOption>(BuildTargetGroup.iOS, "UnityNotificationDefaultAuthorizationOptions", value);
+                    SetSettingValue<AuthorizationOption>(BuildTargetGroup.iOS, "UnityNotificationDefaultAuthorizationOptions", value);
                 }
             }
 
