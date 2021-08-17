@@ -425,7 +425,7 @@ namespace Unity.Notifications.Android
                 if (id == -1)
                     return null;
 
-                var channelId = notificationObj.Call<string>("getChannelId");
+                var channelId = s_NotificationManagerClass.CallStatic<string>("getNotificationChannelId", notificationObj);
                 int flags = notificationObj.Get<int>("flags");
 
                 var notification = new AndroidNotification();

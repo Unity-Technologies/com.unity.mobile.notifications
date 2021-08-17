@@ -656,4 +656,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             notificationBuilder.setGroupAlertBehavior(behavior);
     }
+
+    public static String getNotificationChannelId(Notification notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return notification.getChannelId();
+        }
+
+        return null;
+    }
 }
