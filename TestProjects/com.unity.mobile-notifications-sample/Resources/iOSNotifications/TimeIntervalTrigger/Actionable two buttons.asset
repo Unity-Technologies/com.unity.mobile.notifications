@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
   m_Name: Actionable two buttons
   m_EditorClassIdentifier: 
-  ButtonName: Actionable two buttons
-  Identifier: ActionableTwoButtons
-  CategoryIdentifier: TWO_ACTIONS
+  ButtonName: Actionable 3 buttons
+  Identifier: ActionableThreeButtons
+  CategoryIdentifier: THREE_ACTIONS
   ThreadIdentifier: 
   Title: Actionable, two buttons
   Subtitle: 
   Body: Drag down to show actions
-  ShowInForeground: 0
+  ShowInForeground: 1
   PresentationOptions: 6
   Badge: -1
   Data: 
