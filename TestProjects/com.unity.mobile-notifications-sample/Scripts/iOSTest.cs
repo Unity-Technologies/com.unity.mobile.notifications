@@ -151,7 +151,7 @@ namespace Unity.Notifications.Tests.Sample
         {
             var actionConfirm = new iOSNotificationAction("ACTION_CONFIRM", "Confirm", iOSNotificationActionOptions.Foreground);
             var actionReject = new iOSNotificationAction("ACTION_REJECT", "Reject");
-            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Response", iOSNotificationActionOptions.Foreground, "Respond");
+            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Respond", iOSNotificationActionOptions.Foreground, "Respond");
             var twoActions = new iOSNotificationCategory("TWO_ACTIONS");
             twoActions.AddActions(new[] { actionConfirm, actionReject });
             var withInput = new iOSNotificationCategory("WITH_INPUT");
