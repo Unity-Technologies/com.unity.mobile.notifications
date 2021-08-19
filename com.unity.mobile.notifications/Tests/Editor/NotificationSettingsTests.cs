@@ -45,7 +45,7 @@ namespace Unity.Notifications.Tests
             Assert.IsTrue(NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch);
 
             Assert.AreEqual(PresentationOption.Alert, NotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions);
-            Assert.AreEqual(PresentationOption.Alert, NotificationSettings.iOSSettings.DefaultAuthorizationOptions);
+            Assert.AreEqual(AuthorizationOption.Alert, NotificationSettings.iOSSettings.DefaultAuthorizationOptions);
         }
     }
 }
