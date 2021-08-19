@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,11 +15,11 @@ namespace Unity.Notifications.Android
 
         private List<AndroidJavaObject> m_ReceivedNotificationList = new List<AndroidJavaObject>();
 
-        internal void EnqueueReceivedNotification(AndroidJavaObject intent)
+        internal void EnqueueReceivedNotification(AndroidJavaObject notification)
         {
             lock (this)
             {
-                m_ReceivedNotificationQueue.Add(intent);
+                m_ReceivedNotificationQueue.Add(notification);
             }
         }
 
@@ -45,7 +46,14 @@ namespace Unity.Notifications.Android
 
             foreach (var notification in m_ReceivedNotificationList)
             {
-                AndroidNotificationCenter.ReceivedNotificationCallback(notification);
+                try
+                {
+                    AndroidNotificationCenter.ReceivedNotificationCallback(notification);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
 
             m_ReceivedNotificationList.Clear();
