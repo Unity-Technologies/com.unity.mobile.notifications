@@ -1,8 +1,6 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("Assembly-CSharp-Editor-firstpass")]
 namespace Unity.Notifications.iOS
 {
     internal enum NotificationTriggerType
