@@ -340,6 +340,7 @@ namespace Unity.Notifications.Android
             notificationIntent.Call<AndroidJavaObject>("putExtra", "sortKey", notification.SortKey);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "groupAlertBehaviour", (int)notification.GroupAlertBehaviour);
             notificationIntent.Call<AndroidJavaObject>("putExtra", "showTimestamp", notification.ShowTimestamp);
+            notificationIntent.Call<AndroidJavaObject>("putExtra", "showInForeground", notification.ShowInForeground);
 
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
             notificationIntent.Call<AndroidJavaObject>("putExtra", "timestamp", timestampValue);

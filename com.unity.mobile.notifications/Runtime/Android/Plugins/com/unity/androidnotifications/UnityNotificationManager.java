@@ -1,6 +1,7 @@
 package com.unity.androidnotifications;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -19,6 +20,8 @@ import android.os.BadParcelableException;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
@@ -643,7 +646,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification, Intent intent) {
-        getNotificationManager(context).notify(id, notification);
+        boolean showInForeground = intent.getBooleanExtra("showInForeground", false);
+        if (!isInForeground() || showInForeground) {
+            getNotificationManager(context).notify(id, notification);
+        }
 
         try {
             mNotificationCallback.onSentNotification(intent);
@@ -655,5 +661,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (!isRepeatable)
             UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
+    }
+
+    private static boolean isInForeground() {
+        ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(appProcessInfo);
+        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
     }
 }
