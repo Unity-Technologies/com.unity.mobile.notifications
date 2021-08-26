@@ -77,6 +77,7 @@ namespace Unity.Notifications.Tests.Sample
             ((Action)m_groups["Channels"]["Create Secondary Simple Channel"]).Invoke();
             ((Action)m_groups["Channels"]["Create Fancy Channel"]).Invoke();
             m_LOGGER.Clear().White("Welcome!");
+            HandleLastNotificationIntent();
         }
 
         void OnApplicationPause(bool isPaused)

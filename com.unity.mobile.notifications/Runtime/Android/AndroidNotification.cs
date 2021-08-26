@@ -191,6 +191,9 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
         /// </summary>
+        /// <param name="title">Notification title</param>
+        /// <param name="text">Text to show on notification</param>
+        /// <param name="fireTime">Date and time when to show, can be DateTime.Now to show right away</param>
         public AndroidNotification(string title, string text, DateTime fireTime)
         {
             Title = title;
@@ -220,6 +223,10 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create a repeatable notification struct with all optional fields set to default values.
         /// </summary>
+        /// <param name="title">Notification title</param>
+        /// <param name="text">Text to show on notification</param>
+        /// <param name="fireTime">Date and time when to show, can be DateTime.Now to show right away</param>
+        /// <param name="repeatInterval">Makes notification repeatable with this time interval</param>
         /// <remarks>
         /// There is a minimum period of 1 minute for repeating notifications.
         /// </remarks>
@@ -232,6 +239,11 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create a notification struct with a custom small icon and all optional fields set to default values.
         /// </summary>
+        /// <param name="title">Notification title</param>
+        /// <param name="text">Text to show on notification</param>
+        /// <param name="fireTime">Date and time when to show, can be DateTime.Now to show right away</param>
+        /// <param name="repeatInterval">Makes notification repeatable with this time interval</param>
+        /// <param name="smallIcon">Name of the small icon to be shown on notification</param>
         public AndroidNotification(string title, string text, DateTime fireTime, TimeSpan repeatInterval, string smallIcon)
             : this(title, text, fireTime, repeatInterval)
         {
