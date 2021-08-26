@@ -29,6 +29,22 @@ namespace Unity.Notifications.iOS
         /// The ability to display notifications in a CarPlay environment.
         /// </summary>
         CarPlay = (1 << 3),
+
+        /// <summary>
+        /// The ability to play sounds for critical alerts.
+        /// Critical alerts require a special entitlement issued by Apple.
+        /// </summary>
+        CriticalAlert = (1 << 4),
+
+        /// <summary>
+        /// An option indicating the system should display a button for in-app notification settings.
+        /// </summary>
+        ProvidesAppNotificationSettings = (1 << 5),
+
+        /// <summary>
+        /// The ability to post noninterrupting notifications provisionally to the Notification Center.
+        /// </summary>
+        Provisional = (1 << 6),
     }
 
     [StructLayout(LayoutKind.Sequential)]

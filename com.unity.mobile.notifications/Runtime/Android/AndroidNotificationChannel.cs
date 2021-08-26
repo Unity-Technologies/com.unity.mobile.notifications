@@ -132,6 +132,10 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Create a notification channel struct with all optional fields set to default values.
         /// </summary>
+        /// <param name="id">ID for the channel</param>
+        /// <param name="name">Channel name</param>
+        /// <param name="description">Channel description</param>
+        /// <param name="importance">Importance of the channel</param>
         public AndroidNotificationChannel(string id, string name, string description, Importance importance)
         {
             Id = id;

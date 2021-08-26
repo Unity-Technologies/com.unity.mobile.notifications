@@ -1,7 +1,7 @@
 package com.unity.androidnotifications;
 
-import android.content.Intent;
+import android.app.Notification;
 
 public interface NotificationCallback {
-    void onSentNotification(Intent intent);
+    void onSentNotification(Notification notification);
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,15 +11,15 @@ namespace Unity.Notifications.Android
     {
         private static AndroidReceivedNotificationMainThreadDispatcher instance = null;
 
-        private static readonly Queue<AndroidJavaObject> s_ReceivedNotificationQueue = new Queue<AndroidJavaObject>();
+        private List<AndroidJavaObject> m_ReceivedNotificationQueue = new List<AndroidJavaObject>();
 
-        private static readonly List<AndroidJavaObject> s_ReceivedNotificationList = new List<AndroidJavaObject>();
+        private List<AndroidJavaObject> m_ReceivedNotificationList = new List<AndroidJavaObject>();
 
-        internal static void EnqueueReceivedNotification(AndroidJavaObject intent)
+        internal void EnqueueReceivedNotification(AndroidJavaObject notification)
         {
-            lock (s_ReceivedNotificationQueue)
+            lock (this)
             {
-                s_ReceivedNotificationQueue.Enqueue(intent);
+                m_ReceivedNotificationQueue.Add(notification);
             }
         }
 
@@ -34,18 +35,28 @@ namespace Unity.Notifications.Android
         {
             // Note: Don't call callbacks while locking receivedNotificationQueue, otherwise there's a risk
             //       that callback might introduce an operations which would create a deadlock
-            lock (s_ReceivedNotificationQueue)
+            lock (this)
             {
-                s_ReceivedNotificationList.AddRange(s_ReceivedNotificationQueue);
-                s_ReceivedNotificationQueue.Clear();
+                if (m_ReceivedNotificationQueue.Count == 0)
+                    return;
+                var temp = m_ReceivedNotificationQueue;
+                m_ReceivedNotificationQueue = m_ReceivedNotificationList;
+                m_ReceivedNotificationList = temp;
             }
 
-            foreach (var notification in s_ReceivedNotificationList)
+            foreach (var notification in m_ReceivedNotificationList)
             {
-                AndroidNotificationCenter.ReceivedNotificationCallback(notification);
+                try
+                {
+                    AndroidNotificationCenter.ReceivedNotificationCallback(notification);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
 
-            s_ReceivedNotificationList.Clear();
+            m_ReceivedNotificationList.Clear();
         }
 
         void Awake()
