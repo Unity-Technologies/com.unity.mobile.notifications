@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using Unity.Notifications.iOS;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 namespace Unity.Notifications
 {
@@ -47,10 +48,18 @@ namespace Unity.Notifications
             return new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
         }
 
+        public override void OnActivate(string searchContext, VisualElement rootElement)
+        {
+            base.OnActivate(searchContext, rootElement);
+            // in case of domain reload (enter-exit play mode, this gets lost)
+            if (m_SettingsManager == null)
+                Initialize();
+        }
+
         public override void OnDeactivate()
         {
+            base.OnDeactivate();
             m_SettingsManager.SaveSettings(false);
-            SettingsService.NotifySettingsProviderChanged();
         }
 
         private void Initialize()
