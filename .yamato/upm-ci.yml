@@ -1,14 +1,40 @@
 test_editors:
   - version: trunk
-  - version: 2020.2
-  - version: 2020.1
+  - version: 2021.2
+  - version: 2021.1
+  - version: 2020.3
   - version: 2019.4
+
+# Some issues with 2019.4 on iOS on Yamato, but passes locally
+ios_test_editors:
+  - version: trunk
+  - version: 2021.2
+  - version: 2021.1
+  - version: 2020.3
 
 test_platforms:
   - name: mac
     type: Unity::VM::osx
     image: package-ci/mac:stable
     flavor: m1.mac
+
+artifactory:
+  production: https://artifactory.prd.it.unity3d.com/artifactory/api/
+
+mobile_dependencies:
+  - unity_test_framework:
+    name: com.unity.test-framework.build
+    version: 0.0.1-preview.12
+  - performance_test_framework:
+    name: com.unity.test-framework.utp-reporter
+    version: 1.0.0-preview
+  - mobile_notifications:
+    name: com.unity.mobile.notifications
+    version: file:../../com.unity.mobile.notifications
+
+utr:
+  url_win: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat
+  url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
 
 ---
 pack:
@@ -53,6 +79,35 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
+{% for editor in ios_test_editors %}
+test_iOS_{{ editor.version }}:
+  name: Test {{ editor.version }} on iOS
+  agent:
+    type: Unity::mobile::iPhone
+    image: mobile/macos-10.13-testing:stable
+    flavor: b1.medium
+  commands:
+    - brew tap --force-auto-update unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew install unity-config
+    - unity-config settings editor-path .Editor
+    - unity-config project create .MyTestProject
+{%- for dependency in mobile_dependencies -%}
+    - unity-config project add dependency {{dependency.name}}@{{dependency.version}} --project-path .MyTestProject
+{%- endfor -%}
+    - unity-config project add testable com.unity.mobile.notifications
+    - curl -s {{ utr.url_unix }} --output utr
+    - chmod u+x utr
+    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - ./utr --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --extra-editor-arg="-playerHeartbeatTimeout 900" --extra-editor-arg="-upmNoDefaultPackages"
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/upm-ci.yml#pack
+{% endfor %}
+
 test_trigger:
   name: Tests Trigger
   agent:
@@ -78,6 +133,9 @@ test_trigger:
     {% for platform in test_platforms %}
     - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
+    {% endfor %}
+    {% for editor in ios_test_editors %}
+    - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
     {% endfor %}
 
 publish:

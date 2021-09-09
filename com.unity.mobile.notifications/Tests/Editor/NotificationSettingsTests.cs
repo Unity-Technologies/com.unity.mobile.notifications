@@ -31,7 +31,7 @@ namespace Unity.Notifications.Tests
         public void SetiOSNotifcationSettings_Works()
         {
             NotificationSettings.iOSSettings.AddRemoteNotificationCapability = true;
-            NotificationSettings.iOSSettings.DefaultAuthorizationOptions = PresentationOption.Alert;
+            NotificationSettings.iOSSettings.DefaultAuthorizationOptions = AuthorizationOption.Alert;
             NotificationSettings.iOSSettings.UseLocationNotificationTrigger = true;
             NotificationSettings.iOSSettings.UseAPSReleaseEnvironment = true;
             NotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions = PresentationOption.Alert;
@@ -45,7 +45,7 @@ namespace Unity.Notifications.Tests
             Assert.IsTrue(NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch);
 
             Assert.AreEqual(PresentationOption.Alert, NotificationSettings.iOSSettings.RemoteNotificationForegroundPresentationOptions);
-            Assert.AreEqual(PresentationOption.Alert, NotificationSettings.iOSSettings.DefaultAuthorizationOptions);
+            Assert.AreEqual(AuthorizationOption.Alert, NotificationSettings.iOSSettings.DefaultAuthorizationOptions);
         }
     }
 }
