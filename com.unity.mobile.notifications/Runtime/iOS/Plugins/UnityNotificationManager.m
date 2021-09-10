@@ -200,6 +200,14 @@
     withCompletionHandler:(nonnull void(^)(void))completionHandler
 {
     self.lastReceivedNotification = response.notification;
+    self.lastRespondedNotificationAction = response.actionIdentifier;
+    if ([response isKindOfClass: UNTextInputNotificationResponse.class])
+    {
+        UNTextInputNotificationResponse* resp = (UNTextInputNotificationResponse*)response;
+        self.lastRespondedNotificationUserText = resp.userText;
+    }
+    else
+        self.lastRespondedNotificationUserText = nil;
     completionHandler();
     [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
 }

@@ -134,6 +134,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Use this to retrieve the last local or remote notification received by the app.
         /// </summary>
+        /// <seealso cref="SetNotificationCategories(IEnumerable{iOSNotificationCategory})"/>
         /// <returns>
         /// Returns the last local or remote notification used to open the app or clicked on by the user. If no notification is available it returns null.
         /// </returns>
@@ -145,6 +146,25 @@ namespace Unity.Notifications.iOS
                 return null;
 
             return new iOSNotification(data.Value);
+        }
+
+        /// <summary>
+        /// Get users chosen action for the last actionable notification, null if no action was chosen.
+        /// </summary>
+        /// <seealso cref="SetNotificationCategories(IEnumerable{iOSNotificationCategory})"/>
+        /// <returns>Action identifier</returns>
+        public static string GetLastRespondedNotificationAction()
+        {
+            return iOSNotificationsWrapper.GetLastRespondedNotificationAction();
+        }
+
+        /// <summary>
+        /// Get users text input for the last actionable notification with input support, null if no input.
+        /// </summary>
+        /// <returns>Text user extered in the input field from notification</returns>
+        public static string GetLastRespondedNotificationUserText()
+        {
+            return iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
         }
 
         /// <summary>
@@ -192,6 +212,18 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationSettings GetNotificationSettings()
         {
             return iOSNotificationsWrapper.GetNotificationSettings();
+        }
+
+        /// <summary>
+        /// Set (replace if already set) notification categories.
+        /// Use this to setup actionable notifications. You can specify actions for each category,
+        /// which then will be available for each notification with the same category identifier.
+        /// Categories must be registered before sending notifications.
+        /// </summary>
+        /// <param name="categories">All notification categories for your application</param>
+        public static void SetNotificationCategories(IEnumerable<iOSNotificationCategory> categories)
+        {
+            iOSNotificationsWrapper.SetNotificationCategories(categories);
         }
 
         internal static void OnReceivedRemoteNotification(iOSNotificationWithUserInfo data)
