@@ -102,6 +102,9 @@ test_Android_{{ editor.version }}:
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
        utr.bat --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android
+  after:
+    - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+    - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d > upm-ci~/test-results/android/android_device_log.txt
   artifacts:
     packages:
       paths:
