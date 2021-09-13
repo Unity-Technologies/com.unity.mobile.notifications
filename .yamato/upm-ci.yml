@@ -5,6 +5,13 @@ test_editors:
   - version: 2020.3
   - version: 2019.4
 
+# running test is currently broken in trunk
+android_test_editors:
+  - version: 2021.2
+  - version: 2021.1
+  - version: 2020.3
+  - version: 2019.4
+
 # Some issues with 2019.4 on iOS on Yamato, but passes locally
 ios_test_editors:
   - version: trunk
@@ -79,7 +86,7 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-{% for editor in test_editors %}
+{% for editor in android_test_editors %}
 test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
