@@ -177,6 +177,9 @@ test_trigger:
     {% for editor in ios_test_editors %}
     - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
     {% endfor %}
+    {% for editor in android_test_editors %}
+    - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
+    {% endfor %}
 
 publish:
   name: Publish to Internal Registry
