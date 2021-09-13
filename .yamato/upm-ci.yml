@@ -5,9 +5,8 @@ test_editors:
   - version: 2020.3
   - version: 2019.4
 
-# running test is currently broken in trunk
+# running test is currently broken in trunk and 2021.2
 android_test_editors:
-  - version: 2021.2
   - version: 2021.1
   - version: 2020.3
   - version: 2019.4
