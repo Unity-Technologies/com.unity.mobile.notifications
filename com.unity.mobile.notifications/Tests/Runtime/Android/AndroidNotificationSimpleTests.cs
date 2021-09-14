@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 using Unity.Notifications.Android;
 
 class AndroidNotificationSimpleTests
@@ -19,9 +20,9 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
     {
-#if !UNITY_EDITOR
         var testChannelId = "default_test_channel_10";
         AndroidNotificationCenter.DeleteNotificationChannel(testChannelId);
         Assert.AreNotEqual("default_test_channel_10", AndroidNotificationCenter.GetNotificationChannel(testChannelId).Id);
@@ -36,13 +37,12 @@ class AndroidNotificationSimpleTests
         currentChannelCount++;
 
         Assert.AreEqual(currentChannelCount, AndroidNotificationCenter.GetNotificationChannels().Length);
-#endif
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void DeleteNotificationChannel_NotificationChannelIsDeleted()
     {
-#if !UNITY_EDITOR
         var ch = new AndroidNotificationChannel();
         ch.Id = "default_test_channel_0";
         ch.Name = "Default Channel";
@@ -54,7 +54,6 @@ class AndroidNotificationSimpleTests
         AndroidNotificationCenter.DeleteNotificationChannel(ch.Id);
 
         Assert.AreEqual(numChannels - 1, AndroidNotificationCenter.GetNotificationChannels().Length);
-#endif
     }
 
     [Test]
@@ -78,6 +77,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void BasicSerializeDeserializeNotification_AllParameters()
     {
         const int notificationId = 123;
@@ -165,6 +165,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void BasicSerializeDeserializeNotification_MinimumParameters()
     {
         const int notificationId = 124;
@@ -180,6 +181,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void BasicSerializeDeserializeNotification_CanPutSimpleExtras()
     {
         const int notificationId = 125;
@@ -211,6 +213,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void BasicSerializeDeserializeNotification_WorksWithBinderExtras()
     {
         const int notificationId = 126;
@@ -268,6 +271,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void NotificationIntentSerialization_SimpleNotification()
     {
         const int notificationId = 1234;
@@ -280,6 +284,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void NotificationIntentSerialization_NotificationWithBinderObject()
     {
         const int notificationId = 1234;
@@ -303,6 +308,7 @@ class AndroidNotificationSimpleTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void OldTypeSerializedNotificationCanBedeserialized()
     {
         const int notificationId = 12345;

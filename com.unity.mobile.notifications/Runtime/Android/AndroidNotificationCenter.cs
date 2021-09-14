@@ -212,7 +212,10 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return -1;
 
-            int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
+            // Now.ToString("yyMMddHHmmssffffff"), but avoiding any culture-related formatting or dependencies
+            var now = DateTime.UtcNow;
+            var nowFormatted = $"{now.Year}{now.Month}{now.Day}{now.Hour}{now.Minute}{now.Second}{now.Millisecond}";
+            int id = Math.Abs(nowFormatted.GetHashCode()) + (new System.Random().Next(10000));
             using (var builder = CreateNotificationBuilder(id, notification, channelId))
                 SendNotification(builder);
 

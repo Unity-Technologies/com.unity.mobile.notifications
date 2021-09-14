@@ -5,6 +5,12 @@ test_editors:
   - version: 2020.3
   - version: 2019.4
 
+# running test is currently broken in trunk and 2021.2
+android_test_editors:
+  - version: 2021.1
+  - version: 2020.3
+  - version: 2019.4
+
 # Some issues with 2019.4 on iOS on Yamato, but passes locally
 ios_test_editors:
   - version: trunk
@@ -79,6 +85,40 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
+{% for editor in android_test_editors %}
+test_Android_{{ editor.version }}:
+  name: Test {{ editor.version }} on Android
+  agent:
+    type: Unity::mobile::shield
+    image: mobile/android-execution-r19:stable
+    flavor: b1.medium
+  commands:
+    - choco source add -n Unity -s {{ artifactory.production }}nuget/unity-choco-local
+    - choco install unity-config
+    - unity-config settings editor-path .Editor
+    - unity-config project create .MyTestProject
+{%- for dependency in mobile_dependencies -%}
+    - unity-config project add dependency {{dependency.name}}@{{dependency.version}} --project-path .MyTestProject
+{%- endfor -%}
+    - unity-config project add testable com.unity.mobile.notifications
+    - curl -s {{ utr.url_win }} --output utr.bat
+    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
+    - |
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       utr.bat --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900
+  after:
+    - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+    - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d > upm-ci~/test-results/android/android_device_log.txt
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/upm-ci.yml#pack
+{% endfor %}
+
 {% for editor in ios_test_editors %}
 test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
@@ -136,6 +176,9 @@ test_trigger:
     {% endfor %}
     {% for editor in ios_test_editors %}
     - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
+    {% endfor %}
+    {% for editor in android_test_editors %}
+    - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
     {% endfor %}
 
 publish:
