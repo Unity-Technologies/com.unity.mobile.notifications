@@ -232,7 +232,12 @@ namespace Unity.Notifications
 
             // Draw the toolbar for Android/iOS.
             var toolBarRect = new Rect(totalRect.x, totalRect.y, totalRect.width, k_ToolbarHeight);
-            m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
+            var toolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
+            if (toolbarIndex != m_SettingsManager.ToolbarIndex)
+            {
+                m_SettingsManager.ToolbarIndex = toolbarIndex;
+                m_SettingsManager.SaveSettings();
+            }
 
             var notificationSettingsRect = new Rect(totalRect.x, k_ToolbarHeight + 2, totalRect.width, totalRect.height - k_ToolbarHeight - k_Padding);
 
