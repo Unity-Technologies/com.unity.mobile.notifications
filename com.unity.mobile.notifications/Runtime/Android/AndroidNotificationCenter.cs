@@ -55,6 +55,7 @@ namespace Unity.Notifications.Android
         private static AndroidJavaObject Notification_EXTRA_TEXT;
         private static AndroidJavaObject Notification_EXTRA_SHOW_CHRONOMETER;
         private static AndroidJavaObject Notification_EXTRA_BIG_TEXT;
+        private static AndroidJavaObject Notification_EXTRA_SHOW_WHEN;
         private static int Notification_FLAG_AUTO_CANCEL;
         private static int Notification_FLAG_GROUP_SUMMARY;
 
@@ -94,6 +95,7 @@ namespace Unity.Notifications.Android
                 Notification_EXTRA_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
                 Notification_EXTRA_SHOW_CHRONOMETER = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
                 Notification_EXTRA_BIG_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
+                Notification_EXTRA_SHOW_WHEN = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
                 Notification_FLAG_AUTO_CANCEL = notificationClass.GetStatic<int>("FLAG_AUTO_CANCEL");
                 Notification_FLAG_GROUP_SUMMARY = notificationClass.GetStatic<int>("FLAG_GROUP_SUMMARY");
             }
@@ -480,7 +482,7 @@ namespace Unity.Notifications.Android
                 notification.GroupSummary = 0 != (flags &  Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
                 notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
-                var showTimestamp = extras.Call<bool>("getBoolean", "android.showWhen", false);
+                var showTimestamp = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_WHEN, false);
                 notification.ShowTimestamp = showTimestamp;
                 if (showTimestamp)
                     notification.CustomTimestamp = notificationObj.Get<long>("when").ToDatetime();
