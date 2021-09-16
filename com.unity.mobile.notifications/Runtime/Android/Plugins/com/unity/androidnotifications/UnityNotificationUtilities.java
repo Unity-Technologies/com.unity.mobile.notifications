@@ -81,7 +81,7 @@ public class UnityNotificationUtilities {
                 return Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize notification", e);
+            Log.e("UnityNotifications", "Failed to serialize notification", e);
         }
 
         return null;
@@ -98,7 +98,7 @@ public class UnityNotificationUtilities {
             out.write(bytes);
             return true;
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize notification as Parcel", e);
+            Log.e("UnityNotifications", "Failed to serialize notification as Parcel", e);
         }
 
         return false;
@@ -146,7 +146,7 @@ public class UnityNotificationUtilities {
 
             return true;
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize notification", e);
+            Log.e("UnityNotifications", "Failed to serialize notification", e);
             return false;
         }
     }
@@ -171,7 +171,7 @@ public class UnityNotificationUtilities {
             p.recycle();
             return result;
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize Parcelable", e);
+            Log.e("UnityNotifications", "Failed to serialize Parcelable", e);
             return null;
         }
     }
@@ -228,7 +228,7 @@ public class UnityNotificationUtilities {
                 return null;
             return deserializeParcelable(in);
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize notification intent", e);
+            Log.e("UnityNotifications", "Failed to deserialize notification intent", e);
             return null;
         }
     }
@@ -250,7 +250,7 @@ public class UnityNotificationUtilities {
             try {
                 extras = deserializeParcelable(in);
             } catch (ClassCastException cce) {
-                Log.e("Unity", "Unexpect type of deserialized object", cce);
+                Log.e("UnityNotifications", "Unexpect type of deserialized object", cce);
             }
 
             if (extras == null) {
@@ -331,7 +331,7 @@ public class UnityNotificationUtilities {
 
             return builder.build();
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize notification", e);
+            Log.e("UnityNotifications", "Failed to deserialize notification", e);
             return null;
         }
     }
@@ -391,7 +391,7 @@ public class UnityNotificationUtilities {
             builder.setShowWhen(showTimestamp);
             return builder.build();
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize old style notification", e);
+            Log.e("UnityNotifications", "Failed to deserialize old style notification", e);
             return null;
         }
     }
@@ -426,7 +426,7 @@ public class UnityNotificationUtilities {
                 return b.getParcelable("obj");
             }
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize parcelable", e);
+            Log.e("UnityNotifications", "Failed to deserialize parcelable", e);
         }
 
         return null;
