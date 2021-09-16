@@ -38,6 +38,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
 
+    protected static final String KEY_FIRE_TIME = "fireTime";
+    protected static final String KEY_ID = "id";
+    protected static final String KEY_INTENT_DATA = "data";
+    protected static final String KEY_LARGE_ICON = "largeIcon";
+    protected static final String KEY_REPEAT_INTERVAL = "repeatInterval";
+    protected static final String KEY_NOTIFICATION = "unityNotification";
+    protected static final String KEY_SMALL_ICON = "smallIcon";
+
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
     protected static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
@@ -237,13 +245,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
     public void scheduleNotification(Notification.Builder notificationBuilder) {
         Bundle extras = notificationBuilder.getExtras();
-        int id = extras.getInt("id", -1);
-        long repeatInterval = extras.getLong("repeatInterval", -1);
-        long fireTime = extras.getLong("fireTime", -1);
+        int id = extras.getInt(KEY_ID, -1);
+        long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
+        long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
         Notification notification = notificationBuilder.build();
 
         Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(mContext, mOpenActivity);
-        openAppIntent.putExtra("unityNotification", notification);
+        openAppIntent.putExtra(KEY_NOTIFICATION, notification);
         PendingIntent pendingIntent = getActivityPendingIntent(mContext, id, openAppIntent, 0);
 
         // if less than a second in the future, notify right away
@@ -262,7 +270,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (intent != null) {
             if (this.mRescheduleOnRestart) {
-                intent.putExtra("unityNotification", notification);
+                intent.putExtra(KEY_NOTIFICATION, notification);
                 UnityNotificationManager.saveNotificationIntent(mContext, intent);
             }
 
@@ -270,7 +278,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             notificationBuilder.setContentIntent(pendingIntent);
             finalizeNotificationForDisplay(mContext, notificationBuilder);
             notification = notificationBuilder.build();
-            intent.putExtra("unityNotification", notification);
+            intent.putExtra(KEY_NOTIFICATION, notification);
 
             PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
@@ -338,8 +346,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
     protected static synchronized void saveNotificationIntent(Context context, Intent intent) {
-        Notification notification = intent.getParcelableExtra("unityNotification");
-        String notification_id = Integer.toString(notification.extras.getInt("id", -1));
+        Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
+        String notification_id = Integer.toString(notification.extras.getInt(KEY_ID, -1));
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = prefs.edit().clear();
@@ -520,7 +528,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            if (!intent.hasExtra("unityNotification"))
+            if (!intent.hasExtra(KEY_NOTIFICATION))
                 return;
 
             UnityNotificationManager.sendNotification(context, intent);
@@ -531,8 +539,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Send a notification.
     protected static void sendNotification(Context context, Intent intent) {
-        Notification notification = intent.getParcelableExtra("unityNotification");
-        int id = notification.extras.getInt("id", -1);
+        Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
+        int id = notification.extras.getInt(KEY_ID, -1);
 
         UnityNotificationManager.notify(context, id, notification);
     }
@@ -547,7 +555,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when the app is not running!");
         }
 
-        boolean isRepeatable = notification.extras.getLong("repeatInterval", 0L) > 0;
+        boolean isRepeatable = notification.extras.getLong(KEY_REPEAT_INTERVAL, 0L) > 0;
 
         if (!isRepeatable)
             UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
@@ -571,13 +579,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static void finalizeNotificationForDisplay(Context context, Notification.Builder notificationBuilder) {
-        String icon = notificationBuilder.getExtras().getString("smallIcon");
+        String icon = notificationBuilder.getExtras().getString(KEY_SMALL_ICON);
         int iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
         if (iconId == 0) {
             iconId = context.getApplicationInfo().icon;
         }
         notificationBuilder.setSmallIcon(iconId);
-        icon = notificationBuilder.getExtras().getString("largeIcon");
+        icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
         iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
         if (iconId != 0) {
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), iconId));
