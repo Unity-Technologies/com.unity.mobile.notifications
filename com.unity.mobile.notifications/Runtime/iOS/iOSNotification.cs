@@ -44,6 +44,7 @@ namespace Unity.Notifications.iOS
         public string threadIdentifier;
 
         public IntPtr userInfo;
+        public IntPtr attachments;
 
         // Trigger
         public Int32 triggerType;
@@ -213,6 +214,8 @@ namespace Unity.Notifications.iOS
             get { return userInfo; }
         }
 
+        public List<iOSNotificationAttachment> Attachments { get; set; }
+
         /// <summary>
         /// The conditions that trigger the delivery of the notification.
         /// For notification that were already delivered and whose instance was returned by <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/> or <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/>
@@ -368,6 +371,7 @@ namespace Unity.Notifications.iOS
         {
             this.data = data.data;
             userInfo = data.userInfo;
+            Attachments = data.attachments;
         }
 
         iOSNotificationData data;
@@ -380,7 +384,20 @@ namespace Unity.Notifications.iOS
             iOSNotificationWithUserInfo ret;
             ret.data = data;
             ret.userInfo = userInfo;
+            ret.attachments = Attachments;
             return ret;
+        }
+
+        public void AddAttachment(iOSNotificationAttachment attachment)
+        {
+            var attachments = Attachments;
+            if (attachments == null)
+            {
+                attachments = new List<iOSNotificationAttachment>();
+                Attachments = attachments;
+            }
+
+            attachments.Add(attachment);
         }
     }
 }
