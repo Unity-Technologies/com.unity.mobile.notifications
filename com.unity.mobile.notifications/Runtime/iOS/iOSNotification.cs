@@ -214,6 +214,12 @@ namespace Unity.Notifications.iOS
             get { return userInfo; }
         }
 
+        /// <summary>
+        /// A list of notification attachments.
+        /// Notification attachments can be images, audio or video files. Refer to Apple documentation on supported formats.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc"/>
+        /// <seealso cref="AddAttachment(iOSNotificationAttachment)"/>
         public List<iOSNotificationAttachment> Attachments { get; set; }
 
         /// <summary>
@@ -388,6 +394,10 @@ namespace Unity.Notifications.iOS
             return ret;
         }
 
+        /// <summary>
+        /// Add an attachment to notification.
+        /// </summary>
+        /// <param name="attachment">Attachment to add</param>
         public void AddAttachment(iOSNotificationAttachment attachment)
         {
             var attachments = Attachments;
