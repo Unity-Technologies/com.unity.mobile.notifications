@@ -38,6 +38,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
 
+    protected static final String TAG_UNITY = "UnityNotifications";
+
     protected static final String KEY_FIRE_TIME = "fireTime";
     protected static final String KEY_ID = "id";
     protected static final String KEY_INTENT_DATA = "data";
@@ -83,9 +85,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
             if (mOpenActivity == null)
                 mOpenActivity = activity.getClass();
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e("UnityNotifications", "Failed to load meta-data, NameNotFound: " + e.getMessage());
+            Log.e(TAG_UNITY, "Failed to load meta-data, NameNotFound: " + e.getMessage());
         } catch (NullPointerException e) {
-            Log.e("UnityNotifications", "Failed to load meta-data, NullPointer: " + e.getMessage());
+            Log.e(TAG_UNITY, "Failed to load meta-data, NullPointer: " + e.getMessage());
         }
     }
 
@@ -314,7 +316,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (android.os.Build.MANUFACTURER.equals("samsung") && validNotificationIds.size() >= 499) {
             // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
             // Attempting to schedule more than that might cause the app to crash.
-            Log.w("UnityNotifications", "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
+            Log.w(TAG_UNITY, "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
                     " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.");
             intent = null;
         } else {
@@ -533,7 +535,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             UnityNotificationManager.sendNotification(context, intent);
         } catch (BadParcelableException e) {
-            Log.w("UnityNotifications", e.toString());
+            Log.w(TAG_UNITY, e.toString());
         }
     }
 
@@ -552,7 +554,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         try {
             mNotificationCallback.onSentNotification(notification);
         } catch (RuntimeException ex) {
-            Log.w("UnityNotifications", "Can not invoke OnNotificationReceived event when the app is not running!");
+            Log.w(TAG_UNITY, "Can not invoke OnNotificationReceived event when the app is not running!");
         }
 
         boolean isRepeatable = notification.extras.getLong(KEY_REPEAT_INTERVAL, 0L) > 0;

@@ -27,6 +27,7 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_LARGE_
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_NOTIFICATION;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT_INTERVAL;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_ICON;
+import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 public class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
@@ -81,7 +82,7 @@ public class UnityNotificationUtilities {
                 return Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to serialize notification", e);
+            Log.e(TAG_UNITY, "Failed to serialize notification", e);
         }
 
         return null;
@@ -98,7 +99,7 @@ public class UnityNotificationUtilities {
             out.write(bytes);
             return true;
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to serialize notification as Parcel", e);
+            Log.e(TAG_UNITY, "Failed to serialize notification as Parcel", e);
         }
 
         return false;
@@ -146,7 +147,7 @@ public class UnityNotificationUtilities {
 
             return true;
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to serialize notification", e);
+            Log.e(TAG_UNITY, "Failed to serialize notification", e);
             return false;
         }
     }
@@ -171,7 +172,7 @@ public class UnityNotificationUtilities {
             p.recycle();
             return result;
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to serialize Parcelable", e);
+            Log.e(TAG_UNITY, "Failed to serialize Parcelable", e);
             return null;
         }
     }
@@ -228,7 +229,7 @@ public class UnityNotificationUtilities {
                 return null;
             return deserializeParcelable(in);
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to deserialize notification intent", e);
+            Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
             return null;
         }
     }
@@ -250,7 +251,7 @@ public class UnityNotificationUtilities {
             try {
                 extras = deserializeParcelable(in);
             } catch (ClassCastException cce) {
-                Log.e("UnityNotifications", "Unexpect type of deserialized object", cce);
+                Log.e(TAG_UNITY, "Unexpect type of deserialized object", cce);
             }
 
             if (extras == null) {
@@ -331,7 +332,7 @@ public class UnityNotificationUtilities {
 
             return builder.build();
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to deserialize notification", e);
+            Log.e(TAG_UNITY, "Failed to deserialize notification", e);
             return null;
         }
     }
@@ -391,7 +392,7 @@ public class UnityNotificationUtilities {
             builder.setShowWhen(showTimestamp);
             return builder.build();
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to deserialize old style notification", e);
+            Log.e(TAG_UNITY, "Failed to deserialize old style notification", e);
             return null;
         }
     }
@@ -426,7 +427,7 @@ public class UnityNotificationUtilities {
                 return b.getParcelable("obj");
             }
         } catch (Exception e) {
-            Log.e("UnityNotifications", "Failed to deserialize parcelable", e);
+            Log.e(TAG_UNITY, "Failed to deserialize parcelable", e);
         }
 
         return null;
@@ -455,18 +456,18 @@ public class UnityNotificationUtilities {
         }
 
         if (activityClass == null && fallbackToDefault) {
-            Log.w("UnityNotifications", "No custom_notification_android_activity found, attempting to find app activity class");
+            Log.w(TAG_UNITY, "No custom_notification_android_activity found, attempting to find app activity class");
 
             String classToFind = "com.unity3d.player.UnityPlayerActivity";
             try {
                 return Class.forName(classToFind);
             } catch (ClassNotFoundException ignored) {
-                Log.w("UnityNotifications", String.format("Attempting to find : %s, failed!", classToFind));
+                Log.w(TAG_UNITY, String.format("Attempting to find : %s, failed!", classToFind));
                 classToFind = String.format("%s.UnityPlayerActivity", context.getPackageName());
                 try {
                     return Class.forName(classToFind);
                 } catch (ClassNotFoundException ignored1) {
-                    Log.w("UnityNotifications", String.format("Attempting to find class based on package name: %s, failed!", classToFind));
+                    Log.w(TAG_UNITY, String.format("Attempting to find class based on package name: %s, failed!", classToFind));
                 }
             }
         }
