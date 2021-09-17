@@ -211,9 +211,9 @@ void* _CreateUNTextInputNotificationAction(const char* identifier, const char* t
     return (__bridge_retained void*)action;
 }
 
-void _ReleaseUNNotificationAction(void* action)
+void _ReleaseNSObject(void* obj)
 {
-    UNNotificationAction* a = (__bridge_transfer UNNotificationAction*)action;
+    NSObject* a = (__bridge_transfer NSObject*)obj;
     a = nil;
 }
 

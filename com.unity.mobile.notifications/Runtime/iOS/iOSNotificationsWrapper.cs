@@ -104,7 +104,7 @@ namespace Unity.Notifications.iOS
         internal static extern IntPtr _CreateUNTextInputNotificationAction(string id, string title, int options, string buttonTitle, string placeholder);
 
         [DllImport("__Internal")]
-        private static extern void _ReleaseUNNotificationAction(IntPtr action);
+        private static extern void _ReleaseNSObject(IntPtr obj);
 
         [DllImport("__Internal")]
         private static extern IntPtr _AddActionToNSArray(IntPtr actions, IntPtr action, int capacity);
@@ -451,7 +451,7 @@ namespace Unity.Notifications.iOS
             _SetNotificationCategories(categorySet);
 
             foreach (var act in allActions)
-                _ReleaseUNNotificationAction(act.Value);
+                _ReleaseNSObject(act.Value);
 #endif
         }
     }
