@@ -217,6 +217,13 @@ void _ReleaseNSObject(void* obj)
     a = nil;
 }
 
+const char* _NSErrorToMessage(void* error)
+{
+    NSError* e = (__bridge_transfer NSError*)error;
+    NSString* msg = e.localizedDescription;
+    return strdup(msg.UTF8String);
+}
+
 void* _AddActionToNSArray(void* actions, void* action, int capacity)
 {
     NSMutableArray<UNNotificationAction*>* array;

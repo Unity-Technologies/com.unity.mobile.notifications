@@ -212,8 +212,9 @@ void* _AddItemToNSDictionary(void* dict, const char* key, const char* value)
     return dict;
 }
 
-void* _AddAttachmentToNSArray(void* arr, const char* attId, const char* url)
+void* _AddAttachmentToNSArray(void* arr, const char* attId, const char* url, void** outError)
 {
+    *outError = NULL;
     NSString* attachmentId = nil;
     if (attId != NULL)
         attachmentId = [NSString stringWithUTF8String: attId];
@@ -235,7 +236,8 @@ void* _AddAttachmentToNSArray(void* arr, const char* attId, const char* url)
         return arr;
     }
 
-    // TODO error
+    if (error != nil)
+        *outError = (__bridge_retained void*)error;
     return NULL;
 }
 

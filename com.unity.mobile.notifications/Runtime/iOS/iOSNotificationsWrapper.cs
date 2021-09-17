@@ -89,7 +89,7 @@ namespace Unity.Notifications.iOS
         internal static extern IntPtr _AddItemToNSDictionary(IntPtr dict, string key, string value);
 
         [DllImport("__Internal")]
-        internal static extern IntPtr _AddAttachmentToNSArray(IntPtr atts, string id, string url);
+        internal static extern IntPtr _AddAttachmentToNSArray(IntPtr atts, string id, string url, out IntPtr error);
 
         [DllImport("__Internal")]
         private static extern void _ReadNSDictionary(IntPtr handle, IntPtr nsDict, ReceiveNSDictionaryKeyValueCallback callback);
@@ -105,6 +105,9 @@ namespace Unity.Notifications.iOS
 
         [DllImport("__Internal")]
         private static extern void _ReleaseNSObject(IntPtr obj);
+
+        [DllImport("__Internal")]
+        private static extern string _NSErrorToMessage(IntPtr error);
 
         [DllImport("__Internal")]
         private static extern IntPtr _AddActionToNSArray(IntPtr actions, IntPtr action, int capacity);
@@ -333,7 +336,17 @@ namespace Unity.Notifications.iOS
 
             var atts = IntPtr.Zero;
             foreach (var attachment in attachments)
-                atts = _AddAttachmentToNSArray(atts, attachment.Id, attachment.Url);
+            {
+                IntPtr error;
+                atts = _AddAttachmentToNSArray(atts, attachment.Id, attachment.Url, out error);
+                if (error != IntPtr.Zero)
+                {
+                    if (atts != IntPtr.Zero)
+                        _ReleaseNSObject(atts);
+                    var msg = _NSErrorToMessage(error);
+                    throw new Exception(msg);
+                }
+            }
 
             return atts;
 #else
