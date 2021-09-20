@@ -20,6 +20,15 @@ import android.os.Parcelable;
 import android.util.Base64;
 import android.util.Log;
 
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_FIRE_TIME;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_ID;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_INTENT_DATA;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_LARGE_ICON;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_NOTIFICATION;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT_INTERVAL;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_ICON;
+import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
+
 public class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
     private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
@@ -57,7 +66,7 @@ public class UnityNotificationUtilities {
     */
     protected static String serializeNotificationIntent(Intent intent) {
         try {
-            Notification notification = intent.getParcelableExtra("unityNotification");
+            Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
             if (notification == null)
                 return null;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
@@ -73,7 +82,7 @@ public class UnityNotificationUtilities {
                 return Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize notification", e);
+            Log.e(TAG_UNITY, "Failed to serialize notification", e);
         }
 
         return null;
@@ -90,7 +99,7 @@ public class UnityNotificationUtilities {
             out.write(bytes);
             return true;
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize notification as Parcel", e);
+            Log.e(TAG_UNITY, "Failed to serialize notification as Parcel", e);
         }
 
         return false;
@@ -109,17 +118,17 @@ public class UnityNotificationUtilities {
                 out.write(extras);
             else {
                 // parcelling may fail in case it contains binder object, when that happens serialize manually what we care about
-                out.writeInt(notification.extras.getInt("id"));
+                out.writeInt(notification.extras.getInt(KEY_ID));
                 serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
                 serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
-                serializeString(out, notification.extras.getString("smallIcon"));
-                serializeString(out, notification.extras.getString("largeIcon"));
-                out.writeLong(notification.extras.getLong("fireTime", -1));
-                out.writeLong(notification.extras.getLong("repeatInterval", -1));
+                serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
+                serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
+                out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
+                out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
                 serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
                 out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
                 out.writeBoolean(showWhen);
-                serializeString(out, notification.extras.getString("data"));
+                serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
             }
 
             serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
@@ -138,7 +147,7 @@ public class UnityNotificationUtilities {
 
             return true;
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize notification", e);
+            Log.e(TAG_UNITY, "Failed to serialize notification", e);
             return false;
         }
     }
@@ -163,7 +172,7 @@ public class UnityNotificationUtilities {
             p.recycle();
             return result;
         } catch (Exception e) {
-            Log.e("Unity", "Failed to serialize Parcelable", e);
+            Log.e(TAG_UNITY, "Failed to serialize Parcelable", e);
             return null;
         }
     }
@@ -190,7 +199,7 @@ public class UnityNotificationUtilities {
         if (notification == null)
             return null;
         intent = new Intent(context, UnityNotificationManager.class);
-        intent.putExtra("unityNotification", notification);
+        intent.putExtra(KEY_NOTIFICATION, notification);
         return intent;
     }
 
@@ -220,7 +229,7 @@ public class UnityNotificationUtilities {
                 return null;
             return deserializeParcelable(in);
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize notification intent", e);
+            Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
             return null;
         }
     }
@@ -242,7 +251,7 @@ public class UnityNotificationUtilities {
             try {
                 extras = deserializeParcelable(in);
             } catch (ClassCastException cce) {
-                Log.e("Unity", "Unexpect type of deserialized object", cce);
+                Log.e(TAG_UNITY, "Unexpect type of deserialized object", cce);
             }
 
             if (extras == null) {
@@ -261,14 +270,14 @@ public class UnityNotificationUtilities {
             } else {
                 title = extras.getString(Notification.EXTRA_TITLE);
                 text = extras.getString(Notification.EXTRA_TEXT);
-                smallIcon = extras.getString("smallIcon");
-                largeIcon = extras.getString("largeIcon");
-                fireTime = extras.getLong("fireTime", -1);
-                repeatInterval = extras.getLong("repeatInterval", -1);
+                smallIcon = extras.getString(KEY_SMALL_ICON);
+                largeIcon = extras.getString(KEY_LARGE_ICON);
+                fireTime = extras.getLong(KEY_FIRE_TIME, -1);
+                repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
                 bigText = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : extras.getString(Notification.EXTRA_BIG_TEXT);
                 usesStopWatch = extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false);
                 showWhen = extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
-                intentData = extras.getString("data");
+                intentData = extras.getString(KEY_INTENT_DATA);
             }
 
             String channelId = deserializeString(in);
@@ -288,15 +297,15 @@ public class UnityNotificationUtilities {
             if (extras != null)
                 builder.setExtras(extras);
             else {
-                builder.getExtras().putInt("id", id);
-                UnityNotificationManager.setNotificationIcon(builder, "smallIcon", smallIcon);
-                UnityNotificationManager.setNotificationIcon(builder, "largeIcon", largeIcon);
+                builder.getExtras().putInt(KEY_ID, id);
+                UnityNotificationManager.setNotificationIcon(builder, KEY_SMALL_ICON, smallIcon);
+                UnityNotificationManager.setNotificationIcon(builder, KEY_LARGE_ICON, largeIcon);
                 if (fireTime != -1)
-                    builder.getExtras().putLong("fireTime", fireTime);
+                    builder.getExtras().putLong(KEY_FIRE_TIME, fireTime);
                 if (repeatInterval != -1)
-                    builder.getExtras().putLong("repeatInterval", repeatInterval);
+                    builder.getExtras().putLong(KEY_REPEAT_INTERVAL, repeatInterval);
                 if (intentData != null)
-                    builder.getExtras().putString("data", intentData);
+                    builder.getExtras().putString(KEY_INTENT_DATA, intentData);
             }
             if (title != null)
                 builder.setContentTitle(title);
@@ -323,7 +332,7 @@ public class UnityNotificationUtilities {
 
             return builder.build();
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize notification", e);
+            Log.e(TAG_UNITY, "Failed to deserialize notification", e);
             return null;
         }
     }
@@ -336,20 +345,20 @@ public class UnityNotificationUtilities {
             Bundle bundle = new Bundle();
             bundle.readFromParcel(p);
 
-            int id = bundle.getInt("id", -1);
+            int id = bundle.getInt(KEY_ID, -1);
             String channelId = bundle.getString("channelID");
             String textTitle = bundle.getString("textTitle");
             String textContent = bundle.getString("textContent");
             String smallIcon = bundle.getString("smallIconStr");
             boolean autoCancel = bundle.getBoolean("autoCancel", false);
             boolean usesChronometer = bundle.getBoolean("usesChronometer", false);
-            long fireTime = bundle.getLong("fireTime", -1);
-            long repeatInterval = bundle.getLong("repeatInterval", -1);
+            long fireTime = bundle.getLong(KEY_FIRE_TIME, -1);
+            long repeatInterval = bundle.getLong(KEY_REPEAT_INTERVAL, -1);
             String largeIcon = bundle.getString("largeIconStr");
             int style = bundle.getInt("style", -1);
             int color = bundle.getInt("color", 0);
             int number = bundle.getInt("number", 0);
-            String intentData = bundle.getString("data");
+            String intentData = bundle.getString(KEY_INTENT_DATA);
             String group = bundle.getString("group");
             boolean groupSummary = bundle.getBoolean("groupSummary", false);
             String sortKey = bundle.getString("sortKey");
@@ -357,15 +366,15 @@ public class UnityNotificationUtilities {
             boolean showTimestamp = bundle.getBoolean("showTimestamp", false);
 
             Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
-            builder.getExtras().putInt("id", id);
+            builder.getExtras().putInt(KEY_ID, id);
             builder.setContentTitle(textTitle);
             builder.setContentText(textContent);
-            UnityNotificationManager.setNotificationIcon(builder, "smallIcon", smallIcon);
+            UnityNotificationManager.setNotificationIcon(builder, KEY_SMALL_ICON, smallIcon);
             builder.setAutoCancel(autoCancel);
             builder.setUsesChronometer(usesChronometer);
-            builder.getExtras().putLong("fireTime", fireTime);
-            builder.getExtras().putLong("repeatInterval", repeatInterval);
-            UnityNotificationManager.setNotificationIcon(builder, "largeIcon", largeIcon);
+            builder.getExtras().putLong(KEY_FIRE_TIME, fireTime);
+            builder.getExtras().putLong(KEY_REPEAT_INTERVAL, repeatInterval);
+            UnityNotificationManager.setNotificationIcon(builder, KEY_LARGE_ICON, largeIcon);
             if (style == 2)
                 builder.setStyle(new Notification.BigTextStyle().bigText(textContent));
             if (color != 0)
@@ -373,7 +382,7 @@ public class UnityNotificationUtilities {
             if (number >= 0)
                 builder.setNumber(number);
             if (intentData != null)
-                builder.getExtras().putString("data", intentData);
+                builder.getExtras().putString(KEY_INTENT_DATA, intentData);
             if (null != group && group.length() > 0)
                 builder.setGroup(group);
             builder.setGroupSummary(groupSummary);
@@ -383,7 +392,7 @@ public class UnityNotificationUtilities {
             builder.setShowWhen(showTimestamp);
             return builder.build();
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize old style notification", e);
+            Log.e(TAG_UNITY, "Failed to deserialize old style notification", e);
             return null;
         }
     }
@@ -418,7 +427,7 @@ public class UnityNotificationUtilities {
                 return b.getParcelable("obj");
             }
         } catch (Exception e) {
-            Log.e("Unity", "Failed to deserialize parcelable", e);
+            Log.e(TAG_UNITY, "Failed to deserialize parcelable", e);
         }
 
         return null;
@@ -447,18 +456,18 @@ public class UnityNotificationUtilities {
         }
 
         if (activityClass == null && fallbackToDefault) {
-            Log.w("UnityNotifications", "No custom_notification_android_activity found, attempting to find app activity class");
+            Log.w(TAG_UNITY, "No custom_notification_android_activity found, attempting to find app activity class");
 
             String classToFind = "com.unity3d.player.UnityPlayerActivity";
             try {
                 return Class.forName(classToFind);
             } catch (ClassNotFoundException ignored) {
-                Log.w("UnityNotifications", String.format("Attempting to find : %s, failed!", classToFind));
+                Log.w(TAG_UNITY, String.format("Attempting to find : %s, failed!", classToFind));
                 classToFind = String.format("%s.UnityPlayerActivity", context.getPackageName());
                 try {
                     return Class.forName(classToFind);
                 } catch (ClassNotFoundException ignored1) {
-                    Log.w("UnityNotifications", String.format("Attempting to find class based on package name: %s, failed!", classToFind));
+                    Log.w(TAG_UNITY, String.format("Attempting to find class based on package name: %s, failed!", classToFind));
                 }
             }
         }
