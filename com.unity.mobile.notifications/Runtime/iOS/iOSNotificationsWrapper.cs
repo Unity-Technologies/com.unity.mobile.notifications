@@ -331,7 +331,7 @@ namespace Unity.Notifications.iOS
         public static IntPtr CsAttachmentsToObjc(List<iOSNotificationAttachment> attachments)
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            if (attachments == null)
+            if (attachments == null || attachments.Count == 0)
                 return IntPtr.Zero;
 
             var atts = IntPtr.Zero;
