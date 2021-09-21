@@ -299,7 +299,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static synchronized Intent buildNotificationIntent(Context context, int notificationId) {
         Intent intent = new Intent(context, UnityNotificationManager.class);
 
-        HashSet<String> ids = new HashSet<String>(getScheduledNotificationIDs(context));
+        Set<String> ids = getScheduledNotificationIDs(context);
 
         Set<String> validNotificationIds = new HashSet<String>();
         for (String id : ids) {
