@@ -358,12 +358,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         String data = UnityNotificationUtilities.serializeNotificationIntent(intent);
         editor.putString("data", data);
         editor.apply();
-
-        // Add the id to notification ids SharedPreferences.
-        Set<String> ids = new HashSet<String>(getScheduledNotificationIDs(context));
-        ids.add(notification_id);
-
-        saveScheduledNotificationIDs(context, ids);
     }
 
     protected static String getSharedPrefsNameByNotificationId(String id)
