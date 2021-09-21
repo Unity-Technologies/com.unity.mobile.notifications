@@ -475,14 +475,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void cancelPendingNotification(int id) {
         synchronized (UnityNotificationManager.class) {
             UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
+            String idStr = String.valueOf(id);
+            removeScheduledNotificationID(mContext, idStr);
             if (this.mRescheduleOnRestart) {
-                UnityNotificationManager.deleteExpiredNotificationIntent(mContext, Integer.toString(id));
+                UnityNotificationManager.deleteExpiredNotificationIntent(mContext, idStr);
             }
         }
     }
 
     // Cancel a pending notification by id.
-    protected static synchronized void cancelPendingNotificationIntent(Context context, int id) {
+    protected static void cancelPendingNotificationIntent(Context context, int id) {
         Intent intent = new Intent(context, UnityNotificationManager.class);
         PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_NO_CREATE);
 
@@ -493,8 +495,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
             broadcast.cancel();
         }
-
-        removeScheduledNotificationID(context, String.valueOf(id));
     }
 
     protected static synchronized void removeScheduledNotificationID(Context context, String id) {
