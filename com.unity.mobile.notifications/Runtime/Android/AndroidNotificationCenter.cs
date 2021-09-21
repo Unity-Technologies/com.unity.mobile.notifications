@@ -309,7 +309,7 @@ namespace Unity.Notifications.Android
         public static void CancelScheduledNotification(int id)
         {
             if (Initialize())
-                s_NotificationManager.Call("cancelPendingNotificationIntent", id);
+                s_NotificationManager.Call("cancelPendingNotification", id);
         }
 
         /// <summary>

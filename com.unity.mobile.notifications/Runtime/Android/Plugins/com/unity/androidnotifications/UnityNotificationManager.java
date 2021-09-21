@@ -440,7 +440,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         int[] ids = this.getScheduledNotificationIDs();
 
         for (int id : ids) {
-            cancelPendingNotificationIntent(id);
+            cancelPendingNotification(id);
         }
     }
 
@@ -472,7 +472,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Cancel a pending notification by id.
-    public void cancelPendingNotificationIntent(int id) {
+    public void cancelPendingNotification(int id) {
         synchronized (UnityNotificationManager.class) {
             UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
             if (this.mRescheduleOnRestart) {
