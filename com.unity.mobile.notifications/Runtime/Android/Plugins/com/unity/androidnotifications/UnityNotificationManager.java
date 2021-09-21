@@ -442,11 +442,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
             saveScheduledNotificationIDs(mContext, new HashSet<>());
         }
 
-        for (String id : ids) {
-            cancelPendingNotificationIntent(mContext, Integer.valueOf(id));
-            if (this.mRescheduleOnRestart) {
-                deleteExpiredNotificationIntent(mContext, id);
-            }
+        if (ids.size() > 0) {
+            Context context = mContext;
+            new Thread(() -> {
+                for (String id : ids) {
+                    cancelPendingNotificationIntent(context, Integer.valueOf(id));
+                    if (this.mRescheduleOnRestart) {
+                        deleteExpiredNotificationIntent(context, id);
+                    }
+                }
+            }).start();
         }
     }
 
