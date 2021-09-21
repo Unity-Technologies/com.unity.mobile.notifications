@@ -297,7 +297,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Build a notification Intent to store the PendingIntent.
     private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
-        Intent intent = buildNotificationIntent(context, notificationId);
+        Intent intent = buildNotificationIntent(context);
 
         Set<String> ids = getScheduledNotificationIDs(context);
 
@@ -327,7 +327,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return intent;
     }
 
-    protected static Intent buildNotificationIntent(Context context, int notificationId) {
+    protected static Intent buildNotificationIntent(Context context) {
         Intent intent = new Intent(context, UnityNotificationManager.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
