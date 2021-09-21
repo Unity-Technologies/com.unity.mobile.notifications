@@ -359,9 +359,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         ids.add(notification_id);
 
         saveScheduledNotificationIDs(context, ids);
-
-        // TODO: why we load after saving?
-        UnityNotificationManager.loadNotificationIntents(context);
     }
 
     protected static String getSharedPrefsNameByNotificationId(String id)
@@ -388,8 +385,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        for (String id : idsMarkedForRemoval) {
-            UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+        if (idsMarkedForRemoval.size() > 0) {
+            ids = new HashSet<>(ids);
+            for (String id : idsMarkedForRemoval) {
+                ids.remove(id);
+                deleteExpiredNotificationIntent(context, id);
+            }
+            saveScheduledNotificationIDs(context, ids);
         }
 
         return intent_data_list;
@@ -492,24 +494,20 @@ public class UnityNotificationManager extends BroadcastReceiver {
             broadcast.cancel();
         }
 
-        Set<String> ids = new HashSet<String>(getScheduledNotificationIDs(context));
+        removeScheduledNotificationID(context, String.valueOf(id));
+    }
 
-        String idStr = Integer.toString(id);
-        if (ids.contains(idStr)) {
-            ids.remove(Integer.toString(id));
+    protected static synchronized void removeScheduledNotificationID(Context context, String id) {
+        Set<String> ids = getScheduledNotificationIDs(context);
+        if (ids.contains(id)) {
+            ids = new HashSet<>(ids);
+            ids.remove(id);
             saveScheduledNotificationIDs(context, ids);
         }
     }
 
     // Delete the notification intent from SharedPreferences by id.
     protected static synchronized void deleteExpiredNotificationIntent(Context context, String id) {
-        Set<String> ids = new HashSet<String>(getScheduledNotificationIDs(context));
-
-        cancelPendingNotificationIntent(context, Integer.valueOf(id));
-
-        ids.remove(id);
-        saveScheduledNotificationIDs(context, ids);
-
         SharedPreferences notificationPrefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
         notificationPrefs.edit().clear().apply();
     }
@@ -556,8 +554,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         boolean isRepeatable = notification.extras.getLong(KEY_REPEAT_INTERVAL, 0L) > 0;
 
-        if (!isRepeatable)
-            UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
+        if (!isRepeatable) {
+            String idStr = String.valueOf(id);
+            removeScheduledNotificationID(context, idStr);
+            deleteExpiredNotificationIntent(context, idStr);
+        }
     }
 
     public static Integer getNotificationColor(Notification notification) {
