@@ -436,10 +436,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Cancel all the pending notifications.
     public void cancelAllPendingNotificationIntents() {
-        int[] ids = this.getScheduledNotificationIDs();
+        Set<String> ids;
+        synchronized (UnityNotificationManager.class) {
+            ids = this.getScheduledNotificationIDs(mContext);
+            saveScheduledNotificationIDs(mContext, new HashSet<>());
+        }
 
-        for (int id : ids) {
-            cancelPendingNotification(id);
+        for (String id : ids) {
+            cancelPendingNotificationIntent(mContext, Integer.valueOf(id));
+            if (this.mRescheduleOnRestart) {
+                deleteExpiredNotificationIntent(mContext, id);
+            }
         }
     }
 
@@ -453,21 +460,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         SharedPreferences.Editor editor = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
         editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
         editor.apply();
-    }
-
-    // Get all notification ids from SharedPreferences.
-    protected int[] getScheduledNotificationIDs() {
-        synchronized (UnityNotificationManager.class) {
-            Set<String> ids = getScheduledNotificationIDs(mContext);
-
-            // Convert the string array ids to int array ids.
-            int[] intIds = new int[ids.size()];
-            int index = 0;
-            for (String id : ids) {
-                intIds[index++] = Integer.valueOf(id);
-            }
-            return intIds;
-        }
     }
 
     // Cancel a pending notification by id.
