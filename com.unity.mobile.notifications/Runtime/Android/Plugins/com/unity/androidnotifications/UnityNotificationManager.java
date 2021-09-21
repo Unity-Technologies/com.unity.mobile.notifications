@@ -268,7 +268,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             fireTime += repeatInterval;
         }
 
-        Intent intent = buildNotificationIntent(mContext, id);
+        Intent intent = buildNotificationIntentUpdateList(mContext, id);
 
         if (intent != null) {
             if (this.mRescheduleOnRestart) {
@@ -296,8 +296,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Build a notification Intent to store the PendingIntent.
-    protected static synchronized Intent buildNotificationIntent(Context context, int notificationId) {
-        Intent intent = new Intent(context, UnityNotificationManager.class);
+    private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
+        Intent intent = buildNotificationIntent(context, notificationId);
 
         Set<String> ids = getScheduledNotificationIDs(context);
 
@@ -320,11 +320,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
             intent = null;
         } else {
             validNotificationIds.add(Integer.toString(notificationId));
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
 
         saveScheduledNotificationIDs(context, validNotificationIds);
 
+        return intent;
+    }
+
+    protected static Intent buildNotificationIntent(Context context, int notificationId) {
+        Intent intent = new Intent(context, UnityNotificationManager.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
     }
 
