@@ -32,6 +32,8 @@ import java.util.List;
 public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
+    private static int mSentSinceLastHousekeeping = 0;
+    private static boolean mPerformingHousekeeping = false;
 
     public Context mContext = null;
     protected Activity mActivity = null;
@@ -297,34 +299,82 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Build a notification Intent to store the PendingIntent.
     private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
-        Intent intent = buildNotificationIntent(context);
-
         Set<String> ids = getScheduledNotificationIDs(context);
-
-        Set<String> validNotificationIds = new HashSet<String>();
-        for (String id : ids) {
-            // Get the given broadcast PendingIntent by id as request code.
-            // FLAG_NO_CREATE is set to return null if the described PendingIntent doesn't exist.
-            PendingIntent broadcast = getBroadcastPendingIntent(context, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
-
-            if (broadcast != null) {
-                validNotificationIds.add(id);
-            }
-        }
-
-        if (android.os.Build.MANUFACTURER.equals("samsung") && validNotificationIds.size() >= 499) {
+        if (android.os.Build.MANUFACTURER.equals("samsung") && ids.size() >= 499) {
             // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
             // Attempting to schedule more than that might cause the app to crash.
             Log.w(TAG_UNITY, "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
                     " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.");
-            intent = null;
-        } else {
-            validNotificationIds.add(Integer.toString(notificationId));
+            return null;
         }
 
-        saveScheduledNotificationIDs(context, validNotificationIds);
-
+        Intent intent = buildNotificationIntent(context);
+        ids = new HashSet<>(ids);
+        ids.add(String.valueOf(notificationId));
+        saveScheduledNotificationIDs(context, ids);
+        scheduleHousekeeping(context, ids);
         return intent;
+    }
+
+    private static synchronized void scheduleHousekeeping(Context context, Set<String> ids) {
+        ++mSentSinceLastHousekeeping;
+        if (mSentSinceLastHousekeeping > 50) {
+            mSentSinceLastHousekeeping = 0;
+            Thread housekeepingThread = new Thread(() -> {
+                try {
+                    // when scheduling lots of notifications at once we can have more than one housekeeping thread running
+                    // synchronize them and chain to happen one after the other
+                    synchronized (UnityNotificationManager.class) {
+                        while (mPerformingHousekeeping) {
+                            UnityNotificationManager.class.wait();
+                        }
+                        mPerformingHousekeeping = true;
+                    }
+
+                    performNotificationHousekeeping(context, ids);
+                } catch (InterruptedException e) {
+                    Log.e(TAG_UNITY, "Notification housekeeping interrupted");
+                } finally {
+                    synchronized (UnityNotificationManager.class) {
+                        mPerformingHousekeeping = false;
+                        UnityNotificationManager.class.notify();
+                    }
+                }
+            });
+            housekeepingThread.start();
+        }
+    }
+
+    private static void performNotificationHousekeeping(Context context, Set<String> ids) {
+        Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
+
+        Set<String> invalid = findInvalidNotificationIds(context, ids);
+        synchronized (UnityNotificationManager.class) {
+            // list might have changed while we searched
+            Set<String> currentIds = new HashSet<>(getScheduledNotificationIDs(context));
+            for (String id : invalid)
+                currentIds.remove(id);
+            saveScheduledNotificationIDs(context, currentIds);
+        }
+
+        // in case we have saved intents, clear them
+        for (String id : invalid)
+            deleteExpiredNotificationIntent(context, id);
+    }
+
+    private static Set<String> findInvalidNotificationIds(Context context, Set<String> ids) {
+        Intent intent = buildNotificationIntent(context);
+        HashSet<String> invalid = new HashSet<String>();
+        for (String id : ids) {
+            // Get the given broadcast PendingIntent by id as request code.
+            // FLAG_NO_CREATE is set to return null if the described PendingIntent doesn't exist.
+            PendingIntent broadcast = getBroadcastPendingIntent(context, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
+            if (broadcast == null) {
+                invalid.add(id);
+            }
+        }
+
+        return invalid;
     }
 
     protected static Intent buildNotificationIntent(Context context) {
