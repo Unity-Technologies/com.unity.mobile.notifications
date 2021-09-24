@@ -40,6 +40,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
 
+    protected static final int SAMSUNG_NOTIFICATION_LIMIT = 500;
     protected static final String TAG_UNITY = "UnityNotifications";
 
     protected static final String KEY_FIRE_TIME = "fireTime";
@@ -300,11 +301,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Build a notification Intent to store the PendingIntent.
     private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
         Set<String> ids = getScheduledNotificationIDs(context);
-        if (android.os.Build.MANUFACTURER.equals("samsung") && ids.size() >= 499) {
+        if (android.os.Build.MANUFACTURER.equals("samsung") && ids.size() >= (SAMSUNG_NOTIFICATION_LIMIT - 1)) {
             // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
             // Attempting to schedule more than that might cause the app to crash.
-            Log.w(TAG_UNITY, "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
-                    " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.");
+            Log.w(TAG_UNITY, String.format("Attempting to schedule more than %1$d notifications. There is a limit of %1$d concurrently scheduled Alarms on Samsung devices" +
+                    " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.",
+                    SAMSUNG_NOTIFICATION_LIMIT));
             return null;
         }
 
