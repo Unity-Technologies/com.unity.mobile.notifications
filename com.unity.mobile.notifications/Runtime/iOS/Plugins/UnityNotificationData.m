@@ -163,6 +163,7 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
     }
 
     parseCustomizedData(&notificationData, request);
+    notificationData.attachments = (__bridge_retained void*)request.content.attachments;
 
     return notificationData;
 }
@@ -211,6 +212,35 @@ void* _AddItemToNSDictionary(void* dict, const char* key, const char* value)
     return dict;
 }
 
+void* _AddAttachmentToNSArray(void* arr, const char* attId, const char* url, void** outError)
+{
+    *outError = NULL;
+    NSString* attachmentId = nil;
+    if (attId != NULL)
+        attachmentId = [NSString stringWithUTF8String: attId];
+    NSURL* uri = [NSURL URLWithString: [NSString stringWithUTF8String: url]];
+    NSError* error = nil;
+    UNNotificationAttachment* attachment = [UNNotificationAttachment attachmentWithIdentifier: attachmentId URL: uri options: nil error: &error];
+    if (attachment != nil)
+    {
+        NSMutableArray* array;
+        if (arr != NULL)
+            array = (__bridge NSMutableArray*)arr;
+        else
+        {
+            array = [[NSMutableArray alloc] init];
+            arr = (__bridge_retained void*)array;
+        }
+
+        [array addObject: attachment];
+        return arr;
+    }
+
+    if (error != nil)
+        *outError = (__bridge_retained void*)error;
+    return NULL;
+}
+
 void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit, const char*, const char*))
 {
     NSDictionary* dict = (__bridge NSDictionary*)nsDict;
@@ -231,6 +261,16 @@ void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit
                 callback(csDict, k.UTF8String, v.UTF8String);
             }
         }
+    }];
+}
+
+void _ReadAttachmentsNSArray(void* csList, void* nsArray, void (*callback)(void*, const char*, const char*))
+{
+    NSArray<UNNotificationAttachment*>* attachments = (__bridge_transfer NSArray<UNNotificationAttachment*>*)nsArray;
+    [attachments enumerateObjectsUsingBlock:^(UNNotificationAttachment * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSString* idr = obj.identifier;
+        NSString* url = obj.URL.absoluteString;
+        callback(csList, idr.UTF8String, url.UTF8String);
     }];
 }
 

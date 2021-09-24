@@ -44,6 +44,7 @@ namespace Unity.Notifications.iOS
         public string threadIdentifier;
 
         public IntPtr userInfo;
+        public IntPtr attachments;
 
         // Trigger
         public Int32 triggerType;
@@ -214,6 +215,13 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
+        /// A list of notification attachments.
+        /// Notification attachments can be images, audio or video files. Refer to Apple documentation on supported formats.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc"/>
+        public List<iOSNotificationAttachment> Attachments { get; set; }
+
+        /// <summary>
         /// The conditions that trigger the delivery of the notification.
         /// For notification that were already delivered and whose instance was returned by <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/> or <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/>
         /// use this property to determine what caused the delivery to occur. You can do this by comparing <see cref="iOSNotification.Trigger"/>  to any of the notification trigger types that implement it, such as
@@ -368,6 +376,7 @@ namespace Unity.Notifications.iOS
         {
             this.data = data.data;
             userInfo = data.userInfo;
+            Attachments = data.attachments;
         }
 
         iOSNotificationData data;
@@ -380,6 +389,7 @@ namespace Unity.Notifications.iOS
             iOSNotificationWithUserInfo ret;
             ret.data = data;
             ret.userInfo = userInfo;
+            ret.attachments = Attachments;
             return ret;
         }
     }

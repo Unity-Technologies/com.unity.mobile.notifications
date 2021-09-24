@@ -12,6 +12,7 @@ namespace Unity.Notifications.iOS
     {
         internal iOSNotificationData data;
         internal Dictionary<string, string> userInfo;
+        internal List<iOSNotificationAttachment> attachments;
     }
 
     internal class iOSNotificationsWrapper : MonoBehaviour
@@ -88,7 +89,13 @@ namespace Unity.Notifications.iOS
         internal static extern IntPtr _AddItemToNSDictionary(IntPtr dict, string key, string value);
 
         [DllImport("__Internal")]
+        internal static extern IntPtr _AddAttachmentToNSArray(IntPtr atts, string id, string url, out IntPtr error);
+
+        [DllImport("__Internal")]
         private static extern void _ReadNSDictionary(IntPtr handle, IntPtr nsDict, ReceiveNSDictionaryKeyValueCallback callback);
+
+        [DllImport("__Internal")]
+        private static extern void _ReadAttachmentsNSArray(IntPtr handle, IntPtr nsArray, ReceiveUNNotificationAttachmentCallback callback);
 
         [DllImport("__Internal")]
         internal static extern IntPtr _CreateUNNotificationAction(string id, string title, int options);
@@ -97,7 +104,10 @@ namespace Unity.Notifications.iOS
         internal static extern IntPtr _CreateUNTextInputNotificationAction(string id, string title, int options, string buttonTitle, string placeholder);
 
         [DllImport("__Internal")]
-        private static extern void _ReleaseUNNotificationAction(IntPtr action);
+        private static extern void _ReleaseNSObject(IntPtr obj);
+
+        [DllImport("__Internal")]
+        private static extern string _NSErrorToMessage(IntPtr error);
 
         [DllImport("__Internal")]
         private static extern IntPtr _AddActionToNSArray(IntPtr actions, IntPtr action, int capacity);
@@ -117,6 +127,7 @@ namespace Unity.Notifications.iOS
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(iOSNotificationData notificationData);
         private delegate void ReceiveNSDictionaryKeyValueCallback(IntPtr dict, string key, string value);
+        private delegate void ReceiveUNNotificationAttachmentCallback(IntPtr array, string id, string url);
 
 #if UNITY_IOS && !UNITY_EDITOR && DEVELOPMENT_BUILD
         static iOSNotificationsWrapper()
@@ -186,6 +197,7 @@ namespace Unity.Notifications.iOS
             ret.data = data;
             ret.data.userInfo = IntPtr.Zero;
             ret.userInfo = NSDictionaryToCs(data.userInfo);
+            ret.attachments = AttachmentsNSArrayToCs(data.attachments);
             return ret;
         }
 
@@ -197,6 +209,20 @@ namespace Unity.Notifications.iOS
             if (dictionary == null)
                 return;
             dictionary[key] = value;
+        }
+
+        [MonoPInvokeCallback(typeof(ReceiveUNNotificationAttachmentCallback))]
+        private static void ReceiveUNNotificationAttachment(IntPtr array, string id, string url)
+        {
+            GCHandle handle = GCHandle.FromIntPtr(array);
+            var list = (List<iOSNotificationAttachment>)handle.Target;
+            if (list == null)
+                return;
+            list.Add(new iOSNotificationAttachment()
+            {
+                Id = id,
+                Url = url,
+            });
         }
 
         public static void RequestAuthorization(IntPtr request, int options, bool registerRemote)
@@ -219,6 +245,7 @@ namespace Unity.Notifications.iOS
         {
 #if UNITY_IOS && !UNITY_EDITOR
             data.data.userInfo = iOSNotificationsWrapper.CsDictionaryToObjC(data.userInfo);
+            data.data.attachments = iOSNotificationsWrapper.CsAttachmentsToObjc(data.attachments);
             _ScheduleLocalNotification(data.data);
 #endif
         }
@@ -276,7 +303,7 @@ namespace Unity.Notifications.iOS
             {
                 dataArray[i].data = (iOSNotificationData)Marshal.PtrToStructure(next, typeof(iOSNotificationData));
                 dataArray[i].userInfo = NSDictionaryToCs(dataArray[i].data.userInfo);
-                dataArray[i].data.userInfo = IntPtr.Zero;
+                dataArray[i].attachments = AttachmentsNSArrayToCs(dataArray[i].data.attachments);
                 next = next + structSize;
             }
             _FreeUnmanagediOSNotificationDataArray(ptr, count);
@@ -301,6 +328,32 @@ namespace Unity.Notifications.iOS
 #endif
         }
 
+        public static IntPtr CsAttachmentsToObjc(List<iOSNotificationAttachment> attachments)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            if (attachments == null || attachments.Count == 0)
+                return IntPtr.Zero;
+
+            var atts = IntPtr.Zero;
+            foreach (var attachment in attachments)
+            {
+                IntPtr error;
+                atts = _AddAttachmentToNSArray(atts, attachment.Id, attachment.Url, out error);
+                if (error != IntPtr.Zero)
+                {
+                    if (atts != IntPtr.Zero)
+                        _ReleaseNSObject(atts);
+                    var msg = _NSErrorToMessage(error);
+                    throw new Exception(msg);
+                }
+            }
+
+            return atts;
+#else
+            return IntPtr.Zero;
+#endif
+        }
+
         public static Dictionary<string, string> NSDictionaryToCs(IntPtr dict)
         {
 #if UNITY_IOS && !UNITY_EDITOR
@@ -311,6 +364,21 @@ namespace Unity.Notifications.iOS
             return ret;
 #else
             return new Dictionary<string, string>();
+#endif
+        }
+
+        public static List<iOSNotificationAttachment> AttachmentsNSArrayToCs(IntPtr array)
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            if (array == IntPtr.Zero)
+                return null;
+            var ret = new List<iOSNotificationAttachment>();
+            var handle = GCHandle.Alloc(ret);
+            _ReadAttachmentsNSArray(GCHandle.ToIntPtr(handle), array, ReceiveUNNotificationAttachment);
+            handle.Free();
+            return ret;
+#else
+            return null;
 #endif
         }
 
@@ -352,6 +420,8 @@ namespace Unity.Notifications.iOS
                     data.data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
                     data.userInfo = NSDictionaryToCs(data.data.userInfo);
                     data.data.userInfo = IntPtr.Zero;
+                    data.attachments = AttachmentsNSArrayToCs(data.data.attachments);
+                    data.data.attachments = IntPtr.Zero;
                     _FreeUnmanagediOSNotificationDataArray(ptr, 1);
                     return data;
                 }
@@ -394,7 +464,7 @@ namespace Unity.Notifications.iOS
             _SetNotificationCategories(categorySet);
 
             foreach (var act in allActions)
-                _ReleaseUNNotificationAction(act.Value);
+                _ReleaseNSObject(act.Value);
 #endif
         }
     }

@@ -300,6 +300,9 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     // TODO add a way to specify custom sounds.
     content.sound = [UNNotificationSound defaultSound];
 
+    content.attachments = (__bridge_transfer NSArray<UNNotificationAttachment*>*)data->attachments;
+    data->attachments = NULL;
+
     NSString* identifier = [NSString stringWithUTF8String: data->identifier];
     // Generate UNNotificationTrigger from iOSNotificationData.
     UNNotificationTrigger* trigger;

@@ -27,6 +27,7 @@ typedef struct iOSNotificationData
     char* threadIdentifier;
 
     void* userInfo;
+    void* attachments;
 
     // Trigger
     int triggerType;  //0 - time, 1 - calendar, 2 - location, 3 - push.
