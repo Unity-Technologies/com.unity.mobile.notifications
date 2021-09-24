@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
-  m_Name: With Video
+  m_Name: With Attachments picture-audio
   m_EditorClassIdentifier: 
-  ButtonName: With video
+  ButtonName: With attachments - picture/audio
   Identifier: 
   CategoryIdentifier: 
   ThreadIdentifier: 
-  Title: With Video
+  Title: With Attachments - picture/audio
   Subtitle: 
   Body: 
   ShowInForeground: 0
@@ -27,4 +27,5 @@ MonoBehaviour:
   Repeats: 0
   UserInfo: []
   Attachments:
-  - video.mp4
+  - image.png
+  - audio.mp3
