@@ -221,6 +221,9 @@ namespace Unity.Notifications
 
         public override void OnGUI(string searchContext)
         {
+            if (m_SettingsManager == null)
+                Initialize();
+
             // This has to be called to sync all the changes between m_SettingsManager and m_SettingsManagerObject.
             if (m_SettingsManagerObject.targetObject != null)
                 m_SettingsManagerObject.Update();
