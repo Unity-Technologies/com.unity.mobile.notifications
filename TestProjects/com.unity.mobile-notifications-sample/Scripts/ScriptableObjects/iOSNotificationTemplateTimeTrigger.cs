@@ -56,6 +56,8 @@ namespace Unity.Notifications.Tests.Sample
                 return dict;
             }
         }
+
+        public string[] Attachments;
 #endif
     }
 }

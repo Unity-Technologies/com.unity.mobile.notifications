@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -232,6 +233,13 @@ namespace Unity.Notifications.Tests.Sample
                     };
                     foreach (var item in template.UserInfo)
                         notification.UserInfo[item.Key] = item.Value;
+                    if (template.Attachments != null && template.Attachments.Length > 0)
+                    {
+                        var attachments = new List<iOSNotificationAttachment>();
+                        foreach (var att in template.Attachments)
+                            attachments.Add(new iOSNotificationAttachment() { Url = "file://" + Path.Combine(Application.streamingAssetsPath, att) });
+                        notification.Attachments = attachments;
+                    }
                     ScheduleNotification(notification);
                 });
             }
