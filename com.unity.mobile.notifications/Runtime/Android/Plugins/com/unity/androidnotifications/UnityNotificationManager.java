@@ -32,12 +32,15 @@ import java.util.List;
 public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
+    private static int mSentSinceLastHousekeeping = 0;
+    private static boolean mPerformingHousekeeping = false;
 
     public Context mContext = null;
     protected Activity mActivity = null;
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
 
+    protected static final int SAMSUNG_NOTIFICATION_LIMIT = 500;
     protected static final String TAG_UNITY = "UnityNotifications";
 
     protected static final String KEY_FIRE_TIME = "fireTime";
@@ -268,7 +271,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             fireTime += repeatInterval;
         }
 
-        Intent intent = buildNotificationIntent(mContext, id);
+        Intent intent = buildNotificationIntentUpdateList(mContext, id);
 
         if (intent != null) {
             if (this.mRescheduleOnRestart) {
@@ -296,38 +299,89 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Build a notification Intent to store the PendingIntent.
-    protected static synchronized Intent buildNotificationIntent(Context context, int notificationId) {
-        Intent intent = new Intent(context, UnityNotificationManager.class);
+    private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
+        Set<String> ids = getScheduledNotificationIDs(context);
+        if (android.os.Build.MANUFACTURER.equals("samsung") && ids.size() >= (SAMSUNG_NOTIFICATION_LIMIT - 1)) {
+            // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
+            // Attempting to schedule more than that might cause the app to crash.
+            Log.w(TAG_UNITY, String.format("Attempting to schedule more than %1$d notifications. There is a limit of %1$d concurrently scheduled Alarms on Samsung devices" +
+                    " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.",
+                    SAMSUNG_NOTIFICATION_LIMIT));
+            return null;
+        }
 
-        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> ids = new HashSet<String>(prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
+        Intent intent = buildNotificationIntent(context);
+        ids = new HashSet<>(ids);
+        ids.add(String.valueOf(notificationId));
+        saveScheduledNotificationIDs(context, ids);
+        scheduleHousekeeping(context, ids);
+        return intent;
+    }
 
-        Set<String> validNotificationIds = new HashSet<String>();
+    private static synchronized void scheduleHousekeeping(Context context, Set<String> ids) {
+        ++mSentSinceLastHousekeeping;
+        if (mSentSinceLastHousekeeping > 50) {
+            mSentSinceLastHousekeeping = 0;
+            Thread housekeepingThread = new Thread(() -> {
+                try {
+                    // when scheduling lots of notifications at once we can have more than one housekeeping thread running
+                    // synchronize them and chain to happen one after the other
+                    synchronized (UnityNotificationManager.class) {
+                        while (mPerformingHousekeeping) {
+                            UnityNotificationManager.class.wait();
+                        }
+                        mPerformingHousekeeping = true;
+                    }
+
+                    performNotificationHousekeeping(context, ids);
+                } catch (InterruptedException e) {
+                    Log.e(TAG_UNITY, "Notification housekeeping interrupted");
+                } finally {
+                    synchronized (UnityNotificationManager.class) {
+                        mPerformingHousekeeping = false;
+                        UnityNotificationManager.class.notify();
+                    }
+                }
+            });
+            housekeepingThread.start();
+        }
+    }
+
+    private static void performNotificationHousekeeping(Context context, Set<String> ids) {
+        Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
+
+        Set<String> invalid = findInvalidNotificationIds(context, ids);
+        synchronized (UnityNotificationManager.class) {
+            // list might have changed while we searched
+            Set<String> currentIds = new HashSet<>(getScheduledNotificationIDs(context));
+            for (String id : invalid)
+                currentIds.remove(id);
+            saveScheduledNotificationIDs(context, currentIds);
+        }
+
+        // in case we have saved intents, clear them
+        for (String id : invalid)
+            deleteExpiredNotificationIntent(context, id);
+    }
+
+    private static Set<String> findInvalidNotificationIds(Context context, Set<String> ids) {
+        Intent intent = buildNotificationIntent(context);
+        HashSet<String> invalid = new HashSet<String>();
         for (String id : ids) {
             // Get the given broadcast PendingIntent by id as request code.
             // FLAG_NO_CREATE is set to return null if the described PendingIntent doesn't exist.
             PendingIntent broadcast = getBroadcastPendingIntent(context, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
-
-            if (broadcast != null) {
-                validNotificationIds.add(id);
+            if (broadcast == null) {
+                invalid.add(id);
             }
         }
 
-        if (android.os.Build.MANUFACTURER.equals("samsung") && validNotificationIds.size() >= 499) {
-            // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
-            // Attempting to schedule more than that might cause the app to crash.
-            Log.w(TAG_UNITY, "Attempting to schedule more than 500 notifications. There is a limit of 500 concurrently scheduled Alarms on Samsung devices" +
-                    " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.");
-            intent = null;
-        } else {
-            validNotificationIds.add(Integer.toString(notificationId));
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        }
+        return invalid;
+    }
 
-        SharedPreferences.Editor editor = prefs.edit().clear();
-        editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, validNotificationIds);
-        editor.apply();
-
+    protected static Intent buildNotificationIntent(Context context) {
+        Intent intent = new Intent(context, UnityNotificationManager.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
     }
 
@@ -356,18 +410,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         String data = UnityNotificationUtilities.serializeNotificationIntent(intent);
         editor.putString("data", data);
         editor.apply();
-
-        // Add the id to notification ids SharedPreferences.
-        SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
-        ids.add(notification_id);
-
-        SharedPreferences.Editor idsEditor = idsPrefs.edit().clear();
-        idsEditor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
-        idsEditor.apply();
-
-        // TODO: why we load after saving?
-        UnityNotificationManager.loadNotificationIntents(context);
     }
 
     protected static String getSharedPrefsNameByNotificationId(String id)
@@ -377,8 +419,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Load all the notification intents from SharedPreferences.
     protected static synchronized List<Intent> loadNotificationIntents(Context context) {
-        SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
+        Set<String> ids = getScheduledNotificationIDs(context);
 
         List<Intent> intent_data_list = new ArrayList<Intent>();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
@@ -395,8 +436,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        for (String id : idsMarkedForRemoval) {
-            UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+        if (idsMarkedForRemoval.size() > 0) {
+            ids = new HashSet<>(ids);
+            for (String id : idsMarkedForRemoval) {
+                ids.remove(id);
+                deleteExpiredNotificationIntent(context, id);
+            }
+            saveScheduledNotificationIDs(context, ids);
         }
 
         return intent_data_list;
@@ -442,41 +488,51 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Cancel all the pending notifications.
     public void cancelAllPendingNotificationIntents() {
-        int[] ids = this.getScheduledNotificationIDs();
+        Set<String> ids;
+        synchronized (UnityNotificationManager.class) {
+            ids = this.getScheduledNotificationIDs(mContext);
+            saveScheduledNotificationIDs(mContext, new HashSet<>());
+        }
 
-        for (int id : ids) {
-            cancelPendingNotificationIntent(id);
+        if (ids.size() > 0) {
+            Context context = mContext;
+            new Thread(() -> {
+                for (String id : ids) {
+                    cancelPendingNotificationIntent(context, Integer.valueOf(id));
+                    if (this.mRescheduleOnRestart) {
+                        deleteExpiredNotificationIntent(context, id);
+                    }
+                }
+            }).start();
         }
     }
 
-    // Get all notification ids from SharedPreferences.
-    protected int[] getScheduledNotificationIDs() {
-        synchronized (UnityNotificationManager.class) {
-            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-            Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
+    private static synchronized Set<String> getScheduledNotificationIDs(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+        Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
+        return ids;
+    }
 
-            // Convert the string array ids to int array ids.
-            int[] intIds = new int[ids.size()];
-            int index = 0;
-            for (String id : ids) {
-                intIds[index++] = Integer.valueOf(id);
-            }
-            return intIds;
-        }
+    private static synchronized void saveScheduledNotificationIDs(Context context, Set<String> ids) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
+        editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
+        editor.apply();
     }
 
     // Cancel a pending notification by id.
-    public void cancelPendingNotificationIntent(int id) {
+    public void cancelPendingNotification(int id) {
         synchronized (UnityNotificationManager.class) {
             UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
+            String idStr = String.valueOf(id);
+            removeScheduledNotificationID(mContext, idStr);
             if (this.mRescheduleOnRestart) {
-                UnityNotificationManager.deleteExpiredNotificationIntent(mContext, Integer.toString(id));
+                UnityNotificationManager.deleteExpiredNotificationIntent(mContext, idStr);
             }
         }
     }
 
     // Cancel a pending notification by id.
-    protected static synchronized void cancelPendingNotificationIntent(Context context, int id) {
+    protected static void cancelPendingNotificationIntent(Context context, int id) {
         Intent intent = new Intent(context, UnityNotificationManager.class);
         PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_NO_CREATE);
 
@@ -487,32 +543,19 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
             broadcast.cancel();
         }
+    }
 
-        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> ids = new HashSet<String>(prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
-
-        String idStr = Integer.toString(id);
-        if (ids.contains(idStr)) {
-            ids.remove(Integer.toString(id));
-
-            SharedPreferences.Editor editor = prefs.edit().clear();
-            editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
-            editor.apply();
+    protected static synchronized void removeScheduledNotificationID(Context context, String id) {
+        Set<String> ids = getScheduledNotificationIDs(context);
+        if (ids.contains(id)) {
+            ids = new HashSet<>(ids);
+            ids.remove(id);
+            saveScheduledNotificationIDs(context, ids);
         }
     }
 
     // Delete the notification intent from SharedPreferences by id.
     protected static synchronized void deleteExpiredNotificationIntent(Context context, String id) {
-        SharedPreferences idsPrefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> ids = new HashSet<String>(idsPrefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>()));
-
-        cancelPendingNotificationIntent(context, Integer.valueOf(id));
-
-        ids.remove(id);
-        SharedPreferences.Editor editor = idsPrefs.edit();
-        editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
-        editor.apply();
-
         SharedPreferences notificationPrefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
         notificationPrefs.edit().clear().apply();
     }
@@ -559,8 +602,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         boolean isRepeatable = notification.extras.getLong(KEY_REPEAT_INTERVAL, 0L) > 0;
 
-        if (!isRepeatable)
-            UnityNotificationManager.deleteExpiredNotificationIntent(context, Integer.toString(id));
+        if (!isRepeatable) {
+            String idStr = String.valueOf(id);
+            removeScheduledNotificationID(context, idStr);
+            deleteExpiredNotificationIntent(context, idStr);
+        }
     }
 
     public static Integer getNotificationColor(Notification notification) {
