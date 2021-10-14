@@ -237,5 +237,17 @@ namespace Unity.Notifications.iOS
             var notification = new iOSNotification(data);
             s_OnNotificationReceived(notification);
         }
+
+        /// <summary>
+        /// Opens Settings.
+        /// On iOS there is no way to open notification settings specifically, but you can open settings app with current application settings.
+        /// Note, that application will be suspended, since opening settings is switching to different application.
+        /// </summary>
+        public static void OpenNotificationSettings()
+        {
+#if !UNITY_EDITOR
+            iOSNotificationsWrapper._OpenNotificationSettings();
+#endif
+        }
     }
 }
