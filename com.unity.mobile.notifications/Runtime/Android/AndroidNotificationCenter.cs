@@ -390,6 +390,21 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
+        /// Opens settings.
+        /// On Android versions lower than 8.0 opens settings for the application.
+        /// On Android 8.0 and later opens notification settings for the specified channel, or for the application, if channelId is null.
+        /// Note, that opening settings will suspend the application and switch to settings app.
+        /// </summary>
+        /// <param name="channelId">ID for the channel to open or null to open notification settings for the application.</param>
+        public static void OpenNotificationSettings(string channelId = null)
+        {
+            if (!Initialize())
+                return;
+
+            s_NotificationManager.Call("showNotificationSettings", channelId);
+        }
+
+        /// <summary>
         /// Create Notification.Builder.
         /// Will automatically generate the ID for notification.
         /// <see cref="CreateNotificationBuilder(int, AndroidNotification, string)"/>
