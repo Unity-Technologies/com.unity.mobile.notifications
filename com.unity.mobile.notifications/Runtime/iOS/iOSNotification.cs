@@ -273,6 +273,10 @@ namespace Unity.Notifications.iOS
                 {
                     data.triggerType = 3;
                 }
+                else
+                {
+                    throw new Exception($"Unknown trigger type {value}");
+                }
             }
 
             get
@@ -309,9 +313,13 @@ namespace Unity.Notifications.iOS
                         NotifyOnExit = data.locationTriggerNotifyOnExit
                     };
                 }
-                else
+                else if (data.triggerType == iOSNotificationPushTrigger.Type)
                 {
                     trigger = new iOSNotificationPushTrigger();
+                }
+                else
+                {
+                    throw new Exception($"Unknown trigger type {data.triggerType}");
                 }
                 return trigger;
             }
