@@ -3,19 +3,43 @@ using UnityEngine;
 
 namespace Unity.Notifications.iOS
 {
-    internal enum NotificationTriggerType
+    /// <summary>
+    /// Describes notification trigger type
+    /// </summary>
+    public enum iOSNotificationTriggerType
     {
-        TimeTrigger = 0,
-        CalendarTrigger = 10,
-        LocationTrigger = 20,
-        PushTrigger = 3,
+        /// <summary>
+        /// Time interval trigger
+        /// </summary>
+        TimeInterval = 0,
+        /// <summary>
+        /// Calendar trigger
+        /// </summary>
+        Calendar = 10,
+        /// <summary>
+        /// Location trigger
+        /// </summary>
+        Location = 20,
+        /// <summary>
+        /// Push notification trigger
+        /// </summary>
+        Push = 3,
+        /// <summary>
+        /// Trigger, that is not known to this version of notifications package
+        /// </summary>
         Unknown = -1,
     }
 
     /// <summary>
     /// iOSNotificationTrigger interface is implemented by notification trigger types representing an event that triggers the delivery of a notification.
     /// </summary>
-    public interface iOSNotificationTrigger {}
+    public interface iOSNotificationTrigger
+    {
+        /// <summary>
+        /// Returns the trigger type for this trigger.
+        /// </summary>
+        iOSNotificationTriggerType Type { get; }
+    }
 
     /// <summary>
     /// A trigger condition that causes a notification to be delivered when the user's device enters or exits the specified geographic region.
@@ -33,7 +57,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.LocationTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Location; } }
 
         /// <summary>
         /// The center point of the geographic area.
@@ -72,7 +96,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.PushTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Push; } }
     }
 
     /// <summary>
@@ -86,7 +110,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.TimeTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.TimeInterval; } }
 
         internal int timeInterval;
 
@@ -122,7 +146,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.CalendarTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Calendar; } }
 
         /// <summary>
         /// Year
