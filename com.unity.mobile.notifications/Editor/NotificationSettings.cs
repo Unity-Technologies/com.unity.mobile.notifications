@@ -92,6 +92,19 @@ namespace Unity.Notifications
                     SetSettingValue<string>(BuildTargetGroup.Android, "UnityNotificationAndroidCustomActivityString", value);
                 }
             }
+            
+            public static void ClearDrawableResources()
+            {
+                var manager = NotificationSettingsManager.Initialize();
+                manager.ClearDrawableResources();
+            }
+
+
+            public static void AddDrawableResource(string id, Texture2D image, NotificationIconType type)
+            {
+                var manager = NotificationSettingsManager.Initialize();
+                manager.AddDrawableResource(id, image, type);
+            }
         }
 
         /// <summary>
