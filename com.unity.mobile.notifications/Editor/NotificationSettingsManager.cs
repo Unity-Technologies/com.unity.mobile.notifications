@@ -260,6 +260,14 @@ namespace Unity.Notifications
             DrawableResources.RemoveAt(index);
             SaveSettings();
         }
+        
+       public void ClearDrawableResources()
+        {
+            for (int i = DrawableResources.Count - 1; i >= 0; i--)
+            {
+                RemoveDrawableResource(i);
+            }
+        }
 
         public Dictionary<string, byte[]> GenerateDrawableResourcesForExport()
         {
