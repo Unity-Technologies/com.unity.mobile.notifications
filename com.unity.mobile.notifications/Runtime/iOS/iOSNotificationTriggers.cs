@@ -8,7 +8,8 @@ namespace Unity.Notifications.iOS
         TimeTrigger = 0,
         CalendarTrigger = 10,
         LocationTrigger = 20,
-        PushTrigger = 3
+        PushTrigger = 3,
+        Unknown = -1,
     }
 
     /// <summary>

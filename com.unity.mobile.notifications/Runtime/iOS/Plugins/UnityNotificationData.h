@@ -14,6 +14,7 @@ enum triggerType
     CALENDAR_TRIGGER = 10,
     LOCATION_TRIGGER = 20,
     PUSH_TRIGGER = 3,
+    UNKNOWN_TRIGGER = -1,
 };
 
 typedef struct iOSNotificationData

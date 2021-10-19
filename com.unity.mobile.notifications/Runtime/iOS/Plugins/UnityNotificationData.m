@@ -161,6 +161,8 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
     {
         notificationData.triggerType = PUSH_TRIGGER;
     }
+    else
+        notificationData.triggerType = UNKNOWN_TRIGGER;
 
     parseCustomizedData(&notificationData, request);
     notificationData.attachments = (__bridge_retained void*)request.content.attachments;
