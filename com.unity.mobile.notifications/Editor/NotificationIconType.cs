@@ -1,6 +1,6 @@
 namespace Unity.Notifications
 {
-    internal enum NotificationIconType
+    public enum NotificationIconType
     {
         Small = 0,
         Large = 1
