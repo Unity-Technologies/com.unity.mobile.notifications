@@ -273,7 +273,7 @@ namespace Unity.Notifications.iOS
                 }
                 case iOSNotificationTriggerType.Calendar:
                 {
-                    var trigger = (iOSNotificationCalendarTrigger)value;
+                    var trigger = ((iOSNotificationCalendarTrigger)value).ToUtc();
                     data.trigger.calendar.year = trigger.Year != null ? trigger.Year.Value : -1;
                     data.trigger.calendar.month = trigger.Month != null ? trigger.Month.Value : -1;
                     data.trigger.calendar.day = trigger.Day != null ? trigger.Day.Value : -1;
@@ -321,6 +321,7 @@ namespace Unity.Notifications.iOS
                         Hour = (data.trigger.calendar.hour >= 0) ? (int?)data.trigger.calendar.hour : null,
                         Minute = (data.trigger.calendar.minute >= 0) ? (int?)data.trigger.calendar.minute : null,
                         Second = (data.trigger.calendar.second >= 0) ? (int?)data.trigger.calendar.second : null,
+                        UtcTime = true,
                         Repeats = data.trigger.calendar.repeats != 0
                     };
                 case iOSNotificationTriggerType.Location:
