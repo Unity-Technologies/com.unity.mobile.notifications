@@ -143,4 +143,150 @@ class iOSNotificationTests
         Assert.IsTrue(lastReceivedNotification.UserInfo.ContainsKey("key1"));
         Assert.AreEqual("value1", lastReceivedNotification.UserInfo["key1"]);
     }
+
+    [Test]
+    public void iOSNotificationCalendarTrigger_ToUtc_DoesNotConvertUtcTrigger()
+    {
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = 5,
+            Minute = 5,
+            UtcTime = true,
+        };
+
+        var utcTrigger = trigger.ToUtc();
+
+        Assert.AreEqual(5, utcTrigger.Hour);
+        Assert.AreEqual(5, utcTrigger.Minute);
+    }
+
+    [Test]
+    public void iOSNotificationCalendarTrigger_ToUtc_ConvertsLocalTrigger()
+    {
+        var localTime = DateTime.Now;
+        var utcTime = localTime.ToUniversalTime();
+        if (DateTime.Compare(localTime, utcTime) == 0)
+            return; // running test in GMT time zode
+
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = localTime.Hour,
+            Minute = localTime.Minute,
+            UtcTime = false,
+        };
+
+        var utcTrigger = trigger.ToUtc();
+
+        Assert.AreEqual(utcTime.Hour, utcTrigger.Hour);
+        Assert.AreEqual(utcTime.Minute, utcTrigger.Minute);
+    }
+
+    [Test]
+    public void iOSNotificationCalendarTrigger_ToLocal_DoesNotConvertLocalTrigger()
+    {
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = 5,
+            Minute = 5,
+            UtcTime = false,
+        };
+
+        var localTrigger = trigger.ToLocal();
+
+        Assert.AreEqual(5, localTrigger.Hour);
+        Assert.AreEqual(5, localTrigger.Minute);
+    }
+
+    [Test]
+    public void iOSNotificationCalendarTrigger_ToLocal_ConvertsUtcTrigger()
+    {
+        var localTime = DateTime.Now;
+        var utcTime = localTime.ToUniversalTime();
+        if (DateTime.Compare(localTime, utcTime) == 0)
+            return; // running test in GMT time zode
+
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = utcTime.Hour,
+            Minute = utcTime.Minute,
+            UtcTime = true,
+        };
+
+        var localTrigger = trigger.ToLocal();
+
+        Assert.AreEqual(localTime.Hour, localTrigger.Hour);
+        Assert.AreEqual(localTime.Minute, localTrigger.Minute);
+    }
+
+    [Test]
+    public void iOSNotificationCalendarTrigger_AssignDateTimeComponents_OnlyChangesNonNullFields()
+    {
+        var dt = new DateTime(2025, 5, 5, 6, 6 ,6);
+
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Year = 2020,
+            Month = 10,
+            Day = 8,
+        };
+
+        var check = trigger.AssignDateTimeComponents(dt);
+        Assert.AreEqual(2020, check.Year);
+        Assert.AreEqual(10, check.Month);
+        Assert.AreEqual(8, check.Day);
+        Assert.AreEqual(6, check.Hour);
+        Assert.AreEqual(6, check.Minute);
+        Assert.AreEqual(6, check.Second);
+
+        trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = 3,
+            Minute = 4,
+            Second = 20,
+        };
+
+        check = trigger.AssignDateTimeComponents(dt);
+        Assert.AreEqual(2025, check.Year);
+        Assert.AreEqual(5, check.Month);
+        Assert.AreEqual(5, check.Day);
+        Assert.AreEqual(3, check.Hour);
+        Assert.AreEqual(4, check.Minute);
+        Assert.AreEqual(20, check.Second);
+    }
+
+    [Test]
+    public void OSNotificationCalendarTrigger_AssignNonEmptyComponents_Works()
+    {
+        var dt = new DateTime(2025, 1, 2, 3, 4, 5);
+
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Year = 2020,
+            Month = 10,
+            Day = 10,
+        };
+
+        trigger.AssignNonEmptyComponents(dt);
+        Assert.AreEqual(2025, trigger.Year);
+        Assert.AreEqual(1, trigger.Month);
+        Assert.AreEqual(2, trigger.Day);
+        Assert.IsTrue(null == trigger.Hour);
+        Assert.IsTrue(null == trigger.Minute);
+        Assert.IsTrue(null == trigger.Second);
+
+        trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = 10,
+            Minute = 10,
+            Second = 10,
+        };
+
+        trigger.AssignNonEmptyComponents(dt);
+        Assert.IsTrue(null == trigger.Year);
+        Assert.IsTrue(null == trigger.Month);
+        Assert.IsTrue(null == trigger.Day);
+        Assert.AreEqual(3, trigger.Hour);
+        Assert.AreEqual(4, trigger.Minute);
+        Assert.AreEqual(5, trigger.Second);
+    }
 }
