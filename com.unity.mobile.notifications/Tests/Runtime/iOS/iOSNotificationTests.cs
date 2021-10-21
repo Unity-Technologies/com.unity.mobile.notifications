@@ -155,6 +155,51 @@ class iOSNotificationTests
         Assert.AreEqual("value1", lastReceivedNotification.UserInfo["key1"]);
     }
 
+    IEnumerator SendNotificationUsingCalendarTrigger_NotificationIsReceived(string text, bool useUtc)
+    {
+        var dateTime = useUtc ? DateTime.UtcNow : DateTime.Now;
+        var dt = dateTime.AddSeconds(3);
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Year = dt.Year,
+            Month = dt.Month,
+            Day = dt.Day,
+            Hour = dt.Hour,
+            Minute = dt.Minute,
+            Second = dt.Second,
+            UtcTime = useUtc,
+        };
+
+        var notification = new iOSNotification()
+        {
+            Title = text,
+            Body = text,
+            ShowInForeground = true,
+            ForegroundPresentationOption = PresentationOption.Alert,
+            Trigger = trigger,
+        };
+
+        iOSNotificationCenter.ScheduleNotification(notification);
+        yield return WaitForNotification(5.0f);
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsNotNull(lastReceivedNotification);
+        Assert.AreEqual(text, lastReceivedNotification.Title);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator SendNotificationUsingCalendarTriggerLocalTime_NotificationIsReceived()
+    {
+        yield return SendNotificationUsingCalendarTrigger_NotificationIsReceived("SendNotificationUsingCalendarTriggerLocalTime_NotificationIsReceived", false);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived()
+    {
+        yield return SendNotificationUsingCalendarTrigger_NotificationIsReceived("SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived", true);
+    }
+
     [Test]
     public void iOSNotificationCalendarTrigger_ToUtc_DoesNotConvertUtcTrigger()
     {
