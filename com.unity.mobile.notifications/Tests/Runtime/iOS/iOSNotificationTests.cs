@@ -77,6 +77,17 @@ class iOSNotificationTests
     }
 #endif
 
+    IEnumerator WaitForNotification(float timeout)
+    {
+        var startCount = receivedNotificationCount;
+        float timePassed = 0;
+        while (receivedNotificationCount == startCount && timePassed < timeout)
+        {
+            yield return null;
+            timePassed += Time.deltaTime;
+        }
+    }
+
     [UnityTest]
     [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendSimpleNotification_NotificationIsReceived()
@@ -106,7 +117,7 @@ class iOSNotificationTests
 
         iOSNotificationCenter.ScheduleNotification(notification);
 
-        yield return new WaitForSeconds(6.0f);
+        yield return WaitForNotification(6.0f);
         Assert.AreEqual(1, receivedNotificationCount);
     }
 
@@ -137,7 +148,7 @@ class iOSNotificationTests
 
         iOSNotificationCenter.ScheduleNotification(notification);
 
-        yield return new WaitForSeconds(6.0f);
+        yield return WaitForNotification(6.0f);
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
         Assert.IsTrue(lastReceivedNotification.UserInfo.ContainsKey("key1"));
