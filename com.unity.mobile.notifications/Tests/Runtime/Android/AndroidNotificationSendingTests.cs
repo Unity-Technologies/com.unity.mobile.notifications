@@ -93,7 +93,7 @@ class AndroidNotificationSendingTests
 
         yield return WaitForNotification(8.0f);
 
-        Debug.LogWarning("SendNotificationExplicitID_NotificationIsReceived completed. Received notifications: "  + currentHandler.receivedNotificationCount);
+        Debug.LogWarning("SendNotificationExplicitID_NotificationIsReceived completed. Received notifications: " + currentHandler.receivedNotificationCount);
 
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
@@ -114,7 +114,7 @@ class AndroidNotificationSendingTests
 
         yield return WaitForNotification(8.0f);
 
-        Debug.LogWarning("SendNotification_NotificationIsReceived completed. Received notifications: "  + currentHandler.receivedNotificationCount);
+        Debug.LogWarning("SendNotification_NotificationIsReceived completed. Received notifications: " + currentHandler.receivedNotificationCount);
 
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
@@ -233,7 +233,7 @@ class AndroidNotificationSendingTests
         var gameObjects = new GameObject[1];
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
+            delegate (AndroidNotificationIntentData data)
         {
             gameObjects[0] = new GameObject();
             gameObjects[0].name = "Hello_World";

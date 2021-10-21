@@ -44,7 +44,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Subscribe to this event to receive callbacks whenever a scheduled notification is shown to the user.
         /// </summary>
-        public static event NotificationReceivedCallback OnNotificationReceived = delegate {};
+        public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
 
         private static AndroidJavaClass s_NotificationManagerClass;
         private static AndroidJavaObject s_NotificationManager;
@@ -495,7 +495,7 @@ namespace Unity.Notifications.Android
                 notification.Number = notificationObj.Get<int>("number");
                 notification.IntentData = extras.Call<string>("getString", KEY_INTENT_DATA);
                 notification.Group = notificationObj.Call<string>("getGroup");
-                notification.GroupSummary = 0 != (flags &  Notification_FLAG_GROUP_SUMMARY);
+                notification.GroupSummary = 0 != (flags & Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
                 notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
                 var showTimestamp = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_WHEN, false);

@@ -277,7 +277,7 @@ class iOSNotificationTests
     [Test]
     public void iOSNotificationCalendarTrigger_AssignDateTimeComponents_OnlyChangesNonNullFields()
     {
-        var dt = new DateTime(2025, 5, 5, 6, 6 ,6);
+        var dt = new DateTime(2025, 5, 5, 6, 6, 6);
 
         var trigger = new iOSNotificationCalendarTrigger()
         {

@@ -21,7 +21,7 @@ namespace Unity.Notifications
         private readonly GUIContent k_IdentifierLabelText = new GUIContent("Identifier");
         private readonly GUIContent k_TypeLabelText = new GUIContent("Type");
 
-        private readonly string[] k_ToolbarStrings = {"Android", "iOS"};
+        private readonly string[] k_ToolbarStrings = { "Android", "iOS" };
         private const string k_InfoStringAndroid =
             "Only icons added to this list or manually added to the 'res/drawable' folder can be used for notifications.\n" +
             "Note, that not all devices support colored icons.\n\n" +
