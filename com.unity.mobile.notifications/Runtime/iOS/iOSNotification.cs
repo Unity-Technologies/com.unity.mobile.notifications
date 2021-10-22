@@ -36,7 +36,7 @@ namespace Unity.Notifications.iOS
     internal struct TimeTriggerData
     {
         public Int32 interval;
-        public bool repeats;
+        public Byte repeats;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -268,7 +268,7 @@ namespace Unity.Notifications.iOS
                             if (trigger.Repeats && trigger.timeInterval < 60)
                                 throw new ArgumentException("Time interval must be 60 seconds or greater for repeating notifications.");
 
-                            data.trigger.timeInterval.repeats = trigger.Repeats;
+                            data.trigger.timeInterval.repeats = (byte)(trigger.Repeats ? 1 : 0);
                             break;
                         }
                     case iOSNotificationTriggerType.Calendar:
@@ -310,7 +310,7 @@ namespace Unity.Notifications.iOS
                         return new iOSNotificationTimeIntervalTrigger()
                         {
                             timeInterval = data.trigger.timeInterval.interval,
-                            Repeats = data.trigger.timeInterval.repeats
+                            Repeats = data.trigger.timeInterval.repeats != 0,
                         };
                     case iOSNotificationTriggerType.Calendar:
                         return new iOSNotificationCalendarTrigger()
