@@ -97,7 +97,7 @@ namespace Unity.Notifications
 
             m_ReorderableList.onRemoveCallback = (list) =>
             {
-                m_SettingsManager.RemoveDrawableResource(list.index);
+                m_SettingsManager.RemoveDrawableResourceByIndex(list.index);
             };
 
             m_ReorderableList.onCanAddCallback = (list) =>

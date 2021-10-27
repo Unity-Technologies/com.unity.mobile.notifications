@@ -246,6 +246,15 @@ namespace Unity.Notifications
 
         public void AddDrawableResource(string id, Texture2D image, NotificationIconType type)
         {
+            /* commenting out for now, since you can have same Id's in editor
+            foreach (var drawable in DrawableResources)
+            {
+                if (drawable.Id == id)
+                {
+                    Debug.LogWarning("Drawable with Id"+id+" already exists, please assign another Id");
+                    return;
+                }
+            } */
             var drawableResource = new DrawableResourceData();
             drawableResource.Id = id;
             drawableResource.Type = type;
@@ -255,18 +264,44 @@ namespace Unity.Notifications
             SaveSettings();
         }
 
-        public void RemoveDrawableResource(int index)
+        public void RemoveDrawableResourceByIndex(int index)
         {
-            DrawableResources.RemoveAt(index);
-            SaveSettings();
+            if (index < DrawableResources.Count && index >= 0)
+            {
+                DrawableResources.RemoveAt(index);
+                SaveSettings();
+            }
+            else
+            {
+                Debug.LogWarning("Invalid drawable index provided, drawable not removed.");
+            }
         }
         
-        public void ClearDrawableResources()
+        public void RemoveDrawableResourceById(string id)
         {
-            for (int i = DrawableResources.Count - 1; i >= 0; i--)
+            DrawableResourceData DrawableRes = null;
+            foreach (var drawable in DrawableResources)
             {
-               DrawableResources.RemoveAt(index);              
+                if (drawable.Id == id)
+                {
+                    DrawableRes = drawable;
+                    break;
+                }
             }
+            if (DrawableRes == null)
+            {
+                Debug.LogWarning("Drawable with Id "+id+" not found. Drawable not removed.");
+            }
+            else
+            {
+                DrawableResources.Remove(DrawableRes);
+                SaveSettings();
+            }
+        }
+        
+       public void ClearDrawableResources()
+        {
+            DrawableResources.Clear();
             SaveSettings();
         }
 

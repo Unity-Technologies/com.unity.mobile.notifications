@@ -1,5 +1,6 @@
 using Unity.Notifications.iOS;
 using UnityEditor;
+using UnityEngine;
 
 namespace Unity.Notifications
 {
@@ -93,6 +94,25 @@ namespace Unity.Notifications
                 }
             }
             
+            
+            public static void AddDrawableResource(string id, Texture2D image, NotificationIconType type)
+            {
+                var manager = NotificationSettingsManager.Initialize();
+                manager.AddDrawableResource(id, image, type);
+            }
+            
+            public static void RemoveDrawableResource(int index)
+            {
+                var manager = NotificationSettingsManager.Initialize();
+                manager.RemoveDrawableResourceByIndex(index);
+            }
+            
+            public static void RemoveDrawableResource(string id)
+            {
+                var manager = NotificationSettingsManager.Initialize();
+                manager.RemoveDrawableResourceById(id);
+            }
+            
             public static void ClearDrawableResources()
             {
                 var manager = NotificationSettingsManager.Initialize();
@@ -100,11 +120,6 @@ namespace Unity.Notifications
             }
 
 
-            public static void AddDrawableResource(string id, Texture2D image, NotificationIconType type)
-            {
-                var manager = NotificationSettingsManager.Initialize();
-                manager.AddDrawableResource(id, image, type);
-            }
         }
 
         /// <summary>
