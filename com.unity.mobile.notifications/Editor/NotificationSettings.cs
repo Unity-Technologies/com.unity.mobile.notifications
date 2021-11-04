@@ -99,24 +99,28 @@ namespace Unity.Notifications
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.AddDrawableResource(id, image, type);
+                SettingsService.RepaintAllSettingsWindow();
             }
             
             public static void RemoveDrawableResource(int index)
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.RemoveDrawableResourceByIndex(index);
+                SettingsService.RepaintAllSettingsWindow();
             }
             
             public static void RemoveDrawableResource(string id)
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.RemoveDrawableResourceById(id);
+                SettingsService.RepaintAllSettingsWindow();
             }
             
             public static void ClearDrawableResources()
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.ClearDrawableResources();
+                SettingsService.RepaintAllSettingsWindow();
             }
 
 
