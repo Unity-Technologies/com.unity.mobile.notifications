@@ -93,29 +93,45 @@ namespace Unity.Notifications
                     SetSettingValue<string>(BuildTargetGroup.Android, "UnityNotificationAndroidCustomActivityString", value);
                 }
             }
-            
-            
+
+            /// <summary>
+            /// Add image to notification settings.
+            /// </summary>
+            /// <param name="id">Image identifier</param>
+            /// <param name="image">Image texture, must be obtained from asset database</param>
+            /// <param name="type">Image type</param>
             public static void AddDrawableResource(string id, Texture2D image, NotificationIconType type)
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.AddDrawableResource(id, image, type);
                 SettingsService.RepaintAllSettingsWindow();
             }
-            
+
+            /// <summary>
+            /// Remove icon at given index from notification settings.
+            /// </summary>
+            /// <param name="index">Index of image to remove</param>
             public static void RemoveDrawableResource(int index)
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.RemoveDrawableResourceByIndex(index);
                 SettingsService.RepaintAllSettingsWindow();
             }
-            
+
+            /// <summary>
+            /// Remove icon with given identifier from notification settings.
+            /// </summary>
+            /// <param name="id">ID of the image to remove</param>
             public static void RemoveDrawableResource(string id)
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.RemoveDrawableResourceById(id);
                 SettingsService.RepaintAllSettingsWindow();
             }
-            
+
+            /// <summary>
+            /// Remove all images from notification settings.
+            /// </summary>
             public static void ClearDrawableResources()
             {
                 var manager = NotificationSettingsManager.Initialize();
