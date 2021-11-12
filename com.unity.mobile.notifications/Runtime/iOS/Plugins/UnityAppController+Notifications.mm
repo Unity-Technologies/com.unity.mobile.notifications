@@ -17,9 +17,6 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [UnityNotificationLifeCycleManager sharedInstance];
-
-        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-        center.delegate = [UnityNotificationManager sharedInstance];
     });
 }
 
@@ -71,6 +68,9 @@
                  [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
                  manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
+            
+            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+            center.delegate = [UnityNotificationManager sharedInstance];
          }];
 
         [nc addObserverForName: kUnityDidRegisterForRemoteNotificationsWithDeviceToken
