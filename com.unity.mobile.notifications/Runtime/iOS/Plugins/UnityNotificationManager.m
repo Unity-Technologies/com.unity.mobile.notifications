@@ -215,9 +215,11 @@
 - (void)updateScheduledNotificationList
 {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-    [center getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> * _Nonnull requests) {
-        self.cachedPendingNotificationRequests = requests;
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [center getPendingNotificationRequestsWithCompletionHandler:^(NSArray<UNNotificationRequest *> *     _Nonnull requests) {
+            self.cachedPendingNotificationRequests = requests;
+        }];
+    });
 }
 
 - (void)updateDeliveredNotificationList
