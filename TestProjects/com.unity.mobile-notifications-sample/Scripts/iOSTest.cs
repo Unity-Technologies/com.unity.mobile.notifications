@@ -206,6 +206,7 @@ namespace Unity.Notifications.Tests.Sample
             {
                 ClearBadge();
             });
+            m_groups["General"]["Open settings"] = new Action(iOSNotificationCenter.OpenNotificationSettings);
 
             m_groups["Schedule"] = new OrderedDictionary();
             foreach (iOSNotificationTemplateTimeTrigger template in Resources.LoadAll("iOSNotifications/TimeIntervalTrigger", typeof(iOSNotificationTemplateTimeTrigger)))

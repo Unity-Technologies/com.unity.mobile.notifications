@@ -114,6 +114,10 @@ namespace Unity.Notifications.Tests.Sample
 
             m_groups["General"] = new OrderedDictionary();
             m_groups["General"]["Clear Log"] = new Action(() => { m_LOGGER.Clear(); });
+            m_groups["General"]["Open Settings"] = new Action(() =>
+            {
+                AndroidNotificationCenter.OpenNotificationSettings();
+            });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -195,6 +199,10 @@ namespace Unity.Notifications.Tests.Sample
                         VibrationPattern = new long[] { 0L, 1L, 2L }
                     }
                 );
+            });
+            m_groups["Channels"]["Open settings for secondary"] = new Action(() =>
+            {
+                AndroidNotificationCenter.OpenNotificationSettings("secondary_channel");
             });
             m_groups["Channels"]["Delete All Channels"] = new Action(() => { DeleteAllChannels(); });
 

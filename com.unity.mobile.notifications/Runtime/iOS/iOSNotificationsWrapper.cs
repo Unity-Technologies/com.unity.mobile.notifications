@@ -124,6 +124,9 @@ namespace Unity.Notifications.iOS
         [DllImport("__Internal")]
         private static extern IntPtr _AddStringToNSArray(IntPtr array, string str, int capacity);
 
+        [DllImport("__Internal")]
+        internal static extern void _OpenNotificationSettings();
+
         private delegate void AuthorizationRequestCallback(IntPtr request, iOSAuthorizationRequestData data);
         private delegate void NotificationReceivedCallback(iOSNotificationData notificationData);
         private delegate void ReceiveNSDictionaryKeyValueCallback(IntPtr dict, string key, string value);

@@ -303,4 +303,12 @@ void _SetNotificationCategories(void* categorySet)
     [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories: categories];
 }
 
+void _OpenNotificationSettings()
+{
+    NSURL* url = [NSURL URLWithString: UIApplicationOpenSettingsURLString];
+    UIApplication* app = [UIApplication sharedApplication];
+    if ([app canOpenURL: url])
+        [app openURL: url options: @{} completionHandler: nil];
+}
+
 #endif
