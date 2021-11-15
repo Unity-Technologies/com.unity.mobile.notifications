@@ -276,7 +276,7 @@ namespace Unity.Notifications
                 Debug.LogWarning("Invalid drawable index provided, drawable not removed.");
             }
         }
-        
+
         public void RemoveDrawableResourceById(string id)
         {
             DrawableResourceData DrawableRes = null;
@@ -290,7 +290,7 @@ namespace Unity.Notifications
             }
             if (DrawableRes == null)
             {
-                Debug.LogWarning("Drawable with Id "+id+" not found. Drawable not removed.");
+                Debug.LogWarning("Drawable with Id " + id + " not found. Drawable not removed.");
             }
             else
             {
@@ -298,8 +298,8 @@ namespace Unity.Notifications
                 SaveSettings();
             }
         }
-        
-       public void ClearDrawableResources()
+
+        public void ClearDrawableResources()
         {
             DrawableResources.Clear();
             SaveSettings();
