@@ -71,7 +71,7 @@ namespace Unity.Notifications
             if (type == NotificationIconType.Small)
             {
                 texture = new Texture2D(sourceTexture.width, sourceTexture.height, TextureFormat.RGBA32, true, false);
-                for (var i  = 0; i < sourceTexture.mipmapCount; i++)
+                for (var i = 0; i < sourceTexture.mipmapCount; i++)
                 {
                     var c_0 = sourceTexture.GetPixels(i);
                     var c_1 = texture.GetPixels(i);

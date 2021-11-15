@@ -13,9 +13,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.BadParcelableException;
+import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
@@ -719,5 +721,26 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         return null;
+    }
+
+    public void showNotificationSettings(String channelId) {
+        Intent settingsIntent;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            settingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
+            settingsIntent.setData(uri);
+        } else {
+            if (channelId != null && channelId.length() > 0) {
+                settingsIntent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+                settingsIntent.putExtra(Settings.EXTRA_CHANNEL_ID, channelId);
+            } else {
+                settingsIntent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            }
+
+            settingsIntent.putExtra(Settings.EXTRA_APP_PACKAGE, mContext.getPackageName());
+        }
+
+        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mActivity.startActivity(settingsIntent);
     }
 }

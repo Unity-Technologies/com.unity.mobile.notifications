@@ -33,6 +33,46 @@ namespace Unity.Notifications.iOS
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    internal struct TimeTriggerData
+    {
+        public Int32 interval;
+        public Byte repeats;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct CalendarTriggerData
+    {
+        public Int32 year;
+        public Int32 month;
+        public Int32 day;
+        public Int32 hour;
+        public Int32 minute;
+        public Int32 second;
+        public Byte repeats;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct LocationTriggerData
+    {
+        public float centerX;
+        public float centerY;
+        public float radius;
+        public Byte notifyOnEntry;
+        public Byte notifyOnExit;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    internal struct TriggerData
+    {
+        [FieldOffset(0)]
+        public TimeTriggerData timeInterval;
+        [FieldOffset(0)]
+        public CalendarTriggerData calendar;
+        [FieldOffset(0)]
+        public LocationTriggerData location;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     internal struct iOSNotificationData
     {
         public string identifier;
@@ -48,25 +88,7 @@ namespace Unity.Notifications.iOS
 
         // Trigger
         public Int32 triggerType;
-        public bool repeats;
-
-        //Time trigger
-        public Int32 timeTriggerInterval;
-
-        //Calendar trigger
-        public Int32 calendarTriggerYear;
-        public Int32 calendarTriggerMonth;
-        public Int32 calendarTriggerDay;
-        public Int32 calendarTriggerHour;
-        public Int32 calendarTriggerMinute;
-        public Int32 calendarTriggerSecond;
-
-        //Location trigger
-        public float locationTriggerCenterX;
-        public float locationTriggerCenterY;
-        public float locationTriggerRadius;
-        public bool locationTriggerNotifyOnEntry;
-        public bool locationTriggerNotifyOnExit;
+        public TriggerData trigger;
     }
 
     /// <summary>
@@ -236,84 +258,85 @@ namespace Unity.Notifications.iOS
         {
             set
             {
-                if (value is iOSNotificationTimeIntervalTrigger)
+                switch (value.Type)
                 {
-                    var trigger = (iOSNotificationTimeIntervalTrigger)value;
-                    data.triggerType = iOSNotificationTimeIntervalTrigger.Type;
-                    data.timeTriggerInterval = trigger.timeInterval;
+                    case iOSNotificationTriggerType.TimeInterval:
+                        {
+                            var trigger = (iOSNotificationTimeIntervalTrigger)value;
+                            data.trigger.timeInterval.interval = trigger.timeInterval;
 
-                    if (trigger.Repeats && trigger.timeInterval < 60)
-                        throw new ArgumentException("Time interval must be 60 seconds or greater for repeating notifications.");
+                            if (trigger.Repeats && trigger.timeInterval < 60)
+                                throw new ArgumentException("Time interval must be 60 seconds or greater for repeating notifications.");
 
-                    data.repeats = trigger.Repeats;
+                            data.trigger.timeInterval.repeats = (byte)(trigger.Repeats ? 1 : 0);
+                            break;
+                        }
+                    case iOSNotificationTriggerType.Calendar:
+                        {
+                            var trigger = ((iOSNotificationCalendarTrigger)value).ToUtc();
+                            data.trigger.calendar.year = trigger.Year != null ? trigger.Year.Value : -1;
+                            data.trigger.calendar.month = trigger.Month != null ? trigger.Month.Value : -1;
+                            data.trigger.calendar.day = trigger.Day != null ? trigger.Day.Value : -1;
+                            data.trigger.calendar.hour = trigger.Hour != null ? trigger.Hour.Value : -1;
+                            data.trigger.calendar.minute = trigger.Minute != null ? trigger.Minute.Value : -1;
+                            data.trigger.calendar.second = trigger.Second != null ? trigger.Second.Value : -1;
+                            data.trigger.calendar.repeats = (byte)(trigger.Repeats ? 1 : 0);
+                            break;
+                        }
+                    case iOSNotificationTriggerType.Location:
+                        {
+                            var trigger = (iOSNotificationLocationTrigger)value;
+                            data.trigger.location.centerX = trigger.Center.x;
+                            data.trigger.location.centerY = trigger.Center.y;
+                            data.trigger.location.notifyOnEntry = (byte)(trigger.NotifyOnEntry ? 1 : 0);
+                            data.trigger.location.notifyOnExit = (byte)(trigger.NotifyOnExit ? 1 : 0);
+                            data.trigger.location.radius = trigger.Radius;
+                            break;
+                        }
+                    case iOSNotificationTriggerType.Push:
+                        break;
+                    default:
+                        throw new Exception($"Unknown trigger type {value.Type}");
                 }
-                else if (value is iOSNotificationCalendarTrigger)
-                {
-                    var trigger = (iOSNotificationCalendarTrigger)value;
-                    data.triggerType = iOSNotificationCalendarTrigger.Type;
-                    data.calendarTriggerYear = trigger.Year != null ? trigger.Year.Value : -1;
-                    data.calendarTriggerMonth = trigger.Month != null ? trigger.Month.Value : -1;
-                    data.calendarTriggerDay = trigger.Day != null ? trigger.Day.Value : -1;
-                    data.calendarTriggerHour = trigger.Hour != null ? trigger.Hour.Value : -1;
-                    data.calendarTriggerMinute = trigger.Minute != null ? trigger.Minute.Value : -1;
-                    data.calendarTriggerSecond = trigger.Second != null ? trigger.Second.Value : -1;
-                    data.repeats = trigger.Repeats;
-                }
-                else if (value is iOSNotificationLocationTrigger)
-                {
-                    var trigger = (iOSNotificationLocationTrigger)value;
-                    data.triggerType = iOSNotificationLocationTrigger.Type;
-                    data.locationTriggerCenterX = trigger.Center.x;
-                    data.locationTriggerCenterY = trigger.Center.y;
-                    data.locationTriggerNotifyOnEntry = trigger.NotifyOnEntry;
-                    data.locationTriggerNotifyOnExit = trigger.NotifyOnExit;
-                    data.locationTriggerRadius = trigger.Radius;
-                }
-                else if (value is iOSNotificationPushTrigger)
-                {
-                    data.triggerType = 3;
-                }
+
+                data.triggerType = (int)value.Type;
             }
 
             get
             {
-                iOSNotificationTrigger trigger;
-                if (data.triggerType == iOSNotificationTimeIntervalTrigger.Type)
+                switch ((iOSNotificationTriggerType)data.triggerType)
                 {
-                    trigger = new iOSNotificationTimeIntervalTrigger()
-                    {
-                        timeInterval = data.timeTriggerInterval,
-                        Repeats = data.repeats
-                    };
+                    case iOSNotificationTriggerType.TimeInterval:
+                        return new iOSNotificationTimeIntervalTrigger()
+                        {
+                            timeInterval = data.trigger.timeInterval.interval,
+                            Repeats = data.trigger.timeInterval.repeats != 0,
+                        };
+                    case iOSNotificationTriggerType.Calendar:
+                        return new iOSNotificationCalendarTrigger()
+                        {
+                            Year = (data.trigger.calendar.year > 0) ? (int?)data.trigger.calendar.year : null,
+                            Month = (data.trigger.calendar.month > 0) ? (int?)data.trigger.calendar.month : null,
+                            Day = (data.trigger.calendar.day > 0) ? (int?)data.trigger.calendar.day : null,
+                            Hour = (data.trigger.calendar.hour >= 0) ? (int?)data.trigger.calendar.hour : null,
+                            Minute = (data.trigger.calendar.minute >= 0) ? (int?)data.trigger.calendar.minute : null,
+                            Second = (data.trigger.calendar.second >= 0) ? (int?)data.trigger.calendar.second : null,
+                            UtcTime = true,
+                            Repeats = data.trigger.calendar.repeats != 0
+                        };
+                    case iOSNotificationTriggerType.Location:
+                        return new iOSNotificationLocationTrigger()
+                        {
+                            Center = new Vector2(data.trigger.location.centerX, data.trigger.location.centerY),
+                            Radius = data.trigger.location.radius,
+                            NotifyOnEntry = data.trigger.location.notifyOnEntry != 0,
+                            NotifyOnExit = data.trigger.location.notifyOnExit != 0
+                        };
+                    case iOSNotificationTriggerType.Push:
+                        return new iOSNotificationPushTrigger();
+                    default:
+                        throw new Exception($"Unknown trigger type {data.triggerType}");
                 }
-                else if (data.triggerType == iOSNotificationCalendarTrigger.Type)
-                {
-                    trigger = new iOSNotificationCalendarTrigger()
-                    {
-                        Year = (data.calendarTriggerYear > 0) ? (int?)data.calendarTriggerYear : null,
-                        Month = (data.calendarTriggerMonth > 0) ? (int?)data.calendarTriggerMonth : null,
-                        Day = (data.calendarTriggerDay > 0) ? (int?)data.calendarTriggerDay : null,
-                        Hour = (data.calendarTriggerHour >= 0) ? (int?)data.calendarTriggerHour : null,
-                        Minute = (data.calendarTriggerMinute >= 0) ? (int?)data.calendarTriggerMinute : null,
-                        Second = (data.calendarTriggerSecond >= 0) ? (int?)data.calendarTriggerSecond : null,
-                        Repeats = data.repeats
-                    };
-                }
-                else if (data.triggerType == iOSNotificationLocationTrigger.Type)
-                {
-                    trigger = new iOSNotificationLocationTrigger()
-                    {
-                        Center = new Vector2(data.locationTriggerCenterX, data.locationTriggerCenterY),
-                        Radius = data.locationTriggerRadius,
-                        NotifyOnEntry = data.locationTriggerNotifyOnEntry,
-                        NotifyOnExit = data.locationTriggerNotifyOnExit
-                    };
-                }
-                else
-                {
-                    trigger = new iOSNotificationPushTrigger();
-                }
-                return trigger;
             }
         }
 
@@ -345,25 +368,6 @@ namespace Unity.Notifications.iOS
             data.threadIdentifier = "";
 
             data.triggerType = -1;
-            data.repeats = false;
-
-            //Time trigger
-            data.timeTriggerInterval = -1;
-
-            //Calendar trigger
-            data.calendarTriggerYear = -1;
-            data.calendarTriggerMonth = -1;
-            data.calendarTriggerDay = -1;
-            data.calendarTriggerHour = -1;
-            data.calendarTriggerMinute = -1;
-            data.calendarTriggerSecond = -1;
-
-            //Location trigger
-            data.locationTriggerCenterX = 0f;
-            data.locationTriggerCenterY = 0f;
-            data.locationTriggerRadius = 2f;
-            data.locationTriggerNotifyOnEntry = true;
-            data.locationTriggerNotifyOnExit = false;
 
             data.userInfo = IntPtr.Zero;
             userInfo = new Dictionary<string, string>();

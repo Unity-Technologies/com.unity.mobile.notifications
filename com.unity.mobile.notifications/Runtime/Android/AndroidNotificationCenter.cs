@@ -44,7 +44,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Subscribe to this event to receive callbacks whenever a scheduled notification is shown to the user.
         /// </summary>
-        public static event NotificationReceivedCallback OnNotificationReceived = delegate {};
+        public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
 
         private static AndroidJavaClass s_NotificationManagerClass;
         private static AndroidJavaObject s_NotificationManager;
@@ -390,6 +390,21 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
+        /// Opens settings.
+        /// On Android versions lower than 8.0 opens settings for the application.
+        /// On Android 8.0 and later opens notification settings for the specified channel, or for the application, if channelId is null.
+        /// Note, that opening settings will suspend the application and switch to settings app.
+        /// </summary>
+        /// <param name="channelId">ID for the channel to open or null to open notification settings for the application.</param>
+        public static void OpenNotificationSettings(string channelId = null)
+        {
+            if (!Initialize())
+                return;
+
+            s_NotificationManager.Call("showNotificationSettings", channelId);
+        }
+
+        /// <summary>
         /// Create Notification.Builder.
         /// Will automatically generate the ID for notification.
         /// <see cref="CreateNotificationBuilder(int, AndroidNotification, string)"/>
@@ -495,7 +510,7 @@ namespace Unity.Notifications.Android
                 notification.Number = notificationObj.Get<int>("number");
                 notification.IntentData = extras.Call<string>("getString", KEY_INTENT_DATA);
                 notification.Group = notificationObj.Call<string>("getGroup");
-                notification.GroupSummary = 0 != (flags &  Notification_FLAG_GROUP_SUMMARY);
+                notification.GroupSummary = 0 != (flags & Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
                 notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
                 var showTimestamp = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_WHEN, false);

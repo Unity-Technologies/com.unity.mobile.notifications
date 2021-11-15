@@ -36,7 +36,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool s_OnNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate {};
+        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate { };
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
@@ -64,7 +64,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool s_OnRemoteNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate {};
+        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate { };
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
 
@@ -236,6 +236,18 @@ namespace Unity.Notifications.iOS
         {
             var notification = new iOSNotification(data);
             s_OnNotificationReceived(notification);
+        }
+
+        /// <summary>
+        /// Opens Settings.
+        /// On iOS there is no way to open notification settings specifically, but you can open settings app with current application settings.
+        /// Note, that application will be suspended, since opening settings is switching to different application.
+        /// </summary>
+        public static void OpenNotificationSettings()
+        {
+#if !UNITY_EDITOR
+            iOSNotificationsWrapper._OpenNotificationSettings();
+#endif
         }
     }
 }
