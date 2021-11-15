@@ -3,18 +3,43 @@ using UnityEngine;
 
 namespace Unity.Notifications.iOS
 {
-    internal enum NotificationTriggerType
+    /// <summary>
+    /// Describes notification trigger type
+    /// </summary>
+    public enum iOSNotificationTriggerType
     {
-        TimeTrigger = 0,
-        CalendarTrigger = 10,
-        LocationTrigger = 20,
-        PushTrigger = 3
+        /// <summary>
+        /// Time interval trigger
+        /// </summary>
+        TimeInterval = 0,
+        /// <summary>
+        /// Calendar trigger
+        /// </summary>
+        Calendar = 10,
+        /// <summary>
+        /// Location trigger
+        /// </summary>
+        Location = 20,
+        /// <summary>
+        /// Push notification trigger
+        /// </summary>
+        Push = 3,
+        /// <summary>
+        /// Trigger, that is not known to this version of notifications package
+        /// </summary>
+        Unknown = -1,
     }
 
     /// <summary>
     /// iOSNotificationTrigger interface is implemented by notification trigger types representing an event that triggers the delivery of a notification.
     /// </summary>
-    public interface iOSNotificationTrigger {}
+    public interface iOSNotificationTrigger
+    {
+        /// <summary>
+        /// Returns the trigger type for this trigger.
+        /// </summary>
+        iOSNotificationTriggerType Type { get; }
+    }
 
     /// <summary>
     /// A trigger condition that causes a notification to be delivered when the user's device enters or exits the specified geographic region.
@@ -32,7 +57,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.LocationTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Location; } }
 
         /// <summary>
         /// The center point of the geographic area.
@@ -71,7 +96,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.PushTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Push; } }
     }
 
     /// <summary>
@@ -85,7 +110,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.TimeTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.TimeInterval; } }
 
         internal int timeInterval;
 
@@ -121,7 +146,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The type of notification trigger.
         /// </summary>
-        public static int Type { get { return (int)NotificationTriggerType.CalendarTrigger; } }
+        public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Calendar; } }
 
         /// <summary>
         /// Year
@@ -154,8 +179,72 @@ namespace Unity.Notifications.iOS
         public int? Second { get; set; }
 
         /// <summary>
+        /// Are Date and Time field in UTC time. When false, use local time.
+        /// </summary>
+        public bool UtcTime { get; set; }
+
+        /// <summary>
         /// Indicate whether the notification is repeated every defined time period. For instance if hour and minute fields are set the notification will be triggered every day at the specified hour and minute.
         /// </summary>
         public bool Repeats { get; set; }
+
+        /// <summary>
+        /// Converts this trigger into the one using UTC time.
+        /// </summary>
+        /// <returns>A new trigger with UtcTime set to true and other field adjusted accordingly.</returns>
+        public iOSNotificationCalendarTrigger ToUtc()
+        {
+            if (UtcTime)
+                return this;
+
+            var notificationTime = AssignDateTimeComponents(DateTime.Now).ToUniversalTime();
+            iOSNotificationCalendarTrigger result = this;
+            result.UtcTime = true;
+            result.AssignNonEmptyComponents(notificationTime);
+            return result;
+        }
+
+        /// <summary>
+        /// Converts this trigger into the one using local time.
+        /// </summary>
+        /// <returns>A new trigger with UtcTime set to false and other field adjusted accordingly.</returns>
+        public iOSNotificationCalendarTrigger ToLocal()
+        {
+            if (!UtcTime)
+                return this;
+
+            var notificationTime = AssignDateTimeComponents(DateTime.UtcNow).ToLocalTime();
+            iOSNotificationCalendarTrigger result = this;
+            result.UtcTime = false;
+            result.AssignNonEmptyComponents(notificationTime);
+            return result;
+        }
+
+        internal DateTime AssignDateTimeComponents(DateTime dt)
+        {
+            int year = Year != null ? Year.Value : dt.Year;
+            int month = Month != null ? Month.Value : dt.Month;
+            int day = Day != null ? Day.Value : dt.Day;
+            int hour = Hour != null ? Hour.Value : dt.Hour;
+            int minute = Minute != null ? Minute.Value : dt.Minute;
+            int second = Second != null ? Second.Value : dt.Second;
+            return new DateTime(year, month, day, hour, minute, second, dt.Kind);
+        }
+
+        internal void AssignNonEmptyComponents(DateTime dt)
+        {
+            if (Year != null)
+                Year = dt.Year;
+            if (Month != null)
+                Month = dt.Month;
+            if (Day != null)
+                Day = dt.Day;
+            if (Hour != null)
+                Hour = dt.Hour;
+            if (Minute != null)
+                Minute = dt.Minute;
+            if (Second != null)
+                Second = dt.Second;
+        }
     }
 }
