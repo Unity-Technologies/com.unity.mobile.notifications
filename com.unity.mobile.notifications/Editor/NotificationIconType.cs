@@ -1,8 +1,18 @@
 namespace Unity.Notifications
 {
-    internal enum NotificationIconType
+    /// <summary>
+    /// Notification icon type.
+    /// </summary>
+    public enum NotificationIconType
     {
+        /// <summary>
+        /// Denotes small icon.
+        /// </summary>
         Small = 0,
-        Large = 1
+
+        /// <summary>
+        /// Denotes large icon
+        /// </summary>
+        Large = 1,
     }
 }
