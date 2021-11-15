@@ -125,8 +125,8 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         notificationData.triggerType = TIME_TRIGGER;
 
         UNTimeIntervalNotificationTrigger* timeTrigger = (UNTimeIntervalNotificationTrigger*)request.trigger;
-        notificationData.timeTriggerInterval = timeTrigger.timeInterval;
-        notificationData.repeats = timeTrigger.repeats;
+        notificationData.trigger.timeInterval.interval = timeTrigger.timeInterval;
+        notificationData.trigger.timeInterval.repeats = timeTrigger.repeats;
     }
     else if ([request.trigger isKindOfClass: [UNCalendarNotificationTrigger class]])
     {
@@ -135,12 +135,12 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         UNCalendarNotificationTrigger* calendarTrigger = (UNCalendarNotificationTrigger*)request.trigger;
         NSDateComponents* date = calendarTrigger.dateComponents;
 
-        notificationData.calendarTriggerYear = (int)date.year;
-        notificationData.calendarTriggerMonth = (int)date.month;
-        notificationData.calendarTriggerDay = (int)date.day;
-        notificationData.calendarTriggerHour = (int)date.hour;
-        notificationData.calendarTriggerMinute = (int)date.minute;
-        notificationData.calendarTriggerSecond = (int)date.second;
+        notificationData.trigger.calendar.year = (int)date.year;
+        notificationData.trigger.calendar.month = (int)date.month;
+        notificationData.trigger.calendar.day = (int)date.day;
+        notificationData.trigger.calendar.hour = (int)date.hour;
+        notificationData.trigger.calendar.minute = (int)date.minute;
+        notificationData.trigger.calendar.second = (int)date.second;
     }
     else if ([request.trigger isKindOfClass: [UNLocationNotificationTrigger class]])
     {
@@ -150,17 +150,19 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         UNLocationNotificationTrigger* locationTrigger = (UNLocationNotificationTrigger*)request.trigger;
         CLCircularRegion *region = (CLCircularRegion*)locationTrigger.region;
 
-        notificationData.locationTriggerCenterX = region.center.latitude;
-        notificationData.locationTriggerCenterY = region.center.longitude;
-        notificationData.locationTriggerRadius = region.radius;
-        notificationData.locationTriggerNotifyOnExit = region.notifyOnEntry;
-        notificationData.locationTriggerNotifyOnEntry = region.notifyOnExit;
+        notificationData.trigger.location.centerX = region.center.latitude;
+        notificationData.trigger.location.centerY = region.center.longitude;
+        notificationData.trigger.location.radius = region.radius;
+        notificationData.trigger.location.notifyOnExit = region.notifyOnEntry;
+        notificationData.trigger.location.notifyOnEntry = region.notifyOnExit;
 #endif
     }
     else if ([request.trigger isKindOfClass: [UNPushNotificationTrigger class]])
     {
         notificationData.triggerType = PUSH_TRIGGER;
     }
+    else
+        notificationData.triggerType = UNKNOWN_TRIGGER;
 
     parseCustomizedData(&notificationData, request);
     notificationData.attachments = (__bridge_retained void*)request.content.attachments;

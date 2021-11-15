@@ -308,35 +308,38 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     UNNotificationTrigger* trigger;
     if (data->triggerType == TIME_TRIGGER)
     {
-        trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval: data->timeTriggerInterval repeats: data->repeats];
+        trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval: data->trigger.timeInterval.interval repeats: data->trigger.timeInterval.repeats];
     }
     else if (data->triggerType == CALENDAR_TRIGGER)
     {
         NSDateComponents* date = [[NSDateComponents alloc] init];
-        if (data->calendarTriggerYear >= 0)
-            date.year = data->calendarTriggerYear;
-        if (data->calendarTriggerMonth >= 0)
-            date.month = data->calendarTriggerMonth;
-        if (data->calendarTriggerDay >= 0)
-            date.day = data->calendarTriggerDay;
-        if (data->calendarTriggerHour >= 0)
-            date.hour = data->calendarTriggerHour;
-        if (data->calendarTriggerMinute >= 0)
-            date.minute = data->calendarTriggerMinute;
-        if (data->calendarTriggerSecond >= 0)
-            date.second = data->calendarTriggerSecond;
+        if (data->trigger.calendar.year >= 0)
+            date.year = data->trigger.calendar.year;
+        if (data->trigger.calendar.month >= 0)
+            date.month = data->trigger.calendar.month;
+        if (data->trigger.calendar.day >= 0)
+            date.day = data->trigger.calendar.day;
+        if (data->trigger.calendar.hour >= 0)
+            date.hour = data->trigger.calendar.hour;
+        if (data->trigger.calendar.minute >= 0)
+            date.minute = data->trigger.calendar.minute;
+        if (data->trigger.calendar.second >= 0)
+            date.second = data->trigger.calendar.second;
+        // From C# we get UTC time
+        date.calendar = [NSCalendar calendarWithIdentifier: NSCalendarIdentifierGregorian];
+        date.timeZone = [NSTimeZone timeZoneWithAbbreviation: @"UTC"];
 
-        trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents: date repeats: data->repeats];
+        trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents: date repeats: data->trigger.calendar.repeats];
     }
     else if (data->triggerType == LOCATION_TRIGGER)
     {
 #if UNITY_USES_LOCATION
-        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->locationTriggerCenterX, data->locationTriggerCenterY);
+        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->trigger.location.centerX, data->trigger.location.centerY);
 
         CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center
-                                    radius: data->locationTriggerRadius identifier: identifier];
-        region.notifyOnEntry = data->locationTriggerNotifyOnEntry;
-        region.notifyOnExit = data->locationTriggerNotifyOnExit;
+                                    radius: data->trigger.location.radius identifier: identifier];
+        region.notifyOnEntry = data->trigger.location.notifyOnEntry;
+        region.notifyOnExit = data->trigger.location.notifyOnExit;
 
         trigger = [UNLocationNotificationTrigger triggerWithRegion: region repeats: NO];
 #else

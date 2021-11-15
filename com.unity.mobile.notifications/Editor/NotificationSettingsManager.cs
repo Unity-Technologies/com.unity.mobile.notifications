@@ -279,9 +279,9 @@ namespace Unity.Notifications
                 var scale = drawableResource.Type == NotificationIconType.Small ? 0.375f : 1;
 
                 var textXhdpi = TextureAssetUtils.ScaleTexture(texture, (int)(128 * scale), (int)(128 * scale));
-                var textHdpi  = TextureAssetUtils.ScaleTexture(texture, (int)(96 * scale), (int)(96 * scale));
-                var textMdpi  = TextureAssetUtils.ScaleTexture(texture, (int)(64 * scale), (int)(64 * scale));
-                var textLdpi  = TextureAssetUtils.ScaleTexture(texture, (int)(48 * scale), (int)(48 * scale));
+                var textHdpi = TextureAssetUtils.ScaleTexture(texture, (int)(96 * scale), (int)(96 * scale));
+                var textMdpi = TextureAssetUtils.ScaleTexture(texture, (int)(64 * scale), (int)(64 * scale));
+                var textLdpi = TextureAssetUtils.ScaleTexture(texture, (int)(48 * scale), (int)(48 * scale));
 
                 icons[string.Format("drawable-xhdpi-v11/{0}.png", drawableResource.Id)] = textXhdpi.EncodeToPNG();
                 icons[string.Format("drawable-hdpi-v11/{0}.png", drawableResource.Id)] = textHdpi.EncodeToPNG();
