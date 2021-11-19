@@ -46,10 +46,13 @@
              [UnityNotificationManager sharedInstance].lastReceivedNotification = NULL;
          }];
 
-        [nc addObserverForName: UIApplicationDidFinishLaunchingNotification
+        [nc addObserverForName: kUnityWillFinishLaunchingWithOptions
          object: nil
          queue: [NSOperationQueue mainQueue]
          usingBlock:^(NSNotification *notification) {
+
+             [UNUserNotificationCenter currentNotificationCenter].delegate = [UnityNotificationManager sharedInstance];
+
              BOOL authorizeOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityNotificationRequestAuthorizationOnAppLaunch"] boolValue];
              BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
              BOOL registerRemoteOnLaunch = supportsPushNotification == YES ?
@@ -68,9 +71,6 @@
                  [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
                  manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
-            
-            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-            center.delegate = [UnityNotificationManager sharedInstance];
          }];
 
         [nc addObserverForName: kUnityDidRegisterForRemoteNotificationsWithDeviceToken
