@@ -50,7 +50,6 @@
          object: nil
          queue: [NSOperationQueue mainQueue]
          usingBlock:^(NSNotification *notification) {
-
              [UNUserNotificationCenter currentNotificationCenter].delegate = [UnityNotificationManager sharedInstance];
 
              BOOL authorizeOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityNotificationRequestAuthorizationOnAppLaunch"] boolValue];

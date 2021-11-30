@@ -253,6 +253,12 @@ void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit
             NSString* v = obj;
             callback(csDict, k.UTF8String, v.UTF8String);
         }
+        else if ([obj isKindOfClass: [NSNumber class]])
+        {
+            NSNumber* numberVal = (NSNumber*)obj;
+            NSString* str = numberVal.stringValue;
+            callback(csDict, k.UTF8String, str.UTF8String);
+        }
         else
         {
             NSError* error;
