@@ -13,6 +13,36 @@
 
 #import "UnityNotificationData.h"
 
+
+static NSString* ParseNotificationDataObject(id obj)
+{
+    if ([obj isKindOfClass: [NSString class]])
+        return obj;
+    else if ([obj isKindOfClass: [NSNumber class]])
+    {
+        NSNumber* numberVal = obj;
+        return numberVal.stringValue;
+    }
+    else if ([NSJSONSerialization isValidJSONObject: obj])
+    {
+        NSError* error;
+        NSData* data = [NSJSONSerialization dataWithJSONObject: obj options: NSJSONWritingPrettyPrinted error: &error];
+        if (data)
+        {
+            NSString* v = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+            return v;
+        }
+        else
+        {
+            NSLog(@"Failed parsing notification userInfo value: %@", error);
+        }
+    }
+    else
+        NSLog(@"Failed parsing notification userInfo value");
+
+    return nil;
+}
+
 NotificationSettingsData UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings)
 {
     NotificationSettingsData settingsData;
@@ -216,27 +246,11 @@ void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit
     NSDictionary* dict = (__bridge NSDictionary*)nsDict;
     [dict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         NSString* k = key;
-        if ([obj isKindOfClass: [NSString class]])
-        {
-            NSString* v = obj;
+        NSString* v = ParseNotificationDataObject(obj);
+        if (v != nil)
             callback(csDict, k.UTF8String, v.UTF8String);
-        }
-        else if ([obj isKindOfClass: [NSNumber class]])
-        {
-            NSNumber* numberVal = (NSNumber*)obj;
-            NSString* str = numberVal.stringValue;
-            callback(csDict, k.UTF8String, str.UTF8String);
-        }
         else
-        {
-            NSError* error;
-            NSData* data = [NSJSONSerialization dataWithJSONObject: obj options: NSJSONWritingPrettyPrinted error: &error];
-            if (data)
-            {
-                NSString* v = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-                callback(csDict, k.UTF8String, v.UTF8String);
-            }
-        }
+            NSLog(@"Failed to parse value for key '%@'", key);
     }];
 }
 
