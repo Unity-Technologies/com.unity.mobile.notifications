@@ -42,7 +42,8 @@ static NSString* ParseNotificationDataObject(id obj)
     else
         NSLog(@"Failed parsing notification userInfo value");
 
-    return nil;
+    NSObject* o = obj;
+    return o.description;
 }
 
 NotificationSettingsData UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings)
@@ -81,7 +82,7 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->userInfo = NULL;
 }
 
-void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
+static void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
 {
     NSDictionary* userInfo = request.content.userInfo;
     NSObject* customizedData = [userInfo objectForKey: @"data"];
@@ -94,32 +95,9 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
     }
 
     // For push notifications, we have to handle more cases.
-    NSString* strData;
-    if ([NSJSONSerialization isValidJSONObject: customizedData])
-    {
-        NSError* error;
-        NSData* data = [NSJSONSerialization dataWithJSONObject: customizedData options: NSJSONWritingPrettyPrinted error: &error];
-        if (!data)
-        {
-            NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
-            return;
-        }
-
-        strData = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-    }
-    else
-    {
-        // Convert bool defined with true/false in payload to "true"/"false", otherwise it will be converted to 1/0.
-        if ([customizedData isKindOfClass: [NSNumber class]] && CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(customizedData)))
-        {
-            NSNumber* number = (NSNumber*)customizedData;
-            strData = number.boolValue ? @"true" : @"false";
-        }
-        else
-        {
-            strData = customizedData.description;
-        }
-    }
+    NSString* strData = ParseNotificationDataObject(customizedData);
+    if (strData == nil)
+        NSLog(@"Failed parsing notification userInfo[\"data\"]");
 
     NSMutableDictionary* parsedUserInfo = [NSMutableDictionary dictionaryWithDictionary: userInfo];
     [parsedUserInfo setValue: strData forKey: @"data"];
