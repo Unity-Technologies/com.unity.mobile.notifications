@@ -21,6 +21,8 @@ static NSString* ParseNotificationDataObject(id obj)
     else if ([obj isKindOfClass: [NSNumber class]])
     {
         NSNumber* numberVal = obj;
+        if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(obj)))
+            return numberVal.boolValue ? @"true" : @"false";
         return numberVal.stringValue;
     }
     else if ([NSJSONSerialization isValidJSONObject: obj])
