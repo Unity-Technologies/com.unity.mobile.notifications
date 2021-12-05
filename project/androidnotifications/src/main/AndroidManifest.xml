@@ -2,7 +2,7 @@
     package="com.unity.androidnotifications" >
     <application>
         <receiver android:exported="true" android:name="com.unity.androidnotifications.UnityNotificationManager"/>
-        <receiver android:name="com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver"
+        <receiver android:exported="true" android:name="com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
