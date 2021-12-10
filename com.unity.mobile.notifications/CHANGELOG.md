@@ -2,6 +2,25 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.5.0] - 2021-12-10
+
+### Fixes:
+- [1360115](https://issuetracker.unity3d.com/issues/mobile-notifications-project-settings-window-loses-focus-when-clicking-on-any-category-while-mobile-notifications-pane-is-open) Fixed focus loss when trying to switching from notifications settings.
+- [1373835]() Fixed calendar notifications for buddhist calendars on iOS.
+- [1375744](https://issuetracker.unity3d.com/issues/ios-app-freezes-slash-crashes-when-both-mobile-notifications-and-firebase-are-used) Fixed application startup hang when application uses Unity notifications or Firebase.
+- [1382960](https://issuetracker.unity3d.com/issues/ios-crash-on-pthread-kill-when-clicking-on-a-notification-that-contains-an-integer-value-in-the-apns-file) Fixed a crash when push notification JSON file has integer item at the top level.
+
+### Changes & Improvements:
+- [iOS] Added support for the following notification attachements: images, sounds, videos.
+- [Android] Introduced AndroidNotificationCenter.CreateNotificationBuilder, which allows the greater customizability while creating notifications.
+- [iOS] Added support for actionable notifications
+- [iOS] Added API for registering notification categories with associated actions.
+- [Android] Optimize notification saving.
+- [iOS][Android] Added API to open notification settings
+- [Android] Added API which allows you to change notification icons in Editor.
+- [iOS] Correctly handle boolean values in UserInfo, previously boolean values were detected as numbers and get parsed as 1 or 0, now they will be correctly handled as 'true' and 'false'
+- [Android] Fixed notification package for Android 12 - NotificationRestartOnBootReceiver needs to be marked as exported in manifest file, disable exact alarms because they require special permissions.
+
 ## [1.4.2] - 2021-07-22
 
 ### Fixes:
