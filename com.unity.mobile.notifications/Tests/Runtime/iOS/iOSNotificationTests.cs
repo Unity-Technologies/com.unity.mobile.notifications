@@ -1,12 +1,76 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
-using System.Collections;
 using Unity.Notifications.iOS;
 #if UNITY_EDITOR
+using System.Diagnostics;
+using System.IO;
 using Unity.Notifications;
 using UnityEditor;
+using UnityEditor.TestTools.TestRunner.Api;
+
+
+[InitializeOnLoad]
+class SendPushNotifications : ICallbacks
+{
+    static SendPushNotifications()
+    {
+        var api = ScriptableObject.CreateInstance<TestRunnerApi>();
+        api.RegisterCallbacks(new SendPushNotifications());
+    }
+
+    readonly Dictionary<string, string> pushNotifications = new Dictionary<string, string>()
+    {
+        { "PushNotification_WithSimpleString_IsReceived", "\"Test data\"" },
+        { "PushNotification_WithInteger_IsReceived", "15" },
+        { "PushNotification_WithBool_IsReceived", "true" },
+        { "PushNotification_WithJSON_IsReceived", "{ \"item1\": 3, \"item2\": \"value2\" }" },
+        { "PushNotification_CustomData_IsReceived",  "\"test\", \"CustomKey\": 25" },
+    };
+
+    readonly string pushTemplate = @"{
+    ""aps"": {
+        ""alert"": ""Push Notifications Test"",
+        ""sound"": ""default"",
+        ""badge"": 1
+    },
+    ""data"": $data$
+}";
+
+    void ICallbacks.RunFinished(ITestResultAdaptor result)
+    {
+    }
+
+    void ICallbacks.RunStarted(ITestAdaptor testsToRun)
+    {
+    }
+
+    void ICallbacks.TestFinished(ITestResultAdaptor result)
+    {
+    }
+
+    void ICallbacks.TestStarted(ITestAdaptor test)
+    {
+        string data;
+        if (pushNotifications.TryGetValue(test.Name, out data))
+            SendPush(data);
+    }
+
+    void SendPush(string data)
+    {
+        string fileName = "/tmp/push.apns";
+        File.WriteAllText(fileName, pushTemplate.Replace("$data$", data));
+        var process = new Process();
+        process.StartInfo.UseShellExecute = true;
+        process.StartInfo.FileName = "xcrun";
+        process.StartInfo.Arguments = $"simctl push booted com.unity3d.mobilenotificationtests {fileName}";
+        process.Start();
+    }
+}
+
 #endif
 
 class iOSNotificationTests
@@ -65,7 +129,7 @@ class iOSNotificationTests
             msg += "\n .Body: " + receivedNotification.Body;
             msg += "\n .CategoryIdentifier: " + receivedNotification.CategoryIdentifier;
             msg += "\n .Subtitle: " + receivedNotification.Subtitle;
-            Debug.Log(msg);
+            UnityEngine.Debug.Log(msg);
         };
     }
 
@@ -75,6 +139,7 @@ class iOSNotificationTests
         receivedNotificationCount = 0;
         lastReceivedNotification = null;
         iOSNotificationCenter.RemoveAllScheduledNotifications();
+        iOSNotificationCenter.RemoveAllDeliveredNotifications();
     }
 #endif
 
@@ -181,9 +246,9 @@ class iOSNotificationTests
         };
 
         iOSNotificationCenter.ScheduleNotification(notification);
-        Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, Now: {dateTime}, Notification should arrive on: {dt}");
+        UnityEngine.Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, Now: {dateTime}, Notification should arrive on: {dt}");
         yield return WaitForNotification(20.0f);
-        Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, wait finished at: {DateTime.Now}");
+        UnityEngine.Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, wait finished at: {DateTime.Now}");
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
         Assert.AreEqual(text, lastReceivedNotification.Title);
@@ -203,6 +268,56 @@ class iOSNotificationTests
     public IEnumerator SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived()
     {
         yield return SendNotificationUsingCalendarTrigger_NotificationIsReceived("SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived", true);
+    }
+
+    IEnumerator PushNotificationIsReceived(string data)
+    {
+        yield return WaitForNotification(20.0f);
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.AreEqual(data, lastReceivedNotification.Data);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator PushNotification_WithSimpleString_IsReceived()
+    {
+        yield return PushNotificationIsReceived("Test data");
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator PushNotification_WithInteger_IsReceived()
+    {
+        yield return PushNotificationIsReceived("15");
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator PushNotification_WithBool_IsReceived()
+    {
+        yield return PushNotificationIsReceived("true");
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator PushNotification_WithJSON_IsReceived()
+    {
+        yield return WaitForNotification(20.0f);
+        Assert.AreEqual(1, receivedNotificationCount);
+
+        // clear all whitespace, so json formatting is not an issue
+        string data = lastReceivedNotification.Data.Replace("\n", "").Replace(" ", "");
+        Assert.AreEqual("{\"item1\":3,\"item2\":\"value2\"}", data);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator PushNotification_CustomData_IsReceived()
+    {
+        yield return WaitForNotification(20.0f);
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsTrue(lastReceivedNotification.UserInfo.ContainsKey("CustomKey"));
+        Assert.AreEqual("25", lastReceivedNotification.UserInfo["CustomKey"]);
     }
 
     [Test]
