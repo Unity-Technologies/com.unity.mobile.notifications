@@ -52,6 +52,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static final String KEY_REPEAT_INTERVAL = "repeatInterval";
     protected static final String KEY_NOTIFICATION = "unityNotification";
     protected static final String KEY_SMALL_ICON = "smallIcon";
+    protected static final String KEY_CHANNEL_ID = "channelID";
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -691,6 +692,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     priority = Notification.PRIORITY_DEFAULT;
             }
             notificationBuilder.setPriority(priority);
+            notificationBuilder.getExtras().putString(KEY_CHANNEL_ID, channelID);
 
             return notificationBuilder;
         } else {
