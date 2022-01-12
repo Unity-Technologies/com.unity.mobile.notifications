@@ -654,13 +654,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public Notification.Builder createNotificationBuilder(String channelID) {
+        return createNotificationBuilder(mContext, channelID);
+    }
+
+    @SuppressWarnings("deprecation")
+    protected static Notification.Builder createNotificationBuilder(Context context, String channelID) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            Notification.Builder notificationBuilder = new Notification.Builder(mContext);
+            Notification.Builder notificationBuilder = new Notification.Builder(context);
 
             // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
-            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(mContext, channelID);
+            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(context, channelID);
 
             if (fakeNotificationChannel.vibrationPattern != null && fakeNotificationChannel.vibrationPattern.length > 0) {
                 notificationBuilder.setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND);
@@ -696,7 +700,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             return notificationBuilder;
         } else {
-            return new Notification.Builder(mContext, channelID);
+            return new Notification.Builder(context, channelID);
         }
     }
 
