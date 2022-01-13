@@ -481,46 +481,50 @@ public class UnityNotificationUtilities {
             return Notification.Builder.recoverBuilder(context, notification);
         }
         else {
-            String channelID = notification.extras.getString(KEY_CHANNEL_ID);
-            Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelID);
-            UnityNotificationManager.setNotificationIcon(builder, KEY_SMALL_ICON, notification.extras.getString(KEY_SMALL_ICON));
-            String largeIcon = notification.extras.getString(KEY_LARGE_ICON);
-            if (largeIcon != null && !largeIcon.isEmpty())
-                UnityNotificationManager.setNotificationIcon(builder, KEY_LARGE_ICON, largeIcon);
-            builder.setContentTitle(notification.extras.getString(Notification.EXTRA_TITLE));
-            builder.setContentText(notification.extras.getString(Notification.EXTRA_TEXT));
-            builder.setAutoCancel(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
-            if (notification.number >= 0)
-                builder.setNumber(notification.number);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                String bigText = notification.extras.getString(Notification.EXTRA_BIG_TEXT);
-                if (bigText != null)
-                    builder.setStyle(new Notification.BigTextStyle().bigText(bigText));
-            }
-
-            builder.setWhen(notification.when);
-            String group = notification.getGroup();
-            if (group != null && !group.isEmpty())
-                builder.setGroup(group);
-            builder.setGroupSummary(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));
-            String sortKey = notification.getSortKey();
-            if (sortKey != null && !sortKey.isEmpty())
-                builder.setSortKey(sortKey);
-            builder.setShowWhen(notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false));
-            Integer color = UnityNotificationManager.getNotificationColor(notification);
-            if (color != null)
-                UnityNotificationManager.setNotificationColor(builder, color);
-            UnityNotificationManager.setNotificationUsesChronometer(builder, notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
-            UnityNotificationManager.setNotificationGroupAlertBehavior(builder, UnityNotificationManager.getNotificationGroupAlertBehavior(notification));
-
-            builder.getExtras().putInt(KEY_ID, notification.extras.getInt(KEY_ID, 0));
-            builder.getExtras().putLong(KEY_REPEAT_INTERVAL, notification.extras.getLong(KEY_REPEAT_INTERVAL, 0));
-            builder.getExtras().putLong(KEY_FIRE_TIME, notification.extras.getLong(KEY_FIRE_TIME, 0));
-            String intentData = notification.extras.getString(KEY_INTENT_DATA);
-            if (intentData != null && !intentData.isEmpty())
-                builder.getExtras().putString(KEY_INTENT_DATA, intentData);
-
-            return builder;
+            return recoverBuilderPreNougat(context, notification);
         }
+    }
+
+    private static Notification.Builder recoverBuilderPreNougat(Context context, Notification notification) {
+        String channelID = notification.extras.getString(KEY_CHANNEL_ID);
+        Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelID);
+        UnityNotificationManager.setNotificationIcon(builder, KEY_SMALL_ICON, notification.extras.getString(KEY_SMALL_ICON));
+        String largeIcon = notification.extras.getString(KEY_LARGE_ICON);
+        if (largeIcon != null && !largeIcon.isEmpty())
+            UnityNotificationManager.setNotificationIcon(builder, KEY_LARGE_ICON, largeIcon);
+        builder.setContentTitle(notification.extras.getString(Notification.EXTRA_TITLE));
+        builder.setContentText(notification.extras.getString(Notification.EXTRA_TEXT));
+        builder.setAutoCancel(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
+        if (notification.number >= 0)
+            builder.setNumber(notification.number);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            String bigText = notification.extras.getString(Notification.EXTRA_BIG_TEXT);
+            if (bigText != null)
+                builder.setStyle(new Notification.BigTextStyle().bigText(bigText));
+        }
+
+        builder.setWhen(notification.when);
+        String group = notification.getGroup();
+        if (group != null && !group.isEmpty())
+            builder.setGroup(group);
+        builder.setGroupSummary(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));
+        String sortKey = notification.getSortKey();
+        if (sortKey != null && !sortKey.isEmpty())
+            builder.setSortKey(sortKey);
+        builder.setShowWhen(notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false));
+        Integer color = UnityNotificationManager.getNotificationColor(notification);
+        if (color != null)
+            UnityNotificationManager.setNotificationColor(builder, color);
+        UnityNotificationManager.setNotificationUsesChronometer(builder, notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
+        UnityNotificationManager.setNotificationGroupAlertBehavior(builder, UnityNotificationManager.getNotificationGroupAlertBehavior(notification));
+
+        builder.getExtras().putInt(KEY_ID, notification.extras.getInt(KEY_ID, 0));
+        builder.getExtras().putLong(KEY_REPEAT_INTERVAL, notification.extras.getLong(KEY_REPEAT_INTERVAL, 0));
+        builder.getExtras().putLong(KEY_FIRE_TIME, notification.extras.getLong(KEY_FIRE_TIME, 0));
+        String intentData = notification.extras.getString(KEY_INTENT_DATA);
+        if (intentData != null && !intentData.isEmpty())
+            builder.getExtras().putString(KEY_INTENT_DATA, intentData);
+
+        return builder;
     }
 }
