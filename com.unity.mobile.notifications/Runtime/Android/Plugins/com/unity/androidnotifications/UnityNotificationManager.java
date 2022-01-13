@@ -431,10 +431,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
             SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             String serializedIntentData = prefs.getString("data", "");
 
+            boolean valid = false;
             if (serializedIntentData.length() > 1) {
                 Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, serializedIntentData);
-                intent_data_list.add(intent);
-            } else {
+                if (intent != null) {
+                    intent_data_list.add(intent);
+                    valid = true;
+                }
+            }
+
+            if (!valid) {
                 idsMarkedForRemoval.add(id);
             }
         }
