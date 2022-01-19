@@ -377,4 +377,48 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(GroupAlertBehaviours.GroupAlertChildren, notificationData.Notification.GroupAlertBehaviour);
         Assert.AreEqual(true, notificationData.Notification.ShowTimestamp);
     }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void LegacyRecoverBuilderProducesTheSameNotification()
+    {
+        const int notificationId = 123;
+
+        var original = new AndroidNotification();
+        original.Title = "title";
+        original.Text = "text";
+        original.SmallIcon = "small_icon";
+        original.FireTime = DateTime.Now;
+        original.RepeatInterval = new TimeSpan(0, 0, 5);
+        original.LargeIcon = "large_icon";
+        original.Style = NotificationStyle.BigTextStyle;
+        original.Color = new Color(0.2f, 0.4f, 0.6f, 1.0f);
+        original.Number = 15;
+        original.ShouldAutoCancel = true;
+        original.UsesStopwatch = true;
+        original.Group = "group";
+        original.GroupSummary = true;
+        original.GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertChildren;
+        original.SortKey = "sorting";
+        original.IntentData = "string for intent";
+        original.ShowTimestamp = true;
+        original.CustomTimestamp = new DateTime(2018, 5, 24, 12, 41, 30, 122);
+
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var notification = builder.Call<AndroidJavaObject>("build");
+        var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        var manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
+        var context = manager.Get<AndroidJavaObject>("mContext");
+        var utils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        var recoveredBuilder = utils.CallStatic<AndroidJavaObject>("recoverBuilderPreNougat", context, notification);
+        Assert.IsNotNull(recoveredBuilder);
+
+        var notificationAfterRecover = recoveredBuilder.Call<AndroidJavaObject>("build");
+        Assert.IsNotNull(notificationAfterRecover);
+
+        var notificationData = AndroidNotificationCenter.GetNotificationData(notificationAfterRecover);
+        Assert.IsNotNull(notificationData);
+        var notification2 = notificationData.Notification;
+        CheckNotificationsMatch(original, notification2);
+    }
 }

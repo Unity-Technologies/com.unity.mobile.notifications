@@ -52,6 +52,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static final String KEY_REPEAT_INTERVAL = "repeatInterval";
     protected static final String KEY_NOTIFICATION = "unityNotification";
     protected static final String KEY_SMALL_ICON = "smallIcon";
+    protected static final String KEY_CHANNEL_ID = "channelID";
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -430,10 +431,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
             SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             String serializedIntentData = prefs.getString("data", "");
 
+            boolean valid = false;
             if (serializedIntentData.length() > 1) {
                 Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, serializedIntentData);
-                intent_data_list.add(intent);
-            } else {
+                if (intent != null) {
+                    intent_data_list.add(intent);
+                    valid = true;
+                }
+            }
+
+            if (!valid) {
                 idsMarkedForRemoval.add(id);
             }
         }
@@ -653,13 +660,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public Notification.Builder createNotificationBuilder(String channelID) {
+        return createNotificationBuilder(mContext, channelID);
+    }
+
+    @SuppressWarnings("deprecation")
+    protected static Notification.Builder createNotificationBuilder(Context context, String channelID) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            Notification.Builder notificationBuilder = new Notification.Builder(mContext);
+            Notification.Builder notificationBuilder = new Notification.Builder(context);
 
             // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
-            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(mContext, channelID);
+            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(context, channelID);
 
             if (fakeNotificationChannel.vibrationPattern != null && fakeNotificationChannel.vibrationPattern.length > 0) {
                 notificationBuilder.setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND);
@@ -691,10 +702,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     priority = Notification.PRIORITY_DEFAULT;
             }
             notificationBuilder.setPriority(priority);
+            notificationBuilder.getExtras().putString(KEY_CHANNEL_ID, channelID);
 
             return notificationBuilder;
         } else {
-            return new Notification.Builder(mContext, channelID);
+            return new Notification.Builder(context, channelID);
         }
     }
 
