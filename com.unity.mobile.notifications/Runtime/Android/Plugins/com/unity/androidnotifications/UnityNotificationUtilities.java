@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -65,11 +66,12 @@ public class UnityNotificationUtilities {
        - fallback 1: serialize our known properties + serialize extras as is
        - fallback 2: serialize our known stuff
     */
-    protected static String serializeNotificationIntent(Intent intent) {
+    protected static void serializeNotificationIntent(SharedPreferences prefs, Intent intent) {
         try {
+            String serialized = null;
             Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
             if (notification == null)
-                return null;
+                return;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
             boolean success = serializeNotificationParcel(intent, out);
@@ -80,13 +82,15 @@ public class UnityNotificationUtilities {
             if (success) {
                 out.close();
                 byte[] bytes = data.toByteArray();
-                return Base64.encodeToString(bytes, 0, bytes.length, 0);
+                serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
+
+            SharedPreferences.Editor editor = prefs.edit().clear();
+            editor.putString("data", serialized);
+            editor.apply();
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
         }
-
-        return null;
     }
 
     private static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
@@ -178,8 +182,11 @@ public class UnityNotificationUtilities {
         }
     }
 
-    protected static Intent deserializeNotificationIntent(Context context, String src) {
-        byte[] bytes = Base64.decode(src, 0);
+    protected static Intent deserializeNotificationIntent(Context context, SharedPreferences prefs) {
+        String serializedIntentData = prefs.getString("data", "");
+        if (null == serializedIntentData || serializedIntentData.length() <= 0)
+            return null;
+        byte[] bytes = Base64.decode(serializedIntentData, 0);
         return deserializeNotificationIntent(context, bytes);
     }
 

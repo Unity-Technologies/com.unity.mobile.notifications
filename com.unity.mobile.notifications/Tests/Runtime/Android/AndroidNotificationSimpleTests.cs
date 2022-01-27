@@ -259,10 +259,11 @@ class AndroidNotificationSimpleTests
         intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
 
-        var serializedString = utilsClass.CallStatic<AndroidJavaObject>("serializeNotificationIntent", intent);
-        Assert.IsNotNull(serializedString);
+        var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", context.GetStatic<int>("MODE_PRIVATE"));
 
-        var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, serializedString);
+        utilsClass.CallStatic("serializeNotificationIntent", prefs, intent);
+
+        var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, prefs);
         Assert.IsNotNull(deserializedIntent);
         // don't dispose notification, it is kept in AndroidNotificationIntentData
         var deserializedNotification = deserializedIntent.Call<AndroidJavaObject>("getParcelableExtra", "unityNotification");
