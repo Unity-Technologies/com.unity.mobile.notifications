@@ -438,7 +438,8 @@ class AndroidNotificationSimpleTests
         original.FireTime = DateTime.Now;
         original.LargeIcon = "large_icon";
 
-        var deserializedData = SerializeDeserializeNotificationIntent(original, notificationId, (prefs) => {
+        var deserializedData = SerializeDeserializeNotificationIntent(original, notificationId, (prefs) =>
+        {
             var data = prefs.Call<string>("getString", "data", "");
             // corrupt data
             using (var editor = prefs.Call<AndroidJavaObject>("edit"))
