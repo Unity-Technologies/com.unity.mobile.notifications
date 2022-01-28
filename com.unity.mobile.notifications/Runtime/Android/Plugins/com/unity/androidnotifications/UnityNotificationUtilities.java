@@ -68,6 +68,8 @@ public class UnityNotificationUtilities {
        - serialize as is
        - fallback 1: serialize our known properties + serialize extras as is
        - fallback 2: serialize our known stuff
+       When notification is serialized as-is, it may contain references to resources and in case
+       of app update may fail to deserialize due to resources now missing, hence always save fallback version.
     */
     protected static void serializeNotificationIntent(SharedPreferences prefs, Intent intent) {
         try {
@@ -78,14 +80,11 @@ public class UnityNotificationUtilities {
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
             if (serializeNotificationCustom(notification, out)) {
-                out.close();
+                out.flush();
                 byte[] bytes = data.toByteArray();
                 fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
-                data = new ByteArrayOutputStream();
-                out = new DataOutputStream(data);
             }
-            else
-                data.reset();
+            data.reset();
             if (serializeNotificationParcel(intent, out)) {
                 out.close();
                 byte[] bytes = data.toByteArray();
