@@ -123,9 +123,9 @@ test_Android_{{ editor.version }}:
 test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
-    type: Unity::mobile::iPhone
-    image: mobile/macos-10.13-testing:stable
-    flavor: b1.medium
+    type: Unity::VM::osx
+    image: mobile/ios-macos-10.15:latest
+    flavor: i1.large
   commands:
     - brew tap --force-auto-update unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
     - brew install unity-config
