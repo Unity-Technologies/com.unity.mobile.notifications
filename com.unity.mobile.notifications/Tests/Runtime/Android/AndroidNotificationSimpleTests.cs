@@ -240,15 +240,15 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
     }
 
-    AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidNotification original, int notificationId)
+    AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidNotification original, int notificationId, Action<AndroidJavaObject> inBetween = null)
     {
         using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
         {
-            return SerializeDeserializeNotificationIntent(builder);
+            return SerializeDeserializeNotificationIntent(builder, inBetween);
         }
     }
 
-    AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidJavaObject builder)
+    AndroidNotificationIntentData SerializeDeserializeNotificationIntent(AndroidJavaObject builder, Action<AndroidJavaObject> inBetween = null)
     {
         var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
         var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
@@ -260,8 +260,10 @@ class AndroidNotificationSimpleTests
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
 
         var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", context.GetStatic<int>("MODE_PRIVATE"));
-
         utilsClass.CallStatic("serializeNotificationIntent", prefs, intent);
+
+        if (inBetween != null)
+            inBetween(prefs);
 
         var deserializedIntent = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationIntent", context, prefs);
         Assert.IsNotNull(deserializedIntent);
@@ -421,5 +423,37 @@ class AndroidNotificationSimpleTests
         Assert.IsNotNull(notificationData);
         var notification2 = notificationData.Notification;
         CheckNotificationsMatch(original, notification2);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CorruptedPrimarySerialization_FallsBack()
+    {
+        const int notificationId = 234;
+
+        var original = new AndroidNotification();
+        original.Title = "title";
+        original.Text = "text";
+        original.SmallIcon = "small_icon";
+        original.FireTime = DateTime.Now;
+        original.LargeIcon = "large_icon";
+
+        var deserializedData = SerializeDeserializeNotificationIntent(original, notificationId, (prefs) => {
+            var data = prefs.Call<string>("getString", "data", "");
+            // corrupt data
+            using (var editor = prefs.Call<AndroidJavaObject>("edit"))
+            {
+                editor.Call<AndroidJavaObject>("putString", "data", "jfkasjflksdjflkasdjflkjdsafkjsadfl").Dispose();
+                editor.Call("apply");
+            }
+
+            var data2 = prefs.Call<string>("getString", "data", "");
+            Assert.AreNotEqual(data, data2);
+        });
+
+        Assert.AreEqual(original.Title, deserializedData.Notification.Title);
+        Assert.AreEqual(original.Text, deserializedData.Notification.Text);
+        Assert.AreEqual(original.SmallIcon, deserializedData.Notification.SmallIcon);
+        Assert.AreEqual(original.LargeIcon, deserializedData.Notification.LargeIcon);
     }
 }
