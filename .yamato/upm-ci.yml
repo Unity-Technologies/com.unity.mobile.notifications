@@ -139,7 +139,7 @@ test_iOS_{{ editor.version }}:
     - chmod u+x utr
     - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
-    - ./utr --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --extra-editor-arg="-playerHeartbeatTimeout 900" --extra-editor-arg="-upmNoDefaultPackages"
+    - ./.Editor/Unity.app/Contents/MacOS/Unity -runTests -batchmode -projectPath .MyTestProject -testResults `pwd`/upm-ci~/test-results/ios/results.xml -testPlatform iOS -upmNoDefaultPackages -playerHeartbeatTimeout 900
   artifacts:
     packages:
       paths:
