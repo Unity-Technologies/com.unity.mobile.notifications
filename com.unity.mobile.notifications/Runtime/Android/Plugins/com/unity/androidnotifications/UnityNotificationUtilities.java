@@ -38,6 +38,9 @@ public class UnityNotificationUtilities {
     private static final int NOTIFICATION_SERIALIZATION_VERSION = 0;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
 
+    private static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
+    private static final String SAVED_NOTIFICATION_FALLBACK_KEY = "fallback.data";
+
     protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
             return 0;
@@ -68,25 +71,32 @@ public class UnityNotificationUtilities {
     */
     protected static void serializeNotificationIntent(SharedPreferences prefs, Intent intent) {
         try {
-            String serialized = null;
+            String serialized = null, fallback = null;
             Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
             if (notification == null)
                 return;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
-            boolean success = serializeNotificationParcel(intent, out);
-            if (!success) {
-                data.reset();
-                success = serializeNotificationCustom(notification, out);
+            if (serializeNotificationCustom(notification, out)) {
+                out.close();
+                byte[] bytes = data.toByteArray();
+                fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
+                data = new ByteArrayOutputStream();
+                out = new DataOutputStream(data);
             }
-            if (success) {
+            else
+                data.reset();
+            if (serializeNotificationParcel(intent, out)) {
                 out.close();
                 byte[] bytes = data.toByteArray();
                 serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
+            else
+                serialized = fallback;
 
             SharedPreferences.Editor editor = prefs.edit().clear();
-            editor.putString("data", serialized);
+            editor.putString(SAVED_NOTIFICATION_PRIMARY_KEY, serialized);
+            editor.putString(SAVED_NOTIFICATION_FALLBACK_KEY, fallback);
             editor.apply();
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
@@ -183,10 +193,17 @@ public class UnityNotificationUtilities {
     }
 
     protected static Intent deserializeNotificationIntent(Context context, SharedPreferences prefs) {
-        String serializedIntentData = prefs.getString("data", "");
+        String serializedIntentData = prefs.getString(SAVED_NOTIFICATION_PRIMARY_KEY, "");
         if (null == serializedIntentData || serializedIntentData.length() <= 0)
             return null;
         byte[] bytes = Base64.decode(serializedIntentData, 0);
+        Intent intent = deserializeNotificationIntent(context, bytes);
+        if (intent != null)
+            return intent;
+        serializedIntentData = prefs.getString(SAVED_NOTIFICATION_FALLBACK_KEY, "");
+        if (null == serializedIntentData || serializedIntentData.length() <= 0)
+            return null;
+        bytes = Base64.decode(serializedIntentData, 0);
         return deserializeNotificationIntent(context, bytes);
     }
 
@@ -235,7 +252,12 @@ public class UnityNotificationUtilities {
             int version = in.readInt();
             if (version <0 || version > INTENT_SERIALIZATION_VERSION)
                 return null;
-            return deserializeParcelable(in);
+            Intent result = deserializeParcelable(in);
+            // check that notification itself deserializes
+            Notification notification = result.getParcelableExtra(KEY_NOTIFICATION);
+            if (notification == null)
+                return null;
+            return result;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
             return null;
