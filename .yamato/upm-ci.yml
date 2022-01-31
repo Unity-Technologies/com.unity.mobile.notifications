@@ -127,6 +127,7 @@ test_iOS_{{ editor.version }}:
     image: mobile/ios-macos-10.15:latest
     flavor: i1.large
   commands:
+    - xcrun simctl list
     - brew tap --force-auto-update unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
     - brew install unity-config
     - unity-config settings editor-path .Editor
