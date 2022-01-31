@@ -409,10 +409,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         String notification_id = Integer.toString(notification.extras.getInt(KEY_ID, -1));
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
 
-        SharedPreferences.Editor editor = prefs.edit().clear();
-        String data = UnityNotificationUtilities.serializeNotificationIntent(intent);
-        editor.putString("data", data);
-        editor.apply();
+        UnityNotificationUtilities.serializeNotificationIntent(prefs, intent);
     }
 
     protected static String getSharedPrefsNameByNotificationId(String id)
@@ -429,20 +426,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         for (String id : ids) {
             SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
-            String serializedIntentData = prefs.getString("data", "");
+            Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, prefs);
 
-            boolean valid = false;
-            if (serializedIntentData.length() > 1) {
-                Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, serializedIntentData);
-                if (intent != null) {
-                    intent_data_list.add(intent);
-                    valid = true;
-                }
-            }
-
-            if (!valid) {
+            if (intent != null)
+                intent_data_list.add(intent);
+            else
                 idsMarkedForRemoval.add(id);
-            }
         }
 
         if (idsMarkedForRemoval.size() > 0) {
