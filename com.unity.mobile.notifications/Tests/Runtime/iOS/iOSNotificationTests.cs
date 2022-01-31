@@ -100,6 +100,8 @@ class iOSNotificationTests
         NotificationSettings.iOSSettings.DefaultAuthorizationOptions = originalAuthorizationOptions | AuthorizationOption.Provisional;
         NotificationSettings.iOSSettings.AddRemoteNotificationCapability = false;
         NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch = false;
+
+        UnityEngine.Debug.Log("Application ID is: " + PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.IOS));
 #endif
     }
 
