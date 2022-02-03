@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [1.5.0] - 2021-12-10
+## [2.0.0] - 2022-02-02
 
 ### Fixes:
 - [1360115](https://issuetracker.unity3d.com/issues/mobile-notifications-project-settings-window-loses-focus-when-clicking-on-any-category-while-mobile-notifications-pane-is-open) Fixed focus loss when trying to switching from notifications settings.
