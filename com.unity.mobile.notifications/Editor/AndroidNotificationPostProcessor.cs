@@ -119,7 +119,7 @@ namespace Unity.Notifications
             {
                 notificationRestartOnBootReceiver = manifestXmlDoc.CreateElement("receiver");
                 notificationRestartOnBootReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationRestartOnBootName);
-                notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "true");
+                notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
 
                 var intentFilterNode = manifestXmlDoc.CreateElement("intent-filter");
 
