@@ -238,7 +238,7 @@ namespace Unity.Notifications.Tests.Sample
                     {
                         var attachments = new List<iOSNotificationAttachment>();
                         foreach (var att in template.Attachments)
-                            attachments.Add(new iOSNotificationAttachment() { Url = "file://" + Path.Combine(Application.streamingAssetsPath, att) });
+                            attachments.Add(new iOSNotificationAttachment() { Url = new Uri(Path.Combine(Application.streamingAssetsPath, att)).AbsoluteUri });
                         notification.Attachments = attachments;
                     }
                     ScheduleNotification(notification);
