@@ -15,9 +15,23 @@ namespace Unity.Notifications
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
+            MinSdkCheck();
+
             CopyNotificationResources(projectPath);
 
             InjectAndroidManifest(projectPath);
+        }
+
+        private void MinSdkCheck()
+        {
+#if !UNITY_2020_2_OR_NEWER
+        // API level 21 not supported since 2020.2, need to check for prior releases
+        const AndroidSdkVersions kMinAndroidSdk = AndroidSdkVersions.AndroidApiLevel21;
+
+        if (PlayerSettings.Android.minSdkVersion < AndroidSdkVersions.AndroidApiLevel21)
+                throw new NotSupportedException(string.Format("Minimum Android API level supported by notifications package is {0}, your Player Settings have it set to {1}",
+                    (int)kMinAndroidSdk, PlayerSettings.Android.minSdkVersion));
+#endif
         }
 
         private void CopyNotificationResources(string projectPath)
