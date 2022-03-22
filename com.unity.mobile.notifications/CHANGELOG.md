@@ -20,6 +20,8 @@ All notable changes to this package will be documented in this file.
 - [Android] Added API which allows you to change notification icons in Editor.
 - [iOS] Correctly handle boolean values in UserInfo, previously boolean values were detected as numbers and get parsed as 1 or 0, now they will be correctly handled as 'true' and 'false'
 - [Android] Fixed notification package for Android 12 - NotificationRestartOnBootReceiver needs to be marked as exported in manifest file, disable exact alarms because they require special permissions.
+- [iOS] Fix NotificationSettings.iOSSettings.DefaultAuthorizationOptions having incorrect return type (was PresentationOption, now AuthorizationOption).
+- [iOS] Mobile Notifications 2.0.0: iOSNotificationTrigger.Type is no longer static and returns iOSNotificationTriggerType instead of int.
 
 ## [1.4.2] - 2021-07-22
 

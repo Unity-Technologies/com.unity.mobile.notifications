@@ -172,7 +172,7 @@ PlayerSettings:
     iPhone: com.unity3d.mobilenotificationtests
   buildNumber: {}
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 20
+  AndroidMinSdkVersion: 21
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
   aotOptions: nimt-trampolines=1024
