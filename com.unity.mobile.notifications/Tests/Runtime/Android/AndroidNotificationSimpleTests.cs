@@ -209,7 +209,7 @@ class AndroidNotificationSimpleTests
         var configClass = new AndroidJavaClass("android.graphics.Bitmap$Config");
         var ARGB_8888 = configClass.GetStatic<AndroidJavaObject>("ARGB_8888");
         var bitmapClass = new AndroidJavaClass("android.graphics.Bitmap");
-        return bitmapClass.CallStatic<AndroidJavaObject>("createBitmap", 10000, 10000, ARGB_8888);
+        return bitmapClass.CallStatic<AndroidJavaObject>("createBitmap", 1000, 1000, ARGB_8888);
     }
 
     [Test]
