@@ -259,6 +259,7 @@ class AndroidNotificationSimpleTests
         intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
 
+        // context.GetStatic<int>("MODE_PRIVATE") fails on older android, did investigate why, simply using it's value from docs
         var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", 0 /* MODE_PRIVATE */);
         utilsClass.CallStatic("serializeNotificationIntent", prefs, intent);
 
