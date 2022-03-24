@@ -209,7 +209,7 @@ class AndroidNotificationSimpleTests
         var configClass = new AndroidJavaClass("android.graphics.Bitmap$Config");
         var ARGB_8888 = configClass.GetStatic<AndroidJavaObject>("ARGB_8888");
         var bitmapClass = new AndroidJavaClass("android.graphics.Bitmap");
-        return bitmapClass.CallStatic<AndroidJavaObject>("createBitmap", 10000, 10000, ARGB_8888);
+        return bitmapClass.CallStatic<AndroidJavaObject>("createBitmap", 1000, 1000, ARGB_8888);
     }
 
     [Test]
@@ -259,7 +259,8 @@ class AndroidNotificationSimpleTests
         intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
 
-        var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", context.GetStatic<int>("MODE_PRIVATE"));
+        // context.GetStatic<int>("MODE_PRIVATE") fails on older android, did investigate why, simply using it's value from docs
+        var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", 0 /* MODE_PRIVATE */);
         utilsClass.CallStatic("serializeNotificationIntent", prefs, intent);
 
         if (inBetween != null)
