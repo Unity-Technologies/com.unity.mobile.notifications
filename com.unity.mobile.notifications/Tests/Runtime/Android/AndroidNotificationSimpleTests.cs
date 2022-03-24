@@ -259,7 +259,7 @@ class AndroidNotificationSimpleTests
         intent.Call<AndroidJavaObject>("putExtra", "unityNotification", javaNotif).Dispose();
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
 
-        var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", context.GetStatic<int>("MODE_PRIVATE"));
+        var prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", 0 /* MODE_PRIVATE */);
         utilsClass.CallStatic("serializeNotificationIntent", prefs, intent);
 
         if (inBetween != null)
