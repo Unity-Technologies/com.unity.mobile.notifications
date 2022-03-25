@@ -95,6 +95,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         } catch (NullPointerException e) {
             Log.e(TAG_UNITY, "Failed to load meta-data, NullPointer: " + e.getMessage());
         }
+
+        triggerHousekeeping(context, null);
     }
 
     public static UnityNotificationManager getNotificationManagerImpl(Context context) {
@@ -329,29 +331,39 @@ public class UnityNotificationManager extends BroadcastReceiver {
         ++mSentSinceLastHousekeeping;
         if (mSentSinceLastHousekeeping > 50) {
             mSentSinceLastHousekeeping = 0;
-            Thread housekeepingThread = new Thread(() -> {
-                try {
-                    // when scheduling lots of notifications at once we can have more than one housekeeping thread running
-                    // synchronize them and chain to happen one after the other
-                    synchronized (UnityNotificationManager.class) {
-                        while (mPerformingHousekeeping) {
-                            UnityNotificationManager.class.wait();
-                        }
-                        mPerformingHousekeeping = true;
-                    }
-
-                    performNotificationHousekeeping(context, ids);
-                } catch (InterruptedException e) {
-                    Log.e(TAG_UNITY, "Notification housekeeping interrupted");
-                } finally {
-                    synchronized (UnityNotificationManager.class) {
-                        mPerformingHousekeeping = false;
-                        UnityNotificationManager.class.notify();
-                    }
-                }
-            });
-            housekeepingThread.start();
+            triggerHousekeeping(context, ids);
         }
+    }
+
+    private static synchronized void triggerHousekeeping(Context context, Set<String> ids) {
+        if (ids == null) {
+            ids = getScheduledNotificationIDs(context);
+        }
+
+        // needed for lamda
+        final Set<String> notificationIds = ids;
+        Thread housekeepingThread = new Thread(() -> {
+            try {
+                // when scheduling lots of notifications at once we can have more than one housekeeping thread running
+                // synchronize them and chain to happen one after the other
+                synchronized (UnityNotificationManager.class) {
+                    while (mPerformingHousekeeping) {
+                        UnityNotificationManager.class.wait();
+                    }
+                    mPerformingHousekeeping = true;
+                }
+
+                performNotificationHousekeeping(context, notificationIds);
+            } catch (InterruptedException e) {
+                Log.e(TAG_UNITY, "Notification housekeeping interrupted");
+            } finally {
+                synchronized (UnityNotificationManager.class) {
+                    mPerformingHousekeeping = false;
+                    UnityNotificationManager.class.notify();
+                }
+            }
+        });
+        housekeepingThread.start();
     }
 
     private static void performNotificationHousekeeping(Context context, Set<String> ids) {
@@ -364,6 +376,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             for (String id : invalid)
                 currentIds.remove(id);
             saveScheduledNotificationIDs(context, currentIds);
+            mSentSinceLastHousekeeping = 0;
         }
 
         // in case we have saved intents, clear them
@@ -536,11 +549,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void cancelPendingNotification(int id) {
         synchronized (UnityNotificationManager.class) {
             UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
-            String idStr = String.valueOf(id);
-            removeScheduledNotificationID(mContext, idStr);
-            if (this.mRescheduleOnRestart) {
-                UnityNotificationManager.deleteExpiredNotificationIntent(mContext, idStr);
-            }
+            triggerHousekeeping(mContext, null);
         }
     }
 
@@ -555,15 +564,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 alarmManager.cancel(broadcast);
             }
             broadcast.cancel();
-        }
-    }
-
-    protected static synchronized void removeScheduledNotificationID(Context context, String id) {
-        Set<String> ids = getScheduledNotificationIDs(context);
-        if (ids.contains(id)) {
-            ids = new HashSet<>(ids);
-            ids.remove(id);
-            saveScheduledNotificationIDs(context, ids);
         }
     }
 
@@ -611,14 +611,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
             mNotificationCallback.onSentNotification(notification);
         } catch (RuntimeException ex) {
             Log.w(TAG_UNITY, "Can not invoke OnNotificationReceived event when the app is not running!");
-        }
-
-        boolean isRepeatable = notification.extras.getLong(KEY_REPEAT_INTERVAL, 0L) > 0;
-
-        if (!isRepeatable) {
-            String idStr = String.valueOf(id);
-            removeScheduledNotificationID(context, idStr);
-            deleteExpiredNotificationIntent(context, idStr);
         }
     }
 
