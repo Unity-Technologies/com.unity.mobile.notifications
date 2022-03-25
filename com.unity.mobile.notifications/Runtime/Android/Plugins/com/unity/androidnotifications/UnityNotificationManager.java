@@ -263,33 +263,37 @@ public class UnityNotificationManager extends BroadcastReceiver {
         PendingIntent pendingIntent = getActivityPendingIntent(mContext, id, openAppIntent, 0);
 
         // if less than a second in the future, notify right away
-        if (fireTime - Calendar.getInstance().getTime().getTime() < 1000) {
+        boolean fireNow = fireTime - Calendar.getInstance().getTime().getTime() < 1000;
+        if (!fireNow || repeatInterval > 0) {
+            if (fireNow) {
+                // schedule at next repetition
+                fireTime += repeatInterval;
+            }
+
+            Intent intent = buildNotificationIntentUpdateList(mContext, id);
+
+            if (intent != null) {
+                if (this.mRescheduleOnRestart) {
+                    intent.putExtra(KEY_NOTIFICATION, notification);
+                    UnityNotificationManager.saveNotificationIntent(mContext, intent);
+                }
+
+                // content intent can't and shouldn't be saved, set it now and rebuild
+                notificationBuilder.setContentIntent(pendingIntent);
+                finalizeNotificationForDisplay(mContext, notificationBuilder);
+                notification = notificationBuilder.build();
+                intent.putExtra(KEY_NOTIFICATION, notification);
+
+                PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
+            }
+        }
+
+        if (fireNow) {
             notificationBuilder.setContentIntent(pendingIntent);
             finalizeNotificationForDisplay(mContext, notificationBuilder);
             notification = notificationBuilder.build();
             notify(mContext, id, notification);
-            if (repeatInterval <= 0)
-                return;
-            // schedule at next repetition
-            fireTime += repeatInterval;
-        }
-
-        Intent intent = buildNotificationIntentUpdateList(mContext, id);
-
-        if (intent != null) {
-            if (this.mRescheduleOnRestart) {
-                intent.putExtra(KEY_NOTIFICATION, notification);
-                UnityNotificationManager.saveNotificationIntent(mContext, intent);
-            }
-
-            // content intent can't and shouldn't be saved, set it now and rebuild
-            notificationBuilder.setContentIntent(pendingIntent);
-            finalizeNotificationForDisplay(mContext, notificationBuilder);
-            notification = notificationBuilder.build();
-            intent.putExtra(KEY_NOTIFICATION, notification);
-
-            PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
         }
     }
 
