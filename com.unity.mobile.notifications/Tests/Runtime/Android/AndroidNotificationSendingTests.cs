@@ -292,4 +292,38 @@ class AndroidNotificationSendingTests
             Assert.AreEqual("TheTest", extras.Call<string>("getString", "notification.test.string"));
         }
     }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator SendNotification_CanReschedule()
+    {
+        var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver");
+        AndroidJavaObject context;
+        using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                context = activity.Call<AndroidJavaObject>("getApplicationContext");
+
+        var n = new AndroidNotification();
+        n.Title = "SendNotification_CanReschedule";
+        n.Text = "SendNotification_CanReschedule Text";
+        n.FireTime = System.DateTime.Now.AddSeconds(5);
+
+        Debug.LogWarning("SendNotification_CanReschedule sends notification");
+
+        int id = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
+        yield return new WaitForSeconds(0.2f);
+
+        // simulate reboot by directly cancelling scheduled alarms preserving saves
+        managerClass.CallStatic("cancelPendingNotificationIntent", context, id);
+        yield return new WaitForSeconds(0.2f);
+        // simulate reboot by calling reschedule method, that is called after reboot
+        rebootClass.CallStatic("rescheduleSavedNotifications", context);
+
+        yield return WaitForNotification(120.0f);
+
+        Debug.LogWarning("SendNotification_CanReschedule completed");
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+    }
 }
