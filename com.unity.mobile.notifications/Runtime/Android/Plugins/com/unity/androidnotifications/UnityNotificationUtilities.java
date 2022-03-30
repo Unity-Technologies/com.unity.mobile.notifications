@@ -82,9 +82,9 @@ public class UnityNotificationUtilities {
                 fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
             data.reset();
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(KEY_NOTIFICATION, notification);
-            if (serializeNotificationParcel(bundle, out)) {
+            Intent intent = new Intent();
+            intent.putExtra(KEY_NOTIFICATION, notification);
+            if (serializeNotificationParcel(intent, out)) {
                 out.close();
                 byte[] bytes = data.toByteArray();
                 serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
@@ -101,9 +101,9 @@ public class UnityNotificationUtilities {
         }
     }
 
-    private static boolean serializeNotificationParcel(Bundle bundle, DataOutputStream out) {
+    private static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
         try {
-            byte[] bytes = serializeParcelable(bundle);
+            byte[] bytes = serializeParcelable(intent);
             if (bytes == null || bytes.length == 0)
                 return false;
             out.write(UNITY_MAGIC_NUMBER_PARCELLED);
@@ -248,8 +248,8 @@ public class UnityNotificationUtilities {
             int version = in.readInt();
             if (version <0 || version > INTENT_SERIALIZATION_VERSION)
                 return null;
-            Bundle bundle = deserializeParcelable(in);
-            Notification notification = bundle.getParcelable(KEY_NOTIFICATION);
+            Intent intent = deserializeParcelable(in);
+            Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
             return notification;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
