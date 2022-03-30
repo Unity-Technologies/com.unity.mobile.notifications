@@ -435,18 +435,24 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Load all the notification intents from SharedPreferences.
-    protected static synchronized List<Intent> loadNotificationIntents(Context context) {
+    protected static synchronized List<Notification.Builder> loadSavedNotifications(Context context) {
         Set<String> ids = getScheduledNotificationIDs(context);
 
-        List<Intent> intent_data_list = new ArrayList<Intent>();
+        List<Notification.Builder> intent_data_list = new ArrayList();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
         for (String id : ids) {
             SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+            Notification.Builder builder = null;
             Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, prefs);
+            if (intent != null) {
+                Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
+                if (notification != null)
+                    builder = UnityNotificationUtilities.recoverBuilder(context, notification);
+            }
 
-            if (intent != null)
-                intent_data_list.add(intent);
+            if (builder != null)
+                intent_data_list.add(builder);
             else
                 idsMarkedForRemoval.add(id);
         }

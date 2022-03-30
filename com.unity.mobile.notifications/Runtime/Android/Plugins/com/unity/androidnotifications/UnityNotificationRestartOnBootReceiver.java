@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -25,32 +26,27 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     }
 
     private static void rescheduleSavedNotifications(Context context) {
-        List<Intent> saved_notifications = UnityNotificationManager.loadNotificationIntents(context);
+        List<Notification.Builder> saved_notifications = UnityNotificationManager.loadSavedNotifications(context);
 
-        for (Intent data_intent : saved_notifications) {
-            Notification notification = data_intent.getParcelableExtra(KEY_NOTIFICATION);
-            if (notification == null)
-                continue;
-            long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, 0L);
-            long fireTime = notification.extras.getLong(KEY_FIRE_TIME, 0L);
+        for (Notification.Builder notificationBuilder : saved_notifications) {
+            Bundle extras = notificationBuilder.getExtras();
+            long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, 0L);
+            long fireTime = extras.getLong(KEY_FIRE_TIME, 0L);
             Date currentDate = Calendar.getInstance().getTime();
             Date fireTimeDate = new Date(fireTime);
 
-            int id = notification.extras.getInt(KEY_ID, -1);
+            int id = extras.getInt(KEY_ID, -1);
             boolean isRepeatable = repeatInterval > 0;
 
             if (fireTimeDate.after(currentDate) || isRepeatable) {
                 Intent openAppIntent = UnityNotificationManager.buildOpenAppIntent(context, UnityNotificationUtilities.getOpenAppActivity(context, true));
-                openAppIntent.putExtra(KEY_NOTIFICATION, notification);
+                openAppIntent.putExtra(KEY_NOTIFICATION, notificationBuilder.build());
 
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, id, openAppIntent, 0);
                 Intent intent = UnityNotificationManager.buildNotificationIntent(context);
-                Notification.Builder notificationBuilder = UnityNotificationUtilities.recoverBuilder(context, notification);
-                if (notificationBuilder == null)
-                    continue;
                 notificationBuilder.setContentIntent(pendingIntent);
                 UnityNotificationManager.finalizeNotificationForDisplay(context, notificationBuilder);
-                notification = notificationBuilder.build();
+                Notification notification = notificationBuilder.build();
                 intent.putExtra(KEY_NOTIFICATION, notification);
 
                 PendingIntent broadcast = UnityNotificationManager.getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
