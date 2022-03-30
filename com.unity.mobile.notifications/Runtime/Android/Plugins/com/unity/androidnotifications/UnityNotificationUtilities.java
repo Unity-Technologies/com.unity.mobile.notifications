@@ -506,7 +506,10 @@ public class UnityNotificationUtilities {
 
     protected static Notification.Builder recoverBuilder(Context context, Notification notification) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Notification.Builder.recoverBuilder(context, notification);
+            Notification.Builder builder = Notification.Builder.recoverBuilder(context, notification);
+            // extras not recovered, transfer manually
+            builder.setExtras(notification.extras);
+            return builder;
         }
         else {
             return recoverBuilderPreNougat(context, notification);
