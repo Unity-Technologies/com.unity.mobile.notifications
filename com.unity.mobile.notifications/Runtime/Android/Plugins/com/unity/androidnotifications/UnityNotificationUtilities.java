@@ -71,12 +71,9 @@ public class UnityNotificationUtilities {
        When notification is serialized as-is, it may contain references to resources and in case
        of app update may fail to deserialize due to resources now missing, hence always save fallback version.
     */
-    protected static void serializeNotificationIntent(SharedPreferences prefs, Intent intent) {
+    protected static void serializeNotification(SharedPreferences prefs, Notification notification) {
         try {
             String serialized = null, fallback = null;
-            Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
-            if (notification == null)
-                return;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
             if (serializeNotificationCustom(notification, out)) {
@@ -85,7 +82,9 @@ public class UnityNotificationUtilities {
                 fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
             data.reset();
-            if (serializeNotificationParcel(intent, out)) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(KEY_NOTIFICATION, notification);
+            if (serializeNotificationParcel(bundle, out)) {
                 out.close();
                 byte[] bytes = data.toByteArray();
                 serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
@@ -102,9 +101,9 @@ public class UnityNotificationUtilities {
         }
     }
 
-    private static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
+    private static boolean serializeNotificationParcel(Bundle bundle, DataOutputStream out) {
         try {
-            byte[] bytes = serializeParcelable(intent);
+            byte[] bytes = serializeParcelable(bundle);
             if (bytes == null || bytes.length == 0)
                 return false;
             out.write(UNITY_MAGIC_NUMBER_PARCELLED);
@@ -191,40 +190,38 @@ public class UnityNotificationUtilities {
         }
     }
 
-    protected static Intent deserializeNotificationIntent(Context context, SharedPreferences prefs) {
+    protected static Notification deserializeNotification(Context context, SharedPreferences prefs) {
         String serializedIntentData = prefs.getString(SAVED_NOTIFICATION_PRIMARY_KEY, "");
         if (null == serializedIntentData || serializedIntentData.length() <= 0)
             return null;
         byte[] bytes = Base64.decode(serializedIntentData, 0);
-        Intent intent = deserializeNotificationIntent(context, bytes);
-        if (intent != null)
-            return intent;
+        Notification notification = deserializeNotification(context, bytes);
+        if (notification != null)
+            return notification;
         serializedIntentData = prefs.getString(SAVED_NOTIFICATION_FALLBACK_KEY, "");
         if (null == serializedIntentData || serializedIntentData.length() <= 0)
             return null;
         bytes = Base64.decode(serializedIntentData, 0);
-        return deserializeNotificationIntent(context, bytes);
+        return deserializeNotification(context, bytes);
     }
 
     /* See serialization method above for explaination of fallbacks.
        This one matches it with one additional fallback: support for "old" bundle serialization.
     */
-    private static Intent deserializeNotificationIntent(Context context, byte[] bytes) {
+    private static Notification deserializeNotification(Context context, byte[] bytes) {
         ByteArrayInputStream data = new ByteArrayInputStream(bytes);
         DataInputStream in = new DataInputStream(data);
-        Intent intent = deserializeNotificationIntent(in);
-        if (intent != null)
-            return intent;
+        Notification notification = deserializeNotificationParcelable(in);
+        if (notification != null)
+            return notification;
         data.reset();
-        Notification notification = deserializeNotificationCustom(in);
+        notification = deserializeNotificationCustom(in);
         if (notification == null) {
             notification = deserializedFromOldIntent(bytes);
         }
         if (notification == null)
             return null;
-        intent = new Intent(context, UnityNotificationManager.class);
-        intent.putExtra(KEY_NOTIFICATION, notification);
-        return intent;
+        return notification;
     }
 
     private static boolean readAndCheckMagicNumber(DataInputStream in, byte[] magic) {
@@ -244,19 +241,16 @@ public class UnityNotificationUtilities {
         }
     }
 
-    private static Intent deserializeNotificationIntent(DataInputStream in) {
+    private static Notification deserializeNotificationParcelable(DataInputStream in) {
         try {
             if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER_PARCELLED))
                 return null;
             int version = in.readInt();
             if (version <0 || version > INTENT_SERIALIZATION_VERSION)
                 return null;
-            Intent result = deserializeParcelable(in);
-            // check that notification itself deserializes
-            Notification notification = result.getParcelableExtra(KEY_NOTIFICATION);
-            if (notification == null)
-                return null;
-            return result;
+            Bundle bundle = deserializeParcelable(in);
+            Notification notification = bundle.getParcelable(KEY_NOTIFICATION);
+            return notification;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
             return null;

@@ -277,7 +277,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             if (intent != null) {
                 if (this.mRescheduleOnRestart) {
                     intent.putExtra(KEY_NOTIFICATION, notification);
-                    UnityNotificationManager.saveNotificationIntent(mContext, intent);
+                    UnityNotificationManager.saveNotification(mContext, notification);
                 }
 
                 // content intent can't and shouldn't be saved, set it now and rebuild
@@ -421,12 +421,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
-    protected static synchronized void saveNotificationIntent(Context context, Intent intent) {
-        Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
+    protected static synchronized void saveNotification(Context context, Notification notification) {
         String notification_id = Integer.toString(notification.extras.getInt(KEY_ID, -1));
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
-
-        UnityNotificationUtilities.serializeNotificationIntent(prefs, intent);
+        UnityNotificationUtilities.serializeNotification(prefs, notification);
     }
 
     protected static String getSharedPrefsNameByNotificationId(String id)
@@ -444,12 +442,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
         for (String id : ids) {
             SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             Notification.Builder builder = null;
-            Intent intent = UnityNotificationUtilities.deserializeNotificationIntent(context, prefs);
-            if (intent != null) {
-                Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
-                if (notification != null)
-                    builder = UnityNotificationUtilities.recoverBuilder(context, notification);
-            }
+            Notification notification = UnityNotificationUtilities.deserializeNotification(context, prefs);
+            if (notification != null)
+                builder = UnityNotificationUtilities.recoverBuilder(context, notification);
 
             if (builder != null)
                 intent_data_list.add(builder);
