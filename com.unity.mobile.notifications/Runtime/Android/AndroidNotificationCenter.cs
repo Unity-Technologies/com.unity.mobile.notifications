@@ -383,7 +383,7 @@ namespace Unity.Notifications.Android
                 return null;
 
             var intent = s_CurrentActivity.Call<AndroidJavaObject>("getIntent");
-            var notification = intent.Call<AndroidJavaObject>("getParcelableExtra", KEY_NOTIFICATION);
+            var notification = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationFromIntent", s_CurrentActivity, intent);
             if (notification == null)
                 return null;
             return GetNotificationData(notification);
