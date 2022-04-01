@@ -274,14 +274,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             if (intent != null) {
                 UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
-
-                // rebuild here, because we're setting content intent (which can't be saved)
-                notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
-                mScheduledNotifications.put(Integer.valueOf(id), notification);
-                intent.putExtra(KEY_NOTIFICATION_ID, id);
-
-                PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
+                notification = scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
             }
         }
 
@@ -291,6 +284,21 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
             notify(mContext, id, notification);
         }
+    }
+
+    Notification scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
+        Bundle extras = notificationBuilder.getExtras();
+        int id = extras.getInt(KEY_ID, -1);
+        long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
+        // fireTime not taken from notification, because we may have adjusted it
+
+        Notification notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
+        mScheduledNotifications.put(Integer.valueOf(id), notification);
+        intent.putExtra(KEY_NOTIFICATION_ID, id);
+
+        PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
+        return notification;
     }
 
     protected static Notification buildNotificationForSending(Context context, Class openActivity, Notification.Builder builder) {
