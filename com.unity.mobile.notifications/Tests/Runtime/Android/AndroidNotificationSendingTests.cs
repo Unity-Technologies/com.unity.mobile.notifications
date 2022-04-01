@@ -184,7 +184,7 @@ class AndroidNotificationSendingTests
         var status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Scheduled, status);
 
-        yield return WaitForNotification(8.0f);
+        yield return WaitForNotification(120.0f);
         status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Delivered, status);
 
