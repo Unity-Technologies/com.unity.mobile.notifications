@@ -301,6 +301,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return notification;
     }
 
+    static void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Context context) {
+        if (mUnityNotificationManager == null)
+            return;
+
+        long fireTime = notificationBuilder.getExtras().getLong(KEY_FIRE_TIME, 0L);
+        Intent intent = buildNotificationIntent(context);
+        mUnityNotificationManager.scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
+    }
+
     protected static Notification buildNotificationForSending(Context context, Class openActivity, Notification.Builder builder) {
         int id = builder.getExtras().getInt(KEY_ID, -1);
         Intent openAppIntent = buildOpenAppIntent(context, openActivity);
