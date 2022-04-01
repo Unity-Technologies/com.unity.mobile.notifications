@@ -136,9 +136,13 @@ class AndroidNotificationSimpleTests
         {
             var dataStream = new AndroidJavaObject("java.io.DataInputStream", byteStream);
             // don't dispose notification, it is kept in AndroidNotificationIntentData
-            var deserializedNotification = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", dataStream);
-            Assert.IsNotNull(deserializedNotification);
-            return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+            using (var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", dataStream))
+            {
+                Assert.IsNotNull(deserializedNotificationBuilder);
+                var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");
+                Assert.IsNotNull(deserializedNotification);
+                return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
+            }
         }
     }
 
@@ -263,8 +267,10 @@ class AndroidNotificationSimpleTests
         if (inBetween != null)
             inBetween(prefs);
 
-        var deserializedNotification = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotification", context, prefs);
+        var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotification", context, prefs);
         // don't dispose notification, it is kept in AndroidNotificationIntentData
+        Assert.IsNotNull(deserializedNotificationBuilder);
+        var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");
         Assert.IsNotNull(deserializedNotification);
         return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
     }
@@ -350,7 +356,9 @@ class AndroidNotificationSimpleTests
         var serialized = parcel.Call<AndroidJavaObject>("marshall");
         Assert.IsNotNull(serialized);
 
-        var deserializedNotification = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotification", context, serialized);
+        var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotification", context, serialized);
+        Assert.IsNotNull(deserializedNotificationBuilder);
+        var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");
         Assert.IsNotNull(deserializedNotification);
         var notificationData = AndroidNotificationCenter.GetNotificationData(deserializedNotification);
         Assert.IsNotNull(notificationData);
