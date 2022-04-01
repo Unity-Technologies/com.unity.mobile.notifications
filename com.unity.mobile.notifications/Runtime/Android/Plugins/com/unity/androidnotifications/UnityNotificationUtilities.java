@@ -190,12 +190,12 @@ public class UnityNotificationUtilities {
         }
     }
 
-    protected static Notification deserializeNotification(Context context, SharedPreferences prefs) {
+    protected static Object deserializeNotification(Context context, SharedPreferences prefs) {
         String serializedIntentData = prefs.getString(SAVED_NOTIFICATION_PRIMARY_KEY, "");
         if (null == serializedIntentData || serializedIntentData.length() <= 0)
             return null;
         byte[] bytes = Base64.decode(serializedIntentData, 0);
-        Notification notification = deserializeNotification(context, bytes);
+        Object notification = deserializeNotification(context, bytes);
         if (notification != null)
             return notification;
         serializedIntentData = prefs.getString(SAVED_NOTIFICATION_FALLBACK_KEY, "");
@@ -208,20 +208,18 @@ public class UnityNotificationUtilities {
     /* See serialization method above for explaination of fallbacks.
        This one matches it with one additional fallback: support for "old" bundle serialization.
     */
-    private static Notification deserializeNotification(Context context, byte[] bytes) {
+    private static Object deserializeNotification(Context context, byte[] bytes) {
         ByteArrayInputStream data = new ByteArrayInputStream(bytes);
         DataInputStream in = new DataInputStream(data);
         Notification notification = deserializeNotificationParcelable(in);
         if (notification != null)
             return notification;
         data.reset();
-        notification = deserializeNotificationCustom(in);
-        if (notification == null) {
-            notification = deserializedFromOldIntent(bytes);
+        Notification.Builder builder = deserializeNotificationCustom(in);
+        if (builder == null) {
+            builder = deserializedFromOldIntent(bytes);
         }
-        if (notification == null)
-            return null;
-        return notification;
+        return builder;
     }
 
     private static boolean readAndCheckMagicNumber(DataInputStream in, byte[] magic) {
@@ -257,7 +255,7 @@ public class UnityNotificationUtilities {
         }
     }
 
-    private static Notification deserializeNotificationCustom(DataInputStream in) {
+    private static Notification.Builder deserializeNotificationCustom(DataInputStream in) {
         try {
             if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER))
                 return null;
@@ -353,14 +351,14 @@ public class UnityNotificationUtilities {
                 builder.setWhen(when);
             }
 
-            return builder.build();
+            return builder;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize notification", e);
             return null;
         }
     }
 
-    private static Notification deserializedFromOldIntent(byte[] bytes) {
+    private static Notification.Builder deserializedFromOldIntent(byte[] bytes) {
         try {
             Parcel p = Parcel.obtain();
             p.unmarshall(bytes, 0, bytes.length);
@@ -413,7 +411,7 @@ public class UnityNotificationUtilities {
                 builder.setSortKey(sortKey);
             UnityNotificationManager.setNotificationGroupAlertBehavior(builder, groupAlertBehaviour);
             builder.setShowWhen(showTimestamp);
-            return builder.build();
+            return builder;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize old style notification", e);
             return null;
