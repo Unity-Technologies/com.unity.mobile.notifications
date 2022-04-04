@@ -301,8 +301,10 @@ class AndroidNotificationSendingTests
         var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver");
         AndroidJavaObject context;
         using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+        {
             using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
                 context = activity.Call<AndroidJavaObject>("getApplicationContext");
+        }
 
         var n = new AndroidNotification();
         n.Title = "SendNotification_CanReschedule";
