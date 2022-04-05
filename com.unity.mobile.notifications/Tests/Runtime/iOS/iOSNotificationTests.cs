@@ -117,7 +117,7 @@ class iOSNotificationTests
 
         iOSNotificationCenter.ScheduleNotification(notification);
 
-        yield return WaitForNotification(6.0f);
+        yield return WaitForNotification(10.0f);
         Assert.AreEqual(1, receivedNotificationCount);
     }
 
@@ -148,7 +148,7 @@ class iOSNotificationTests
 
         iOSNotificationCenter.ScheduleNotification(notification);
 
-        yield return WaitForNotification(6.0f);
+        yield return WaitForNotification(10.0f);
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
         Assert.IsTrue(lastReceivedNotification.UserInfo.ContainsKey("key1"));
@@ -180,7 +180,7 @@ class iOSNotificationTests
         };
 
         iOSNotificationCenter.ScheduleNotification(notification);
-        yield return WaitForNotification(5.0f);
+        yield return WaitForNotification(10.0f);
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
         Assert.AreEqual(text, lastReceivedNotification.Title);
