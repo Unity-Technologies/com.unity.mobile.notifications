@@ -177,6 +177,11 @@ namespace Unity.Notifications.Android
             }
         }
 
+        /// <summary>
+        /// Set this notification to be shown when app is in the foreground.
+        /// </summary>
+        public bool ShowInForeground { get; set; }
+
         internal bool ShowCustomTimestamp { get; set; }
 
         private Color m_Color;
@@ -208,6 +213,7 @@ namespace Unity.Notifications.Android
             GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
             ShowTimestamp = false;
             ShowCustomTimestamp = false;
+            ShowInForeground = true;
 
             m_RepeatInterval = (-1L).ToTimeSpan();
             m_Color = new Color(0, 0, 0, 0);

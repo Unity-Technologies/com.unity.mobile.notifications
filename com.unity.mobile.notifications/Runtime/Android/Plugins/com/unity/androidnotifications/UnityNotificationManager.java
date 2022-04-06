@@ -1,6 +1,7 @@
 package com.unity.androidnotifications;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -21,6 +22,8 @@ import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
@@ -53,6 +56,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static final String KEY_NOTIFICATION = "unityNotification";
     protected static final String KEY_SMALL_ICON = "smallIcon";
     protected static final String KEY_CHANNEL_ID = "channelID";
+    protected static final String SHOW_IN_FOREGROUND = "showInForeground";
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -601,7 +605,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification) {
-        getNotificationManager(context).notify(id, notification);
+        boolean showInForeground = notification.extras.getBoolean(SHOW_IN_FOREGROUND, false);
+        if (!isInForeground() || showInForeground) {
+            getNotificationManager(context).notify(id, notification);
+        }
 
         try {
             mNotificationCallback.onSentNotification(notification);
@@ -733,6 +740,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         return null;
+    }
+    
+    private static boolean isInForeground() {
+        ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(appProcessInfo);
+        return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
     }
 
     public void showNotificationSettings(String channelId) {
