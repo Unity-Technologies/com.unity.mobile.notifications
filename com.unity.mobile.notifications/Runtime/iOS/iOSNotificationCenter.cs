@@ -36,7 +36,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool s_OnNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate {};
+        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate { };
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
@@ -64,7 +64,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool s_OnRemoteNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate {};
+        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate { };
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
 
@@ -94,6 +94,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Schedules a local notification for delivery.
         /// </summary>
+        /// <param name="notification">Notification to schedule</param>
         public static void ScheduleNotification(iOSNotification notification)
         {
             if (!Initialize())
@@ -105,6 +106,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Returns all notifications that are currently scheduled.
         /// </summary>
+        /// <returns>Array of scheduled notifications</returns>
         public static iOSNotification[] GetScheduledNotifications()
         {
             return NotificationDataToNotifications(iOSNotificationsWrapper.GetScheduledNotificationData());
@@ -113,6 +115,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Returns all of the app's delivered notifications that are currently shown in the Notification Center.
         /// </summary>
+        /// <returns>Array of delivered notifications</returns>
         public static iOSNotification[] GetDeliveredNotifications()
         {
             return NotificationDataToNotifications(iOSNotificationsWrapper.GetDeliveredNotificationData());
@@ -147,6 +150,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Unschedules the specified notification.
         /// </summary>
+        /// <param name="identifier">Identifier for the notification to be removed</param>
         public static void RemoveScheduledNotification(string identifier)
         {
             if (Initialize())
@@ -156,6 +160,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Removes the specified notification from Notification Center.
         /// </summary>
+        /// <param name="identifier">Identifier for the notification to be removed</param>
         public static void RemoveDeliveredNotification(string identifier)
         {
             if (Initialize())
@@ -183,6 +188,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Get the notification settings for this app.
         /// </summary>
+        /// <returns>Notification settings</returns>
         public static iOSNotificationSettings GetNotificationSettings()
         {
             return iOSNotificationsWrapper.GetNotificationSettings();

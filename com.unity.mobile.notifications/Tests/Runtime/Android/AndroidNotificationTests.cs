@@ -81,7 +81,7 @@ class AndroidNotificationTests
 
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
+            delegate (AndroidNotificationIntentData data)
         {
             receivedNotificationCount += 1;
             Assert.AreEqual(originalId, data.Id);
@@ -93,7 +93,7 @@ class AndroidNotificationTests
 
         yield return new WaitForSeconds(8.0f);
 
-        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: "  + receivedNotificationCount.ToString());
+        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: " + receivedNotificationCount.ToString());
 
         Assert.AreEqual(1, receivedNotificationCount);
 
@@ -133,7 +133,7 @@ class AndroidNotificationTests
 
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
+            delegate (AndroidNotificationIntentData data)
         {
             receivedNotificationCount += 1;
             Assert.AreEqual(originalId, data.Id);
@@ -144,7 +144,7 @@ class AndroidNotificationTests
 
         yield return new WaitForSeconds(8.0f);
 
-        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: "  + receivedNotificationCount.ToString());
+        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: " + receivedNotificationCount.ToString());
 
         Assert.AreEqual(1, receivedNotificationCount);
 
@@ -184,7 +184,7 @@ class AndroidNotificationTests
         AndroidNotificationCenter.CancelAllNotifications();
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
+            delegate (AndroidNotificationIntentData data)
         {
             receivedNotificationCount += 1;
             Assert.AreEqual(originalId, data.Id);
@@ -194,7 +194,7 @@ class AndroidNotificationTests
 
         yield return new WaitForSeconds(6.0f);
 
-        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: "  + receivedNotificationCount.ToString());
+        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: " + receivedNotificationCount.ToString());
 
         Assert.AreEqual(0, receivedNotificationCount);
 
@@ -203,7 +203,7 @@ class AndroidNotificationTests
         receivedNotificationCount = 0;
     }
 
-//    [UnityTest]
+    //    [UnityTest]
     public IEnumerator ScheduleRepeatableNotification_NotificationsAreReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -226,7 +226,7 @@ class AndroidNotificationTests
         int originalId = AndroidNotificationCenter.SendNotification(n, "default_test_channel_2");
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
+            delegate (AndroidNotificationIntentData data)
         {
             receivedNotificationCount += 1;
             Assert.AreEqual(originalId, data.Id);
@@ -359,7 +359,7 @@ class AndroidNotificationTests
 
 
         AndroidNotificationCenter.NotificationReceivedCallback receivedNotificationHandler =
-            delegate(AndroidNotificationIntentData data)
+            delegate (AndroidNotificationIntentData data)
         {
             receivedNotificationCount += 1;
 
@@ -375,7 +375,7 @@ class AndroidNotificationTests
 
         yield return new WaitForSeconds(8.0f);
 
-        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: "  + receivedNotificationCount.ToString());
+        Debug.LogWarning("SendNotification_NotificationIsReceived:::   Assert.AreEqual(1, receivedNotificationCount) receivedNotificationCount: " + receivedNotificationCount.ToString());
 
         Assert.AreEqual(1, receivedNotificationCount);
 
