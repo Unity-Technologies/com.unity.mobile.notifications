@@ -287,27 +287,37 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     Notification scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
+        return scheduleAlarmWithNotification(mContext, mOpenActivity, notificationBuilder, intent, fireTime);
+    }
+
+    static Notification scheduleAlarmWithNotification(Context context, Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
         Bundle extras = notificationBuilder.getExtras();
         int id = extras.getInt(KEY_ID, -1);
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         // fireTime not taken from notification, because we may have adjusted it
 
-        Notification notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
+        Notification notification = buildNotificationForSending(context, activityClass, notificationBuilder);
         mScheduledNotifications.put(Integer.valueOf(id), notification);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
-        PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
+        PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        UnityNotificationManager.scheduleNotificationIntentAlarm(context, repeatInterval, fireTime, broadcast);
         return notification;
     }
 
     static void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Context context) {
-        if (mUnityNotificationManager == null)
-            return;
-
         long fireTime = notificationBuilder.getExtras().getLong(KEY_FIRE_TIME, 0L);
         Intent intent = buildNotificationIntent(context);
-        mUnityNotificationManager.scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
+
+        Class openActivity;
+        if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
+            openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
+        }
+        else {
+            openActivity = mUnityNotificationManager.mOpenActivity;
+        }
+
+        scheduleAlarmWithNotification(context, openActivity, notificationBuilder, intent, fireTime);
     }
 
     protected static Notification buildNotificationForSending(Context context, Class openActivity, Notification.Builder builder) {
@@ -637,13 +647,21 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 } else {
                     Notification.Builder builder = (Notification.Builder)notification;
                     // this is different instance and does not have mOpenActivity
-                    if (builder == null || mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
+                    if (builder == null) {
                         Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
                         return;
                     }
 
+                    Class openActivity;
+                    if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
+                        openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
+                    }
+                    else {
+                        openActivity = mUnityNotificationManager.mOpenActivity;
+                    }
+
                     id = builder.getExtras().getInt(KEY_NOTIFICATION_ID, -1);
-                    notif = buildNotificationForSending(context, mUnityNotificationManager.mOpenActivity, builder);
+                    notif = buildNotificationForSending(context, openActivity, builder);
                     // if notification is not sendable, it wasn't cached
                     mScheduledNotifications.put(Integer.valueOf(id), notif);
                 }
