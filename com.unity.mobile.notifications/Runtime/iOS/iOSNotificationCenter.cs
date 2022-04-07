@@ -36,7 +36,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool s_OnNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate {};
+        private static event NotificationReceivedCallback s_OnNotificationReceived = delegate { };
 
         /// <summary>
         /// Subscribe to this event to receive a callback whenever a remote notification is received while the app is in foreground,
@@ -64,7 +64,7 @@ namespace Unity.Notifications.iOS
         }
 
         private static bool s_OnRemoteNotificationReceivedCallbackSet;
-        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate {};
+        private static event NotificationReceivedCallback s_OnRemoteNotificationReceived = delegate { };
 
         internal delegate void AuthorizationRequestCompletedCallback(iOSAuthorizationRequestData data);
 

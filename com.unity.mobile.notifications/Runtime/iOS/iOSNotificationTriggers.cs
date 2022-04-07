@@ -14,7 +14,7 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// iOSNotificationTrigger interface is implemented by notification trigger types representing an event that triggers the delivery of a notification.
     /// </summary>
-    public interface iOSNotificationTrigger {}
+    public interface iOSNotificationTrigger { }
 
     /// <summary>
     /// A trigger condition that causes a notification to be delivered when the user's device enters or exits the specified geographic region.

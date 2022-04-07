@@ -44,7 +44,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Subscribe to this event to receive callbacks whenever a scheduled notification is shown to the user.
         /// </summary>
-        public static event NotificationReceivedCallback OnNotificationReceived = delegate {};
+        public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
 
         private static AndroidJavaClass s_NotificationManagerClass;
         private static AndroidJavaObject s_NotificationManager;
