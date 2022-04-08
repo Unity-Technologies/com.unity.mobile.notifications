@@ -17,9 +17,6 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [UnityNotificationLifeCycleManager sharedInstance];
-
-        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-        center.delegate = [UnityNotificationManager sharedInstance];
     });
 }
 
@@ -49,10 +46,13 @@
              [UnityNotificationManager sharedInstance].lastReceivedNotification = NULL;
          }];
 
-        [nc addObserverForName: UIApplicationDidFinishLaunchingNotification
+        [nc addObserverForName: kUnityWillFinishLaunchingWithOptions
          object: nil
          queue: [NSOperationQueue mainQueue]
          usingBlock:^(NSNotification *notification) {
+
+             [UNUserNotificationCenter currentNotificationCenter].delegate = [UnityNotificationManager sharedInstance];
+
              BOOL authorizeOnLaunch = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityNotificationRequestAuthorizationOnAppLaunch"] boolValue];
              BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
              BOOL registerRemoteOnLaunch = supportsPushNotification == YES ?
