@@ -36,6 +36,7 @@ class iOSNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendSimpleNotification_NotificationIsReceived()
     {
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
@@ -68,6 +69,7 @@ class iOSNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendNotificationWithUserInfo_NotificationIsReceivedWithSameUserInfo()
     {
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
