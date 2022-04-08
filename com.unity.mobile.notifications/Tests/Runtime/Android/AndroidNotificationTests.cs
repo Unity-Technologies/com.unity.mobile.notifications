@@ -10,6 +10,7 @@ class AndroidNotificationTests
     private static int receivedNotificationCount = 0;
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
     {
         var testChannelId = "default_test_channel_10";
@@ -29,6 +30,7 @@ class AndroidNotificationTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void DeleteNotificationChannels_NotificationChannelsAreDeleted()
     {
         if (AndroidNotificationCenter.GetNotificationChannels().Length < 1)
@@ -49,6 +51,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotificationExplicitID_NotificationIsReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -104,6 +107,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotification_NotificationIsReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -155,6 +159,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotificationAndCancelNotification_NotificationIsNotReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -303,6 +308,7 @@ class AndroidNotificationTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void CreateNotificationChannelWithInitializedSettings_ChannelSettingsAreSaved()
     {
         var chOrig = new AndroidNotificationChannel();
@@ -330,6 +336,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotification_NotificationIsReceived_CallMainThread()
     {
         AndroidNotificationCenter.CancelAllNotifications();
