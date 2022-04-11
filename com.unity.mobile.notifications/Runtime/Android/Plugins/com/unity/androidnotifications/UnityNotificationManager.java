@@ -372,6 +372,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return intent_data_list;
     }
 
+    private static boolean canScheduleExactAlarms(AlarmManager alarmManager) {
+        // The commented-out if below is the correct one and should replace the one further down
+        // However it requires compile SDK 31 to compile, cutting edge and not shipped with Unity at the moment of writing this
+        // It means exact timing for notifications is not supported on Android 12+ out of the box
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            //return alarmManager.canScheduleExactAlarms();
+        if (Build.VERSION.SDK_INT >= 31)
+            return false;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
     // Call AlarmManager to set the broadcast intent with fire time and interval.
     protected static void scheduleNotificationIntentAlarm(Context context, Intent intent, PendingIntent broadcast) {
         long repeatInterval = intent.getLongExtra("repeatInterval", 0L);
@@ -380,7 +391,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         if (repeatInterval <= 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && canScheduleExactAlarms(alarmManager)) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, fireTime, broadcast);
             } else {
                 alarmManager.set(AlarmManager.RTC_WAKEUP, fireTime, broadcast);
