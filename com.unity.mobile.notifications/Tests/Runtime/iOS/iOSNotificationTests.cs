@@ -4,11 +4,51 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using Unity.Notifications.iOS;
+#if UNITY_EDITOR
+using Unity.Notifications;
+using UnityEditor;
+#endif
 
 class iOSNotificationTests
+    : IPrebuildSetup, IPostBuildCleanup
 {
     private static int receivedNotificationCount = 0;
     private static iOSNotification lastReceivedNotification = null;
+#if UNITY_EDITOR
+    private static iOSSdkVersion originaliOSSDK;
+    private static bool originalRequestAuthorizationOnAppLaunch;
+    private static PresentationOption originalAuthorizationOptions;
+    private static bool originalAddRemoteNotificationCapability;
+    private static bool originalRequestRemoteOnLaunch;
+#endif
+
+    public void Setup()
+    {
+#if UNITY_EDITOR
+        originaliOSSDK = PlayerSettings.iOS.sdkVersion;
+        originalRequestAuthorizationOnAppLaunch = NotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch;
+        originalAuthorizationOptions = NotificationSettings.iOSSettings.DefaultAuthorizationOptions;
+        originalAddRemoteNotificationCapability = NotificationSettings.iOSSettings.AddRemoteNotificationCapability;
+        originalRequestRemoteOnLaunch = NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch;
+
+        PlayerSettings.iOS.sdkVersion = iOSSdkVersion.SimulatorSDK;
+        NotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch = true;
+        NotificationSettings.iOSSettings.DefaultAuthorizationOptions = originalAuthorizationOptions;
+        NotificationSettings.iOSSettings.AddRemoteNotificationCapability = false;
+        NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch = false;
+#endif
+    }
+
+    public void Cleanup()
+    {
+#if UNITY_EDITOR
+        PlayerSettings.iOS.sdkVersion = originaliOSSDK;
+        NotificationSettings.iOSSettings.RequestAuthorizationOnAppLaunch = originalRequestAuthorizationOnAppLaunch;
+        NotificationSettings.iOSSettings.DefaultAuthorizationOptions = originalAuthorizationOptions;
+        NotificationSettings.iOSSettings.AddRemoteNotificationCapability = originalAddRemoteNotificationCapability;
+        NotificationSettings.iOSSettings.NotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch = originalRequestRemoteOnLaunch;
+#endif
+    }
 
     [OneTimeSetUp]
     public void BeforeTests()
@@ -36,6 +76,7 @@ class iOSNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendSimpleNotification_NotificationIsReceived()
     {
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()
@@ -68,6 +109,7 @@ class iOSNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendNotificationWithUserInfo_NotificationIsReceivedWithSameUserInfo()
     {
         var timeTrigger = new iOSNotificationTimeIntervalTrigger()

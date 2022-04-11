@@ -10,6 +10,7 @@ class AndroidNotificationTests
     private static int receivedNotificationCount = 0;
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void CreateNotificationChannel_NotificationChannelIsCreated()
     {
         var testChannelId = "default_test_channel_10";
@@ -29,6 +30,7 @@ class AndroidNotificationTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void DeleteNotificationChannels_NotificationChannelsAreDeleted()
     {
         if (AndroidNotificationCenter.GetNotificationChannels().Length < 1)
@@ -49,6 +51,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotificationExplicitID_NotificationIsReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -104,6 +107,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotification_NotificationIsReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -155,6 +159,7 @@ class AndroidNotificationTests
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotificationAndCancelNotification_NotificationIsNotReceived()
     {
         AndroidNotificationCenter.CancelAllNotifications();
@@ -303,6 +308,7 @@ class AndroidNotificationTests
     }
 
     [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void CreateNotificationChannelWithInitializedSettings_ChannelSettingsAreSaved()
     {
         var chOrig = new AndroidNotificationChannel();
@@ -314,7 +320,8 @@ class AndroidNotificationTests
         chOrig.CanShowBadge = true;
         chOrig.EnableLights = true;
         chOrig.EnableVibration = false;
-        chOrig.LockScreenVisibility = LockScreenVisibility.Private;
+        // read-only
+        //chOrig.LockScreenVisibility = LockScreenVisibility.Private;
 
         AndroidNotificationCenter.RegisterNotificationChannel(chOrig);
 
@@ -326,10 +333,11 @@ class AndroidNotificationTests
         Assert.AreEqual(chOrig.Importance, ch.Importance);
         Assert.AreEqual(chOrig.EnableLights, ch.EnableLights);
         Assert.AreEqual(chOrig.EnableVibration, ch.EnableVibration);
-        Assert.AreEqual(chOrig.LockScreenVisibility, ch.LockScreenVisibility);
+        //Assert.AreEqual(chOrig.LockScreenVisibility, ch.LockScreenVisibility);
     }
 
     [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotification_NotificationIsReceived_CallMainThread()
     {
         AndroidNotificationCenter.CancelAllNotifications();

@@ -1,14 +1,38 @@
 test_editors:
   - version: trunk
-  - version: 2020.2
-  - version: 2020.1
-  - version: 2019.4
+  - version: 2022.1
+  - version: 2021.2
+  - version: 2020.3
+
+ios_test_editors:
+  - version: trunk
+  - version: 2022.1
+  - version: 2021.2
+  - version: 2020.3
 
 test_platforms:
   - name: mac
     type: Unity::VM::osx
     image: package-ci/mac:stable
     flavor: m1.mac
+
+artifactory:
+  production: https://artifactory.prd.it.unity3d.com/artifactory/api/
+
+mobile_dependencies:
+  - unity_test_framework:
+    name: com.unity.test-framework.build
+    version: 0.0.1-preview.12
+  - performance_test_framework:
+    name: com.unity.test-framework.utp-reporter
+    version: 1.0.0-preview
+  - mobile_notifications:
+    name: com.unity.mobile.notifications
+    version: file:../../com.unity.mobile.notifications
+
+utr:
+  url_win: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat
+  url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
 
 ---
 pack:
@@ -53,6 +77,73 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
+{% for editor in test_editors %}
+test_Android_{{ editor.version }}:
+  name: Test {{ editor.version }} on Android
+  agent:
+    type: Unity::mobile::shield
+    image: mobile/android-execution-r19:stable
+    flavor: b1.medium
+  commands:
+    - choco source add -n Unity -s {{ artifactory.production }}nuget/unity-choco-local
+    - choco install unity-config
+    - unity-config settings editor-path .Editor
+    - unity-config project create .MyTestProject
+{%- for dependency in mobile_dependencies -%}
+    - unity-config project add dependency {{dependency.name}}@{{dependency.version}} --project-path .MyTestProject
+{%- endfor -%}
+    - unity-config project add testable com.unity.mobile.notifications
+    - curl -s {{ utr.url_win }} --output utr.bat
+    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
+    - utr.bat --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - |
+       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
+       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       utr.bat --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
+  after:
+    - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+    - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d > upm-ci~/test-results/android/android_device_log.txt
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/upm-ci.yml#pack
+{% endfor %}
+
+{% for editor in ios_test_editors %}
+test_iOS_{{ editor.version }}:
+  name: Test {{ editor.version }} on iOS
+  agent:
+    type: Unity::VM::osx
+    image: mobile/ios-macos-10.15:latest
+    flavor: i1.large
+  variables:
+    IOS_SIMULATOR_SDK: 1
+  commands:
+    - brew tap --force-auto-update unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew install unity-config
+    - unity-config settings editor-path .Editor
+    - unity-config project create .MyTestProject
+{%- for dependency in mobile_dependencies -%}
+    - unity-config project add dependency {{dependency.name}}@{{dependency.version}} --project-path .MyTestProject
+{%- endfor -%}
+    - unity-config project add testable com.unity.mobile.notifications
+    - curl -s {{ utr.url_unix }} --output utr
+    - chmod u+x utr
+    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - ./utr --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - ./utr --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/upm-ci.yml#pack
+{% endfor %}
+
 test_trigger:
   name: Tests Trigger
   agent:
@@ -78,6 +169,7 @@ test_trigger:
     {% for platform in test_platforms %}
     - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
+    - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
     {% endfor %}
 
 publish:
@@ -86,6 +178,8 @@ publish:
     type: Unity::VM
     image: package-ci/win10:stable
     flavor: b1.large
+  variables:
+    UPMCI_ENABLE_PACKAGE_SIGNING: 1
   commands:
     - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
     - upm-ci package publish --package-path com.unity.mobile.notifications
