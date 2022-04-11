@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using Unity.Notifications.iOS;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 namespace Unity.Notifications
 {
@@ -47,10 +48,18 @@ namespace Unity.Notifications
             return new NotificationSettingsProvider("Project/Mobile Notifications", SettingsScope.Project);
         }
 
+        public override void OnActivate(string searchContext, VisualElement rootElement)
+        {
+            base.OnActivate(searchContext, rootElement);
+            // in case of domain reload (enter-exit play mode, this gets lost)
+            if (m_SettingsManager == null)
+                Initialize();
+        }
+
         public override void OnDeactivate()
         {
+            base.OnDeactivate();
             m_SettingsManager.SaveSettings(false);
-            SettingsService.NotifySettingsProviderChanged();
         }
 
         private void Initialize()
@@ -212,6 +221,9 @@ namespace Unity.Notifications
 
         public override void OnGUI(string searchContext)
         {
+            if (m_SettingsManager == null)
+                Initialize();
+
             // This has to be called to sync all the changes between m_SettingsManager and m_SettingsManagerObject.
             if (m_SettingsManagerObject.targetObject != null)
                 m_SettingsManagerObject.Update();
@@ -223,7 +235,12 @@ namespace Unity.Notifications
 
             // Draw the toolbar for Android/iOS.
             var toolBarRect = new Rect(totalRect.x, totalRect.y, totalRect.width, k_ToolbarHeight);
-            m_SettingsManager.ToolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
+            var toolbarIndex = GUI.Toolbar(toolBarRect, m_SettingsManager.ToolbarIndex, k_ToolbarStrings);
+            if (toolbarIndex != m_SettingsManager.ToolbarIndex)
+            {
+                m_SettingsManager.ToolbarIndex = toolbarIndex;
+                m_SettingsManager.SaveSettings();
+            }
 
             var notificationSettingsRect = new Rect(totalRect.x, k_ToolbarHeight + 2, totalRect.width, totalRect.height - k_ToolbarHeight - k_Padding);
 
