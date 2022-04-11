@@ -112,7 +112,7 @@ namespace Unity.Notifications
 
                 applicationXmlNode.AppendChild(notificationManagerReceiver);
             }
-            notificationManagerReceiver.SetAttribute("exported", kAndroidNamespaceURI, "true");
+            notificationManagerReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
 
             // Create notification restart-on-boot receiver if necessary.
             if (notificationRestartOnBootReceiver == null)
@@ -130,6 +130,7 @@ namespace Unity.Notifications
                 applicationXmlNode.AppendChild(notificationRestartOnBootReceiver);
             }
             notificationRestartOnBootReceiver.SetAttribute("enabled", kAndroidNamespaceURI, "false");
+            notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
         }
 
         internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name)
