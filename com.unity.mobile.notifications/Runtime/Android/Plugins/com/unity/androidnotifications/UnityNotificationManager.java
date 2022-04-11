@@ -56,7 +56,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static final String KEY_NOTIFICATION = "unityNotification";
     protected static final String KEY_SMALL_ICON = "smallIcon";
     protected static final String KEY_CHANNEL_ID = "channelID";
-    protected static final String SHOW_IN_FOREGROUND = "showInForeground";
+    protected static final String SHOW_IN_FOREGROUND = "com.unity.showInForeground";
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
