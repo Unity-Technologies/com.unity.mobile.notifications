@@ -13,6 +13,39 @@
 
 #import "UnityNotificationData.h"
 
+
+static NSString* ParseNotificationDataObject(id obj)
+{
+    if ([obj isKindOfClass: [NSString class]])
+        return obj;
+    else if ([obj isKindOfClass: [NSNumber class]])
+    {
+        NSNumber* numberVal = obj;
+        if (CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(obj)))
+            return numberVal.boolValue ? @"true" : @"false";
+        return numberVal.stringValue;
+    }
+    else if ([NSJSONSerialization isValidJSONObject: obj])
+    {
+        NSError* error;
+        NSData* data = [NSJSONSerialization dataWithJSONObject: obj options: NSJSONWritingPrettyPrinted error: &error];
+        if (data)
+        {
+            NSString* v = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+            return v;
+        }
+        else
+        {
+            NSLog(@"Failed parsing notification userInfo value: %@", error);
+        }
+    }
+    else
+        NSLog(@"Failed parsing notification userInfo value");
+
+    NSObject* o = obj;
+    return o.description;
+}
+
 NotificationSettingsData UNNotificationSettingsToNotificationSettingsData(UNNotificationSettings* settings)
 {
     NotificationSettingsData settingsData;
@@ -49,7 +82,7 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->userInfo = NULL;
 }
 
-void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
+static void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
 {
     NSDictionary* userInfo = request.content.userInfo;
     NSObject* customizedData = [userInfo objectForKey: @"data"];
@@ -62,32 +95,9 @@ void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRe
     }
 
     // For push notifications, we have to handle more cases.
-    NSString* strData;
-    if ([NSJSONSerialization isValidJSONObject: customizedData])
-    {
-        NSError* error;
-        NSData* data = [NSJSONSerialization dataWithJSONObject: customizedData options: NSJSONWritingPrettyPrinted error: &error];
-        if (!data)
-        {
-            NSLog(@"Failed parsing notification userInfo[\"data\"]: %@", error);
-            return;
-        }
-
-        strData = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-    }
-    else
-    {
-        // Convert bool defined with true/false in payload to "true"/"false", otherwise it will be converted to 1/0.
-        if ([customizedData isKindOfClass: [NSNumber class]] && CFBooleanGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(customizedData)))
-        {
-            NSNumber* number = (NSNumber*)customizedData;
-            strData = number.boolValue ? @"true" : @"false";
-        }
-        else
-        {
-            strData = customizedData.description;
-        }
-    }
+    NSString* strData = ParseNotificationDataObject(customizedData);
+    if (strData == nil)
+        NSLog(@"Failed parsing notification userInfo[\"data\"]");
 
     NSMutableDictionary* parsedUserInfo = [NSMutableDictionary dictionaryWithDictionary: userInfo];
     [parsedUserInfo setValue: strData forKey: @"data"];
@@ -216,21 +226,11 @@ void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit
     NSDictionary* dict = (__bridge NSDictionary*)nsDict;
     [dict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         NSString* k = key;
-        if ([obj isKindOfClass: [NSString class]])
-        {
-            NSString* v = obj;
+        NSString* v = ParseNotificationDataObject(obj);
+        if (v != nil)
             callback(csDict, k.UTF8String, v.UTF8String);
-        }
         else
-        {
-            NSError* error;
-            NSData* data = [NSJSONSerialization dataWithJSONObject: obj options: NSJSONWritingPrettyPrinted error: &error];
-            if (data)
-            {
-                NSString* v = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-                callback(csDict, k.UTF8String, v.UTF8String);
-            }
-        }
+            NSLog(@"Failed to parse value for key '%@'", key);
     }];
 }
 
