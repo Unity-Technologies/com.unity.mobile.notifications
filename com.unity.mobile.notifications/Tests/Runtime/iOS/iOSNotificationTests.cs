@@ -74,6 +74,7 @@ class iOSNotificationTests
     {
         receivedNotificationCount = 0;
         lastReceivedNotification = null;
+        iOSNotificationCenter.RemoveAllScheduledNotifications();
     }
 #endif
 
@@ -158,7 +159,7 @@ class iOSNotificationTests
     IEnumerator SendNotificationUsingCalendarTrigger_NotificationIsReceived(string text, bool useUtc)
     {
         var dateTime = useUtc ? DateTime.UtcNow : DateTime.Now;
-        var dt = dateTime.AddSeconds(3);
+        var dt = dateTime.AddSeconds(5);
         var trigger = new iOSNotificationCalendarTrigger()
         {
             Year = dt.Year,
@@ -180,6 +181,7 @@ class iOSNotificationTests
         };
 
         iOSNotificationCenter.ScheduleNotification(notification);
+        Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, Now: {dateTime}, Notification should arrive on: {dt}");
         yield return WaitForNotification(10.0f);
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
