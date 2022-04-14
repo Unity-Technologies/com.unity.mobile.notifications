@@ -19,17 +19,6 @@ test_platforms:
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
 
-mobile_dependencies:
-  - unity_test_framework:
-    name: com.unity.test-framework.build
-    version: 0.0.1-preview.12
-  - performance_test_framework:
-    name: com.unity.test-framework.utp-reporter
-    version: 1.0.0-preview
-  - mobile_notifications:
-    name: com.unity.mobile.notifications
-    version: file:../../com.unity.mobile.notifications
-
 utr:
   url_win: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat
   url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
@@ -114,20 +103,12 @@ test_iOS_{{ editor.version }}:
   variables:
     IOS_SIMULATOR_SDK: 1
   commands:
-    - brew tap --force-auto-update unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
-    - brew install unity-config
-    - unity-config settings editor-path .Editor
-    - unity-config project create .MyTestProject
-{%- for dependency in mobile_dependencies -%}
-    - unity-config project add dependency {{dependency.name}}@{{dependency.version}} --project-path .MyTestProject
-{%- endfor -%}
-    - unity-config project add testable com.unity.mobile.notifications
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
     - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
-    - ./utr --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
-    - ./utr --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
+    - ./utr --testproject=TestProjects\com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - ./utr --testproject=TestProjects\com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
   artifacts:
     packages:
       paths:
