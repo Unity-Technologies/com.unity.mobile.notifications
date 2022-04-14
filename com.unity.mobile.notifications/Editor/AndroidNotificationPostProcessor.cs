@@ -24,8 +24,8 @@ namespace Unity.Notifications
 
         private void MinSdkCheck()
         {
-#if !UNITY_2020_2_OR_NEWER
-        // API level 21 not supported since 2020.2, need to check for prior releases
+#if !UNITY_2021_2_OR_NEWER
+        // API level 21 not supported since 2021.2, need to check for prior releases
         const AndroidSdkVersions kMinAndroidSdk = AndroidSdkVersions.AndroidApiLevel21;
 
         if (PlayerSettings.Android.minSdkVersion < AndroidSdkVersions.AndroidApiLevel21)
