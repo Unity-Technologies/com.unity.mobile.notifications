@@ -85,22 +85,14 @@ test_Android_{{ editor.version }}:
     image: mobile/android-execution-r19:stable
     flavor: b1.medium
   commands:
-    - choco source add -n Unity -s {{ artifactory.production }}nuget/unity-choco-local
-    - choco install unity-config
-    - unity-config settings editor-path .Editor
-    - unity-config project create .MyTestProject
-{%- for dependency in mobile_dependencies -%}
-    - unity-config project add dependency {{dependency.name}}@{{dependency.version}} --project-path .MyTestProject
-{%- endfor -%}
-    - unity-config project add testable com.unity.mobile.notifications
     - curl -s {{ utr.url_win }} --output utr.bat
     - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
-    - utr.bat --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - utr.bat --testproject=TestProjects\com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-       utr.bat --testproject=.MyTestProject --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
+       utr.bat --testproject=TestProjects\com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
   after:
     - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
     - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d > upm-ci~/test-results/android/android_device_log.txt
