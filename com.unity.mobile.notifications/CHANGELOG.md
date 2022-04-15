@@ -2,6 +2,16 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.0.1] - 2022-04-15
+
+### Fixes:
+- [Android] Change exported attribute to false in the manifest for package receivers.
+- [Android] [issue 144](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/144) Fix Transaction.TooLargeException exception on some devices for notifications with large icons or more content.
+- [Android] [issue 160](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/160) Fix UnityNotificationRestartOnBootReceiver not setting FLAG_IMMUTABLE.
+
+### Changes & Improvements:
+- [Android] Build will now fail if minimum SDK in Unity is lower than supported by package.
+
 ## [2.0.0] - 2022-02-02
 
 ### Fixes:
