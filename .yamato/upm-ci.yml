@@ -178,9 +178,7 @@ test_trigger:
     {% endfor %}
     {% endfor %}
     {% for editor in android_test_editors %}
-    {% for platform in test_platforms %}
     - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
-    {% endfor %}
     {% endfor %}
 
 publish:
