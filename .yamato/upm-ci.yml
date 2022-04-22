@@ -3,6 +3,13 @@ test_editors:
   - version: 2022.1
   - version: 2021.3
   - version: 2020.3
+  - version: 2019.4
+
+test_players:
+  - version: trunk
+  - version: 2022.1
+  - version: 2021.3
+  - version: 2020.3
 
 test_platforms:
   - name: mac
@@ -60,7 +67,7 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-{% for editor in test_editors %}
+{% for editor in test_players %}
 test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
@@ -87,7 +94,7 @@ test_Android_{{ editor.version }}:
     - .yamato/upm-ci.yml#pack
 {% endfor %}
 
-{% for editor in test_editors %}
+{% for editor in test_players %}
 test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
