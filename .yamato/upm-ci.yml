@@ -3,6 +3,13 @@ test_editors:
   - version: 2022.1
   - version: 2021.3
   - version: 2020.3
+  - version: 2019.4
+
+android_test_editors:
+  - version: trunk
+  - version: 2022.1
+  - version: 2021.3
+  - version: 2020.3
 
 ios_test_editors:
   - version: trunk
@@ -77,7 +84,7 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-{% for editor in test_editors %}
+{% for editor in android_test_editors %}
 test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
@@ -169,6 +176,8 @@ test_trigger:
     {% for platform in test_platforms %}
     - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
+    {% endfor %}
+    {% for editor in android_test_editors %}
     - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
     {% endfor %}
 
