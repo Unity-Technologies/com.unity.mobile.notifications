@@ -113,6 +113,8 @@ public class UnityNotificationUtilities {
             return true;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification as Parcel", e);
+        } catch (OutOfMemoryError e) {
+            Log.e(TAG_UNITY, "Failed to serialize notification as Parcel", e);
         }
 
         return false;
@@ -186,8 +188,11 @@ public class UnityNotificationUtilities {
             return result;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize Parcelable", e);
-            return null;
+        } catch (OutOfMemoryError e) {
+            Log.e(TAG_UNITY, "Failed to serialize Parcelable", e);
         }
+
+        return null;
     }
 
     protected static Object deserializeNotification(Context context, SharedPreferences prefs) {
@@ -251,8 +256,11 @@ public class UnityNotificationUtilities {
             return notification;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
-            return null;
+        } catch (OutOfMemoryError e) {
+            Log.e(TAG_UNITY, "Failed to deserialize notification intent", e);
         }
+
+        return null;
     }
 
     private static Notification.Builder deserializeNotificationCustom(DataInputStream in) {
@@ -354,8 +362,11 @@ public class UnityNotificationUtilities {
             return builder;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize notification", e);
-            return null;
+        } catch (OutOfMemoryError e) {
+            Log.e(TAG_UNITY, "Failed to deserialize notification", e);
         }
+
+        return null;
     }
 
     private static Notification.Builder deserializedFromOldIntent(byte[] bytes) {
@@ -414,8 +425,11 @@ public class UnityNotificationUtilities {
             return builder;
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to deserialize old style notification", e);
-            return null;
+        } catch (OutOfMemoryError e) {
+            Log.e(TAG_UNITY, "Failed to deserialize old style notification", e);
         }
+
+        return null;
     }
 
     private static String deserializeString(DataInputStream in) throws IOException {
@@ -448,6 +462,8 @@ public class UnityNotificationUtilities {
                 return b.getParcelable("obj");
             }
         } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to deserialize parcelable", e);
+        } catch (OutOfMemoryError e) {
             Log.e(TAG_UNITY, "Failed to deserialize parcelable", e);
         }
 
