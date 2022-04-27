@@ -36,6 +36,7 @@ namespace Unity.Notifications.Tests.Sample
         [TextArea] public string IntentData = "";
         public bool ShowTimestamp = false;
         public long RepeatInterval;
+        public bool ShowInForeground = true;
 #endif
     }
 }
