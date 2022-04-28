@@ -475,4 +475,30 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(original.SmallIcon, deserializedData.Notification.SmallIcon);
         Assert.AreEqual(original.LargeIcon, deserializedData.Notification.LargeIcon);
     }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CanDeserializeCustomSerializedNotification_v0()
+    {
+        const int notificationId = 245;
+
+        var original = CreateNotificationWithAllParameters();
+
+        AndroidNotificationIntentData deserialized;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            // put something to extrax to force completely custom serialization of them
+            var bitmap = CreateBitmap();
+            Assert.IsNotNull(bitmap);
+            var extras = builder.Call<AndroidJavaObject>("getExtras");
+            extras.Call("putParcelable", "binder_item", bitmap);
+
+            // Serialize like we did in version 0
+            deserialized = SerializeDeserializeNotification(builder, "serializeNotificationCustom_v0");
+        }
+
+        Assert.IsNotNull(deserialized);
+        original.ShowInForeground = true;  // v0 did not have this, so should default to true
+        CheckNotificationsMatch(original, deserialized.Notification);
+    }
 }
