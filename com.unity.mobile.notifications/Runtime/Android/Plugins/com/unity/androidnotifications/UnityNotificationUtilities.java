@@ -29,13 +29,14 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_LARGE_
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_NOTIFICATION;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT_INTERVAL;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_ICON;
+import static com.unity.androidnotifications.UnityNotificationManager.SHOW_IN_FOREGROUND;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 public class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
     private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
     private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
-    private static final int NOTIFICATION_SERIALIZATION_VERSION = 0;
+    private static final int NOTIFICATION_SERIALIZATION_VERSION = 1;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
 
     private static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
@@ -144,6 +145,7 @@ public class UnityNotificationUtilities {
                 out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
                 out.writeBoolean(showWhen);
                 serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
+                out.writeBoolean(notification.extras.getBoolean(SHOW_IN_FOREGROUND, true));
             }
 
             serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
@@ -275,7 +277,7 @@ public class UnityNotificationUtilities {
             int id = 0;
             String title, text, smallIcon, largeIcon, bigText, intentData;
             long fireTime, repeatInterval;
-            boolean usesStopWatch, showWhen;
+            boolean usesStopWatch, showWhen, showInForeground = true;
             Bundle extras = null;
             try {
                 extras = deserializeParcelable(in);
@@ -296,6 +298,8 @@ public class UnityNotificationUtilities {
                 usesStopWatch = in.readBoolean();
                 showWhen = in.readBoolean();
                 intentData = deserializeString(in);
+                if (version > 0)
+                    showInForeground = in.readBoolean();
             } else {
                 title = extras.getString(Notification.EXTRA_TITLE);
                 text = extras.getString(Notification.EXTRA_TEXT);
@@ -335,6 +339,7 @@ public class UnityNotificationUtilities {
                     builder.getExtras().putLong(KEY_REPEAT_INTERVAL, repeatInterval);
                 if (intentData != null)
                     builder.getExtras().putString(KEY_INTENT_DATA, intentData);
+                builder.getExtras().putBoolean(SHOW_IN_FOREGROUND, showInForeground);
             }
             if (title != null)
                 builder.setContentTitle(title);
