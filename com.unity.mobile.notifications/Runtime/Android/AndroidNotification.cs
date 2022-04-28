@@ -178,7 +178,7 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// Set this notification to be shown when app is in the foreground.
+        /// Set this notification to be shown when app is in the foreground (default: true).
         /// </summary>
         public bool ShowInForeground
         {
