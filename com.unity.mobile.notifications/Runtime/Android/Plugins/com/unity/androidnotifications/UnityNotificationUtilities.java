@@ -249,7 +249,7 @@ public class UnityNotificationUtilities {
             if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER_PARCELLED))
                 return null;
             int version = in.readInt();
-            if (version <0 || version > INTENT_SERIALIZATION_VERSION)
+            if (version < 0 || version > INTENT_SERIALIZATION_VERSION)
                 return null;
             Intent intent = deserializeParcelable(in);
             Notification notification = intent.getParcelableExtra(KEY_NOTIFICATION);
