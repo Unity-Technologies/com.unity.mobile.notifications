@@ -329,4 +329,27 @@ class AndroidNotificationSendingTests
 
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
     }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator SendNotificationNotShownInForeground_IsDeliveredButNotShown()
+    {
+        var n = new AndroidNotification();
+        n.Title = "SendNotificationNotShownInForeground_ISDeliveredButNotShown";
+        n.Text = "SendNotificationNotShownInForeground_ISDeliveredButNotShown Text";
+        n.FireTime = System.DateTime.Now;
+        n.ShowInForeground = false;
+
+        Debug.LogWarning("SendNotificationNotShownInForeground_ISDeliveredButNotShown sends notification");
+
+        int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
+        yield return WaitForNotification(5.0f);
+
+        Debug.LogWarning("SendNotificationNotShownInForeground_ISDeliveredButNotShown sends completed");
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        yield return new WaitForSeconds(2.0f);  // give some time, since on some devices we don't immediately get infor on delivered notifications
+        var status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
+        Assert.AreEqual(NotificationStatus.Unknown, status);  // status should be unknown, rather than Delivered
+    }
 }
