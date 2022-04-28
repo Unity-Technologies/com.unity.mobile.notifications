@@ -497,7 +497,7 @@ namespace Unity.Notifications.Android
                 notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
                 notification.FireTime = extras.Call<long>("getLong", KEY_FIRE_TIME, -1L).ToDatetime();
                 notification.RepeatInterval = extras.Call<long>("getLong", KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
-                notification.ShowInForeground = extras.Call<bool>("getBoolean", SHOW_IN_FOREGROUND, false);
+                notification.ShowInForeground = extras.Call<bool>("getBoolean", SHOW_IN_FOREGROUND, true);
 
                 if (extras.Call<bool>("containsKey", Notification_EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;

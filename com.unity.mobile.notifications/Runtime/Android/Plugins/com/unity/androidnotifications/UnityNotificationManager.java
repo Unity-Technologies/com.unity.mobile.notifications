@@ -681,7 +681,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification) {
-        boolean showInForeground = notification.extras.getBoolean(SHOW_IN_FOREGROUND, false);
+        boolean showInForeground = notification.extras.getBoolean(SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
             getNotificationManager(context).notify(id, notification);
         }
@@ -809,7 +809,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         return null;
     }
-    
+
     private static boolean isInForeground() {
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(appProcessInfo);
