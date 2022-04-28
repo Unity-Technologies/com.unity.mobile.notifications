@@ -60,7 +60,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
     protected static final String KEY_SMALL_ICON = "smallIcon";
     protected static final String KEY_CHANNEL_ID = "channelID";
-    protected static final String SHOW_IN_FOREGROUND = "com.unity.showInForeground";
+    protected static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -681,7 +681,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification) {
-        boolean showInForeground = notification.extras.getBoolean(SHOW_IN_FOREGROUND, true);
+        boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
             getNotificationManager(context).notify(id, notification);
         }

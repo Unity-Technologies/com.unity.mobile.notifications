@@ -29,7 +29,7 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_LARGE_
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_NOTIFICATION;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT_INTERVAL;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_ICON;
-import static com.unity.androidnotifications.UnityNotificationManager.SHOW_IN_FOREGROUND;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_SHOW_IN_FOREGROUND;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 public class UnityNotificationUtilities {
@@ -145,7 +145,7 @@ public class UnityNotificationUtilities {
                 out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
                 out.writeBoolean(showWhen);
                 serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
-                out.writeBoolean(notification.extras.getBoolean(SHOW_IN_FOREGROUND, true));
+                out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
             }
 
             serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
@@ -339,7 +339,7 @@ public class UnityNotificationUtilities {
                     builder.getExtras().putLong(KEY_REPEAT_INTERVAL, repeatInterval);
                 if (intentData != null)
                     builder.getExtras().putString(KEY_INTENT_DATA, intentData);
-                builder.getExtras().putBoolean(SHOW_IN_FOREGROUND, showInForeground);
+                builder.getExtras().putBoolean(KEY_SHOW_IN_FOREGROUND, showInForeground);
             }
             if (title != null)
                 builder.setContentTitle(title);

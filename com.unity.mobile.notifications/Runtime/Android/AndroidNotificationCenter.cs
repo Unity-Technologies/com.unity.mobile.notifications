@@ -66,7 +66,7 @@ namespace Unity.Notifications.Android
         private static AndroidJavaObject KEY_REPEAT_INTERVAL;
         private static AndroidJavaObject KEY_NOTIFICATION;
         private static AndroidJavaObject KEY_SMALL_ICON;
-        private static AndroidJavaObject SHOW_IN_FOREGROUND;
+        private static AndroidJavaObject KEY_SHOW_IN_FOREGROUND;
 
         /// <summary>
         /// Initialize the AndroidNotificationCenter class.
@@ -116,7 +116,7 @@ namespace Unity.Notifications.Android
             KEY_REPEAT_INTERVAL = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
             KEY_NOTIFICATION = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
             KEY_SMALL_ICON = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
-            SHOW_IN_FOREGROUND = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("SHOW_IN_FOREGROUND");
+            KEY_SHOW_IN_FOREGROUND = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_SHOW_IN_FOREGROUND");
 
             s_Initialized = true;
 #endif
@@ -469,7 +469,7 @@ namespace Unity.Notifications.Android
                 extras.Call("putInt", KEY_ID, id);
                 extras.Call("putLong", KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
                 extras.Call("putLong", KEY_FIRE_TIME, fireTime);
-                extras.Call("putBoolean", SHOW_IN_FOREGROUND, notification.ShowInForeground);
+                extras.Call("putBoolean", KEY_SHOW_IN_FOREGROUND, notification.ShowInForeground);
                 if (!string.IsNullOrEmpty(notification.IntentData))
                     extras.Call("putString", KEY_INTENT_DATA, notification.IntentData);
             }
@@ -497,7 +497,7 @@ namespace Unity.Notifications.Android
                 notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
                 notification.FireTime = extras.Call<long>("getLong", KEY_FIRE_TIME, -1L).ToDatetime();
                 notification.RepeatInterval = extras.Call<long>("getLong", KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
-                notification.ShowInForeground = extras.Call<bool>("getBoolean", SHOW_IN_FOREGROUND, true);
+                notification.ShowInForeground = extras.Call<bool>("getBoolean", KEY_SHOW_IN_FOREGROUND, true);
 
                 if (extras.Call<bool>("containsKey", Notification_EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
