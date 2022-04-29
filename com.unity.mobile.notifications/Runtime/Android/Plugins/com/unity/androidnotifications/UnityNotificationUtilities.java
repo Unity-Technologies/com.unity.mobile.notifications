@@ -33,6 +33,12 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_SHOW_I
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 public class UnityNotificationUtilities {
+    /*
+        We serialize notifications and save them to shared prefs, so that if app is killed, we can recreate them.
+        The serialized BLOB starts with a four byte magic number descibing serialization type, followed by an integer version.
+        IMPORTANT: IF YOU DO A CHANGE THAT AFFECTS THE LAYOUT, BUMP THE VERSION, AND ENSURE OLD VERSION STILL DESERIALIZES. ADD TEST.
+        In real life app can get updated having old serialized notifications present, so we should be able to deserialize them.
+    */
     // magic stands for "Unity Mobile Notifications Notification"
     private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
     private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
