@@ -21,6 +21,7 @@ namespace Unity.Notifications.Tests.Sample
         private Logger m_LOGGER;
         private int _notificationExplicitID;
         private Button ButtonModifyExplicitID;
+        private Button ButtonCancelExplicitID;
 
         public int notificationExplicitID
         {
@@ -30,6 +31,7 @@ namespace Unity.Notifications.Tests.Sample
                 _notificationExplicitID = value;
                 bool buttonsEnabled = _notificationExplicitID != 0;
                 ButtonModifyExplicitID.interactable = buttonsEnabled;
+                ButtonCancelExplicitID.interactable = buttonsEnabled;
             }
         }
 
@@ -116,6 +118,7 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
             m_groups["Modify"]["Modify pending Explicit notification"] = new Action(() => { ModifyExplicitNotification(); });
+            m_groups["Modify"]["Cancel pending Explicit notification"] = new Action(() => { CancelExplicitNotification(); });
 
             m_groups["Send"] = new OrderedDictionary();
             foreach (AndroidNotificationTemplate template in Resources.LoadAll("AndroidNotifications", typeof(AndroidNotificationTemplate)))
@@ -231,6 +234,8 @@ namespace Unity.Notifications.Tests.Sample
             }
             ButtonModifyExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
             ButtonModifyExplicitID.interactable = false;
+            ButtonCancelExplicitID = GameObject.Find("Modify/Cancel pending Explicit notification").GetComponent<Button>();
+            ButtonCancelExplicitID.interactable = false;
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
         }
 
@@ -246,6 +251,14 @@ namespace Unity.Notifications.Tests.Sample
             m_LOGGER
                 .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                 .Properties(template, 1);
+        }
+
+        public void CancelExplicitNotification()
+        {
+            AndroidNotificationCenter.CancelScheduledNotification(notificationExplicitID);
+            notificationExplicitID = 0;
+            m_LOGGER
+                .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
         }
 
         public void SendNotification(AndroidNotification notification, string channel = "default_channel", int notificationID = 0, bool log = true)
