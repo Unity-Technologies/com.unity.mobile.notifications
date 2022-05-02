@@ -427,11 +427,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        StatusBarNotification[] active = getNotificationManager(context).getActiveNotifications();
-        for (StatusBarNotification notification : active) {
-            // any notifications in status bar are still valid
-            String id = String.valueOf(notification.getId());
-            invalid.remove(id);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            StatusBarNotification[] active = getNotificationManager(context).getActiveNotifications();
+            for (StatusBarNotification notification : active) {
+                // any notifications in status bar are still valid
+                String id = String.valueOf(notification.getId());
+                invalid.remove(id);
+            }
         }
 
         // if app is launched with notification, user still has access to it
