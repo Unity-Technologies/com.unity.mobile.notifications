@@ -297,7 +297,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         // fireTime not taken from notification, because we may have adjusted it
 
         Notification notification = buildNotificationForSending(context, activityClass, notificationBuilder);
-        mScheduledNotifications.put(Integer.valueOf(id), notification);
+        putScheduledNotification(Integer.valueOf(id), notification);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
         PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -404,8 +404,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
         synchronized (UnityNotificationManager.class) {
             // list might have changed while we searched
             Set<String> currentIds = new HashSet<>(getScheduledNotificationIDs(context));
-            for (String id : invalid)
+            for (String id : invalid) {
                 currentIds.remove(id);
+                removeScheduledNotification(Integer.valueOf(id));
+            }
             saveScheduledNotificationIDs(context, currentIds);
             mSentSinceLastHousekeeping = 0;
         }
@@ -665,7 +667,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     id = builder.getExtras().getInt(KEY_NOTIFICATION_ID, -1);
                     notif = buildNotificationForSending(context, openActivity, builder);
                     // if notification is not sendable, it wasn't cached
-                    mScheduledNotifications.put(Integer.valueOf(id), notif);
+                    putScheduledNotification(Integer.valueOf(id), notif);
                 }
 
                 if (notif != null) {
@@ -821,8 +823,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
             int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
             Integer notificationId = Integer.valueOf(id);
-            if (mScheduledNotifications.containsKey(notificationId)) {
-                notification = mScheduledNotifications.get(notificationId);
+            if ((notification = getScheduledNotification(notificationId)) != null) {
                 sendable = true;
             } else {
                 // in case we don't have cached notification, deserialize from storage
@@ -869,5 +870,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mActivity.startActivity(settingsIntent);
+    }
+
+    private static synchronized void putScheduledNotification(Integer id, Notification notification) {
+        mScheduledNotifications.put(id, notification);
+    }
+
+    private static synchronized Notification getScheduledNotification(Integer id) {
+        return mScheduledNotifications.get(id);
+    }
+
+    private static synchronized Notification removeScheduledNotification(Integer id) {
+        return mScheduledNotifications.remove(id);
     }
 }
