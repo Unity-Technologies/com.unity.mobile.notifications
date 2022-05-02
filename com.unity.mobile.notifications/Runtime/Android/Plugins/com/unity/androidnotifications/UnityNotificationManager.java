@@ -603,6 +603,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     cancelPendingNotificationIntent(context, Integer.valueOf(id));
                     deleteExpiredNotificationIntent(context, id);
                 }
+                triggerHousekeeping(context, null);
             }).start();
         }
     }
