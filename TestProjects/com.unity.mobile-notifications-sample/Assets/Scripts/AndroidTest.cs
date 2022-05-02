@@ -20,7 +20,7 @@ namespace Unity.Notifications.Tests.Sample
         private Dictionary<string, OrderedDictionary> m_groups;
         private Logger m_LOGGER;
         private int _notificationExplicitID;
-        private Button ButtonExplicitID;
+        private Button ButtonModifyExplicitID;
 
         public int notificationExplicitID
         {
@@ -28,14 +28,8 @@ namespace Unity.Notifications.Tests.Sample
             set
             {
                 _notificationExplicitID = value;
-                if (_notificationExplicitID == 0)
-                {
-                    ButtonExplicitID.interactable = false;
-                }
-                else
-                {
-                    ButtonExplicitID.interactable = true;
-                }
+                bool buttonsEnabled = _notificationExplicitID != 0;
+                ButtonModifyExplicitID.interactable = buttonsEnabled;
             }
         }
 
@@ -235,8 +229,8 @@ namespace Unity.Notifications.Tests.Sample
                 }
                 buttonGameObject.gameObject.SetActive(false);
             }
-            ButtonExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
-            ButtonExplicitID.interactable = false;
+            ButtonModifyExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
+            ButtonModifyExplicitID.interactable = false;
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
         }
 
