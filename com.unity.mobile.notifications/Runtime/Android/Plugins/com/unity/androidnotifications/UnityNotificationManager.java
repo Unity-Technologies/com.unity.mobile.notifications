@@ -38,6 +38,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
     private static HashMap<Integer, Notification> mScheduledNotifications = new HashMap();
+    private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
     private static int mSentSinceLastHousekeeping = 0;
     private static boolean mPerformingHousekeeping = false;
 
@@ -57,6 +58,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
     protected static final String KEY_SMALL_ICON = "smallIcon";
     protected static final String KEY_CHANNEL_ID = "channelID";
+    protected static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -326,6 +328,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
         openAppIntent.putExtra(KEY_NOTIFICATION_ID, id);
         PendingIntent pendingIntent = getActivityPendingIntent(context, id, openAppIntent, 0);
         builder.setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            // Can't check StatusBar notifications pre-M, so ask to be notified when dismissed
+            Intent deleteIntent = new Intent(context, UnityNotificationManager.class);
+            deleteIntent.putExtra(KEY_NOTIFICATION_DISMISSED, id);
+            PendingIntent deletePending = getBroadcastPendingIntent(context, id, deleteIntent, 0);
+            builder.setDeleteIntent(deletePending);
+        }
+
         finalizeNotificationForDisplay(context, builder);
         return builder.build();
     }
@@ -434,6 +445,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
             for (StatusBarNotification notification : active) {
                 // any notifications in status bar are still valid
                 String id = String.valueOf(notification.getId());
+                invalid.remove(id);
+            }
+        }
+        else synchronized (UnityNotificationManager.class) {
+            for (Integer visibleId : mVisibleNotifications) {
+                String id = String.valueOf(visibleId);
                 invalid.remove(id);
             }
         }
@@ -548,18 +565,21 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Check the notification status by id.
     public int checkNotificationStatus(int id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // TODO: what if the notification has been dismissed by the user?
             for (StatusBarNotification n : getNotificationManager().getActiveNotifications()) {
                 if (id == n.getId())
                     return 2;
             }
-
-            if (checkIfPendingNotificationIsRegistered(id))
-                return 1;
-
-            return 0;
+        } else synchronized (UnityNotificationManager.class) {
+            for (Integer notificationId : mVisibleNotifications) {
+                if (notificationId.intValue() == id)
+                    return 2;
+            }
         }
-        return -1;
+
+        if (checkIfPendingNotificationIsRegistered(id))
+            return 1;
+
+        return 0;
     }
 
     // Check if the pending notification with the given id has been registered.
@@ -674,6 +694,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     UnityNotificationManager.notify(context, id, notif);
                 }
             }
+            else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
+                if (removedId > 0) synchronized (UnityNotificationManager.class) {
+                    mVisibleNotifications.remove(removedId);
+                }
+            }
         } catch (BadParcelableException e) {
             Log.w(TAG_UNITY, e.toString());
         }
@@ -682,6 +708,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification) {
         getNotificationManager(context).notify(id, notification);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            synchronized (UnityNotificationManager.class) {
+                mVisibleNotifications.add(Integer.valueOf(id));
+            }
 
         try {
             mNotificationCallback.onSentNotification(notification);
