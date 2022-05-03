@@ -332,6 +332,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             // Can't check StatusBar notifications pre-M, so ask to be notified when dismissed
             Intent deleteIntent = new Intent(context, UnityNotificationManager.class);
+            deleteIntent.setAction(KEY_NOTIFICATION_DISMISSED); // need action to distinguish intent from content one
             deleteIntent.putExtra(KEY_NOTIFICATION_DISMISSED, id);
             PendingIntent deletePending = getBroadcastPendingIntent(context, id, deleteIntent, 0);
             builder.setDeleteIntent(deletePending);
@@ -661,6 +662,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
+                    int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
+                    if (removedId > 0) synchronized (UnityNotificationManager.class) {
+                        mVisibleNotifications.remove(removedId);
+                    }
+                    return;
+                }
+            }
             Object notification = getNotificationOrBuilderForIntent(context, intent);
             if (notification != null) {
                 Notification notif = null;
@@ -695,12 +705,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     UnityNotificationManager.notify(context, id, notif);
                 }
             }
-            else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
-                if (removedId > 0) synchronized (UnityNotificationManager.class) {
-                    mVisibleNotifications.remove(removedId);
-                }
-            }
         } catch (BadParcelableException e) {
             Log.w(TAG_UNITY, e.toString());
         }
@@ -709,10 +713,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification) {
         getNotificationManager(context).notify(id, notification);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-            synchronized (UnityNotificationManager.class) {
-                mVisibleNotifications.add(Integer.valueOf(id));
-            }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (UnityNotificationManager.class) {
+            mVisibleNotifications.add(Integer.valueOf(id));
+        }
 
         try {
             mNotificationCallback.onSentNotification(notification);
