@@ -33,12 +33,59 @@ namespace Unity.Notifications.Android
 
     struct NotificationManagerJni
     {
+        private AndroidJavaClass klass;
         private AndroidJavaObject self;
 
 
-        public NotificationManagerJni(AndroidJavaObject obj)
+        public NotificationManagerJni(AndroidJavaClass clazz, AndroidJavaObject obj)
         {
+            klass = clazz;
             self = obj;
+        }
+
+        public AndroidJavaObject GetNotificationFromIntent(AndroidJavaObject activity, AndroidJavaObject intent)
+        {
+            return klass.CallStatic<AndroidJavaObject>("getNotificationFromIntent", activity, intent);
+        }
+
+        public void SetNotificationIcon(AndroidJavaObject builder, AndroidJavaObject keyName, string icon)
+        {
+            klass.CallStatic("setNotificationIcon", builder, keyName, icon);
+        }
+
+        public void SetNotificationColor(AndroidJavaObject builder, int color)
+        {
+            klass.CallStatic("setNotificationColor", builder, color);
+        }
+
+        public Color? GetNotificationColor(AndroidJavaObject notification)
+        {
+            using (var color = klass.CallStatic<AndroidJavaObject>("getNotificationColor", notification))
+            {
+                if (color == null)
+                    return null;
+                return color.Call<int>("intValue").ToColor();
+            }
+        }
+
+        public void SetNotificationUsesChronometer(AndroidJavaObject builder, bool usesStopwatch)
+        {
+            klass.CallStatic("setNotificationUsesChronometer", builder, usesStopwatch);
+        }
+
+        public void SetNotificationGroupAlertBehavior(AndroidJavaObject builder, int groupAlertBehaviour)
+        {
+            klass.CallStatic("setNotificationGroupAlertBehavior", builder, groupAlertBehaviour);
+        }
+
+        public int GetNotificationGroupAlertBehavior(AndroidJavaObject notification)
+        {
+            return klass.CallStatic<int>("getNotificationGroupAlertBehavior", notification);
+        }
+
+        public string GetNotificationChannelId(AndroidJavaObject notification)
+        {
+            return klass.CallStatic<string>("getNotificationChannelId", notification);
         }
 
         public void RegisterNotificationChannel(AndroidNotificationChannel channel)
@@ -133,7 +180,6 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static event NotificationReceivedCallback OnNotificationReceived = delegate { };
 
-        private static AndroidJavaClass s_NotificationManagerClass;
         private static AndroidJavaObject s_CurrentActivity;
         private static JniApi s_Jni;
         private static bool s_Initialized = false;
@@ -171,17 +217,16 @@ namespace Unity.Notifications.Android
             }
 
 #if UNITY_EDITOR || !UNITY_ANDROID
-            s_NotificationManagerClass = null;
             s_CurrentActivity = null;
 #elif UNITY_ANDROID
             var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             s_CurrentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             var context = s_CurrentActivity.Call<AndroidJavaObject>("getApplicationContext");
 
-            s_NotificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-            var notificationManager = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
+            var notificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+            var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
             notificationManager.Call("setNotificationCallback", new NotificationCallback());
-            s_Jni.NotificationManager = new NotificationManagerJni(notificationManager);
+            s_Jni.NotificationManager = new NotificationManagerJni(notificationManagerClass, notificationManager);
 
             using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
             {
@@ -194,13 +239,13 @@ namespace Unity.Notifications.Android
                 Notification_FLAG_GROUP_SUMMARY = notificationClass.GetStatic<int>("FLAG_GROUP_SUMMARY");
             }
 
-            KEY_FIRE_TIME = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_FIRE_TIME");
-            KEY_ID = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_ID");
-            KEY_INTENT_DATA = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_INTENT_DATA");
-            KEY_LARGE_ICON = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_LARGE_ICON");
-            KEY_REPEAT_INTERVAL = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
-            KEY_NOTIFICATION = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
-            KEY_SMALL_ICON = s_NotificationManagerClass.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
+            KEY_FIRE_TIME = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_FIRE_TIME");
+            KEY_ID = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_ID");
+            KEY_INTENT_DATA = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_INTENT_DATA");
+            KEY_LARGE_ICON = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_LARGE_ICON");
+            KEY_REPEAT_INTERVAL = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
+            KEY_NOTIFICATION = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
+            KEY_SMALL_ICON = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
 
             s_Initialized = true;
 #endif
@@ -458,7 +503,7 @@ namespace Unity.Notifications.Android
                 return null;
 
             var intent = s_CurrentActivity.Call<AndroidJavaObject>("getIntent");
-            var notification = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationFromIntent", s_CurrentActivity, intent);
+            var notification = s_Jni.NotificationManager.GetNotificationFromIntent(s_CurrentActivity, intent);
             if (notification == null)
                 return null;
             return GetNotificationData(notification);
@@ -506,9 +551,9 @@ namespace Unity.Notifications.Android
             }
 
             var notificationBuilder = s_Jni.NotificationManager.CreateNotificationBuilder(channelId);
-            s_NotificationManagerClass.CallStatic("setNotificationIcon", notificationBuilder, KEY_SMALL_ICON, notification.SmallIcon);
+            s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, KEY_SMALL_ICON, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
-                s_NotificationManagerClass.CallStatic("setNotificationIcon", notificationBuilder, KEY_LARGE_ICON, notification.LargeIcon);
+                s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, KEY_LARGE_ICON, notification.LargeIcon);
             notificationBuilder.Call<AndroidJavaObject>("setContentTitle", notification.Title).Dispose();
             notificationBuilder.Call<AndroidJavaObject>("setContentText", notification.Text).Dispose();
             notificationBuilder.Call<AndroidJavaObject>("setAutoCancel", notification.ShouldAutoCancel).Dispose();
@@ -533,9 +578,9 @@ namespace Unity.Notifications.Android
             notificationBuilder.Call<AndroidJavaObject>("setShowWhen", notification.ShowTimestamp).Dispose();
             int color = notification.Color.ToInt();
             if (color != 0)
-                s_NotificationManagerClass.CallStatic("setNotificationColor", notificationBuilder, color);
-            s_NotificationManagerClass.CallStatic("setNotificationUsesChronometer", notificationBuilder, notification.UsesStopwatch);
-            s_NotificationManagerClass.CallStatic("setNotificationGroupAlertBehavior", notificationBuilder, (int)notification.GroupAlertBehaviour);
+                s_Jni.NotificationManager.SetNotificationColor(notificationBuilder, color);
+            s_Jni.NotificationManager.SetNotificationUsesChronometer(notificationBuilder, notification.UsesStopwatch);
+            s_Jni.NotificationManager.SetNotificationGroupAlertBehavior(notificationBuilder, (int)notification.GroupAlertBehaviour);
 
             using (var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras"))
             {
@@ -557,7 +602,7 @@ namespace Unity.Notifications.Android
                 if (id == -1)
                     return null;
 
-                var channelId = s_NotificationManagerClass.CallStatic<string>("getNotificationChannelId", notificationObj);
+                var channelId = s_Jni.NotificationManager.GetNotificationChannelId(notificationObj);
                 int flags = notificationObj.Get<int>("flags");
 
                 var notification = new AndroidNotification();
@@ -575,19 +620,13 @@ namespace Unity.Notifications.Android
                 else
                     notification.Style = NotificationStyle.None;
 
-                using (var color = s_NotificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationColor", notificationObj))
-                {
-                    if (color == null)
-                        notification.Color = null;
-                    else
-                        notification.Color = color.Call<int>("intValue").ToColor();
-                }
+                notification.Color = s_Jni.NotificationManager.GetNotificationColor(notificationObj);
                 notification.Number = notificationObj.Get<int>("number");
                 notification.IntentData = extras.Call<string>("getString", KEY_INTENT_DATA);
                 notification.Group = notificationObj.Call<string>("getGroup");
                 notification.GroupSummary = 0 != (flags & Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
-                notification.GroupAlertBehaviour = s_NotificationManagerClass.CallStatic<int>("getNotificationGroupAlertBehavior", notificationObj).ToGroupAlertBehaviours();
+                notification.GroupAlertBehaviour = s_Jni.NotificationManager.GetNotificationGroupAlertBehavior(notificationObj).ToGroupAlertBehaviours();
                 var showTimestamp = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_WHEN, false);
                 notification.ShowTimestamp = showTimestamp;
                 if (showTimestamp)
