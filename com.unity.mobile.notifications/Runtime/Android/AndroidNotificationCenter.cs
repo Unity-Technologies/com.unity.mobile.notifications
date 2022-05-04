@@ -215,20 +215,23 @@ namespace Unity.Notifications.Android
             {
                 builder.Call<AndroidJavaObject>("setShowWhen", showTimestamp).Dispose();
             }
+        }
 
-            public static void ExtrasPutInt(AndroidJavaObject extras, AndroidJavaObject key, int value)
+        public static class Bundle
+        {
+            public static void PutInt(AndroidJavaObject bundle, AndroidJavaObject key, int value)
             {
-                extras.Call("putInt", key, value);
+                bundle.Call("putInt", key, value);
             }
 
-            public static void ExtrasPutLong(AndroidJavaObject extras, AndroidJavaObject key, long value)
+            public static void PutLong(AndroidJavaObject bundle, AndroidJavaObject key, long value)
             {
-                extras.Call("putLong", key, value);
+                bundle.Call("putLong", key, value);
             }
 
-            public static void ExtrasPutString(AndroidJavaObject extras, AndroidJavaObject key, string value)
+            public static void PutString(AndroidJavaObject bundle, AndroidJavaObject key, string value)
             {
-                extras.Call("putString", key, value);
+                bundle.Call("putString", key, value);
             }
         }
     }
@@ -652,11 +655,11 @@ namespace Unity.Notifications.Android
 
             using (var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras"))
             {
-                JniApi.NotificationBuilder.ExtrasPutInt(extras, KEY_ID, id);
-                JniApi.NotificationBuilder.ExtrasPutLong(extras, KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
-                JniApi.NotificationBuilder.ExtrasPutLong(extras, KEY_FIRE_TIME, fireTime);
+                JniApi.Bundle.PutInt(extras, KEY_ID, id);
+                JniApi.Bundle.PutLong(extras, KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
+                JniApi.Bundle.PutLong(extras, KEY_FIRE_TIME, fireTime);
                 if (!string.IsNullOrEmpty(notification.IntentData))
-                    JniApi.NotificationBuilder.ExtrasPutString(extras, KEY_INTENT_DATA, notification.IntentData);
+                    JniApi.Bundle.PutString(extras, KEY_INTENT_DATA, notification.IntentData);
             }
 
             return notificationBuilder;
