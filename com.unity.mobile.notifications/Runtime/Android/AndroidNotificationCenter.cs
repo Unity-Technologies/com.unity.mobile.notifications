@@ -219,6 +219,31 @@ namespace Unity.Notifications.Android
 
         public static class Bundle
         {
+            public static bool ContainsKey(AndroidJavaObject bundle, AndroidJavaObject key)
+            {
+                return bundle.Call<bool>("containsKey", key);
+            }
+
+            public static bool GetBoolean(AndroidJavaObject bundle, AndroidJavaObject key, bool defaultValue)
+            {
+                return bundle.Call<bool>("getBoolean", key, defaultValue);
+            }
+
+            public static int GetInt(AndroidJavaObject bundle, AndroidJavaObject key, int defaultValue)
+            {
+                return bundle.Call<int>("getInt", key, defaultValue);
+            }
+
+            public static long GetLong(AndroidJavaObject bundle, AndroidJavaObject key, long defaultValue)
+            {
+                return bundle.Call<long>("getLong", key, defaultValue);
+            }
+
+            public static string GetString(AndroidJavaObject bundle, AndroidJavaObject key)
+            {
+                return bundle.Call<string>("getString", key);
+            }
+
             public static void PutInt(AndroidJavaObject bundle, AndroidJavaObject key, int value)
             {
                 bundle.Call("putInt", key, value);
@@ -669,7 +694,7 @@ namespace Unity.Notifications.Android
         {
             using (var extras = notificationObj.Get<AndroidJavaObject>("extras"))
             {
-                var id = extras.Call<int>("getInt", KEY_ID, -1);
+                var id = JniApi.Bundle.GetInt(extras, KEY_ID, -1);
                 if (id == -1)
                     return null;
 
@@ -677,28 +702,28 @@ namespace Unity.Notifications.Android
                 int flags = notificationObj.Get<int>("flags");
 
                 var notification = new AndroidNotification();
-                notification.Title = extras.Call<string>("getString", Notification_EXTRA_TITLE);
-                notification.Text = extras.Call<string>("getString", Notification_EXTRA_TEXT);
-                notification.SmallIcon = extras.Call<string>("getString", KEY_SMALL_ICON);
-                notification.LargeIcon = extras.Call<string>("getString", KEY_LARGE_ICON);
+                notification.Title = JniApi.Bundle.GetString(extras, Notification_EXTRA_TITLE);
+                notification.Text = JniApi.Bundle.GetString(extras, Notification_EXTRA_TEXT);
+                notification.SmallIcon = JniApi.Bundle.GetString(extras, KEY_SMALL_ICON);
+                notification.LargeIcon = JniApi.Bundle.GetString(extras, KEY_LARGE_ICON);
                 notification.ShouldAutoCancel = 0 != (flags & Notification_FLAG_AUTO_CANCEL);
-                notification.UsesStopwatch = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_CHRONOMETER, false);
-                notification.FireTime = extras.Call<long>("getLong", KEY_FIRE_TIME, -1L).ToDatetime();
-                notification.RepeatInterval = extras.Call<long>("getLong", KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
+                notification.UsesStopwatch = JniApi.Bundle.GetBoolean(extras, Notification_EXTRA_SHOW_CHRONOMETER, false);
+                notification.FireTime = JniApi.Bundle.GetLong(extras, KEY_FIRE_TIME, -1L).ToDatetime();
+                notification.RepeatInterval = JniApi.Bundle.GetLong(extras, KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
 
-                if (extras.Call<bool>("containsKey", Notification_EXTRA_BIG_TEXT))
+                if (JniApi.Bundle.ContainsKey(extras, Notification_EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
                 else
                     notification.Style = NotificationStyle.None;
 
                 notification.Color = s_Jni.NotificationManager.GetNotificationColor(notificationObj);
                 notification.Number = notificationObj.Get<int>("number");
-                notification.IntentData = extras.Call<string>("getString", KEY_INTENT_DATA);
+                notification.IntentData = JniApi.Bundle.GetString(extras, KEY_INTENT_DATA);
                 notification.Group = notificationObj.Call<string>("getGroup");
                 notification.GroupSummary = 0 != (flags & Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
                 notification.GroupAlertBehaviour = s_Jni.NotificationManager.GetNotificationGroupAlertBehavior(notificationObj).ToGroupAlertBehaviours();
-                var showTimestamp = extras.Call<bool>("getBoolean", Notification_EXTRA_SHOW_WHEN, false);
+                var showTimestamp = JniApi.Bundle.GetBoolean(extras, Notification_EXTRA_SHOW_WHEN, false);
                 notification.ShowTimestamp = showTimestamp;
                 if (showTimestamp)
                     notification.CustomTimestamp = notificationObj.Get<long>("when").ToDatetime();
