@@ -163,6 +163,74 @@ namespace Unity.Notifications.Android
     struct JniApi
     {
         public NotificationManagerJni NotificationManager;
+
+        public static class NotificationBuilder
+        {
+            public static void SetContentTitle(AndroidJavaObject builder, string title)
+            {
+                builder.Call<AndroidJavaObject>("setContentTitle", title).Dispose();
+            }
+
+            public static void SetContentText(AndroidJavaObject builder, string text)
+            {
+                builder.Call<AndroidJavaObject>("setContentText", text).Dispose();
+            }
+
+            public static void SetAutoCancel(AndroidJavaObject builder, bool shouldAutoCancel)
+            {
+                builder.Call<AndroidJavaObject>("setAutoCancel", shouldAutoCancel).Dispose();
+            }
+
+            public static void SetNumber(AndroidJavaObject builder, int number)
+            {
+                builder.Call<AndroidJavaObject>("setNumber", number).Dispose();
+            }
+
+            public static void SetStyle(AndroidJavaObject builder, AndroidJavaObject style)
+            {
+                builder.Call<AndroidJavaObject>("setStyle", style).Dispose();
+            }
+
+            public static void SetWhen(AndroidJavaObject builder, long timestamp)
+            {
+                builder.Call<AndroidJavaObject>("setWhen", timestamp).Dispose();
+            }
+
+            public static void SetGroup(AndroidJavaObject builder, string group)
+            {
+                builder.Call<AndroidJavaObject>("setGroup", group).Dispose();
+            }
+
+            public static void SetGroupSummary(AndroidJavaObject builder, bool groupSummary)
+            {
+                builder.Call<AndroidJavaObject>("setGroupSummary", groupSummary).Dispose();
+            }
+
+            public static void SetSortKey(AndroidJavaObject builder, string sortKey)
+            {
+                builder.Call<AndroidJavaObject>("setSortKey", sortKey).Dispose();
+            }
+
+            public static void SetShowWhen(AndroidJavaObject builder, bool showTimestamp)
+            {
+                builder.Call<AndroidJavaObject>("setShowWhen", showTimestamp).Dispose();
+            }
+
+            public static void ExtrasPutInt(AndroidJavaObject extras, AndroidJavaObject key, int value)
+            {
+                extras.Call("putInt", key, value);
+            }
+
+            public static void ExtrasPutLong(AndroidJavaObject extras, AndroidJavaObject key, long value)
+            {
+                extras.Call("putLong", key, value);
+            }
+
+            public static void ExtrasPutString(AndroidJavaObject extras, AndroidJavaObject key, string value)
+            {
+                extras.Call("putString", key, value);
+            }
+        }
     }
 
     /// <summary>
@@ -554,28 +622,28 @@ namespace Unity.Notifications.Android
             s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, KEY_SMALL_ICON, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
                 s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, KEY_LARGE_ICON, notification.LargeIcon);
-            notificationBuilder.Call<AndroidJavaObject>("setContentTitle", notification.Title).Dispose();
-            notificationBuilder.Call<AndroidJavaObject>("setContentText", notification.Text).Dispose();
-            notificationBuilder.Call<AndroidJavaObject>("setAutoCancel", notification.ShouldAutoCancel).Dispose();
+            JniApi.NotificationBuilder.SetContentTitle(notificationBuilder, notification.Title);
+            JniApi.NotificationBuilder.SetContentText(notificationBuilder, notification.Text);
+            JniApi.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
             if (notification.Number >= 0)
-                notificationBuilder.Call<AndroidJavaObject>("setNumber", notification.Number).Dispose();
+                JniApi.NotificationBuilder.SetNumber(notificationBuilder, notification.Number);
             if (notification.Style == NotificationStyle.BigTextStyle)
             {
                 using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
                 {
                     style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
-                    notificationBuilder.Call<AndroidJavaObject>("setStyle", style).Dispose();
+                    JniApi.NotificationBuilder.SetStyle(notificationBuilder, style);
                 }
             }
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
-            notificationBuilder.Call<AndroidJavaObject>("setWhen", timestampValue).Dispose();
+            JniApi.NotificationBuilder.SetWhen(notificationBuilder, timestampValue);
             if (!string.IsNullOrEmpty(notification.Group))
-                notificationBuilder.Call<AndroidJavaObject>("setGroup", notification.Group).Dispose();
+                JniApi.NotificationBuilder.SetGroup(notificationBuilder, notification.Group);
             if (notification.GroupSummary)
-                notificationBuilder.Call<AndroidJavaObject>("setGroupSummary", notification.GroupSummary).Dispose();
+                JniApi.NotificationBuilder.SetGroupSummary(notificationBuilder, notification.GroupSummary);
             if (!string.IsNullOrEmpty(notification.SortKey))
-                notificationBuilder.Call<AndroidJavaObject>("setSortKey", notification.SortKey).Dispose();
-            notificationBuilder.Call<AndroidJavaObject>("setShowWhen", notification.ShowTimestamp).Dispose();
+                JniApi.NotificationBuilder.SetSortKey(notificationBuilder, notification.SortKey);
+            JniApi.NotificationBuilder.SetShowWhen(notificationBuilder, notification.ShowTimestamp);
             int color = notification.Color.ToInt();
             if (color != 0)
                 s_Jni.NotificationManager.SetNotificationColor(notificationBuilder, color);
@@ -584,11 +652,11 @@ namespace Unity.Notifications.Android
 
             using (var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras"))
             {
-                extras.Call("putInt", KEY_ID, id);
-                extras.Call("putLong", KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
-                extras.Call("putLong", KEY_FIRE_TIME, fireTime);
+                JniApi.NotificationBuilder.ExtrasPutInt(extras, KEY_ID, id);
+                JniApi.NotificationBuilder.ExtrasPutLong(extras, KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
+                JniApi.NotificationBuilder.ExtrasPutLong(extras, KEY_FIRE_TIME, fireTime);
                 if (!string.IsNullOrEmpty(notification.IntentData))
-                    extras.Call("putString", KEY_INTENT_DATA, notification.IntentData);
+                    JniApi.NotificationBuilder.ExtrasPutString(extras, KEY_INTENT_DATA, notification.IntentData);
             }
 
             return notificationBuilder;
