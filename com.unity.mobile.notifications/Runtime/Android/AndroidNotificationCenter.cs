@@ -190,6 +190,61 @@ namespace Unity.Notifications.Android
     {
         public NotificationManagerJni NotificationManager;
 
+        public static class Notification
+        {
+            public static AndroidJavaObject EXTRA_TITLE;
+            public static AndroidJavaObject EXTRA_TEXT;
+            public static AndroidJavaObject EXTRA_SHOW_CHRONOMETER;
+            public static AndroidJavaObject EXTRA_BIG_TEXT;
+            public static AndroidJavaObject EXTRA_SHOW_WHEN;
+            public static int FLAG_AUTO_CANCEL;
+            public static int FLAG_GROUP_SUMMARY;
+
+            public static void CollectConstants()
+            {
+                using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
+                {
+                    EXTRA_TITLE = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TITLE");
+                    EXTRA_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
+                    EXTRA_SHOW_CHRONOMETER = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
+                    EXTRA_BIG_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
+                    EXTRA_SHOW_WHEN = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
+                    FLAG_AUTO_CANCEL = notificationClass.GetStatic<int>("FLAG_AUTO_CANCEL");
+                    FLAG_GROUP_SUMMARY = notificationClass.GetStatic<int>("FLAG_GROUP_SUMMARY");
+                }
+            }
+
+            public static AndroidJavaObject Extras(AndroidJavaObject notification)
+            {
+                return notification.Get<AndroidJavaObject>("extras");
+            }
+
+            public static int Flags(AndroidJavaObject notification)
+            {
+                return notification.Get<int>("flags");
+            }
+
+            public static int Number(AndroidJavaObject notification)
+            {
+                return notification.Get<int>("number");
+            }
+
+            public static string GetGroup(AndroidJavaObject notification)
+            {
+                return notification.Call<string>("getGroup");
+            }
+
+            public static string GetSortKey(AndroidJavaObject notification)
+            {
+                return notification.Call<string>("getSortKey");
+            }
+
+            internal static long When(AndroidJavaObject notification)
+            {
+                return notification.Get<long>("when");
+            }
+        }
+
         public static class NotificationBuilder
         {
             public static AndroidJavaObject GetExtras(AndroidJavaObject builder)
@@ -311,14 +366,6 @@ namespace Unity.Notifications.Android
         private static JniApi s_Jni;
         private static bool s_Initialized = false;
 
-        private static AndroidJavaObject Notification_EXTRA_TITLE;
-        private static AndroidJavaObject Notification_EXTRA_TEXT;
-        private static AndroidJavaObject Notification_EXTRA_SHOW_CHRONOMETER;
-        private static AndroidJavaObject Notification_EXTRA_BIG_TEXT;
-        private static AndroidJavaObject Notification_EXTRA_SHOW_WHEN;
-        private static int Notification_FLAG_AUTO_CANCEL;
-        private static int Notification_FLAG_GROUP_SUMMARY;
-
         /// <summary>
         /// Initialize the AndroidNotificationCenter class.
         /// Can be safely called multiple times
@@ -346,17 +393,7 @@ namespace Unity.Notifications.Android
             var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
             notificationManager.Call("setNotificationCallback", new NotificationCallback());
             s_Jni.NotificationManager = new NotificationManagerJni(notificationManagerClass, notificationManager);
-
-            using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
-            {
-                Notification_EXTRA_TITLE = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TITLE");
-                Notification_EXTRA_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
-                Notification_EXTRA_SHOW_CHRONOMETER = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
-                Notification_EXTRA_BIG_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
-                Notification_EXTRA_SHOW_WHEN = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
-                Notification_FLAG_AUTO_CANCEL = notificationClass.GetStatic<int>("FLAG_AUTO_CANCEL");
-                Notification_FLAG_GROUP_SUMMARY = notificationClass.GetStatic<int>("FLAG_GROUP_SUMMARY");
-            }
+            JniApi.Notification.CollectConstants();
 
             s_Initialized = true;
 #endif
@@ -707,41 +744,41 @@ namespace Unity.Notifications.Android
 
         internal static AndroidNotificationIntentData GetNotificationData(AndroidJavaObject notificationObj)
         {
-            using (var extras = notificationObj.Get<AndroidJavaObject>("extras"))
+            using (var extras = JniApi.Notification.Extras(notificationObj))
             {
                 var id = JniApi.Bundle.GetInt(extras, s_Jni.NotificationManager.KEY_ID, -1);
                 if (id == -1)
                     return null;
 
                 var channelId = s_Jni.NotificationManager.GetNotificationChannelId(notificationObj);
-                int flags = notificationObj.Get<int>("flags");
+                int flags = JniApi.Notification.Flags(notificationObj);
 
                 var notification = new AndroidNotification();
-                notification.Title = JniApi.Bundle.GetString(extras, Notification_EXTRA_TITLE);
-                notification.Text = JniApi.Bundle.GetString(extras, Notification_EXTRA_TEXT);
+                notification.Title = JniApi.Bundle.GetString(extras, JniApi.Notification.EXTRA_TITLE);
+                notification.Text = JniApi.Bundle.GetString(extras, JniApi.Notification.EXTRA_TEXT);
                 notification.SmallIcon = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_SMALL_ICON);
                 notification.LargeIcon = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_LARGE_ICON);
-                notification.ShouldAutoCancel = 0 != (flags & Notification_FLAG_AUTO_CANCEL);
-                notification.UsesStopwatch = JniApi.Bundle.GetBoolean(extras, Notification_EXTRA_SHOW_CHRONOMETER, false);
+                notification.ShouldAutoCancel = 0 != (flags & JniApi.Notification.FLAG_AUTO_CANCEL);
+                notification.UsesStopwatch = JniApi.Bundle.GetBoolean(extras, JniApi.Notification.EXTRA_SHOW_CHRONOMETER, false);
                 notification.FireTime = JniApi.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L).ToDatetime();
                 notification.RepeatInterval = JniApi.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
 
-                if (JniApi.Bundle.ContainsKey(extras, Notification_EXTRA_BIG_TEXT))
+                if (JniApi.Bundle.ContainsKey(extras, JniApi.Notification.EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
                 else
                     notification.Style = NotificationStyle.None;
 
                 notification.Color = s_Jni.NotificationManager.GetNotificationColor(notificationObj);
-                notification.Number = notificationObj.Get<int>("number");
+                notification.Number = JniApi.Notification.Number(notificationObj);
                 notification.IntentData = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA);
-                notification.Group = notificationObj.Call<string>("getGroup");
-                notification.GroupSummary = 0 != (flags & Notification_FLAG_GROUP_SUMMARY);
-                notification.SortKey = notificationObj.Call<string>("getSortKey");
+                notification.Group = JniApi.Notification.GetGroup(notificationObj);
+                notification.GroupSummary = 0 != (flags & JniApi.Notification.FLAG_GROUP_SUMMARY);
+                notification.SortKey = JniApi.Notification.GetSortKey(notificationObj);
                 notification.GroupAlertBehaviour = s_Jni.NotificationManager.GetNotificationGroupAlertBehavior(notificationObj).ToGroupAlertBehaviours();
-                var showTimestamp = JniApi.Bundle.GetBoolean(extras, Notification_EXTRA_SHOW_WHEN, false);
+                var showTimestamp = JniApi.Bundle.GetBoolean(extras, JniApi.Notification.EXTRA_SHOW_WHEN, false);
                 notification.ShowTimestamp = showTimestamp;
                 if (showTimestamp)
-                    notification.CustomTimestamp = notificationObj.Get<long>("when").ToDatetime();
+                    notification.CustomTimestamp = JniApi.Notification.When(notificationObj).ToDatetime();
 
                 var data = new AndroidNotificationIntentData(id, channelId, notification);
                 data.NativeNotification = notificationObj;
