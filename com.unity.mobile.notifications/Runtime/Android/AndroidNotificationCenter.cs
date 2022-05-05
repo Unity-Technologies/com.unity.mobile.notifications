@@ -201,6 +201,18 @@ namespace Unity.Notifications.Android
     {
         public NotificationManagerJni NotificationManager;
 
+        public static JniMethodID FindMethod(AndroidJavaClass clazz, string name, string signature, bool isStatic)
+        {
+#if UNITY_2022_2_OR_NEWER
+            var method = AndroidJNIHelper.GetMethodID(clazz.GetRawClass(), name, signature, isStatic);
+            if (method == IntPtr.Zero)
+                throw new Exception($"Method {name} with signature {signature} not found");
+            return method;
+#else
+            return name;
+#endif
+        }
+
         public static class Notification
         {
             public static AndroidJavaObject EXTRA_TITLE;
