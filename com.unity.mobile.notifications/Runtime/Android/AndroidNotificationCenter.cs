@@ -44,6 +44,17 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject KEY_NOTIFICATION;
         public AndroidJavaObject KEY_SMALL_ICON;
 
+        private const string getNotificationFromIntent = "getNotificationFromIntent";
+        private const string setNotificationIcon = "setNotificationIcon";
+        private const string setNotificationColor = "setNotificationColor";
+        private const string getNotificationColor = "getNotificationColor";
+        private const string setNotificationUsesChronometer = "setNotificationUsesChronometer";
+        private const string setNotificationGroupAlertBehavior = "setNotificationGroupAlertBehavior";
+        private const string getNotificationGroupAlertBehavior = "getNotificationGroupAlertBehavior";
+        private const string getNotificationChannelId = "getNotificationChannelId";
+        private const string scheduleNotification = "scheduleNotification";
+        private const string createNotificationBuilder = "createNotificationBuilder";
+
 
         public NotificationManagerJni(AndroidJavaClass clazz, AndroidJavaObject obj)
         {
@@ -71,22 +82,22 @@ namespace Unity.Notifications.Android
 
         public AndroidJavaObject GetNotificationFromIntent(AndroidJavaObject activity, AndroidJavaObject intent)
         {
-            return klass.CallStatic<AndroidJavaObject>("getNotificationFromIntent", activity, intent);
+            return klass.CallStatic<AndroidJavaObject>(getNotificationFromIntent, activity, intent);
         }
 
         public void SetNotificationIcon(AndroidJavaObject builder, AndroidJavaObject keyName, string icon)
         {
-            klass.CallStatic("setNotificationIcon", builder, keyName, icon);
+            klass.CallStatic(setNotificationIcon, builder, keyName, icon);
         }
 
         public void SetNotificationColor(AndroidJavaObject builder, int color)
         {
-            klass.CallStatic("setNotificationColor", builder, color);
+            klass.CallStatic(setNotificationColor, builder, color);
         }
 
         public Color? GetNotificationColor(AndroidJavaObject notification)
         {
-            using (var color = klass.CallStatic<AndroidJavaObject>("getNotificationColor", notification))
+            using (var color = klass.CallStatic<AndroidJavaObject>(getNotificationColor, notification))
             {
                 if (color == null)
                     return null;
@@ -96,22 +107,22 @@ namespace Unity.Notifications.Android
 
         public void SetNotificationUsesChronometer(AndroidJavaObject builder, bool usesStopwatch)
         {
-            klass.CallStatic("setNotificationUsesChronometer", builder, usesStopwatch);
+            klass.CallStatic(setNotificationUsesChronometer, builder, usesStopwatch);
         }
 
         public void SetNotificationGroupAlertBehavior(AndroidJavaObject builder, int groupAlertBehaviour)
         {
-            klass.CallStatic("setNotificationGroupAlertBehavior", builder, groupAlertBehaviour);
+            klass.CallStatic(setNotificationGroupAlertBehavior, builder, groupAlertBehaviour);
         }
 
         public int GetNotificationGroupAlertBehavior(AndroidJavaObject notification)
         {
-            return klass.CallStatic<int>("getNotificationGroupAlertBehavior", notification);
+            return klass.CallStatic<int>(getNotificationGroupAlertBehavior, notification);
         }
 
         public string GetNotificationChannelId(AndroidJavaObject notification)
         {
-            return klass.CallStatic<string>("getNotificationChannelId", notification);
+            return klass.CallStatic<string>(getNotificationChannelId, notification);
         }
 
         public void RegisterNotificationChannel(AndroidNotificationChannel channel)
@@ -142,7 +153,7 @@ namespace Unity.Notifications.Android
 
         public void ScheduleNotification(AndroidJavaObject notificationBuilder)
         {
-            self.Call("scheduleNotification", notificationBuilder);
+            self.Call(scheduleNotification, notificationBuilder);
         }
 
         public bool CheckIfPendingNotificationIsRegistered(int id)
@@ -182,7 +193,7 @@ namespace Unity.Notifications.Android
 
         public AndroidJavaObject CreateNotificationBuilder(String channelId)
         {
-            return self.Call<AndroidJavaObject>("createNotificationBuilder", channelId);
+            return self.Call<AndroidJavaObject>(createNotificationBuilder, channelId);
         }
     }
 
