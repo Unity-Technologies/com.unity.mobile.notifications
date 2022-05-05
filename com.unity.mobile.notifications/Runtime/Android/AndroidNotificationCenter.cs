@@ -192,6 +192,11 @@ namespace Unity.Notifications.Android
 
         public static class NotificationBuilder
         {
+            public static AndroidJavaObject GetExtras(AndroidJavaObject builder)
+            {
+                return builder.Call<AndroidJavaObject>("getExtras");
+            }
+
             public static void SetContentTitle(AndroidJavaObject builder, string title)
             {
                 builder.Call<AndroidJavaObject>("setContentTitle", title).Dispose();
@@ -688,7 +693,7 @@ namespace Unity.Notifications.Android
             s_Jni.NotificationManager.SetNotificationUsesChronometer(notificationBuilder, notification.UsesStopwatch);
             s_Jni.NotificationManager.SetNotificationGroupAlertBehavior(notificationBuilder, (int)notification.GroupAlertBehaviour);
 
-            using (var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras"))
+            using (var extras = JniApi.NotificationBuilder.GetExtras(notificationBuilder))
             {
                 JniApi.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
                 JniApi.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
