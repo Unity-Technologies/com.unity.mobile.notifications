@@ -3,6 +3,12 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_2022_2_OR_NEWER
+    using JniMethodID = System.IntPtr;
+#else
+    using JniMethodID = System.String;
+#endif
+
 namespace Unity.Notifications.Android
 {
     /// <summary>
@@ -44,22 +50,33 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject KEY_NOTIFICATION;
         public AndroidJavaObject KEY_SMALL_ICON;
 
-        private const string getNotificationFromIntent = "getNotificationFromIntent";
-        private const string setNotificationIcon = "setNotificationIcon";
-        private const string setNotificationColor = "setNotificationColor";
-        private const string getNotificationColor = "getNotificationColor";
-        private const string setNotificationUsesChronometer = "setNotificationUsesChronometer";
-        private const string setNotificationGroupAlertBehavior = "setNotificationGroupAlertBehavior";
-        private const string getNotificationGroupAlertBehavior = "getNotificationGroupAlertBehavior";
-        private const string getNotificationChannelId = "getNotificationChannelId";
-        private const string scheduleNotification = "scheduleNotification";
-        private const string createNotificationBuilder = "createNotificationBuilder";
+        private JniMethodID getNotificationFromIntent;
+        private JniMethodID setNotificationIcon;
+        private JniMethodID setNotificationColor;
+        private JniMethodID getNotificationColor;
+        private JniMethodID setNotificationUsesChronometer;
+        private JniMethodID setNotificationGroupAlertBehavior;
+        private JniMethodID getNotificationGroupAlertBehavior;
+        private JniMethodID getNotificationChannelId;
+        private JniMethodID scheduleNotification;
+        private JniMethodID createNotificationBuilder;
 
 
         public NotificationManagerJni(AndroidJavaClass clazz, AndroidJavaObject obj)
         {
             klass = clazz;
             self = obj;
+
+            getNotificationFromIntent = default;
+            setNotificationIcon = default;
+            setNotificationColor = default;
+            getNotificationColor = default;
+            setNotificationUsesChronometer = default;
+            setNotificationGroupAlertBehavior = default;
+            getNotificationGroupAlertBehavior = default;
+            getNotificationChannelId = default;
+            scheduleNotification = default;
+            createNotificationBuilder = default;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
             KEY_FIRE_TIME = clazz.GetStatic<AndroidJavaObject>("KEY_FIRE_TIME");
@@ -69,6 +86,8 @@ namespace Unity.Notifications.Android
             KEY_REPEAT_INTERVAL = clazz.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
             KEY_NOTIFICATION = clazz.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
             KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
+
+            CollectMethods(clazz);
 #else
             KEY_FIRE_TIME = null;
             KEY_ID = null;
@@ -78,6 +97,20 @@ namespace Unity.Notifications.Android
             KEY_NOTIFICATION = null;
             KEY_SMALL_ICON = null;
 #endif
+        }
+
+        void CollectMethods(AndroidJavaClass clazz)
+        {
+            getNotificationFromIntent = JniApi.FindMethod(clazz, "getNotificationFromIntent", "(Landroid/content/Context;Landroid/content/Intent;)Landroid/app/Notification;", true);
+            setNotificationIcon = JniApi.FindMethod(clazz, "setNotificationIcon", "(Landroid/app/Notification$Builder;Ljava/lang/String;Ljava/lang/String;)V", true);
+            setNotificationColor = JniApi.FindMethod(clazz, "setNotificationColor", "(Landroid/app/Notification$Builder;I)V", true);
+            getNotificationColor = JniApi.FindMethod(clazz, "getNotificationColor", "(Landroid/app/Notification;)Ljava/lang/Integer;", true);
+            setNotificationUsesChronometer = JniApi.FindMethod(clazz, "setNotificationUsesChronometer", "(Landroid/app/Notification$Builder;Z)V", true);
+            setNotificationGroupAlertBehavior = JniApi.FindMethod(clazz, "setNotificationGroupAlertBehavior", "(Landroid/app/Notification$Builder;I)V", true);
+            getNotificationGroupAlertBehavior = JniApi.FindMethod(clazz, "getNotificationGroupAlertBehavior", "(Landroid/app/Notification;)I", true);
+            getNotificationChannelId = JniApi.FindMethod(clazz, "getNotificationChannelId", "(Landroid/app/Notification;)Ljava/lang/String;", true);
+            scheduleNotification = JniApi.FindMethod(clazz, "scheduleNotification", "(Landroid/app/Notification$Builder;)V", false);
+            createNotificationBuilder = JniApi.FindMethod(clazz, "createNotificationBuilder", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
         }
 
         public AndroidJavaObject GetNotificationFromIntent(AndroidJavaObject activity, AndroidJavaObject intent)
