@@ -36,11 +36,37 @@ namespace Unity.Notifications.Android
         private AndroidJavaClass klass;
         private AndroidJavaObject self;
 
+        public AndroidJavaObject KEY_FIRE_TIME;
+        public AndroidJavaObject KEY_ID;
+        public AndroidJavaObject KEY_INTENT_DATA;
+        public AndroidJavaObject KEY_LARGE_ICON;
+        public AndroidJavaObject KEY_REPEAT_INTERVAL;
+        public AndroidJavaObject KEY_NOTIFICATION;
+        public AndroidJavaObject KEY_SMALL_ICON;
+
 
         public NotificationManagerJni(AndroidJavaClass clazz, AndroidJavaObject obj)
         {
             klass = clazz;
             self = obj;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            KEY_FIRE_TIME = clazz.GetStatic<AndroidJavaObject>("KEY_FIRE_TIME");
+            KEY_ID = clazz.GetStatic<AndroidJavaObject>("KEY_ID");
+            KEY_INTENT_DATA = clazz.GetStatic<AndroidJavaObject>("KEY_INTENT_DATA");
+            KEY_LARGE_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_LARGE_ICON");
+            KEY_REPEAT_INTERVAL = clazz.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
+            KEY_NOTIFICATION = clazz.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
+            KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
+#else
+            KEY_FIRE_TIME = null;
+            KEY_ID = null;
+            KEY_INTENT_DATA = null;
+            KEY_LARGE_ICON = null;
+            KEY_REPEAT_INTERVAL = null;
+            KEY_NOTIFICATION = null;
+            KEY_SMALL_ICON = null;
+#endif
         }
 
         public AndroidJavaObject GetNotificationFromIntent(AndroidJavaObject activity, AndroidJavaObject intent)
@@ -288,14 +314,6 @@ namespace Unity.Notifications.Android
         private static int Notification_FLAG_AUTO_CANCEL;
         private static int Notification_FLAG_GROUP_SUMMARY;
 
-        private static AndroidJavaObject KEY_FIRE_TIME;
-        private static AndroidJavaObject KEY_ID;
-        private static AndroidJavaObject KEY_INTENT_DATA;
-        private static AndroidJavaObject KEY_LARGE_ICON;
-        private static AndroidJavaObject KEY_REPEAT_INTERVAL;
-        private static AndroidJavaObject KEY_NOTIFICATION;
-        private static AndroidJavaObject KEY_SMALL_ICON;
-
         /// <summary>
         /// Initialize the AndroidNotificationCenter class.
         /// Can be safely called multiple times
@@ -334,14 +352,6 @@ namespace Unity.Notifications.Android
                 Notification_FLAG_AUTO_CANCEL = notificationClass.GetStatic<int>("FLAG_AUTO_CANCEL");
                 Notification_FLAG_GROUP_SUMMARY = notificationClass.GetStatic<int>("FLAG_GROUP_SUMMARY");
             }
-
-            KEY_FIRE_TIME = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_FIRE_TIME");
-            KEY_ID = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_ID");
-            KEY_INTENT_DATA = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_INTENT_DATA");
-            KEY_LARGE_ICON = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_LARGE_ICON");
-            KEY_REPEAT_INTERVAL = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
-            KEY_NOTIFICATION = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
-            KEY_SMALL_ICON = notificationManagerClass.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
 
             s_Initialized = true;
 #endif
@@ -647,9 +657,9 @@ namespace Unity.Notifications.Android
             }
 
             var notificationBuilder = s_Jni.NotificationManager.CreateNotificationBuilder(channelId);
-            s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, KEY_SMALL_ICON, notification.SmallIcon);
+            s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_SMALL_ICON, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
-                s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, KEY_LARGE_ICON, notification.LargeIcon);
+                s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_LARGE_ICON, notification.LargeIcon);
             JniApi.NotificationBuilder.SetContentTitle(notificationBuilder, notification.Title);
             JniApi.NotificationBuilder.SetContentText(notificationBuilder, notification.Text);
             JniApi.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
@@ -680,11 +690,11 @@ namespace Unity.Notifications.Android
 
             using (var extras = notificationBuilder.Call<AndroidJavaObject>("getExtras"))
             {
-                JniApi.Bundle.PutInt(extras, KEY_ID, id);
-                JniApi.Bundle.PutLong(extras, KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
-                JniApi.Bundle.PutLong(extras, KEY_FIRE_TIME, fireTime);
+                JniApi.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
+                JniApi.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
+                JniApi.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
                 if (!string.IsNullOrEmpty(notification.IntentData))
-                    JniApi.Bundle.PutString(extras, KEY_INTENT_DATA, notification.IntentData);
+                    JniApi.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
             }
 
             return notificationBuilder;
@@ -694,7 +704,7 @@ namespace Unity.Notifications.Android
         {
             using (var extras = notificationObj.Get<AndroidJavaObject>("extras"))
             {
-                var id = JniApi.Bundle.GetInt(extras, KEY_ID, -1);
+                var id = JniApi.Bundle.GetInt(extras, s_Jni.NotificationManager.KEY_ID, -1);
                 if (id == -1)
                     return null;
 
@@ -704,12 +714,12 @@ namespace Unity.Notifications.Android
                 var notification = new AndroidNotification();
                 notification.Title = JniApi.Bundle.GetString(extras, Notification_EXTRA_TITLE);
                 notification.Text = JniApi.Bundle.GetString(extras, Notification_EXTRA_TEXT);
-                notification.SmallIcon = JniApi.Bundle.GetString(extras, KEY_SMALL_ICON);
-                notification.LargeIcon = JniApi.Bundle.GetString(extras, KEY_LARGE_ICON);
+                notification.SmallIcon = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_SMALL_ICON);
+                notification.LargeIcon = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_LARGE_ICON);
                 notification.ShouldAutoCancel = 0 != (flags & Notification_FLAG_AUTO_CANCEL);
                 notification.UsesStopwatch = JniApi.Bundle.GetBoolean(extras, Notification_EXTRA_SHOW_CHRONOMETER, false);
-                notification.FireTime = JniApi.Bundle.GetLong(extras, KEY_FIRE_TIME, -1L).ToDatetime();
-                notification.RepeatInterval = JniApi.Bundle.GetLong(extras, KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
+                notification.FireTime = JniApi.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L).ToDatetime();
+                notification.RepeatInterval = JniApi.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
 
                 if (JniApi.Bundle.ContainsKey(extras, Notification_EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
@@ -718,7 +728,7 @@ namespace Unity.Notifications.Android
 
                 notification.Color = s_Jni.NotificationManager.GetNotificationColor(notificationObj);
                 notification.Number = notificationObj.Get<int>("number");
-                notification.IntentData = JniApi.Bundle.GetString(extras, KEY_INTENT_DATA);
+                notification.IntentData = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA);
                 notification.Group = notificationObj.Call<string>("getGroup");
                 notification.GroupSummary = 0 != (flags & Notification_FLAG_GROUP_SUMMARY);
                 notification.SortKey = notificationObj.Call<string>("getSortKey");
