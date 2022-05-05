@@ -257,11 +257,15 @@ namespace Unity.Notifications.Android
             public static int FLAG_AUTO_CANCEL;
             public static int FLAG_GROUP_SUMMARY;
 
+            static JniMethodID getGroup;
+            static JniMethodID getSortKey;
+
             public static void CollectJni()
             {
                 using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
                 {
                     CollectConstants(notificationClass);
+                    CollectMethods(notificationClass);
                 }
             }
 
@@ -274,6 +278,12 @@ namespace Unity.Notifications.Android
                 EXTRA_SHOW_WHEN = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
                 FLAG_AUTO_CANCEL = clazz.GetStatic<int>("FLAG_AUTO_CANCEL");
                 FLAG_GROUP_SUMMARY = clazz.GetStatic<int>("FLAG_GROUP_SUMMARY");
+            }
+
+            static void CollectMethods(AndroidJavaClass clazz)
+            {
+                getGroup = JniApi.FindMethod(clazz, "getGroup", "()Ljava/lang/String;", false);
+                getSortKey = JniApi.FindMethod(clazz, "getSortKey", "()Ljava/lang/String;", false);
             }
 
             public static AndroidJavaObject Extras(AndroidJavaObject notification)
@@ -293,12 +303,12 @@ namespace Unity.Notifications.Android
 
             public static string GetGroup(AndroidJavaObject notification)
             {
-                return notification.Call<string>("getGroup");
+                return notification.Call<string>(getGroup);
             }
 
             public static string GetSortKey(AndroidJavaObject notification)
             {
-                return notification.Call<string>("getSortKey");
+                return notification.Call<string>(getSortKey);
             }
 
             internal static long When(AndroidJavaObject notification)
