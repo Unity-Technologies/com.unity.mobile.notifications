@@ -88,6 +88,7 @@ namespace Unity.Notifications.Android
             KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
 
             CollectMethods(clazz);
+            JniApi.Notification.CollectJni();
 #else
             KEY_FIRE_TIME = null;
             KEY_ID = null;
@@ -256,18 +257,23 @@ namespace Unity.Notifications.Android
             public static int FLAG_AUTO_CANCEL;
             public static int FLAG_GROUP_SUMMARY;
 
-            public static void CollectConstants()
+            public static void CollectJni()
             {
                 using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
                 {
-                    EXTRA_TITLE = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TITLE");
-                    EXTRA_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
-                    EXTRA_SHOW_CHRONOMETER = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
-                    EXTRA_BIG_TEXT = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
-                    EXTRA_SHOW_WHEN = notificationClass.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
-                    FLAG_AUTO_CANCEL = notificationClass.GetStatic<int>("FLAG_AUTO_CANCEL");
-                    FLAG_GROUP_SUMMARY = notificationClass.GetStatic<int>("FLAG_GROUP_SUMMARY");
+                    CollectConstants(notificationClass);
                 }
+            }
+
+            static void CollectConstants(AndroidJavaClass clazz)
+            {
+                EXTRA_TITLE = clazz.GetStatic<AndroidJavaObject>("EXTRA_TITLE");
+                EXTRA_TEXT = clazz.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
+                EXTRA_SHOW_CHRONOMETER = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
+                EXTRA_BIG_TEXT = clazz.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
+                EXTRA_SHOW_WHEN = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
+                FLAG_AUTO_CANCEL = clazz.GetStatic<int>("FLAG_AUTO_CANCEL");
+                FLAG_GROUP_SUMMARY = clazz.GetStatic<int>("FLAG_GROUP_SUMMARY");
             }
 
             public static AndroidJavaObject Extras(AndroidJavaObject notification)
@@ -449,7 +455,6 @@ namespace Unity.Notifications.Android
             var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
             notificationManager.Call("setNotificationCallback", new NotificationCallback());
             s_Jni.NotificationManager = new NotificationManagerJni(notificationManagerClass, notificationManager);
-            JniApi.Notification.CollectConstants();
 
             s_Initialized = true;
 #endif
