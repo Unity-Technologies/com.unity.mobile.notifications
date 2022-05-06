@@ -864,13 +864,18 @@ namespace Unity.Notifications.Android
                 Debug.LogError("Failed to schedule notification, it did not contain a valid FireTime");
             }
 
+            // NOTE: JNI calls are expensive, so we avoid calls that set something that is also a default
+
             var notificationBuilder = s_Jni.NotificationManager.CreateNotificationBuilder(channelId);
             s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_SMALL_ICON, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
                 s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_LARGE_ICON, notification.LargeIcon);
-            s_Jni.NotificationBuilder.SetContentTitle(notificationBuilder, notification.Title);
-            s_Jni.NotificationBuilder.SetContentText(notificationBuilder, notification.Text);
-            s_Jni.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
+            if (!string.IsNullOrEmpty(notification.Title))
+                s_Jni.NotificationBuilder.SetContentTitle(notificationBuilder, notification.Title);
+            if (!string.IsNullOrEmpty(notification.Text))
+                s_Jni.NotificationBuilder.SetContentText(notificationBuilder, notification.Text);
+            if (notification.ShouldAutoCancel)
+                s_Jni.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
             if (notification.Number >= 0)
                 s_Jni.NotificationBuilder.SetNumber(notificationBuilder, notification.Number);
             if (notification.Style == NotificationStyle.BigTextStyle)
@@ -889,12 +894,15 @@ namespace Unity.Notifications.Android
                 s_Jni.NotificationBuilder.SetGroupSummary(notificationBuilder, notification.GroupSummary);
             if (!string.IsNullOrEmpty(notification.SortKey))
                 s_Jni.NotificationBuilder.SetSortKey(notificationBuilder, notification.SortKey);
-            s_Jni.NotificationBuilder.SetShowWhen(notificationBuilder, notification.ShowTimestamp);
+            if (notification.ShowTimestamp)
+                s_Jni.NotificationBuilder.SetShowWhen(notificationBuilder, notification.ShowTimestamp);
             int color = notification.Color.ToInt();
             if (color != 0)
                 s_Jni.NotificationManager.SetNotificationColor(notificationBuilder, color);
-            s_Jni.NotificationManager.SetNotificationUsesChronometer(notificationBuilder, notification.UsesStopwatch);
-            s_Jni.NotificationManager.SetNotificationGroupAlertBehavior(notificationBuilder, (int)notification.GroupAlertBehaviour);
+            if (notification.UsesStopwatch)
+                s_Jni.NotificationManager.SetNotificationUsesChronometer(notificationBuilder, notification.UsesStopwatch);
+            if (notification.GroupAlertBehaviour != GroupAlertBehaviours.GroupAlertAll)  // All is default value
+                s_Jni.NotificationManager.SetNotificationGroupAlertBehavior(notificationBuilder, (int)notification.GroupAlertBehaviour);
 
             using (var extras = s_Jni.NotificationBuilder.GetExtras(notificationBuilder))
             {
