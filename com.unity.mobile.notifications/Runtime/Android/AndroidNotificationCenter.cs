@@ -88,8 +88,6 @@ namespace Unity.Notifications.Android
             KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
 
             CollectMethods(clazz);
-            JniApi.NotificationBuilder.CollectJni();
-            JniApi.Bundle.CollectJni();
 #else
             KEY_FIRE_TIME = null;
             KEY_ID = null;
@@ -233,79 +231,88 @@ namespace Unity.Notifications.Android
     }
 
     struct NotificationJni
+    {
+        public AndroidJavaObject EXTRA_TITLE;
+        public AndroidJavaObject EXTRA_TEXT;
+        public AndroidJavaObject EXTRA_SHOW_CHRONOMETER;
+        public AndroidJavaObject EXTRA_BIG_TEXT;
+        public AndroidJavaObject EXTRA_SHOW_WHEN;
+        public int FLAG_AUTO_CANCEL;
+        public int FLAG_GROUP_SUMMARY;
+
+        JniMethodID getGroup;
+        JniMethodID getSortKey;
+
+        public void CollectJni()
         {
-            public AndroidJavaObject EXTRA_TITLE;
-            public AndroidJavaObject EXTRA_TEXT;
-            public AndroidJavaObject EXTRA_SHOW_CHRONOMETER;
-            public AndroidJavaObject EXTRA_BIG_TEXT;
-            public AndroidJavaObject EXTRA_SHOW_WHEN;
-            public int FLAG_AUTO_CANCEL;
-            public int FLAG_GROUP_SUMMARY;
-
-            JniMethodID getGroup;
-            JniMethodID getSortKey;
-
-            public void CollectJni()
+            using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
             {
-                using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
-                {
-                    CollectConstants(notificationClass);
-                    CollectMethods(notificationClass);
-                }
-            }
-
-            void CollectConstants(AndroidJavaClass clazz)
-            {
-                EXTRA_TITLE = clazz.GetStatic<AndroidJavaObject>("EXTRA_TITLE");
-                EXTRA_TEXT = clazz.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
-                EXTRA_SHOW_CHRONOMETER = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
-                EXTRA_BIG_TEXT = clazz.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
-                EXTRA_SHOW_WHEN = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
-                FLAG_AUTO_CANCEL = clazz.GetStatic<int>("FLAG_AUTO_CANCEL");
-                FLAG_GROUP_SUMMARY = clazz.GetStatic<int>("FLAG_GROUP_SUMMARY");
-            }
-
-            void CollectMethods(AndroidJavaClass clazz)
-            {
-                getGroup = JniApi.FindMethod(clazz, "getGroup", "()Ljava/lang/String;", false);
-                getSortKey = JniApi.FindMethod(clazz, "getSortKey", "()Ljava/lang/String;", false);
-            }
-
-            public AndroidJavaObject Extras(AndroidJavaObject notification)
-            {
-                return notification.Get<AndroidJavaObject>("extras");
-            }
-
-            public int Flags(AndroidJavaObject notification)
-            {
-                return notification.Get<int>("flags");
-            }
-
-            public int Number(AndroidJavaObject notification)
-            {
-                return notification.Get<int>("number");
-            }
-
-            public string GetGroup(AndroidJavaObject notification)
-            {
-                return notification.Call<string>(getGroup);
-            }
-
-            public string GetSortKey(AndroidJavaObject notification)
-            {
-                return notification.Call<string>(getSortKey);
-            }
-
-            internal long When(AndroidJavaObject notification)
-            {
-                return notification.Get<long>("when");
+                CollectConstants(notificationClass);
+                CollectMethods(notificationClass);
             }
         }
+
+        void CollectConstants(AndroidJavaClass clazz)
+        {
+            EXTRA_TITLE = clazz.GetStatic<AndroidJavaObject>("EXTRA_TITLE");
+            EXTRA_TEXT = clazz.GetStatic<AndroidJavaObject>("EXTRA_TEXT");
+            EXTRA_SHOW_CHRONOMETER = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_CHRONOMETER");
+            EXTRA_BIG_TEXT = clazz.GetStatic<AndroidJavaObject>("EXTRA_BIG_TEXT");
+            EXTRA_SHOW_WHEN = clazz.GetStatic<AndroidJavaObject>("EXTRA_SHOW_WHEN");
+            FLAG_AUTO_CANCEL = clazz.GetStatic<int>("FLAG_AUTO_CANCEL");
+            FLAG_GROUP_SUMMARY = clazz.GetStatic<int>("FLAG_GROUP_SUMMARY");
+        }
+
+        void CollectMethods(AndroidJavaClass clazz)
+        {
+            getGroup = JniApi.FindMethod(clazz, "getGroup", "()Ljava/lang/String;", false);
+            getSortKey = JniApi.FindMethod(clazz, "getSortKey", "()Ljava/lang/String;", false);
+        }
+
+        public AndroidJavaObject Extras(AndroidJavaObject notification)
+        {
+            return notification.Get<AndroidJavaObject>("extras");
+        }
+
+        public int Flags(AndroidJavaObject notification)
+        {
+            return notification.Get<int>("flags");
+        }
+
+        public int Number(AndroidJavaObject notification)
+        {
+            return notification.Get<int>("number");
+        }
+
+        public string GetGroup(AndroidJavaObject notification)
+        {
+            return notification.Call<string>(getGroup);
+        }
+
+        public string GetSortKey(AndroidJavaObject notification)
+        {
+            return notification.Call<string>(getSortKey);
+        }
+
+        internal long When(AndroidJavaObject notification)
+        {
+            return notification.Get<long>("when");
+        }
+    }
 
     struct JniApi
     {
         public NotificationManagerJni NotificationManager;
         public NotificationJni Notification;
+
+        public JniApi(AndroidJavaClass notificationManagerClass, AndroidJavaObject notificationManager)
+        {
+            NotificationManager = new NotificationManagerJni(notificationManagerClass, notificationManager);
+            Notification = default;
+            Notification.CollectJni();
+            JniApi.NotificationBuilder.CollectJni();
+            JniApi.Bundle.CollectJni();
+        }
 
         public static JniMethodID FindMethod(AndroidJavaClass clazz, string name, string signature, bool isStatic)
         {
@@ -520,8 +527,7 @@ namespace Unity.Notifications.Android
             var notificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
             var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
             notificationManager.Call("setNotificationCallback", new NotificationCallback());
-            s_Jni.NotificationManager = new NotificationManagerJni(notificationManagerClass, notificationManager);
-            s_Jni.Notification.CollectJni();
+            s_Jni = new JniApi(notificationManagerClass, notificationManager);
 
             s_Initialized = true;
 #endif
