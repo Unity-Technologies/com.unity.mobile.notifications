@@ -90,6 +90,7 @@ namespace Unity.Notifications.Android
             CollectMethods(clazz);
             JniApi.Notification.CollectJni();
             JniApi.NotificationBuilder.CollectJni();
+            JniApi.Bundle.CollectJni();
 #else
             KEY_FIRE_TIME = null;
             KEY_ID = null;
@@ -408,44 +409,68 @@ namespace Unity.Notifications.Android
 
         public static class Bundle
         {
+            static JniMethodID containsKey;
+            static JniMethodID getBoolean;
+            static JniMethodID getInt;
+            static JniMethodID getLong;
+            static JniMethodID getString;
+            static JniMethodID putInt;
+            static JniMethodID putLong;
+            static JniMethodID putString;
+
+            public static void CollectJni()
+            {
+                using (var clazz = new AndroidJavaClass("android/os/Bundle"))
+                {
+                    containsKey = JniApi.FindMethod(clazz, "containsKey", "(Ljava/lang/String;)Z", false);
+                    getBoolean = JniApi.FindMethod(clazz, "getBoolean", "(Ljava/lang/String;Z)Z", false);
+                    getInt = JniApi.FindMethod(clazz, "getInt", "(Ljava/lang/String;I)I", false);
+                    getLong = JniApi.FindMethod(clazz, "getLong", "(Ljava/lang/String;J)J", false);
+                    getString = JniApi.FindMethod(clazz, "getString", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                    putInt = JniApi.FindMethod(clazz, "putInt", "(Ljava/lang/String;I)V", false);
+                    putLong = JniApi.FindMethod(clazz, "putLong", "(Ljava/lang/String;J)V", false);
+                    putString = JniApi.FindMethod(clazz, "putString", "(Ljava/lang/String;Ljava/lang/String;)V", false);
+                }
+            }
+
             public static bool ContainsKey(AndroidJavaObject bundle, AndroidJavaObject key)
             {
-                return bundle.Call<bool>("containsKey", key);
+                return bundle.Call<bool>(containsKey, key);
             }
 
             public static bool GetBoolean(AndroidJavaObject bundle, AndroidJavaObject key, bool defaultValue)
             {
-                return bundle.Call<bool>("getBoolean", key, defaultValue);
+                return bundle.Call<bool>(getBoolean, key, defaultValue);
             }
 
             public static int GetInt(AndroidJavaObject bundle, AndroidJavaObject key, int defaultValue)
             {
-                return bundle.Call<int>("getInt", key, defaultValue);
+                return bundle.Call<int>(getInt, key, defaultValue);
             }
 
             public static long GetLong(AndroidJavaObject bundle, AndroidJavaObject key, long defaultValue)
             {
-                return bundle.Call<long>("getLong", key, defaultValue);
+                return bundle.Call<long>(getLong, key, defaultValue);
             }
 
             public static string GetString(AndroidJavaObject bundle, AndroidJavaObject key)
             {
-                return bundle.Call<string>("getString", key);
+                return bundle.Call<string>(getString, key);
             }
 
             public static void PutInt(AndroidJavaObject bundle, AndroidJavaObject key, int value)
             {
-                bundle.Call("putInt", key, value);
+                bundle.Call(putInt, key, value);
             }
 
             public static void PutLong(AndroidJavaObject bundle, AndroidJavaObject key, long value)
             {
-                bundle.Call("putLong", key, value);
+                bundle.Call(putLong, key, value);
             }
 
             public static void PutString(AndroidJavaObject bundle, AndroidJavaObject key, string value)
             {
-                bundle.Call("putString", key, value);
+                bundle.Call(putString, key, value);
             }
         }
     }
