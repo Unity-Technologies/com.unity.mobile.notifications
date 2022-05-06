@@ -245,12 +245,18 @@ namespace Unity.Notifications.Android
         JniMethodID getGroup;
         JniMethodID getSortKey;
 
+        JniFieldID extras;
+        JniFieldID flags;
+        JniFieldID number;
+        JniFieldID when;
+
         public void CollectJni()
         {
             using (var notificationClass = new AndroidJavaClass("android.app.Notification"))
             {
                 CollectConstants(notificationClass);
                 CollectMethods(notificationClass);
+                CollectFields(notificationClass);
             }
         }
 
@@ -271,19 +277,27 @@ namespace Unity.Notifications.Android
             getSortKey = JniApi.FindMethod(clazz, "getSortKey", "()Ljava/lang/String;", false);
         }
 
+        void CollectFields(AndroidJavaClass clazz)
+        {
+            extras = JniApi.FindField(clazz, "extras", "Landroid/os/Bundle;", false);
+            flags = JniApi.FindField(clazz, "flags", "I", false);
+            number = JniApi.FindField(clazz, "number", "I", false);
+            when = JniApi.FindField(clazz, "when", "J", false);
+        }
+
         public AndroidJavaObject Extras(AndroidJavaObject notification)
         {
-            return notification.Get<AndroidJavaObject>("extras");
+            return notification.Get<AndroidJavaObject>(extras);
         }
 
         public int Flags(AndroidJavaObject notification)
         {
-            return notification.Get<int>("flags");
+            return notification.Get<int>(flags);
         }
 
         public int Number(AndroidJavaObject notification)
         {
-            return notification.Get<int>("number");
+            return notification.Get<int>(number);
         }
 
         public string GetGroup(AndroidJavaObject notification)
@@ -298,7 +312,7 @@ namespace Unity.Notifications.Android
 
         internal long When(AndroidJavaObject notification)
         {
-            return notification.Get<long>("when");
+            return notification.Get<long>(when);
         }
     }
 
