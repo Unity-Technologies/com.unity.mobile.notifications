@@ -300,17 +300,107 @@ namespace Unity.Notifications.Android
         }
     }
 
+    struct NotificationBuilderJni
+    {
+        JniMethodID getExtras;
+        JniMethodID setContentTitle;
+        JniMethodID setContentText;
+        JniMethodID setAutoCancel;
+        JniMethodID setNumber;
+        JniMethodID setStyle;
+        JniMethodID setWhen;
+        JniMethodID setGroup;
+        JniMethodID setGroupSummary;
+        JniMethodID setSortKey;
+        JniMethodID setShowWhen;
+
+        public void CollectJni()
+        {
+            using (var clazz = new AndroidJavaClass("android.app.Notification$Builder"))
+            {
+                getExtras = JniApi.FindMethod(clazz, "getExtras", "()Landroid/os/Bundle;", false);
+                setContentTitle = JniApi.FindMethod(clazz, "setContentTitle", "(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;", false);
+                setContentText = JniApi.FindMethod(clazz, "setContentText", "(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;", false);
+                setAutoCancel = JniApi.FindMethod(clazz, "setAutoCancel", "(Z)Landroid/app/Notification$Builder;", false);
+                setNumber = JniApi.FindMethod(clazz, "setNumber", "(I)Landroid/app/Notification$Builder;", false);
+                setStyle = JniApi.FindMethod(clazz, "setStyle", "(Landroid/app/Notification$Style;)Landroid/app/Notification$Builder;", false);
+                setWhen = JniApi.FindMethod(clazz, "setWhen", "(J)Landroid/app/Notification$Builder;", false);
+                setGroup = JniApi.FindMethod(clazz, "setGroup", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
+                setGroupSummary = JniApi.FindMethod(clazz, "setGroupSummary", "(Z)Landroid/app/Notification$Builder;", false);
+                setSortKey = JniApi.FindMethod(clazz, "setSortKey", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
+                setShowWhen = JniApi.FindMethod(clazz, "setShowWhen", "(Z)Landroid/app/Notification$Builder;", false);
+            }
+        }
+
+        public AndroidJavaObject GetExtras(AndroidJavaObject builder)
+        {
+            return builder.Call<AndroidJavaObject>(getExtras);
+        }
+
+        public void SetContentTitle(AndroidJavaObject builder, string title)
+        {
+            builder.Call<AndroidJavaObject>(setContentTitle, title).Dispose();
+        }
+
+        public void SetContentText(AndroidJavaObject builder, string text)
+        {
+            builder.Call<AndroidJavaObject>(setContentText, text).Dispose();
+        }
+
+        public void SetAutoCancel(AndroidJavaObject builder, bool shouldAutoCancel)
+        {
+            builder.Call<AndroidJavaObject>(setAutoCancel, shouldAutoCancel).Dispose();
+        }
+
+        public void SetNumber(AndroidJavaObject builder, int number)
+        {
+            builder.Call<AndroidJavaObject>(setNumber, number).Dispose();
+        }
+
+        public void SetStyle(AndroidJavaObject builder, AndroidJavaObject style)
+        {
+            builder.Call<AndroidJavaObject>(setStyle, style).Dispose();
+        }
+
+        public void SetWhen(AndroidJavaObject builder, long timestamp)
+        {
+            builder.Call<AndroidJavaObject>(setWhen, timestamp).Dispose();
+        }
+
+        public void SetGroup(AndroidJavaObject builder, string group)
+        {
+            builder.Call<AndroidJavaObject>(setGroup, group).Dispose();
+        }
+
+        public void SetGroupSummary(AndroidJavaObject builder, bool groupSummary)
+        {
+            builder.Call<AndroidJavaObject>(setGroupSummary, groupSummary).Dispose();
+        }
+
+        public void SetSortKey(AndroidJavaObject builder, string sortKey)
+        {
+            builder.Call<AndroidJavaObject>(setSortKey, sortKey).Dispose();
+        }
+
+        public void SetShowWhen(AndroidJavaObject builder, bool showTimestamp)
+        {
+            builder.Call<AndroidJavaObject>(setShowWhen, showTimestamp).Dispose();
+        }
+    }
+
     struct JniApi
     {
         public NotificationManagerJni NotificationManager;
         public NotificationJni Notification;
+        public NotificationBuilderJni NotificationBuilder;
 
         public JniApi(AndroidJavaClass notificationManagerClass, AndroidJavaObject notificationManager)
         {
             NotificationManager = new NotificationManagerJni(notificationManagerClass, notificationManager);
             Notification = default;
             Notification.CollectJni();
-            JniApi.NotificationBuilder.CollectJni();
+            NotificationBuilder = default;
+            NotificationBuilder.CollectJni();
             JniApi.Bundle.CollectJni();
         }
 
@@ -324,94 +414,6 @@ namespace Unity.Notifications.Android
 #else
             return name;
 #endif
-        }
-
-        public static class NotificationBuilder
-        {
-            static JniMethodID getExtras;
-            static JniMethodID setContentTitle;
-            static JniMethodID setContentText;
-            static JniMethodID setAutoCancel;
-            static JniMethodID setNumber;
-            static JniMethodID setStyle;
-            static JniMethodID setWhen;
-            static JniMethodID setGroup;
-            static JniMethodID setGroupSummary;
-            static JniMethodID setSortKey;
-            static JniMethodID setShowWhen;
-
-            public static void CollectJni()
-            {
-                using (var clazz = new AndroidJavaClass("android.app.Notification$Builder"))
-                {
-                    getExtras = JniApi.FindMethod(clazz, "getExtras", "()Landroid/os/Bundle;", false);
-                    setContentTitle = JniApi.FindMethod(clazz, "setContentTitle", "(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;", false);
-                    setContentText = JniApi.FindMethod(clazz, "setContentText", "(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;", false);
-                    setAutoCancel = JniApi.FindMethod(clazz, "setAutoCancel", "(Z)Landroid/app/Notification$Builder;", false);
-                    setNumber = JniApi.FindMethod(clazz, "setNumber", "(I)Landroid/app/Notification$Builder;", false);
-                    setStyle = JniApi.FindMethod(clazz, "setStyle", "(Landroid/app/Notification$Style;)Landroid/app/Notification$Builder;", false);
-                    setWhen = JniApi.FindMethod(clazz, "setWhen", "(J)Landroid/app/Notification$Builder;", false);
-                    setGroup = JniApi.FindMethod(clazz, "setGroup", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
-                    setGroupSummary = JniApi.FindMethod(clazz, "setGroupSummary", "(Z)Landroid/app/Notification$Builder;", false);
-                    setSortKey = JniApi.FindMethod(clazz, "setSortKey", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
-                    setShowWhen = JniApi.FindMethod(clazz, "setShowWhen", "(Z)Landroid/app/Notification$Builder;", false);
-                }
-            }
-
-            public static AndroidJavaObject GetExtras(AndroidJavaObject builder)
-            {
-                return builder.Call<AndroidJavaObject>(getExtras);
-            }
-
-            public static void SetContentTitle(AndroidJavaObject builder, string title)
-            {
-                builder.Call<AndroidJavaObject>(setContentTitle, title).Dispose();
-            }
-
-            public static void SetContentText(AndroidJavaObject builder, string text)
-            {
-                builder.Call<AndroidJavaObject>(setContentText, text).Dispose();
-            }
-
-            public static void SetAutoCancel(AndroidJavaObject builder, bool shouldAutoCancel)
-            {
-                builder.Call<AndroidJavaObject>(setAutoCancel, shouldAutoCancel).Dispose();
-            }
-
-            public static void SetNumber(AndroidJavaObject builder, int number)
-            {
-                builder.Call<AndroidJavaObject>(setNumber, number).Dispose();
-            }
-
-            public static void SetStyle(AndroidJavaObject builder, AndroidJavaObject style)
-            {
-                builder.Call<AndroidJavaObject>(setStyle, style).Dispose();
-            }
-
-            public static void SetWhen(AndroidJavaObject builder, long timestamp)
-            {
-                builder.Call<AndroidJavaObject>(setWhen, timestamp).Dispose();
-            }
-
-            public static void SetGroup(AndroidJavaObject builder, string group)
-            {
-                builder.Call<AndroidJavaObject>(setGroup, group).Dispose();
-            }
-
-            public static void SetGroupSummary(AndroidJavaObject builder, bool groupSummary)
-            {
-                builder.Call<AndroidJavaObject>(setGroupSummary, groupSummary).Dispose();
-            }
-
-            public static void SetSortKey(AndroidJavaObject builder, string sortKey)
-            {
-                builder.Call<AndroidJavaObject>(setSortKey, sortKey).Dispose();
-            }
-
-            public static void SetShowWhen(AndroidJavaObject builder, bool showTimestamp)
-            {
-                builder.Call<AndroidJavaObject>(setShowWhen, showTimestamp).Dispose();
-            }
         }
 
         public static class Bundle
@@ -836,35 +838,35 @@ namespace Unity.Notifications.Android
             s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_SMALL_ICON, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
                 s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_LARGE_ICON, notification.LargeIcon);
-            JniApi.NotificationBuilder.SetContentTitle(notificationBuilder, notification.Title);
-            JniApi.NotificationBuilder.SetContentText(notificationBuilder, notification.Text);
-            JniApi.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
+            s_Jni.NotificationBuilder.SetContentTitle(notificationBuilder, notification.Title);
+            s_Jni.NotificationBuilder.SetContentText(notificationBuilder, notification.Text);
+            s_Jni.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
             if (notification.Number >= 0)
-                JniApi.NotificationBuilder.SetNumber(notificationBuilder, notification.Number);
+                s_Jni.NotificationBuilder.SetNumber(notificationBuilder, notification.Number);
             if (notification.Style == NotificationStyle.BigTextStyle)
             {
                 using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
                 {
                     style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
-                    JniApi.NotificationBuilder.SetStyle(notificationBuilder, style);
+                    s_Jni.NotificationBuilder.SetStyle(notificationBuilder, style);
                 }
             }
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
-            JniApi.NotificationBuilder.SetWhen(notificationBuilder, timestampValue);
+            s_Jni.NotificationBuilder.SetWhen(notificationBuilder, timestampValue);
             if (!string.IsNullOrEmpty(notification.Group))
-                JniApi.NotificationBuilder.SetGroup(notificationBuilder, notification.Group);
+                s_Jni.NotificationBuilder.SetGroup(notificationBuilder, notification.Group);
             if (notification.GroupSummary)
-                JniApi.NotificationBuilder.SetGroupSummary(notificationBuilder, notification.GroupSummary);
+                s_Jni.NotificationBuilder.SetGroupSummary(notificationBuilder, notification.GroupSummary);
             if (!string.IsNullOrEmpty(notification.SortKey))
-                JniApi.NotificationBuilder.SetSortKey(notificationBuilder, notification.SortKey);
-            JniApi.NotificationBuilder.SetShowWhen(notificationBuilder, notification.ShowTimestamp);
+                s_Jni.NotificationBuilder.SetSortKey(notificationBuilder, notification.SortKey);
+            s_Jni.NotificationBuilder.SetShowWhen(notificationBuilder, notification.ShowTimestamp);
             int color = notification.Color.ToInt();
             if (color != 0)
                 s_Jni.NotificationManager.SetNotificationColor(notificationBuilder, color);
             s_Jni.NotificationManager.SetNotificationUsesChronometer(notificationBuilder, notification.UsesStopwatch);
             s_Jni.NotificationManager.SetNotificationGroupAlertBehavior(notificationBuilder, (int)notification.GroupAlertBehaviour);
 
-            using (var extras = JniApi.NotificationBuilder.GetExtras(notificationBuilder))
+            using (var extras = s_Jni.NotificationBuilder.GetExtras(notificationBuilder))
             {
                 JniApi.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
                 JniApi.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
