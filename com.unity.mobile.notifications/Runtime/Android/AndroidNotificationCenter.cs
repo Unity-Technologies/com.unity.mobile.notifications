@@ -388,11 +388,79 @@ namespace Unity.Notifications.Android
         }
     }
 
+    struct BundleJni
+    {
+        JniMethodID containsKey;
+        JniMethodID getBoolean;
+        JniMethodID getInt;
+        JniMethodID getLong;
+        JniMethodID getString;
+        JniMethodID putInt;
+        JniMethodID putLong;
+        JniMethodID putString;
+
+        public void CollectJni()
+        {
+            using (var clazz = new AndroidJavaClass("android/os/Bundle"))
+            {
+                containsKey = JniApi.FindMethod(clazz, "containsKey", "(Ljava/lang/String;)Z", false);
+                getBoolean = JniApi.FindMethod(clazz, "getBoolean", "(Ljava/lang/String;Z)Z", false);
+                getInt = JniApi.FindMethod(clazz, "getInt", "(Ljava/lang/String;I)I", false);
+                getLong = JniApi.FindMethod(clazz, "getLong", "(Ljava/lang/String;J)J", false);
+                getString = JniApi.FindMethod(clazz, "getString", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                putInt = JniApi.FindMethod(clazz, "putInt", "(Ljava/lang/String;I)V", false);
+                putLong = JniApi.FindMethod(clazz, "putLong", "(Ljava/lang/String;J)V", false);
+                putString = JniApi.FindMethod(clazz, "putString", "(Ljava/lang/String;Ljava/lang/String;)V", false);
+            }
+        }
+
+        public bool ContainsKey(AndroidJavaObject bundle, AndroidJavaObject key)
+        {
+            return bundle.Call<bool>(containsKey, key);
+        }
+
+        public bool GetBoolean(AndroidJavaObject bundle, AndroidJavaObject key, bool defaultValue)
+        {
+            return bundle.Call<bool>(getBoolean, key, defaultValue);
+        }
+
+        public int GetInt(AndroidJavaObject bundle, AndroidJavaObject key, int defaultValue)
+        {
+            return bundle.Call<int>(getInt, key, defaultValue);
+        }
+
+        public long GetLong(AndroidJavaObject bundle, AndroidJavaObject key, long defaultValue)
+        {
+            return bundle.Call<long>(getLong, key, defaultValue);
+        }
+
+        public string GetString(AndroidJavaObject bundle, AndroidJavaObject key)
+        {
+            return bundle.Call<string>(getString, key);
+        }
+
+        public void PutInt(AndroidJavaObject bundle, AndroidJavaObject key, int value)
+        {
+            bundle.Call(putInt, key, value);
+        }
+
+        public void PutLong(AndroidJavaObject bundle, AndroidJavaObject key, long value)
+        {
+            bundle.Call(putLong, key, value);
+        }
+
+        public void PutString(AndroidJavaObject bundle, AndroidJavaObject key, string value)
+        {
+            bundle.Call(putString, key, value);
+        }
+    }
+
     struct JniApi
     {
         public NotificationManagerJni NotificationManager;
         public NotificationJni Notification;
         public NotificationBuilderJni NotificationBuilder;
+        public BundleJni Bundle;
 
         public JniApi(AndroidJavaClass notificationManagerClass, AndroidJavaObject notificationManager)
         {
@@ -401,7 +469,8 @@ namespace Unity.Notifications.Android
             Notification.CollectJni();
             NotificationBuilder = default;
             NotificationBuilder.CollectJni();
-            JniApi.Bundle.CollectJni();
+            Bundle = default;
+            Bundle.CollectJni();
         }
 
         public static JniMethodID FindMethod(AndroidJavaClass clazz, string name, string signature, bool isStatic)
@@ -414,73 +483,6 @@ namespace Unity.Notifications.Android
 #else
             return name;
 #endif
-        }
-
-        public static class Bundle
-        {
-            static JniMethodID containsKey;
-            static JniMethodID getBoolean;
-            static JniMethodID getInt;
-            static JniMethodID getLong;
-            static JniMethodID getString;
-            static JniMethodID putInt;
-            static JniMethodID putLong;
-            static JniMethodID putString;
-
-            public static void CollectJni()
-            {
-                using (var clazz = new AndroidJavaClass("android/os/Bundle"))
-                {
-                    containsKey = JniApi.FindMethod(clazz, "containsKey", "(Ljava/lang/String;)Z", false);
-                    getBoolean = JniApi.FindMethod(clazz, "getBoolean", "(Ljava/lang/String;Z)Z", false);
-                    getInt = JniApi.FindMethod(clazz, "getInt", "(Ljava/lang/String;I)I", false);
-                    getLong = JniApi.FindMethod(clazz, "getLong", "(Ljava/lang/String;J)J", false);
-                    getString = JniApi.FindMethod(clazz, "getString", "(Ljava/lang/String;)Ljava/lang/String;", false);
-                    putInt = JniApi.FindMethod(clazz, "putInt", "(Ljava/lang/String;I)V", false);
-                    putLong = JniApi.FindMethod(clazz, "putLong", "(Ljava/lang/String;J)V", false);
-                    putString = JniApi.FindMethod(clazz, "putString", "(Ljava/lang/String;Ljava/lang/String;)V", false);
-                }
-            }
-
-            public static bool ContainsKey(AndroidJavaObject bundle, AndroidJavaObject key)
-            {
-                return bundle.Call<bool>(containsKey, key);
-            }
-
-            public static bool GetBoolean(AndroidJavaObject bundle, AndroidJavaObject key, bool defaultValue)
-            {
-                return bundle.Call<bool>(getBoolean, key, defaultValue);
-            }
-
-            public static int GetInt(AndroidJavaObject bundle, AndroidJavaObject key, int defaultValue)
-            {
-                return bundle.Call<int>(getInt, key, defaultValue);
-            }
-
-            public static long GetLong(AndroidJavaObject bundle, AndroidJavaObject key, long defaultValue)
-            {
-                return bundle.Call<long>(getLong, key, defaultValue);
-            }
-
-            public static string GetString(AndroidJavaObject bundle, AndroidJavaObject key)
-            {
-                return bundle.Call<string>(getString, key);
-            }
-
-            public static void PutInt(AndroidJavaObject bundle, AndroidJavaObject key, int value)
-            {
-                bundle.Call(putInt, key, value);
-            }
-
-            public static void PutLong(AndroidJavaObject bundle, AndroidJavaObject key, long value)
-            {
-                bundle.Call(putLong, key, value);
-            }
-
-            public static void PutString(AndroidJavaObject bundle, AndroidJavaObject key, string value)
-            {
-                bundle.Call(putString, key, value);
-            }
         }
     }
 
@@ -868,11 +870,11 @@ namespace Unity.Notifications.Android
 
             using (var extras = s_Jni.NotificationBuilder.GetExtras(notificationBuilder))
             {
-                JniApi.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
-                JniApi.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
-                JniApi.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
+                s_Jni.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
+                s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
+                s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
                 if (!string.IsNullOrEmpty(notification.IntentData))
-                    JniApi.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
+                    s_Jni.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
             }
 
             return notificationBuilder;
@@ -882,7 +884,7 @@ namespace Unity.Notifications.Android
         {
             using (var extras = s_Jni.Notification.Extras(notificationObj))
             {
-                var id = JniApi.Bundle.GetInt(extras, s_Jni.NotificationManager.KEY_ID, -1);
+                var id = s_Jni.Bundle.GetInt(extras, s_Jni.NotificationManager.KEY_ID, -1);
                 if (id == -1)
                     return null;
 
@@ -890,28 +892,28 @@ namespace Unity.Notifications.Android
                 int flags = s_Jni.Notification.Flags(notificationObj);
 
                 var notification = new AndroidNotification();
-                notification.Title = JniApi.Bundle.GetString(extras, s_Jni.Notification.EXTRA_TITLE);
-                notification.Text = JniApi.Bundle.GetString(extras, s_Jni.Notification.EXTRA_TEXT);
-                notification.SmallIcon = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_SMALL_ICON);
-                notification.LargeIcon = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_LARGE_ICON);
+                notification.Title = s_Jni.Bundle.GetString(extras, s_Jni.Notification.EXTRA_TITLE);
+                notification.Text = s_Jni.Bundle.GetString(extras, s_Jni.Notification.EXTRA_TEXT);
+                notification.SmallIcon = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_SMALL_ICON);
+                notification.LargeIcon = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_LARGE_ICON);
                 notification.ShouldAutoCancel = 0 != (flags & s_Jni.Notification.FLAG_AUTO_CANCEL);
-                notification.UsesStopwatch = JniApi.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_CHRONOMETER, false);
-                notification.FireTime = JniApi.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L).ToDatetime();
-                notification.RepeatInterval = JniApi.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
+                notification.UsesStopwatch = s_Jni.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_CHRONOMETER, false);
+                notification.FireTime = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L).ToDatetime();
+                notification.RepeatInterval = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
 
-                if (JniApi.Bundle.ContainsKey(extras, s_Jni.Notification.EXTRA_BIG_TEXT))
+                if (s_Jni.Bundle.ContainsKey(extras, s_Jni.Notification.EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
                 else
                     notification.Style = NotificationStyle.None;
 
                 notification.Color = s_Jni.NotificationManager.GetNotificationColor(notificationObj);
                 notification.Number = s_Jni.Notification.Number(notificationObj);
-                notification.IntentData = JniApi.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA);
+                notification.IntentData = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA);
                 notification.Group = s_Jni.Notification.GetGroup(notificationObj);
                 notification.GroupSummary = 0 != (flags & s_Jni.Notification.FLAG_GROUP_SUMMARY);
                 notification.SortKey = s_Jni.Notification.GetSortKey(notificationObj);
                 notification.GroupAlertBehaviour = s_Jni.NotificationManager.GetNotificationGroupAlertBehavior(notificationObj).ToGroupAlertBehaviours();
-                var showTimestamp = JniApi.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_WHEN, false);
+                var showTimestamp = s_Jni.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_WHEN, false);
                 notification.ShowTimestamp = showTimestamp;
                 if (showTimestamp)
                     notification.CustomTimestamp = s_Jni.Notification.When(notificationObj).ToDatetime();
