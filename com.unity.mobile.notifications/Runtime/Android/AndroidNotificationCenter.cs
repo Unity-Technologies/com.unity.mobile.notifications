@@ -5,8 +5,10 @@ using UnityEngine;
 
 #if UNITY_2022_2_OR_NEWER
     using JniMethodID = System.IntPtr;
+    using JniFieldID = System.IntPtr;
 #else
     using JniMethodID = System.String;
+    using JniFieldID = System.String;
 #endif
 
 namespace Unity.Notifications.Android
@@ -471,6 +473,18 @@ namespace Unity.Notifications.Android
             NotificationBuilder.CollectJni();
             Bundle = default;
             Bundle.CollectJni();
+        }
+
+        public static JniFieldID FindField(AndroidJavaClass clazz, string name, string signature, bool isStatic)
+        {
+#if UNITY_2022_2_OR_NEWER
+            var field = AndroidJNIHelper.GetFieldID(clazz.GetRawClass(), name, signature, isStatic);
+            if (field == IntPtr.Zero)
+                throw new Exception($"Field {name} with signature {signature} not found");
+            return field;
+#else
+            return name;
+#endif
         }
 
         public static JniMethodID FindMethod(AndroidJavaClass clazz, string name, string signature, bool isStatic)
