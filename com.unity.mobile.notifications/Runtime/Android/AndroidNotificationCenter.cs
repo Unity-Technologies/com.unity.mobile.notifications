@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_2022_2_OR_NEWER
-    using JniMethodID = System.IntPtr;
-    using JniFieldID = System.IntPtr;
+using JniMethodID = System.IntPtr;
+using JniFieldID = System.IntPtr;
 #else
-    using JniMethodID = System.String;
-    using JniFieldID = System.String;
+using JniMethodID = System.String;
+using JniFieldID = System.String;
 #endif
 
 namespace Unity.Notifications.Android
