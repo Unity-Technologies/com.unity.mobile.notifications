@@ -182,7 +182,8 @@ class iOSNotificationTests
 
         iOSNotificationCenter.ScheduleNotification(notification);
         Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, Now: {dateTime}, Notification should arrive on: {dt}");
-        yield return WaitForNotification(10.0f);
+        yield return WaitForNotification(20.0f);
+        Debug.Log($"SendNotificationUsingCalendarTrigger_NotificationIsReceived, wait finished at: {DateTime.Now}");
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
         Assert.AreEqual(text, lastReceivedNotification.Title);
