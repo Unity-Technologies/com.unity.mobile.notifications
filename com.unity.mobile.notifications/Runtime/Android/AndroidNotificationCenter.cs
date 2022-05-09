@@ -136,7 +136,13 @@ namespace Unity.Notifications.Android
             {
                 if (color == null)
                     return null;
+#if UNITY_2022_2_OR_NEWER
+                int val;
+                AndroidJNIHelper.Unbox(color.GetRawObject(), out val);
+                return val.ToColor();
+#else
                 return color.Call<int>("intValue").ToColor();
+#endif
             }
         }
 
