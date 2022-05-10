@@ -261,9 +261,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
     public void scheduleNotification(Notification.Builder notificationBuilder) {
+        int id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
+        putScheduledNotification(id);
         mBackgroundThread.enqueueTask(() -> {
             Bundle extras = notificationBuilder.getExtras();
-            int id = extras.getInt(KEY_ID, -1);
             long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
             long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
             Notification notification = null;
@@ -583,6 +584,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
+        if (haveScheduledNotification(id))
+            return 1;
         if (checkIfPendingNotificationIsRegistered(id))
             return 1;
 
@@ -912,8 +915,19 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mActivity.startActivity(settingsIntent);
     }
 
+    private static synchronized void putScheduledNotification(Integer id) {
+        // don't replace existing, only put null as placeholder so we properly report status as being scheduled
+        if (!mScheduledNotifications.containsKey(id))
+            mScheduledNotifications.put(id, null);
+    }
+
     private static synchronized void putScheduledNotification(Integer id, Notification notification) {
         mScheduledNotifications.put(id, notification);
+    }
+
+    private static synchronized boolean haveScheduledNotification(Integer id) {
+        // have key but notification is null, means scheduling is still happening on other thread
+        return mScheduledNotifications.containsKey(id) && mScheduledNotifications.get(id) == null;
     }
 
     private static synchronized Notification getScheduledNotification(Integer id) {
