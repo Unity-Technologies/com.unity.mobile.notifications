@@ -45,6 +45,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public Context mContext = null;
     protected Activity mActivity = null;
     protected Class mOpenActivity = null;
+    protected UnityNotificationBackgroundThread mBackgroundThread;
 
     protected static final int SAMSUNG_NOTIFICATION_LIMIT = 500;
     protected static final String TAG_UNITY = "UnityNotifications";
@@ -75,6 +76,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         super();
         mContext = context;
         mActivity = activity;
+        mBackgroundThread = new UnityNotificationBackgroundThread();
+        mBackgroundThread.start();
 
         try {
             ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
@@ -385,28 +388,29 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         // needed for lamda
         final Set<String> notificationIds = ids;
-        Thread housekeepingThread = new Thread(() -> {
-            try {
-                // when scheduling lots of notifications at once we can have more than one housekeeping thread running
-                // synchronize them and chain to happen one after the other
-                synchronized (UnityNotificationManager.class) {
-                    while (mPerformingHousekeeping) {
-                        UnityNotificationManager.class.wait();
+        if (mUnityNotificationManager != null) {
+            mUnityNotificationManager.mBackgroundThread.enqueueTask(() -> {
+                try {
+                    // when scheduling lots of notifications at once we can have more than one housekeeping thread running
+                    // synchronize them and chain to happen one after the other
+                    synchronized (UnityNotificationManager.class) {
+                        while (mPerformingHousekeeping) {
+                            UnityNotificationManager.class.wait();
+                        }
+                        mPerformingHousekeeping = true;
                     }
-                    mPerformingHousekeeping = true;
-                }
 
-                performNotificationHousekeeping(context, notificationIds);
-            } catch (InterruptedException e) {
-                Log.e(TAG_UNITY, "Notification housekeeping interrupted");
-            } finally {
-                synchronized (UnityNotificationManager.class) {
-                    mPerformingHousekeeping = false;
-                    UnityNotificationManager.class.notify();
+                    performNotificationHousekeeping(context, notificationIds);
+                } catch (InterruptedException e) {
+                    Log.e(TAG_UNITY, "Notification housekeeping interrupted");
+                } finally {
+                    synchronized (UnityNotificationManager.class) {
+                        mPerformingHousekeeping = false;
+                        UnityNotificationManager.class.notify();
+                    }
                 }
-            }
-        });
-        housekeepingThread.start();
+            });
+        }
     }
 
     private static void performNotificationHousekeeping(Context context, Set<String> ids) {
@@ -599,13 +603,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (ids.size() > 0) {
             Context context = mContext;
-            new Thread(() -> {
+            mBackgroundThread.enqueueTask(() -> {
                 for (String id : ids) {
                     cancelPendingNotificationIntent(context, Integer.valueOf(id));
                     deleteExpiredNotificationIntent(context, id);
                 }
                 triggerHousekeeping(context, null);
-            }).start();
+            });
         }
     }
 
