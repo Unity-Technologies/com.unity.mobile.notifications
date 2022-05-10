@@ -40,7 +40,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private static HashMap<Integer, Notification> mScheduledNotifications = new HashMap();
     private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
     private static int mSentSinceLastHousekeeping = 0;
-    private static boolean mPerformingHousekeeping = false;
 
     public Context mContext = null;
     protected Activity mActivity = null;
@@ -393,25 +392,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         final Set<String> notificationIds = ids;
         if (mUnityNotificationManager != null) {
             mUnityNotificationManager.mBackgroundThread.enqueueTask(() -> {
-                try {
-                    // when scheduling lots of notifications at once we can have more than one housekeeping thread running
-                    // synchronize them and chain to happen one after the other
-                    synchronized (UnityNotificationManager.class) {
-                        while (mPerformingHousekeeping) {
-                            UnityNotificationManager.class.wait();
-                        }
-                        mPerformingHousekeeping = true;
-                    }
-
-                    performNotificationHousekeeping(context, notificationIds);
-                } catch (InterruptedException e) {
-                    Log.e(TAG_UNITY, "Notification housekeeping interrupted");
-                } finally {
-                    synchronized (UnityNotificationManager.class) {
-                        mPerformingHousekeeping = false;
-                        UnityNotificationManager.class.notify();
-                    }
-                }
+                performNotificationHousekeeping(context, notificationIds);
             });
         }
     }
