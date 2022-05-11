@@ -378,21 +378,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
         ++mSentSinceLastHousekeeping;
         if (mSentSinceLastHousekeeping > 50) {
             mSentSinceLastHousekeeping = 0;
-            triggerHousekeeping(context, ids);
+            triggerHousekeeping();
         }
     }
 
-    private static synchronized void triggerHousekeeping(Context context, Set<String> ids) {
-        if (ids == null) {
-            ids = getScheduledNotificationIDs(context);
-        }
-
-        // needed for lamda
-        final Set<String> notificationIds = ids;
+    private static synchronized void triggerHousekeeping() {
         if (mUnityNotificationManager != null) {
-            mUnityNotificationManager.mBackgroundThread.enqueueTask(() -> {
-                performNotificationHousekeeping(context, notificationIds);
-            });
+            mUnityNotificationManager.mBackgroundThread.enqueueHousekeeping();
         }
     }
 
@@ -592,7 +584,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     cancelPendingNotificationIntent(context, Integer.valueOf(id));
                     deleteExpiredNotificationIntent(context, id);
                 }
-                triggerHousekeeping(context, null);
+                triggerHousekeeping();
             });
         }
     }
@@ -613,7 +605,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void cancelPendingNotification(int id) {
         synchronized (UnityNotificationManager.class) {
             UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
-            triggerHousekeeping(mContext, null);
+            triggerHousekeeping();
         }
     }
 
