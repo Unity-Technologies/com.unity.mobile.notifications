@@ -8,14 +8,20 @@ import java.util.Set;
 public class UnityNotificationBackgroundThread extends Thread {
     private LinkedTransferQueue<Runnable> mTasks = new LinkedTransferQueue();
 
+    public UnityNotificationBackgroundThread() {
+        enqueueHousekeeping();
+    }
+
     public void enqueueTask(Runnable task) {
         mTasks.add(task);
     }
 
+    public void enqueueHousekeeping() {
+        mTasks.add(() -> { performHousekeeping(); });
+    }
+
     @Override
     public void run() {
-        performHousekeeping();
-
         while (true) {
             try {
                 Runnable task = mTasks.take();
