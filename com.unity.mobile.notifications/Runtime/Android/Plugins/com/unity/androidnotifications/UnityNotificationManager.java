@@ -402,8 +402,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         Set<String> invalid = findInvalidNotificationIds(context, ids);
         synchronized (UnityNotificationManager.class) {
-            // list might have changed while we searched
-            Set<String> currentIds = new HashSet<>(getScheduledNotificationIDs(context));
+            Set<String> currentIds = new HashSet<>(ids);
             for (String id : invalid) {
                 currentIds.remove(id);
                 removeScheduledNotification(Integer.valueOf(id));
