@@ -76,7 +76,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mContext = context;
         mActivity = activity;
         mBackgroundThread = new UnityNotificationBackgroundThread();
-        mBackgroundThread.start();
 
         try {
             ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
@@ -102,7 +101,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Log.e(TAG_UNITY, "Failed to load meta-data, NullPointer: " + e.getMessage());
         }
 
-        triggerHousekeeping(context, null);
+        mBackgroundThread.start();
     }
 
     public static UnityNotificationManager getNotificationManagerImpl(Context context) {
@@ -397,7 +396,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    private static void performNotificationHousekeeping(Context context, Set<String> ids) {
+    protected static void performNotificationHousekeeping(Context context, Set<String> ids) {
         Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
 
         Set<String> invalid = findInvalidNotificationIds(context, ids);
@@ -598,7 +597,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    private static synchronized Set<String> getScheduledNotificationIDs(Context context) {
+    protected static synchronized Set<String> getScheduledNotificationIDs(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
         return ids;
