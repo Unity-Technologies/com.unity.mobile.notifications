@@ -22,6 +22,7 @@ namespace Unity.Notifications.Tests.Sample
         private int _notificationExplicitID;
         private Button ButtonModifyExplicitID;
         private Button ButtonCancelExplicitID;
+        private Button ButtonCheckStatusExplicitID;
 
         public int notificationExplicitID
         {
@@ -32,6 +33,7 @@ namespace Unity.Notifications.Tests.Sample
                 bool buttonsEnabled = _notificationExplicitID != 0;
                 ButtonModifyExplicitID.interactable = buttonsEnabled;
                 ButtonCancelExplicitID.interactable = buttonsEnabled;
+                ButtonCheckStatusExplicitID.interactable = buttonsEnabled;
             }
         }
 
@@ -60,6 +62,7 @@ namespace Unity.Notifications.Tests.Sample
                 .Properties(notificationIntentData.Notification, 1);
             if (notificationIntentData.Id == notificationExplicitID)
             {
+                AndroidNotificationCenter.CheckScheduledNotificationStatus(notificationExplicitID);
                 notificationExplicitID = 0;
             }
         }
@@ -119,6 +122,8 @@ namespace Unity.Notifications.Tests.Sample
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
             m_groups["Modify"]["Modify pending Explicit notification"] = new Action(() => { ModifyExplicitNotification(); });
             m_groups["Modify"]["Cancel pending Explicit notification"] = new Action(() => { CancelExplicitNotification(); });
+            m_groups["Modify"]["Check status of Explicit notification"] = new Action(() => { CheckStatusOfExplicitNotification (); });
+            
 
             m_groups["Send"] = new OrderedDictionary();
             foreach (AndroidNotificationTemplate template in Resources.LoadAll("AndroidNotifications", typeof(AndroidNotificationTemplate)))
@@ -130,6 +135,7 @@ namespace Unity.Notifications.Tests.Sample
                         {
                             Title = template.Title,
                             Text = template.Text,
+                            
                             SmallIcon = template.SmallIcon,
                             LargeIcon = template.LargeIcon,
                             Style = template.NotificationStyle,
@@ -236,6 +242,9 @@ namespace Unity.Notifications.Tests.Sample
             ButtonModifyExplicitID.interactable = false;
             ButtonCancelExplicitID = GameObject.Find("Modify/Cancel pending Explicit notification").GetComponent<Button>();
             ButtonCancelExplicitID.interactable = false;
+            ButtonCheckStatusExplicitID = GameObject.Find("Modify/Check status of Explicit notification").GetComponent<Button>();
+            ButtonCheckStatusExplicitID.interactable = false;
+            
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
         }
 
@@ -259,6 +268,13 @@ namespace Unity.Notifications.Tests.Sample
             notificationExplicitID = 0;
             m_LOGGER
                 .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}");
+        }
+
+        public void CheckStatusOfExplicitNotification()
+        {
+            m_LOGGER
+                .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Explicit notification (ID:{notificationExplicitID}) status: {AndroidNotificationCenter.CheckScheduledNotificationStatus(notificationExplicitID)}");
+            
         }
 
         public void SendNotification(AndroidNotification notification, string channel = "default_channel", int notificationID = 0, bool log = true)
