@@ -1,18 +1,32 @@
 package com.unity.androidnotifications;
 
+import android.app.Notification;
 import android.content.Context;
 
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.Set;
 
 public class UnityNotificationBackgroundThread extends Thread {
+    public static class ScheduleNotificationTask implements Runnable {
+        private Notification.Builder notificationBuilder;
+
+        public ScheduleNotificationTask(Notification.Builder builder) {
+            notificationBuilder = builder;
+        }
+
+        @Override
+        public void run() {
+            UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationBuilder);
+        }
+    }
+
     private LinkedTransferQueue<Runnable> mTasks = new LinkedTransferQueue();
 
     public UnityNotificationBackgroundThread() {
         enqueueHousekeeping();
     }
 
-    public void enqueueTask(Runnable task) {
+    public void enqueueNotification(ScheduleNotificationTask task) {
         mTasks.add(task);
     }
 

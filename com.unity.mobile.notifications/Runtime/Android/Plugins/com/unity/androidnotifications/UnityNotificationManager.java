@@ -261,35 +261,38 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void scheduleNotification(Notification.Builder notificationBuilder) {
         int id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
         putScheduledNotification(id);
-        mBackgroundThread.enqueueTask(() -> {
-            Bundle extras = notificationBuilder.getExtras();
-            long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
-            long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
-            Notification notification = null;
+        mBackgroundThread.enqueueNotification(new UnityNotificationBackgroundThread.ScheduleNotificationTask(notificationBuilder));
+    }
 
-            // if less than a second in the future, notify right away
-            boolean fireNow = fireTime - Calendar.getInstance().getTime().getTime() < 1000;
-            if (!fireNow || repeatInterval > 0) {
-                if (fireNow) {
-                    // schedule at next repetition
-                    fireTime += repeatInterval;
-                }
+    protected void performNotificationScheduling(Notification.Builder notificationBuilder) {
+        Bundle extras = notificationBuilder.getExtras();
+        int id = extras.getInt(KEY_ID, -1);
+        long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
+        long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
+        Notification notification = null;
 
-                Intent intent = buildNotificationIntentUpdateList(mContext, id);
-
-                if (intent != null) {
-                    UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
-                    notification = scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
-                }
-            }
-
+        // if less than a second in the future, notify right away
+        boolean fireNow = fireTime - Calendar.getInstance().getTime().getTime() < 1000;
+        if (!fireNow || repeatInterval > 0) {
             if (fireNow) {
-                if (notification == null) {
-                    notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
-                }
-                notify(mContext, id, notification);
+                // schedule at next repetition
+                fireTime += repeatInterval;
             }
-        });
+
+            Intent intent = buildNotificationIntentUpdateList(mContext, id);
+
+            if (intent != null) {
+                UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
+                notification = scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
+            }
+        }
+
+        if (fireNow) {
+            if (notification == null) {
+                notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
+            }
+            notify(mContext, id, notification);
+        }
     }
 
     Notification scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
