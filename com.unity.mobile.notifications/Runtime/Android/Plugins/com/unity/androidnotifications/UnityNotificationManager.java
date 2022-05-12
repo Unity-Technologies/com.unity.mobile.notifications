@@ -571,22 +571,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Cancel all the pending notifications.
     public void cancelAllPendingNotificationIntents() {
-        Set<String> ids;
-        synchronized (UnityNotificationManager.class) {
-            ids = this.getScheduledNotificationIDs(mContext);
-            saveScheduledNotificationIDs(mContext, new HashSet<>());
-        }
-
-        if (ids.size() > 0) {
-            Context context = mContext;
-            mBackgroundThread.enqueueTask(() -> {
-                for (String id : ids) {
-                    cancelPendingNotificationIntent(context, Integer.valueOf(id));
-                    deleteExpiredNotificationIntent(context, id);
-                }
-                triggerHousekeeping();
-            });
-        }
+        mBackgroundThread.enqueueCancelAllNotifications();
     }
 
     protected static synchronized Set<String> getScheduledNotificationIDs(Context context) {
@@ -603,10 +588,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Cancel a pending notification by id.
     public void cancelPendingNotification(int id) {
-        synchronized (UnityNotificationManager.class) {
-            UnityNotificationManager.cancelPendingNotificationIntent(mContext, id);
-            triggerHousekeeping();
-        }
+        mBackgroundThread.enqueueCancelNotification(id);
     }
 
     // Cancel a pending notification by id.

@@ -16,6 +16,26 @@ public class UnityNotificationBackgroundThread extends Thread {
         mTasks.add(task);
     }
 
+    public void enqueueCancelNotification(int id) {
+        mTasks.add(() -> {
+            UnityNotificationManager.cancelPendingNotificationIntent(UnityNotificationManager.mUnityNotificationManager.mContext, id);
+        });
+    }
+
+    public void enqueueCancelAllNotifications() {
+        mTasks.add(() -> {
+            Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
+            Set<String> ids = UnityNotificationManager.getScheduledNotificationIDs(context);
+
+            if (ids.size() > 0) {
+                for (String id : ids) {
+                    UnityNotificationManager.cancelPendingNotificationIntent(context, Integer.valueOf(id));
+                    UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+                }
+            }
+        });
+    }
+
     public void enqueueHousekeeping() {
         mTasks.add(() -> { performHousekeeping(); });
     }
