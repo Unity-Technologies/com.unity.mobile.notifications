@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedTransferQueue;
 import java.util.Set;
 
 public class UnityNotificationBackgroundThread extends Thread {
-    public static class ScheduleNotificationTask implements Runnable {
+    private static class ScheduleNotificationTask implements Runnable {
         private Notification.Builder notificationBuilder;
 
         public ScheduleNotificationTask(Notification.Builder builder) {
@@ -33,8 +33,8 @@ public class UnityNotificationBackgroundThread extends Thread {
         enqueueHousekeeping();
     }
 
-    public void enqueueNotification(ScheduleNotificationTask task) {
-        mTasks.add(task);
+    public void enqueueNotification(Notification.Builder notificationBuilder) {
+        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(notificationBuilder));
     }
 
     public void enqueueCancelNotification(int id) {

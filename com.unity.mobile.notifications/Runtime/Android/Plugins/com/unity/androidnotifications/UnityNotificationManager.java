@@ -260,7 +260,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void scheduleNotification(Notification.Builder notificationBuilder) {
         int id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
         putScheduledNotification(id);
-        mBackgroundThread.enqueueNotification(new UnityNotificationBackgroundThread.ScheduleNotificationTask(notificationBuilder));
+        mBackgroundThread.enqueueNotification(notificationBuilder);
     }
 
     protected void performNotificationScheduling(Notification.Builder notificationBuilder) {
