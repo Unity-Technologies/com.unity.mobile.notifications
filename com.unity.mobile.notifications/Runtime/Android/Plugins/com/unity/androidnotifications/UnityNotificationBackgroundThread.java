@@ -1,7 +1,10 @@
 package com.unity.androidnotifications;
 
+import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
+
 import android.app.Notification;
 import android.content.Context;
+import android.util.Log;
 
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.Set;
@@ -21,8 +24,12 @@ public class UnityNotificationBackgroundThread extends Thread {
     }
 
     private LinkedTransferQueue<Runnable> mTasks = new LinkedTransferQueue();
+    private int mSentNotificationsSinceHousekeeping = 0;
+    private int mOtherTasksSinceHousekeeping = 0;
 
     public UnityNotificationBackgroundThread() {
+        // force housekeeping
+        mOtherTasksSinceHousekeeping = 2;
         enqueueHousekeeping();
     }
 
@@ -50,7 +57,7 @@ public class UnityNotificationBackgroundThread extends Thread {
         });
     }
 
-    public void enqueueHousekeeping() {
+    private void enqueueHousekeeping() {
         mTasks.add(() -> { performHousekeeping(); });
     }
 
@@ -59,7 +66,7 @@ public class UnityNotificationBackgroundThread extends Thread {
         while (true) {
             try {
                 Runnable task = mTasks.take();
-                task.run();
+                executeTask(task);
             } catch (InterruptedException e) {
                 if (mTasks.isEmpty())
                     break;
@@ -67,7 +74,32 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
     }
 
+    private void executeTask(Runnable task) {
+        try {
+            ScheduleNotificationTask scheduleTask = null;
+            if (task instanceof ScheduleNotificationTask)
+                scheduleTask = (ScheduleNotificationTask)task;
+
+            task.run();
+
+            if (scheduleTask != null)
+                ++mSentNotificationsSinceHousekeeping;
+            else
+                ++mOtherTasksSinceHousekeeping;
+            if (mSentNotificationsSinceHousekeeping >= 50)
+                enqueueHousekeeping();
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Exception executing notification task", e);
+        }
+    }
+
     private void performHousekeeping() {
+        // don't do housekeeping if last task we did was housekeeping (other=1)
+        boolean performHousekeeping = mSentNotificationsSinceHousekeeping > 0 && mOtherTasksSinceHousekeeping > 1;
+        mSentNotificationsSinceHousekeeping = 0;
+        mOtherTasksSinceHousekeeping = 0;
+        if (!performHousekeeping)
+            return;
         Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
         Set<String> notificationIds = UnityNotificationManager.getScheduledNotificationIDs(context);
         UnityNotificationManager.performNotificationHousekeeping(context, notificationIds);

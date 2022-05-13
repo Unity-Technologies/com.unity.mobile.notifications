@@ -39,7 +39,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static UnityNotificationManager mUnityNotificationManager;
     private static HashMap<Integer, Notification> mScheduledNotifications = new HashMap();
     private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
-    private static int mSentSinceLastHousekeeping = 0;
 
     public Context mContext = null;
     protected Activity mActivity = null;
@@ -373,22 +372,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         ids = new HashSet<>(ids);
         ids.add(String.valueOf(notificationId));
         saveScheduledNotificationIDs(context, ids);
-        scheduleHousekeeping(context, ids);
         return intent;
-    }
-
-    private static synchronized void scheduleHousekeeping(Context context, Set<String> ids) {
-        ++mSentSinceLastHousekeeping;
-        if (mSentSinceLastHousekeeping > 50) {
-            mSentSinceLastHousekeeping = 0;
-            triggerHousekeeping();
-        }
-    }
-
-    private static synchronized void triggerHousekeeping() {
-        if (mUnityNotificationManager != null) {
-            mUnityNotificationManager.mBackgroundThread.enqueueHousekeeping();
-        }
     }
 
     protected static void performNotificationHousekeeping(Context context, Set<String> ids) {
@@ -402,7 +386,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 removeScheduledNotification(Integer.valueOf(id));
             }
             saveScheduledNotificationIDs(context, currentIds);
-            mSentSinceLastHousekeeping = 0;
         }
 
         // in case we have saved intents, clear them
