@@ -358,7 +358,6 @@ namespace Unity.Notifications.Android
 
         /// <summary>
         /// Return the status of a scheduled notification.
-        /// Only available in API  23 and above.
         /// </summary>
         /// <param name="id">ID of the notification to check</param>
         /// <returns>The status of the notification</returns>
