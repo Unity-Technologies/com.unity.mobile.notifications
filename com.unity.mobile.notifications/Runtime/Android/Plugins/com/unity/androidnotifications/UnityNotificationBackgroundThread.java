@@ -60,14 +60,11 @@ public class UnityNotificationBackgroundThread extends Thread {
             try {
                 Runnable task = mTasks.take();
                 task.run();
-                android.util.Log.d("Unity", "Notification background task done");
             } catch (InterruptedException e) {
                 if (mTasks.isEmpty())
                     break;
             }
         }
-
-        android.util.Log.d("Unity", "Notification background thread exited");
     }
 
     private void performHousekeeping() {
