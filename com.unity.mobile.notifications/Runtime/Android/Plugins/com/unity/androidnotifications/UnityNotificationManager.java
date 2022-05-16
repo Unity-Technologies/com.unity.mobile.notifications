@@ -260,12 +260,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void scheduleNotification(Notification.Builder notificationBuilder) {
         int id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
         putScheduledNotification(id);
-        mBackgroundThread.enqueueNotification(notificationBuilder);
+        mBackgroundThread.enqueueNotification(id, notificationBuilder);
     }
 
-    protected void performNotificationScheduling(Notification.Builder notificationBuilder) {
+    protected void performNotificationScheduling(int id, Notification.Builder notificationBuilder) {
         Bundle extras = notificationBuilder.getExtras();
-        int id = extras.getInt(KEY_ID, -1);
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
         Notification notification = null;

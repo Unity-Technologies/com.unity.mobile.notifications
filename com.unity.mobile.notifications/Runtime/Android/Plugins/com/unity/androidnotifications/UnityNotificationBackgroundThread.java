@@ -11,15 +11,17 @@ import java.util.Set;
 
 public class UnityNotificationBackgroundThread extends Thread {
     private static class ScheduleNotificationTask implements Runnable {
+        private int notificationId;
         private Notification.Builder notificationBuilder;
 
-        public ScheduleNotificationTask(Notification.Builder builder) {
+        public ScheduleNotificationTask(int id, Notification.Builder builder) {
+            notificationId = id;
             notificationBuilder = builder;
         }
 
         @Override
         public void run() {
-            UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationBuilder);
+            UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
         }
     }
 
@@ -33,8 +35,8 @@ public class UnityNotificationBackgroundThread extends Thread {
         enqueueHousekeeping();
     }
 
-    public void enqueueNotification(Notification.Builder notificationBuilder) {
-        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(notificationBuilder));
+    public void enqueueNotification(int id, Notification.Builder notificationBuilder) {
+        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(id, notificationBuilder));
     }
 
     public void enqueueCancelNotification(int id) {
