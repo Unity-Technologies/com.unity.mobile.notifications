@@ -11,7 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UnityNotificationBackgroundThread extends Thread {
-    private static class ScheduleNotificationTask implements Runnable {
+    private static abstract class Task {
+        public abstract void run(Context context);
+    }
+
+    private static class ScheduleNotificationTask extends Task {
         private int notificationId;
         private Notification.Builder notificationBuilder;
 
@@ -21,8 +25,7 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
 
         @Override
-        public void run() {
-            Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
+        public void run(Context context) {
             Set<String> ids = UnityNotificationManager.getScheduledNotificationIDs(context);
             String id = String.valueOf(notificationId);
             // are we replacing existing alarm or have capacity to schedule new one
@@ -35,7 +38,45 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
     }
 
-    private LinkedTransferQueue<Runnable> mTasks = new LinkedTransferQueue();
+    private static class CancelNotificationTask extends Task {
+        private int notificationId;
+
+        public CancelNotificationTask(int id) {
+            notificationId = id;
+        }
+
+        @Override
+        public void run(Context context) {
+            UnityNotificationManager.cancelPendingNotificationIntent(context, notificationId);
+        }
+    }
+
+    private static class CancelAllNotificationsTask extends Task {
+        @Override
+        public void run(Context context) {
+            Set<String> ids = UnityNotificationManager.getScheduledNotificationIDs(context);
+
+            for (String id : ids) {
+                UnityNotificationManager.cancelPendingNotificationIntent(context, Integer.valueOf(id));
+                UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+            }
+        }
+    }
+
+    private static class HousekeepingTask extends Task {
+        UnityNotificationBackgroundThread thread;
+
+        public HousekeepingTask(UnityNotificationBackgroundThread th) {
+            thread = th;
+        }
+
+        @Override
+        public void run(Context context) {
+            thread.performHousekeeping(context);
+        }
+    }
+
+    private LinkedTransferQueue<Task> mTasks = new LinkedTransferQueue();
     private int mSentNotificationsSinceHousekeeping = 0;
     private int mOtherTasksSinceHousekeeping = 0;
 
@@ -50,35 +91,24 @@ public class UnityNotificationBackgroundThread extends Thread {
     }
 
     public void enqueueCancelNotification(int id) {
-        mTasks.add(() -> {
-            UnityNotificationManager.cancelPendingNotificationIntent(UnityNotificationManager.mUnityNotificationManager.mContext, id);
-        });
+        mTasks.add(new CancelNotificationTask(id));
     }
 
     public void enqueueCancelAllNotifications() {
-        mTasks.add(() -> {
-            Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
-            Set<String> ids = UnityNotificationManager.getScheduledNotificationIDs(context);
-
-            if (ids.size() > 0) {
-                for (String id : ids) {
-                    UnityNotificationManager.cancelPendingNotificationIntent(context, Integer.valueOf(id));
-                    UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
-                }
-            }
-        });
+        mTasks.add(new CancelAllNotificationsTask());
     }
 
     private void enqueueHousekeeping() {
-        mTasks.add(() -> { performHousekeeping(); });
+        mTasks.add(new HousekeepingTask(this));
     }
 
     @Override
     public void run() {
+        Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
         while (true) {
             try {
-                Runnable task = mTasks.take();
-                executeTask(task);
+                Task task = mTasks.take();
+                executeTask(context, task);
             } catch (InterruptedException e) {
                 if (mTasks.isEmpty())
                     break;
@@ -86,13 +116,13 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
     }
 
-    private void executeTask(Runnable task) {
+    private void executeTask(Context context, Task task) {
         try {
             ScheduleNotificationTask scheduleTask = null;
             if (task instanceof ScheduleNotificationTask)
                 scheduleTask = (ScheduleNotificationTask)task;
 
-            task.run();
+            task.run(context);
 
             if (scheduleTask != null)
                 ++mSentNotificationsSinceHousekeeping;
@@ -105,14 +135,13 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
     }
 
-    private void performHousekeeping() {
+    private void performHousekeeping(Context context) {
         // don't do housekeeping if last task we did was housekeeping (other=1)
         boolean performHousekeeping = mSentNotificationsSinceHousekeeping > 0 && mOtherTasksSinceHousekeeping > 1;
         mSentNotificationsSinceHousekeeping = 0;
         mOtherTasksSinceHousekeeping = 0;
         if (!performHousekeeping)
             return;
-        Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
         Set<String> notificationIds = UnityNotificationManager.getScheduledNotificationIDs(context);
         UnityNotificationManager.performNotificationHousekeeping(context, notificationIds);
     }
