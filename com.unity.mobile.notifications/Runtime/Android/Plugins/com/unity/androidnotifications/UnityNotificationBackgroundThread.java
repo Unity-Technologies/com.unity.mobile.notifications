@@ -7,6 +7,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.concurrent.LinkedTransferQueue;
+import java.util.HashSet;
 import java.util.Set;
 
 public class UnityNotificationBackgroundThread extends Thread {
@@ -21,6 +22,15 @@ public class UnityNotificationBackgroundThread extends Thread {
 
         @Override
         public void run() {
+            Context context = UnityNotificationManager.mUnityNotificationManager.mContext;
+            Set<String> ids = UnityNotificationManager.getScheduledNotificationIDs(context);
+            String id = String.valueOf(notificationId);
+            // are we replacing existing alarm or have capacity to schedule new one
+            if (!(ids.contains(id) || UnityNotificationManager.canScheduleMoreAlarms(ids)))
+                return;
+            ids = new HashSet<>(ids);
+            ids.add(id);
+            UnityNotificationManager.saveScheduledNotificationIDs(context, ids);
             UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
         }
     }

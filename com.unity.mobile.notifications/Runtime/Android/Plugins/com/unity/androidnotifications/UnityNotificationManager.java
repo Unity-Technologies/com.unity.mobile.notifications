@@ -277,7 +277,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 fireTime += repeatInterval;
             }
 
-            Intent intent = buildNotificationIntentUpdateList(mContext, id);
+            Intent intent = buildNotificationIntent(mContext);
 
             if (intent != null) {
                 UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
@@ -353,19 +353,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         return openAppIntent;
-    }
-
-    // Build a notification Intent to store the PendingIntent.
-    private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
-        Set<String> ids = getScheduledNotificationIDs(context);
-        if (!canScheduleMoreAlarms(ids))
-            return null;
-
-        Intent intent = buildNotificationIntent(context);
-        ids = new HashSet<>(ids);
-        ids.add(String.valueOf(notificationId));
-        saveScheduledNotificationIDs(context, ids);
-        return intent;
     }
 
     protected static boolean canScheduleMoreAlarms(Set<String> ids) {
@@ -574,7 +561,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return ids;
     }
 
-    private static synchronized void saveScheduledNotificationIDs(Context context, Set<String> ids) {
+    protected static synchronized void saveScheduledNotificationIDs(Context context, Set<String> ids) {
         SharedPreferences.Editor editor = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
         editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
         editor.apply();
