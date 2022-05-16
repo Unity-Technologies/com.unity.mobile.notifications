@@ -78,7 +78,7 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private LinkedTransferQueue<Task> mTasks = new LinkedTransferQueue();
     private int mSentNotificationsSinceHousekeeping = 0;
-    private int mOtherTasksSinceHousekeeping = 0;
+    private int mOtherTasksSinceHousekeeping;
 
     public UnityNotificationBackgroundThread() {
         // force housekeeping
@@ -128,8 +128,9 @@ public class UnityNotificationBackgroundThread extends Thread {
                 ++mSentNotificationsSinceHousekeeping;
             else
                 ++mOtherTasksSinceHousekeeping;
-            if (mSentNotificationsSinceHousekeeping >= 50)
+            if ((mSentNotificationsSinceHousekeeping + mOtherTasksSinceHousekeeping) >= 50) {
                 enqueueHousekeeping();
+            }
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Exception executing notification task", e);
         }
