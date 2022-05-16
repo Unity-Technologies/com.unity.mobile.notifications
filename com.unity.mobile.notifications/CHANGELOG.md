@@ -2,6 +2,15 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.0.2] - 2022-05-13
+
+### Changes & Improvements:
+- [Android] - AndroidNotificationCenter.CheckScheduledNotificationStatus now works on devices with all API levels
+
+### Fixes:
+- [Android] [issue 186](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/186) Mitigate OutOfMemory errors causing application crash
+- [Android] [issue 188](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/188) Fix unguarded API usage from level 23
+
 ## [2.0.1] - 2022-04-15
 
 ### Fixes:
