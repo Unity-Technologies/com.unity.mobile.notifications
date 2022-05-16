@@ -358,20 +358,29 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Build a notification Intent to store the PendingIntent.
     private static synchronized Intent buildNotificationIntentUpdateList(Context context, int notificationId) {
         Set<String> ids = getScheduledNotificationIDs(context);
-        if (android.os.Build.MANUFACTURER.equals("samsung") && ids.size() >= (SAMSUNG_NOTIFICATION_LIMIT - 1)) {
-            // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
-            // Attempting to schedule more than that might cause the app to crash.
-            Log.w(TAG_UNITY, String.format("Attempting to schedule more than %1$d notifications. There is a limit of %1$d concurrently scheduled Alarms on Samsung devices" +
-                    " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.",
-                    SAMSUNG_NOTIFICATION_LIMIT));
+        if (!canScheduleMoreAlarms(ids))
             return null;
-        }
 
         Intent intent = buildNotificationIntent(context);
         ids = new HashSet<>(ids);
         ids.add(String.valueOf(notificationId));
         saveScheduledNotificationIDs(context, ids);
         return intent;
+    }
+
+    protected static boolean canScheduleMoreAlarms(Set<String> ids) {
+        if (ids.size() < (SAMSUNG_NOTIFICATION_LIMIT - 1))
+            return true;
+        if ("samsung".equals(android.os.Build.MANUFACTURER)) {
+            // There seems to be a limit of 500 concurrently scheduled alarms on Samsung devices.
+            // Attempting to schedule more than that might cause the app to crash.
+            Log.w(TAG_UNITY, String.format("Attempting to schedule more than %1$d notifications. There is a limit of %1$d concurrently scheduled Alarms on Samsung devices" +
+                            " either wait for the currently scheduled ones to be triggered or cancel them if you wish to schedule additional notifications.",
+                    SAMSUNG_NOTIFICATION_LIMIT));
+            return false;
+        }
+
+        return true;
     }
 
     protected static void performNotificationHousekeeping(Context context, Set<String> ids) {
