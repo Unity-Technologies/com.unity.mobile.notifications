@@ -47,15 +47,21 @@ public class UnityNotificationBackgroundThread extends Thread {
         public boolean run(Context context, Set<String> notificationIds) {
             UnityNotificationManager.cancelPendingNotificationIntent(context, notificationId);
             String id = String.valueOf(notificationId);
-            UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
-            notificationIds.remove(id);
-            return true;
+            if (notificationIds.remove(id)) {
+                UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+                return true;
+            }
+
+            return false;
         }
     }
 
     private static class CancelAllNotificationsTask extends Task {
         @Override
         public boolean run(Context context, Set<String> notificationIds) {
+            if (notificationIds.isEmpty())
+                return false;
+
             for (String id : notificationIds) {
                 UnityNotificationManager.cancelPendingNotificationIntent(context, Integer.valueOf(id));
                 UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
