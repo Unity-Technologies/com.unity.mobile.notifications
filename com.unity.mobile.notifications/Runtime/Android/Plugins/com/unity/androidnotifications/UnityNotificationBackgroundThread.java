@@ -77,13 +77,11 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
     }
 
+    private static final int TASKS_FOR_HOUSEKEEPING = 50;
     private LinkedTransferQueue<Task> mTasks = new LinkedTransferQueue();
-    private int mSentNotificationsSinceHousekeeping = 0;
-    private int mOtherTasksSinceHousekeeping;
+    private int mTasksSinceHousekeeping = TASKS_FOR_HOUSEKEEPING;  // we want hoursekeeping at the start
 
     public UnityNotificationBackgroundThread() {
-        // force housekeeping
-        mOtherTasksSinceHousekeeping = 2;
         enqueueHousekeeping();
     }
 
@@ -111,6 +109,10 @@ public class UnityNotificationBackgroundThread extends Thread {
             try {
                 Task task = mTasks.take();
                 executeTask(context, task, notificationIds);
+                if (!(task instanceof HousekeepingTask))
+                    ++mTasksSinceHousekeeping;
+                if (mTasks.size() == 0)
+                    enqueueHousekeeping();
             } catch (InterruptedException e) {
                 if (mTasks.isEmpty())
                     break;
@@ -120,19 +122,7 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private void executeTask(Context context, Task task, Set<String> notificationIds) {
         try {
-            ScheduleNotificationTask scheduleTask = null;
-            if (task instanceof ScheduleNotificationTask)
-                scheduleTask = (ScheduleNotificationTask)task;
-
             task.run(context, notificationIds);
-
-            if (scheduleTask != null)
-                ++mSentNotificationsSinceHousekeeping;
-            else
-                ++mOtherTasksSinceHousekeeping;
-            if ((mSentNotificationsSinceHousekeeping + mOtherTasksSinceHousekeeping) >= 50) {
-                enqueueHousekeeping();
-            }
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Exception executing notification task", e);
         }
@@ -140,11 +130,9 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private void performHousekeeping(Context context, Set<String> notificationIds) {
         // don't do housekeeping if last task we did was housekeeping (other=1)
-        boolean performHousekeeping = mSentNotificationsSinceHousekeeping > 0 && mOtherTasksSinceHousekeeping > 1;
-        mSentNotificationsSinceHousekeeping = 0;
-        mOtherTasksSinceHousekeeping = 0;
-        if (!performHousekeeping)
-            return;
-        UnityNotificationManager.performNotificationHousekeeping(context, notificationIds);
+        boolean performHousekeeping = mTasksSinceHousekeeping >= TASKS_FOR_HOUSEKEEPING;
+        mTasksSinceHousekeeping = 0;
+        if (performHousekeeping)
+            UnityNotificationManager.performNotificationHousekeeping(context, notificationIds);
     }
 }
