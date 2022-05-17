@@ -380,7 +380,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 currentIds.remove(id);
                 removeScheduledNotification(Integer.valueOf(id));
             }
-            saveScheduledNotificationIDs(context, currentIds);
         }
 
         // in case we have saved intents, clear them
