@@ -320,6 +320,8 @@ class AndroidNotificationSendingTests
         // temporary null the manager, cause that's what we have in reality
         var manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
         managerClass.SetStatic<AndroidJavaObject>("mUnityNotificationManager", null);
+        // also clear cached notifications, since they don't exist after reboot
+        managerClass.GetStatic<AndroidJavaObject>("mScheduledNotifications").Call("clear");
 
         // simulate reboot by directly cancelling scheduled alarms preserving saves
         managerClass.CallStatic("cancelPendingNotificationIntent", context, id);
