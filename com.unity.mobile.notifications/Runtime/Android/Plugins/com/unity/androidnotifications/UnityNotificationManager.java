@@ -719,6 +719,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
             getNotificationManager(context).notify(id, notification);
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (UnityNotificationManager.class) {
             mVisibleNotifications.add(Integer.valueOf(id));
         }
