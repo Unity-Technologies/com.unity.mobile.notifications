@@ -14,11 +14,19 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The application is not authorized to post notifications.
         /// </summary>
-        Denied,
+        Denied = 1,
         /// <summary>
         /// The application is authorized to post notifications.
         /// </summary>
-        Authorized
+        Authorized = 2,
+        /// <summary>
+        /// The application is authorized to post non-interruptive user notifications.
+        /// </summary>
+        Provisional = 3,
+        /// <summary>
+        /// The application is temporarily authorized to post notifications. Only available to app clips.
+        /// </summary>
+        Ephemeral = 4,
     }
 
     /// <summary>
