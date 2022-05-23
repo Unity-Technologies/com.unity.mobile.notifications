@@ -51,6 +51,7 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject KEY_REPEAT_INTERVAL;
         public AndroidJavaObject KEY_NOTIFICATION;
         public AndroidJavaObject KEY_SMALL_ICON;
+        public AndroidJavaObject KEY_SHOW_IN_FOREGROUND;
 
         private JniMethodID getNotificationFromIntent;
         private JniMethodID setNotificationIcon;
@@ -88,6 +89,7 @@ namespace Unity.Notifications.Android
             KEY_REPEAT_INTERVAL = clazz.GetStatic<AndroidJavaObject>("KEY_REPEAT_INTERVAL");
             KEY_NOTIFICATION = clazz.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
             KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
+            KEY_SHOW_IN_FOREGROUND = clazz.GetStatic<AndroidJavaObject>("KEY_SHOW_IN_FOREGROUND");
 
             CollectMethods(clazz);
 #else
@@ -98,6 +100,7 @@ namespace Unity.Notifications.Android
             KEY_REPEAT_INTERVAL = null;
             KEY_NOTIFICATION = null;
             KEY_SMALL_ICON = null;
+            KEY_SHOW_IN_FOREGROUND = null;
 #endif
         }
 
@@ -417,6 +420,7 @@ namespace Unity.Notifications.Android
         JniMethodID getInt;
         JniMethodID getLong;
         JniMethodID getString;
+        JniMethodID putBoolean;
         JniMethodID putInt;
         JniMethodID putLong;
         JniMethodID putString;
@@ -430,6 +434,7 @@ namespace Unity.Notifications.Android
                 getInt = JniApi.FindMethod(clazz, "getInt", "(Ljava/lang/String;I)I", false);
                 getLong = JniApi.FindMethod(clazz, "getLong", "(Ljava/lang/String;J)J", false);
                 getString = JniApi.FindMethod(clazz, "getString", "(Ljava/lang/String;)Ljava/lang/String;", false);
+                putBoolean = JniApi.FindMethod(clazz, "putBoolean", "(Ljava/lang/String;Z)V", false);
                 putInt = JniApi.FindMethod(clazz, "putInt", "(Ljava/lang/String;I)V", false);
                 putLong = JniApi.FindMethod(clazz, "putLong", "(Ljava/lang/String;J)V", false);
                 putString = JniApi.FindMethod(clazz, "putString", "(Ljava/lang/String;Ljava/lang/String;)V", false);
@@ -459,6 +464,11 @@ namespace Unity.Notifications.Android
         public string GetString(AndroidJavaObject bundle, AndroidJavaObject key)
         {
             return bundle.Call<string>(getString, key);
+        }
+
+        public void PutBoolean(AndroidJavaObject bundle, AndroidJavaObject key, bool value)
+        {
+            bundle.Call(putBoolean, key, value);
         }
 
         public void PutInt(AndroidJavaObject bundle, AndroidJavaObject key, int value)
@@ -914,6 +924,7 @@ namespace Unity.Notifications.Android
                 s_Jni.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
                 s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
                 s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
+                s_Jni.Bundle.PutBoolean(extras, s_Jni.NotificationManager.KEY_SHOW_IN_FOREGROUND, notification.ShowInForeground);
                 if (!string.IsNullOrEmpty(notification.IntentData))
                     s_Jni.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
             }
@@ -941,6 +952,7 @@ namespace Unity.Notifications.Android
                 notification.UsesStopwatch = s_Jni.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_CHRONOMETER, false);
                 notification.FireTime = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L).ToDatetime();
                 notification.RepeatInterval = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
+                notification.ShowInForeground = s_Jni.Bundle.GetBoolean(extras, s_Jni.NotificationManager.KEY_SHOW_IN_FOREGROUND, true);
 
                 if (s_Jni.Bundle.ContainsKey(extras, s_Jni.Notification.EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;

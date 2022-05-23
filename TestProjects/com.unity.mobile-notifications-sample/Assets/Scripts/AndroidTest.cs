@@ -149,7 +149,8 @@ namespace Unity.Notifications.Tests.Sample
                             SortKey = template.SortKey,
                             IntentData = template.IntentData,
                             ShowTimestamp = template.ShowTimestamp,
-                            RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval)
+                            RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval),
+                            ShowInForeground = template.ShowInForeground,
                         },
                         template.Channel, template.NotificationID
                     );
