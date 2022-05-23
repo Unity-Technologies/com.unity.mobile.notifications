@@ -28,9 +28,6 @@ public class UnityNotificationBackgroundThread extends Thread {
         @Override
         public boolean run(Context context, Set<String> notificationIds) {
             String id = String.valueOf(notificationId);
-            // are we replacing existing alarm or have capacity to schedule new one
-            if (!(notificationIds.contains(id) || UnityNotificationManager.canScheduleMoreAlarms(notificationIds)))
-                return false;
             UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
             return notificationIds.add(id);
         }
