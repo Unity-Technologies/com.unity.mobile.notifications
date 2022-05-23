@@ -76,31 +76,39 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(repeatInterval, n.RepeatInterval);
     }
 
+    AndroidNotification CreateNotificationWithAllParameters()
+    {
+        var notification = new AndroidNotification();
+        notification.Title = "title";
+        notification.Text = "text";
+        notification.SmallIcon = "small_icon";
+        notification.FireTime = DateTime.Now;
+        notification.RepeatInterval = new TimeSpan(0, 0, 5);
+        notification.LargeIcon = "large_icon";
+        notification.Style = NotificationStyle.BigTextStyle;
+        notification.Color = new Color(0.2f, 0.4f, 0.6f, 1.0f);
+        notification.Number = 15;
+        notification.ShouldAutoCancel = true;
+        notification.UsesStopwatch = true;
+        notification.Group = "group";
+        notification.GroupSummary = true;
+        notification.GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertChildren;
+        notification.SortKey = "sorting";
+        notification.IntentData = "string for intent";
+        notification.ShowTimestamp = true;
+        notification.ShowInForeground = false;  // this one defaults to true
+        notification.CustomTimestamp = new DateTime(2018, 5, 24, 12, 41, 30, 122);
+
+        return notification;
+    }
+
     [Test]
     [UnityPlatform(RuntimePlatform.Android)]
     public void BasicSerializeDeserializeNotification_AllParameters()
     {
         const int notificationId = 123;
 
-        var original = new AndroidNotification();
-        original.Title = "title";
-        original.Text = "text";
-        original.SmallIcon = "small_icon";
-        original.FireTime = DateTime.Now;
-        original.RepeatInterval = new TimeSpan(0, 0, 5);
-        original.LargeIcon = "large_icon";
-        original.Style = NotificationStyle.BigTextStyle;
-        original.Color = new Color(0.2f, 0.4f, 0.6f, 1.0f);
-        original.Number = 15;
-        original.ShouldAutoCancel = true;
-        original.UsesStopwatch = true;
-        original.Group = "group";
-        original.GroupSummary = true;
-        original.GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertChildren;
-        original.SortKey = "sorting";
-        original.IntentData = "string for intent";
-        original.ShowTimestamp = true;
-        original.CustomTimestamp = new DateTime(2018, 5, 24, 12, 41, 30, 122);
+        var original = CreateNotificationWithAllParameters();
 
         var deserializedData = SerializeDeserializeNotification(original, notificationId);
 
@@ -119,13 +127,18 @@ class AndroidNotificationSimpleTests
 
     AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder)
     {
+        return SerializeDeserializeNotification(builder, "serializeNotificationCustom");
+    }
+
+    AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder, string serializeMethod)
+    {
         var javaNotif = builder.Call<AndroidJavaObject>("build");
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
         AndroidJavaObject serializedBytes;  // use java object, since we don't need the bytes, so don't waste time on marshalling
         using (var byteStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
         {
             var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream);
-            var didSerialize = utilsClass.CallStatic<bool>("serializeNotificationCustom", javaNotif, dataStream);
+            var didSerialize = utilsClass.CallStatic<bool>(serializeMethod, javaNotif, dataStream);
             Assert.IsTrue(didSerialize);
             dataStream.Call("close");
             serializedBytes = byteStream.Call<AndroidJavaObject>("toByteArray");
@@ -165,6 +178,7 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(original.SortKey, other.SortKey);
         Assert.AreEqual(original.IntentData, other.IntentData);
         Assert.AreEqual(original.ShowTimestamp, other.ShowTimestamp);
+        Assert.AreEqual(original.ShowInForeground, other.ShowInForeground);
         Assert.AreEqual(original.CustomTimestamp, other.CustomTimestamp);
     }
 
@@ -296,6 +310,7 @@ class AndroidNotificationSimpleTests
 
         var original = new AndroidNotification();
         original.FireTime = DateTime.Now.AddSeconds(2);
+        original.ShowInForeground = false;  // non default value
 
         var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
         var extras = builder.Call<AndroidJavaObject>("getExtras");
@@ -306,6 +321,7 @@ class AndroidNotificationSimpleTests
         var deserializedData = SerializeDeserializeNotification(builder);
 
         Assert.AreEqual(original.FireTime.ToString(), deserializedData.Notification.FireTime.ToString());
+        Assert.IsFalse(deserializedData.Notification.ShowInForeground);
         var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
         var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
         // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
@@ -458,5 +474,31 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(original.Text, deserializedData.Notification.Text);
         Assert.AreEqual(original.SmallIcon, deserializedData.Notification.SmallIcon);
         Assert.AreEqual(original.LargeIcon, deserializedData.Notification.LargeIcon);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CanDeserializeCustomSerializedNotification_v0()
+    {
+        const int notificationId = 245;
+
+        var original = CreateNotificationWithAllParameters();
+
+        AndroidNotificationIntentData deserialized;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            // put something to extrax to force completely custom serialization of them
+            var bitmap = CreateBitmap();
+            Assert.IsNotNull(bitmap);
+            var extras = builder.Call<AndroidJavaObject>("getExtras");
+            extras.Call("putParcelable", "binder_item", bitmap);
+
+            // Serialize like we did in version 0
+            deserialized = SerializeDeserializeNotification(builder, "serializeNotificationCustom_v0");
+        }
+
+        Assert.IsNotNull(deserialized);
+        original.ShowInForeground = true;  // v0 did not have this, so should default to true
+        CheckNotificationsMatch(original, deserialized.Notification);
     }
 }
