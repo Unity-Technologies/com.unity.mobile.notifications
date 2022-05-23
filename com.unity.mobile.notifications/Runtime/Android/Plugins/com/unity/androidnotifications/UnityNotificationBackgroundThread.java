@@ -28,8 +28,16 @@ public class UnityNotificationBackgroundThread extends Thread {
         @Override
         public boolean run(Context context, Set<String> notificationIds) {
             String id = String.valueOf(notificationId);
-            UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
-            return notificationIds.add(id);
+            try {
+                UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
+                return notificationIds.add(id);
+            } finally {
+                // if failed to schedule or replace, remove from settings and cache, so the status is correctly reported
+                if (!notificationIds.contains(id)) {
+                    UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+                    UnityNotificationManager.removeScheduledNotification(Integer.valueOf(notificationId));
+                }
+            }
         }
     }
 

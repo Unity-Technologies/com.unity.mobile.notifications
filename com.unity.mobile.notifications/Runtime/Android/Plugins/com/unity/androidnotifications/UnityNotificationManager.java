@@ -864,7 +864,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return mScheduledNotifications.get(id);
     }
 
-    private static synchronized Notification removeScheduledNotification(Integer id) {
+    protected static synchronized Notification removeScheduledNotification(Integer id) {
         return mScheduledNotifications.remove(id);
     }
 }
