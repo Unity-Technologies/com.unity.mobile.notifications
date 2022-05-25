@@ -282,15 +282,26 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public NotificationChannelWrapper[] getNotificationChannels() {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            List<NotificationChannel> channels = getNotificationManager().getNotificationChannels();
+            NotificationChannelWrapper[] channelList = new NotificationChannelWrapper[channels.size()];
+            int i = 0;
+            for (NotificationChannel ch : channels) {
+                channelList[i++] = notificationChannelToWrapper(ch);
+            }
 
-        NotificationChannelWrapper[] channels = new NotificationChannelWrapper[channelIdsSet.size()];
-        int i = 0;
-        for (String k : channelIdsSet) {
-            channels[i++] = getNotificationChannel(k);
+            return channelList;
+        } else {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
+
+            NotificationChannelWrapper[] channels = new NotificationChannelWrapper[channelIdsSet.size()];
+            int i = 0;
+            for (String k : channelIdsSet) {
+                channels[i++] = getNotificationChannel(k);
+            }
+            return channels;
         }
-        return channels;
     }
 
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
