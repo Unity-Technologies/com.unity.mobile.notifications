@@ -17,12 +17,13 @@ public class UnityNotificationManagerOreo extends UnityNotificationManager {
     public NotificationChannelWrapper[] getNotificationChannels() {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
 
-        List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
-
-        for (NotificationChannel ch : getNotificationManager().getNotificationChannels()) {
-            channelList.add(notificationChannelToWrapper(ch));
+        List<NotificationChannel> channels = getNotificationManager().getNotificationChannels();
+        NotificationChannelWrapper[] channelList = new NotificationChannelWrapper[channels.size()];
+        int i = 0;
+        for (NotificationChannel ch : channels) {
+            channelList[i++] = notificationChannelToWrapper(ch);
         }
 
-        return channelList.toArray(new NotificationChannelWrapper[channelList.size()]);
+        return channelList;
     }
 }
