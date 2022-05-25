@@ -13,18 +13,6 @@ public class UnityNotificationManagerOreo extends UnityNotificationManager {
         super(context, activity);
     }
 
-    protected static NotificationChannelWrapper getOreoNotificationChannel(Context context, String id) {
-        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-
-        List<NotificationChannelWrapper> channelList = new ArrayList<NotificationChannelWrapper>();
-
-        for (NotificationChannel ch : getNotificationManager(context).getNotificationChannels()) {
-            if (ch.getId() == id)
-                return notificationChannelToWrapper(ch);
-        }
-        return null;
-    }
-
     @Override
     public void deleteNotificationChannel(String id) {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;

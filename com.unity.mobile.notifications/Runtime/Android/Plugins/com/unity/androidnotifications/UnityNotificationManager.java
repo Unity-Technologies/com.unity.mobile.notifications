@@ -195,11 +195,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return String.format("unity_notification_channel_%s", id);
     }
 
-    // Get a notification channel by id.
-    // This function will only be called for devices which are low than Android O.
     protected static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return UnityNotificationManagerOreo.getOreoNotificationChannel(context, id);
+            NotificationChannel ch = getNotificationManager(context).getNotificationChannel(id);
+            if (ch == null)
+                return null;
+            return notificationChannelToWrapper(ch);
         }
 
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
