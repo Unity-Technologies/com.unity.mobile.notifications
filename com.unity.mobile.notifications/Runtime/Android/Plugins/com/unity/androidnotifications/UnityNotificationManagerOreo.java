@@ -13,32 +13,6 @@ public class UnityNotificationManagerOreo extends UnityNotificationManager {
         super(context, activity);
     }
 
-    @Override
-    public void registerNotificationChannel(
-            String id,
-            String name,
-            int importance,
-            String description,
-            boolean enableLights,
-            boolean enableVibration,
-            boolean canBypassDnd,
-            boolean canShowBadge,
-            long[] vibrationPattern,
-            int lockscreenVisibility) {
-        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-
-        NotificationChannel channel = new NotificationChannel(id, name, importance);
-        channel.setDescription(description);
-        channel.enableLights(enableLights);
-        channel.enableVibration(enableVibration);
-        channel.setBypassDnd(canBypassDnd);
-        channel.setShowBadge(canShowBadge);
-        channel.setVibrationPattern(vibrationPattern);
-        channel.setLockscreenVisibility(lockscreenVisibility);
-
-        getNotificationManager().createNotificationChannel(channel);
-    }
-
     protected static NotificationChannelWrapper getOreoNotificationChannel(Context context, String id) {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
 

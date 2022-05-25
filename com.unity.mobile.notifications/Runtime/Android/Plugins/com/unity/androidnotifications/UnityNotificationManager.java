@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -139,8 +140,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         UnityNotificationManager.mNotificationCallback = notificationCallback;
     }
 
-    // Register a new notification channel.
-    // This function will only be called for devices which are low than Android O.
     public void registerNotificationChannel(
             String id,
             String name,
@@ -152,30 +151,43 @@ public class UnityNotificationManager extends BroadcastReceiver {
             boolean canShowBadge,
             long[] vibrationPattern,
             int lockscreenVisibility) {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
-        channelIds.add(id); // TODO: what if users create the channel again with the same id?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(id, name, importance);
+            channel.setDescription(description);
+            channel.enableLights(enableLights);
+            channel.enableVibration(enableVibration);
+            channel.setBypassDnd(canBypassDnd);
+            channel.setShowBadge(canShowBadge);
+            channel.setVibrationPattern(vibrationPattern);
+            channel.setLockscreenVisibility(lockscreenVisibility);
 
-        // Add to notification channel ids SharedPreferences.
-        SharedPreferences.Editor editor = prefs.edit().clear();
-        editor.putStringSet("ChannelIDs", channelIds);
-        editor.apply();
+            getNotificationManager().createNotificationChannel(channel);
+        } else {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
+            channelIds.add(id); // TODO: what if users create the channel again with the same id?
 
-        // Store the channel into a SharedPreferences.
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
-        editor = channelPrefs.edit();
+            // Add to notification channel ids SharedPreferences.
+            SharedPreferences.Editor editor = prefs.edit().clear();
+            editor.putStringSet("ChannelIDs", channelIds);
+            editor.apply();
 
-        editor.putString("title", name); // Sadly I can't change the "title" here to "name" due to backward compatibility.
-        editor.putInt("importance", importance);
-        editor.putString("description", description);
-        editor.putBoolean("enableLights", enableLights);
-        editor.putBoolean("enableVibration", enableVibration);
-        editor.putBoolean("canBypassDnd", canBypassDnd);
-        editor.putBoolean("canShowBadge", canShowBadge);
-        editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
-        editor.putInt("lockscreenVisibility", lockscreenVisibility);
+            // Store the channel into a SharedPreferences.
+            SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+            editor = channelPrefs.edit();
 
-        editor.apply();
+            editor.putString("title", name); // Sadly I can't change the "title" here to "name" due to backward compatibility.
+            editor.putInt("importance", importance);
+            editor.putString("description", description);
+            editor.putBoolean("enableLights", enableLights);
+            editor.putBoolean("enableVibration", enableVibration);
+            editor.putBoolean("canBypassDnd", canBypassDnd);
+            editor.putBoolean("canShowBadge", canShowBadge);
+            editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
+            editor.putInt("lockscreenVisibility", lockscreenVisibility);
+
+            editor.apply();
+        }
     }
 
     protected static String getSharedPrefsNameByChannelId(String id)
