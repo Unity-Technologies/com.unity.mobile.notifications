@@ -115,14 +115,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Called from managed code.
     public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
-        if (mUnityNotificationManager != null)
-            return mUnityNotificationManager;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mUnityNotificationManager = new UnityNotificationManagerOreo(context, activity);
-        } else {
+        if (mUnityNotificationManager == null)
             mUnityNotificationManager = new UnityNotificationManager(context, activity);
-        }
 
         return mUnityNotificationManager;
     }
