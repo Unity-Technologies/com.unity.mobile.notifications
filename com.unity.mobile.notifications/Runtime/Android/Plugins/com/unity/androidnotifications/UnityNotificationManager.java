@@ -1,5 +1,6 @@
 package com.unity.androidnotifications;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
@@ -233,9 +234,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return channel;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     protected static NotificationChannelWrapper notificationChannelToWrapper(NotificationChannel channel) {
-        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-
         NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
 
         wrapper.id = channel.getId();
