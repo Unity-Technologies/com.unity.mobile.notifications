@@ -14,13 +14,6 @@ public class UnityNotificationManagerOreo extends UnityNotificationManager {
     }
 
     @Override
-    public void deleteNotificationChannel(String id) {
-        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-
-        getNotificationManager().deleteNotificationChannel(id);
-    }
-
-    @Override
     public NotificationChannelWrapper[] getNotificationChannels() {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
 

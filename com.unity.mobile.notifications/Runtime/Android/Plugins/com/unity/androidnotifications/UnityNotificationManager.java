@@ -258,24 +258,27 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return UnityNotificationManager.getNotificationChannel(mContext, id);
     }
 
-    // Delete a notification channel by id.
-    // This function will only be called for devices which are low than Android O.
     public void deleteNotificationChannel(String id) {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getNotificationManager().deleteNotificationChannel(id);
+        } else {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> channelIds = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
 
-        if (!channelIds.contains(id))
-            return;
+            if (!channelIds.contains(id))
+                return;
 
-        // Remove from the notification channel ids SharedPreferences.
-        channelIds.remove(id);
-        SharedPreferences.Editor editor = prefs.edit().clear();
-        editor.putStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, channelIds);
-        editor.apply();
+            // Remove from the notification channel ids SharedPreferences.
+            channelIds = new HashSet(channelIds);
+            channelIds.remove(id);
+            SharedPreferences.Editor editor = prefs.edit().clear();
+            editor.putStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, channelIds);
+            editor.apply();
 
-        // Delete the notification channel SharedPreferences.
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
-        channelPrefs.edit().clear().apply();
+            // Delete the notification channel SharedPreferences.
+            SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+            channelPrefs.edit().clear().apply();
+        }
     }
 
     // Get all notification channels.
