@@ -232,6 +232,25 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return channel;
     }
 
+    protected static NotificationChannelWrapper notificationChannelToWrapper(NotificationChannel channel) {
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+
+        NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
+
+        wrapper.id = channel.getId();
+        wrapper.name = channel.getName().toString();
+        wrapper.importance = channel.getImportance();
+        wrapper.description = channel.getDescription();
+        wrapper.enableLights = channel.shouldShowLights();
+        wrapper.enableVibration = channel.shouldVibrate();
+        wrapper.canBypassDnd = channel.canBypassDnd();
+        wrapper.canShowBadge = channel.canShowBadge();
+        wrapper.vibrationPattern = channel.getVibrationPattern();
+        wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
+
+        return wrapper;
+    }
+
     // Get a notification channel by id.
     // This function will only be called for devices which are low than Android O.
     protected NotificationChannelWrapper getNotificationChannel(String id) {

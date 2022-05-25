@@ -25,23 +25,6 @@ public class UnityNotificationManagerOreo extends UnityNotificationManager {
         return null;
     }
 
-    protected static NotificationChannelWrapper notificationChannelToWrapper(NotificationChannel channel) {
-        NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
-
-        wrapper.id = channel.getId();
-        wrapper.name = channel.getName().toString();
-        wrapper.importance = channel.getImportance();
-        wrapper.description = channel.getDescription();
-        wrapper.enableLights = channel.shouldShowLights();
-        wrapper.enableVibration = channel.shouldVibrate();
-        wrapper.canBypassDnd = channel.canBypassDnd();
-        wrapper.canShowBadge = channel.canShowBadge();
-        wrapper.vibrationPattern = channel.getVibrationPattern();
-        wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
-
-        return wrapper;
-    }
-
     @Override
     public void deleteNotificationChannel(String id) {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
