@@ -229,7 +229,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    protected static NotificationChannelWrapper notificationChannelToWrapper(NotificationChannel channel) {
+    protected static NotificationChannelWrapper notificationChannelToWrapper(Object chan) {
+        // Possibly unavailable classes cannot be in API, breaks reflection code looping over when searching for method
+        NotificationChannel channel = (NotificationChannel)chan;
         NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
 
         wrapper.id = channel.getId();
