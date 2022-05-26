@@ -278,6 +278,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public NotificationChannelWrapper[] getNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             List<NotificationChannel> channels = getNotificationManager().getNotificationChannels();
+            if (channels.size() == 0)
+                return null;
             NotificationChannelWrapper[] channelList = new NotificationChannelWrapper[channels.size()];
             int i = 0;
             for (NotificationChannel ch : channels) {
@@ -288,7 +290,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         } else {
             SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
             Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
-
+            if (channelIdsSet.size() == 0)
+                return null;
             NotificationChannelWrapper[] channels = new NotificationChannelWrapper[channelIdsSet.size()];
             int i = 0;
             for (String k : channelIdsSet) {
