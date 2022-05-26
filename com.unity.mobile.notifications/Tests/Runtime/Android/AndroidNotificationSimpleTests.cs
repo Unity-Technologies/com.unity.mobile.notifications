@@ -41,6 +41,47 @@ class AndroidNotificationSimpleTests
 
     [Test]
     [UnityPlatform(RuntimePlatform.Android)]
+    public void GetNotificationChannel_ReturnsTheChannel()
+    {
+        var channel = AndroidNotificationCenter.GetNotificationChannel(kChannelId);
+        Assert.IsNotNull(channel);
+        Assert.AreEqual("SerializeDeserializeNotification channel", channel.Name);
+        Assert.AreEqual("SerializeDeserializeNotification channel", channel.Description);
+        Assert.AreEqual(Importance.High, channel.Importance);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void GetNotificationChannel_NonExistentChannel_ReturnsNull()
+    {
+        var channel = AndroidNotificationCenter.GetNotificationChannel("DoesNotExist");
+        Assert.IsNotNull(channel);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void GetNotificationChannels_NoChannels_ReturnsEmptyArray()
+    {
+        var channels = AndroidNotificationCenter.GetNotificationChannels();
+        foreach (var channel in channels)
+            AndroidNotificationCenter.DeleteNotificationChannel(channel.Id);
+
+        try
+        {
+            var chans = AndroidNotificationCenter.GetNotificationChannels();
+            Assert.IsNotNull(chans);
+            Assert.AreEqual(0, chans.Length);
+        }
+        finally
+        {
+            // recreate test channels to not break other tests
+            foreach (var channel in channels)
+                AndroidNotificationCenter.RegisterNotificationChannel(channel);
+        }
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void DeleteNotificationChannel_NotificationChannelIsDeleted()
     {
         var ch = new AndroidNotificationChannel();
