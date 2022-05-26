@@ -190,7 +190,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return String.format("unity_notification_channel_%s", id);
     }
 
-    protected static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
+    private static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel ch = getNotificationManager(context).getNotificationChannel(id);
             if (ch == null)
@@ -229,7 +229,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    protected static NotificationChannelWrapper notificationChannelToWrapper(Object chan) {
+    private static NotificationChannelWrapper notificationChannelToWrapper(Object chan) {
         // Possibly unavailable classes cannot be in API, breaks reflection code looping over when searching for method
         NotificationChannel channel = (NotificationChannel)chan;
         NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
@@ -248,9 +248,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return wrapper;
     }
 
-    // Get a notification channel by id.
-    // This function will only be called for devices which are low than Android O.
-    protected NotificationChannelWrapper getNotificationChannel(String id) {
+    public NotificationChannelWrapper getNotificationChannel(String id) {
         return UnityNotificationManager.getNotificationChannel(mContext, id);
     }
 
