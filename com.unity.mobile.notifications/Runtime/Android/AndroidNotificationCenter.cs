@@ -637,7 +637,7 @@ namespace Unity.Notifications.Android
             var androidChannels = s_Jni.NotificationManager.GetNotificationChannels();
             var channels = new AndroidNotificationChannel[androidChannels == null ? 0 : androidChannels.Length];
 
-            for (int i = 0; i < androidChannels.Length; ++i)
+            for (int i = 0; i < channels.Length; ++i)
             {
                 var channel = androidChannels[i];
                 var ch = new AndroidNotificationChannel();
