@@ -717,6 +717,18 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
+        /// Schedule a notification created using the provided Notification.Builder object.
+        /// Notification builder should be created by calling CreateNotificationBuilder.
+        /// Stores the notification id to the second argument
+        /// </summary>
+        public static void SendNotification(AndroidJavaObject notificationBuilder, out int id)
+        {
+            id = -1;
+            if (Initialize())
+                id = s_Jni.NotificationManager.ScheduleNotification(notificationBuilder);
+        }
+
+        /// <summary>
         /// Update an already scheduled notification.
         /// If a notification with the specified id was already scheduled it will be overridden with the information from the passed notification struct.
         /// </summary>
