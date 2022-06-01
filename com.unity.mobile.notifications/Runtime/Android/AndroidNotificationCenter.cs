@@ -885,6 +885,12 @@ namespace Unity.Notifications.Android
 
         static void CreateNotificationBuilder(AndroidNotification notification, string channelId, out AndroidJavaObject notificationBuilder, out AndroidJavaObject extras)
         {
+            if (!Initialize())
+            {
+                notificationBuilder = extras = null;
+                return;
+            }
+
             long fireTime = notification.FireTime.ToLong();
             if (fireTime < 0L)
             {
