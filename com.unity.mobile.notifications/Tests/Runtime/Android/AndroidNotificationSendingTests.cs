@@ -317,6 +317,12 @@ class AndroidNotificationSendingTests
         int id = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
         yield return new WaitForSeconds(0.2f);
 
+        // temporary null the manager, cause that's what we have in reality
+        var manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
+        managerClass.SetStatic<AndroidJavaObject>("mUnityNotificationManager", null);
+        // also clear cached notifications, since they don't exist after reboot
+        managerClass.GetStatic<AndroidJavaObject>("mScheduledNotifications").Call("clear");
+
         // simulate reboot by directly cancelling scheduled alarms preserving saves
         managerClass.CallStatic("cancelPendingNotificationIntent", context, id);
         yield return new WaitForSeconds(0.2f);
@@ -327,6 +333,8 @@ class AndroidNotificationSendingTests
 
         Debug.LogWarning("SendNotification_CanReschedule completed");
 
+        // restore manager (to not ruin other tests)
+        managerClass.SetStatic("mUnityNotificationManager", manager);
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
     }
 
