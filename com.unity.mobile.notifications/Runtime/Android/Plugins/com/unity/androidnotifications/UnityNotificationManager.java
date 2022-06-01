@@ -30,19 +30,19 @@ import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.unity3d.player.UnityPlayer;
 
 public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
-    private static HashMap<Integer, Notification> mScheduledNotifications = new HashMap();
+    private static ConcurrentHashMap<Integer, Object> mScheduledNotifications = new ConcurrentHashMap();
     private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
 
     public Context mContext = null;
@@ -303,7 +303,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
     public void scheduleNotification(Notification.Builder notificationBuilder) {
         int id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
-        putScheduledNotification(id);
+        // don't replace existing, only put null as placeholder so we properly report status as being scheduled
+        mScheduledNotifications.putIfAbsent(Integer.valueOf(id), null);
         mBackgroundThread.enqueueNotification(id, notificationBuilder);
     }
 
@@ -348,7 +349,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         // fireTime not taken from notification, because we may have adjusted it
 
         Notification notification = buildNotificationForSending(context, activityClass, notificationBuilder);
-        putScheduledNotification(Integer.valueOf(id), notification);
+        mScheduledNotifications.put(Integer.valueOf(id), notification);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
         PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -669,7 +670,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     id = builder.getExtras().getInt(KEY_NOTIFICATION_ID, -1);
                     notif = buildNotificationForSending(context, openActivity, builder);
                     // if notification is not sendable, it wasn't cached
-                    putScheduledNotification(Integer.valueOf(id), notif);
+                    mScheduledNotifications.put(Integer.valueOf(id), notif);
                 }
 
                 if (notif != null) {
@@ -848,7 +849,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
             int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
             Integer notificationId = Integer.valueOf(id);
-            if ((notification = getScheduledNotification(notificationId)) != null) {
+            if ((notification = mScheduledNotifications.get(notificationId)) != null) {
                 sendable = true;
             } else {
                 // in case we don't have cached notification, deserialize from storage
@@ -897,27 +898,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mActivity.startActivity(settingsIntent);
     }
 
-    private static synchronized void putScheduledNotification(Integer id) {
-        // don't replace existing, only put null as placeholder so we properly report status as being scheduled
-        if (!mScheduledNotifications.containsKey(id))
-            mScheduledNotifications.put(id, null);
+    private static boolean haveScheduledNotification(Integer id) {
+        Object value = mScheduledNotifications.get(id);
+        if (value == null)
+            return false;
+        // If map contains builder, in means we're still scheduling
+        return value instanceof Notification.Builder;
     }
 
-    private static synchronized void putScheduledNotification(Integer id, Notification notification) {
-        mScheduledNotifications.put(id, notification);
-    }
-
-    private static synchronized boolean haveScheduledNotification(Integer id) {
-        // have key but notification is null, means scheduling is still happening on other thread
-        return mScheduledNotifications.containsKey(id) && mScheduledNotifications.get(id) == null;
-    }
-
-    private static synchronized Notification getScheduledNotification(Integer id) {
-        return mScheduledNotifications.get(id);
-    }
-
-    protected static synchronized Notification removeScheduledNotification(Integer id) {
-        return mScheduledNotifications.remove(id);
+    protected static void removeScheduledNotification(Integer id) {
+        mScheduledNotifications.remove(id);
     }
 }
 
