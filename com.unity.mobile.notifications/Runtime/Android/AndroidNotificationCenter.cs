@@ -114,7 +114,7 @@ namespace Unity.Notifications.Android
             setNotificationGroupAlertBehavior = JniApi.FindMethod(clazz, "setNotificationGroupAlertBehavior", "(Landroid/app/Notification$Builder;I)V", true);
             getNotificationGroupAlertBehavior = JniApi.FindMethod(clazz, "getNotificationGroupAlertBehavior", "(Landroid/app/Notification;)I", true);
             getNotificationChannelId = JniApi.FindMethod(clazz, "getNotificationChannelId", "(Landroid/app/Notification;)Ljava/lang/String;", true);
-            scheduleNotification = JniApi.FindMethod(clazz, "scheduleNotification", "(Landroid/app/Notification$Builder;)V", false);
+            scheduleNotification = JniApi.FindMethod(clazz, "scheduleNotification", "(Landroid/app/Notification$Builder;)I", false);
             createNotificationBuilder = JniApi.FindMethod(clazz, "createNotificationBuilder", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
         }
 
@@ -195,9 +195,9 @@ namespace Unity.Notifications.Android
             self.Call("deleteNotificationChannel", channelId);
         }
 
-        public void ScheduleNotification(AndroidJavaObject notificationBuilder)
+        public int ScheduleNotification(AndroidJavaObject notificationBuilder)
         {
-            self.Call(scheduleNotification, notificationBuilder);
+            return self.Call<int>(scheduleNotification, notificationBuilder);
         }
 
         public bool CheckIfPendingNotificationIsRegistered(int id)
@@ -860,8 +860,11 @@ namespace Unity.Notifications.Android
         /// </summary>
         public static AndroidJavaObject CreateNotificationBuilder(AndroidNotification notification, string channelId)
         {
-            int id = Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()) + (new System.Random().Next(10000));
-            return CreateNotificationBuilder(id, notification, channelId);
+            AndroidJavaObject builder, extras;
+            CreateNotificationBuilder(notification, channelId, out builder, out extras);
+            if (extras != null)
+                extras.Dispose();
+            return builder;
         }
 
         /// <summary>

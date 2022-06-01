@@ -30,6 +30,7 @@ import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
 import java.util.Calendar;
+import java.util.Random;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -300,12 +301,30 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
-    public void scheduleNotification(Notification.Builder notificationBuilder) {
-        int id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
+    private int generateUniqueId() {
+        int id = 0;
+        Random random = new Random();
+        do {
+            id += random.nextInt(1000);
+        } while (mScheduledNotifications.containsKey(Integer.valueOf(id)));
+
+        return id;
+    }
+
+    public int scheduleNotification(Notification.Builder notificationBuilder) {
+        Bundle extras = notificationBuilder.getExtras();
+        int id;
+        if (extras.containsKey(KEY_ID))
+            id = notificationBuilder.getExtras().getInt(KEY_ID, -1);
+        else {
+            id = generateUniqueId();
+            extras.putInt(KEY_ID, id);
+        }
+
         // don't replace existing, only put null as placeholder so we properly report status as being scheduled
         mScheduledNotifications.putIfAbsent(Integer.valueOf(id), null);
         mBackgroundThread.enqueueNotification(id, notificationBuilder);
+        return id;
     }
 
     protected void performNotificationScheduling(int id, Notification.Builder notificationBuilder) {
