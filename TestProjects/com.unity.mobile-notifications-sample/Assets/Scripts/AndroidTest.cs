@@ -107,7 +107,7 @@ namespace Unity.Notifications.Tests.Sample
                 m_LOGGER.Red("Notification not found!", 1);
             }
         }
-        
+
         private AndroidNotification parseNotificationTemplate(AndroidNotificationTemplate template)
         {
             AndroidNotification newNotification = new AndroidNotification()
@@ -358,7 +358,7 @@ namespace Unity.Notifications.Tests.Sample
             Canvas.ForceUpdateCanvases();
             m_gameObjectReferences.LogsScrollRect.verticalNormalizedPosition = 0f;
         }
-        
+
         IEnumerator RunCustomSequence()
         {
             AndroidNotificationTemplate ant = AndroidNotificationsTemplates[4];
