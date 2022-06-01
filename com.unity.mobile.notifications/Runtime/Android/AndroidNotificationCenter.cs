@@ -873,6 +873,18 @@ namespace Unity.Notifications.Android
         /// <returns>A proxy object for created Notification.Builder</returns>
         public static AndroidJavaObject CreateNotificationBuilder(int id, AndroidNotification notification, string channelId)
         {
+            AndroidJavaObject builder, extras;
+            CreateNotificationBuilder(notification, channelId, out builder, out extras);
+            if (extras != null)
+            {
+                s_Jni.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
+                extras.Dispose();
+            }
+            return builder;
+        }
+
+        static void CreateNotificationBuilder(AndroidNotification notification, string channelId, out AndroidJavaObject notificationBuilder, out AndroidJavaObject extras)
+        {
             long fireTime = notification.FireTime.ToLong();
             if (fireTime < 0L)
             {
@@ -881,7 +893,7 @@ namespace Unity.Notifications.Android
 
             // NOTE: JNI calls are expensive, so we avoid calls that set something that is also a default
 
-            var notificationBuilder = s_Jni.NotificationManager.CreateNotificationBuilder(channelId);
+            notificationBuilder = s_Jni.NotificationManager.CreateNotificationBuilder(channelId);
             s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_SMALL_ICON, notification.SmallIcon);
             if (!string.IsNullOrEmpty(notification.LargeIcon))
                 s_Jni.NotificationManager.SetNotificationIcon(notificationBuilder, s_Jni.NotificationManager.KEY_LARGE_ICON, notification.LargeIcon);
@@ -919,17 +931,12 @@ namespace Unity.Notifications.Android
             if (notification.GroupAlertBehaviour != GroupAlertBehaviours.GroupAlertAll)  // All is default value
                 s_Jni.NotificationManager.SetNotificationGroupAlertBehavior(notificationBuilder, (int)notification.GroupAlertBehaviour);
 
-            using (var extras = s_Jni.NotificationBuilder.GetExtras(notificationBuilder))
-            {
-                s_Jni.Bundle.PutInt(extras, s_Jni.NotificationManager.KEY_ID, id);
-                s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
-                s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
-                s_Jni.Bundle.PutBoolean(extras, s_Jni.NotificationManager.KEY_SHOW_IN_FOREGROUND, notification.ShowInForeground);
-                if (!string.IsNullOrEmpty(notification.IntentData))
-                    s_Jni.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
-            }
-
-            return notificationBuilder;
+            extras = s_Jni.NotificationBuilder.GetExtras(notificationBuilder);
+            s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
+            s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
+            s_Jni.Bundle.PutBoolean(extras, s_Jni.NotificationManager.KEY_SHOW_IN_FOREGROUND, notification.ShowInForeground);
+            if (!string.IsNullOrEmpty(notification.IntentData))
+                s_Jni.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
         }
 
         internal static AndroidNotificationIntentData GetNotificationData(AndroidJavaObject notificationObj)
