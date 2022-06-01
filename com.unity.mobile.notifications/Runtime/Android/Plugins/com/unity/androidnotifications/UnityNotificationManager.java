@@ -321,8 +321,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             extras.putInt(KEY_ID, id);
         }
 
-        // don't replace existing, only put null as placeholder so we properly report status as being scheduled
-        mScheduledNotifications.putIfAbsent(Integer.valueOf(id), null);
+        // don't replace, put builder as placeholder to report the status correctly
+        mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
         mBackgroundThread.enqueueNotification(id, notificationBuilder);
         return id;
     }
