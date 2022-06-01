@@ -1,9 +1,11 @@
 package com.unity.androidnotifications;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -112,14 +114,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Called from managed code.
     public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
-        if (mUnityNotificationManager != null)
-            return mUnityNotificationManager;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mUnityNotificationManager = new UnityNotificationManagerOreo(context, activity);
-        } else {
+        if (mUnityNotificationManager == null)
             mUnityNotificationManager = new UnityNotificationManager(context, activity);
-        }
 
         return mUnityNotificationManager;
     }
@@ -138,8 +134,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         UnityNotificationManager.mNotificationCallback = notificationCallback;
     }
 
-    // Register a new notification channel.
-    // This function will only be called for devices which are low than Android O.
     public void registerNotificationChannel(
             String id,
             String name,
@@ -151,30 +145,43 @@ public class UnityNotificationManager extends BroadcastReceiver {
             boolean canShowBadge,
             long[] vibrationPattern,
             int lockscreenVisibility) {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
-        channelIds.add(id); // TODO: what if users create the channel again with the same id?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(id, name, importance);
+            channel.setDescription(description);
+            channel.enableLights(enableLights);
+            channel.enableVibration(enableVibration);
+            channel.setBypassDnd(canBypassDnd);
+            channel.setShowBadge(canShowBadge);
+            channel.setVibrationPattern(vibrationPattern);
+            channel.setLockscreenVisibility(lockscreenVisibility);
 
-        // Add to notification channel ids SharedPreferences.
-        SharedPreferences.Editor editor = prefs.edit().clear();
-        editor.putStringSet("ChannelIDs", channelIds);
-        editor.apply();
+            getNotificationManager().createNotificationChannel(channel);
+        } else {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
+            channelIds.add(id); // TODO: what if users create the channel again with the same id?
 
-        // Store the channel into a SharedPreferences.
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
-        editor = channelPrefs.edit();
+            // Add to notification channel ids SharedPreferences.
+            SharedPreferences.Editor editor = prefs.edit().clear();
+            editor.putStringSet("ChannelIDs", channelIds);
+            editor.apply();
 
-        editor.putString("title", name); // Sadly I can't change the "title" here to "name" due to backward compatibility.
-        editor.putInt("importance", importance);
-        editor.putString("description", description);
-        editor.putBoolean("enableLights", enableLights);
-        editor.putBoolean("enableVibration", enableVibration);
-        editor.putBoolean("canBypassDnd", canBypassDnd);
-        editor.putBoolean("canShowBadge", canShowBadge);
-        editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
-        editor.putInt("lockscreenVisibility", lockscreenVisibility);
+            // Store the channel into a SharedPreferences.
+            SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+            editor = channelPrefs.edit();
 
-        editor.apply();
+            editor.putString("title", name); // Sadly I can't change the "title" here to "name" due to backward compatibility.
+            editor.putInt("importance", importance);
+            editor.putString("description", description);
+            editor.putBoolean("enableLights", enableLights);
+            editor.putBoolean("enableVibration", enableVibration);
+            editor.putBoolean("canBypassDnd", canBypassDnd);
+            editor.putBoolean("canShowBadge", canShowBadge);
+            editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
+            editor.putInt("lockscreenVisibility", lockscreenVisibility);
+
+            editor.apply();
+        }
     }
 
     protected static String getSharedPrefsNameByChannelId(String id)
@@ -182,11 +189,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return String.format("unity_notification_channel_%s", id);
     }
 
-    // Get a notification channel by id.
-    // This function will only be called for devices which are low than Android O.
-    protected static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
+    private static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return UnityNotificationManagerOreo.getOreoNotificationChannel(context, id);
+            NotificationChannel ch = getNotificationManager(context).getNotificationChannel(id);
+            if (ch == null)
+                return null;
+            return notificationChannelToWrapper(ch);
         }
 
         SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
@@ -219,44 +227,77 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return channel;
     }
 
-    // Get a notification channel by id.
-    // This function will only be called for devices which are low than Android O.
-    protected NotificationChannelWrapper getNotificationChannel(String id) {
+    @TargetApi(Build.VERSION_CODES.O)
+    private static NotificationChannelWrapper notificationChannelToWrapper(Object chan) {
+        // Possibly unavailable classes cannot be in API, breaks reflection code looping over when searching for method
+        NotificationChannel channel = (NotificationChannel)chan;
+        NotificationChannelWrapper wrapper = new NotificationChannelWrapper();
+
+        wrapper.id = channel.getId();
+        wrapper.name = channel.getName().toString();
+        wrapper.importance = channel.getImportance();
+        wrapper.description = channel.getDescription();
+        wrapper.enableLights = channel.shouldShowLights();
+        wrapper.enableVibration = channel.shouldVibrate();
+        wrapper.canBypassDnd = channel.canBypassDnd();
+        wrapper.canShowBadge = channel.canShowBadge();
+        wrapper.vibrationPattern = channel.getVibrationPattern();
+        wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
+
+        return wrapper;
+    }
+
+    public NotificationChannelWrapper getNotificationChannel(String id) {
         return UnityNotificationManager.getNotificationChannel(mContext, id);
     }
 
-    // Delete a notification channel by id.
-    // This function will only be called for devices which are low than Android O.
     public void deleteNotificationChannel(String id) {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getNotificationManager().deleteNotificationChannel(id);
+        } else {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> channelIds = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
 
-        if (!channelIds.contains(id))
-            return;
+            if (!channelIds.contains(id))
+                return;
 
-        // Remove from the notification channel ids SharedPreferences.
-        channelIds.remove(id);
-        SharedPreferences.Editor editor = prefs.edit().clear();
-        editor.putStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, channelIds);
-        editor.apply();
+            // Remove from the notification channel ids SharedPreferences.
+            channelIds = new HashSet(channelIds);
+            channelIds.remove(id);
+            SharedPreferences.Editor editor = prefs.edit().clear();
+            editor.putStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, channelIds);
+            editor.apply();
 
-        // Delete the notification channel SharedPreferences.
-        SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
-        channelPrefs.edit().clear().apply();
+            // Delete the notification channel SharedPreferences.
+            SharedPreferences channelPrefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+            channelPrefs.edit().clear().apply();
+        }
     }
 
-    // Get all notification channels.
-    // This function will only be called for devices which are low than Android O.
-    public Object[] getNotificationChannels() {
-        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-        Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>());
+    public NotificationChannelWrapper[] getNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            List<NotificationChannel> channels = getNotificationManager().getNotificationChannels();
+            if (channels.size() == 0)
+                return null;
+            NotificationChannelWrapper[] channelList = new NotificationChannelWrapper[channels.size()];
+            int i = 0;
+            for (NotificationChannel ch : channels) {
+                channelList[i++] = notificationChannelToWrapper(ch);
+            }
 
-        ArrayList<NotificationChannelWrapper> channels = new ArrayList<>();
-
-        for (String k : channelIdsSet) {
-            channels.add(getNotificationChannel(k));
+            return channelList;
+        } else {
+            SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
+            Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
+            if (channelIdsSet.size() == 0)
+                return null;
+            NotificationChannelWrapper[] channels = new NotificationChannelWrapper[channelIdsSet.size()];
+            int i = 0;
+            for (String k : channelIdsSet) {
+                channels[i++] = getNotificationChannel(k);
+            }
+            return channels;
         }
-        return channels.toArray();
     }
 
     // This is called from Unity managed code to call AlarmManager to set a broadcast intent for sending a notification.
@@ -878,4 +919,24 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static synchronized Notification removeScheduledNotification(Integer id) {
         return mScheduledNotifications.remove(id);
     }
+}
+
+// Provide a wrapper for NotificationChannel.
+// Create this wrapper for all Android versions as NotificationChannel is only available for Android O or above.
+class NotificationChannelWrapper {
+    public String id;
+    public String name;
+    public int importance;
+    public String description;
+    public boolean enableLights;
+    public boolean enableVibration;
+    public boolean canBypassDnd;
+    public boolean canShowBadge;
+    public long[] vibrationPattern;
+    public int lockscreenVisibility;
+}
+
+// Implemented in C# to receive callback on notification show
+interface NotificationCallback {
+    void onSentNotification(Notification notification);
 }
