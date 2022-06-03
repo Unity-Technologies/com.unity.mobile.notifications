@@ -3,10 +3,42 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Notifications.Android;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 class AndroidNotificationSimpleTests
+    : IPrebuildSetup, IPostBuildCleanup
 {
     const string kChannelId = "SerializeDeserializeNotificationChannel";
+
+#if UNITY_EDITOR
+    PluginImporter GetTestUtils()
+    {
+        var assets = AssetDatabase.FindAssets("UnityNotificationTestUtils");
+        if (assets.Length != 1)
+            throw new Exception("Something is wrong");
+        return (PluginImporter)AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(assets[0]));
+    }
+#endif
+
+    public void Setup()
+    {
+#if UNITY_EDITOR
+        var testUtils = GetTestUtils();
+        testUtils.SetCompatibleWithPlatform(BuildTarget.Android, true);
+        testUtils.SaveAndReimport();
+#endif
+    }
+
+    public void Cleanup()
+    {
+#if UNITY_EDITOR
+        var testUtils = GetTestUtils();
+        testUtils.SetCompatibleWithPlatform(BuildTarget.Android, false);
+        testUtils.SaveAndReimport();
+#endif
+    }
 
     [OneTimeSetUp]
     public void BeforeAllTests()
