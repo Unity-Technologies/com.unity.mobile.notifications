@@ -40,7 +40,7 @@ class UnityNotificationUtilities {
         In real life app can get updated having old serialized notifications present, so we should be able to deserialize them.
     */
     // magic stands for "Unity Mobile Notifications Notification"
-    private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
+    static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
     private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
     private static final int NOTIFICATION_SERIALIZATION_VERSION = 1;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
@@ -175,7 +175,7 @@ class UnityNotificationUtilities {
         }
     }
 
-    private static void serializeString(DataOutputStream out, String s) throws IOException {
+    static void serializeString(DataOutputStream out, String s) throws IOException {
         if (s == null || s.length() == 0)
             out.writeInt(0);
         else {
@@ -185,7 +185,7 @@ class UnityNotificationUtilities {
         }
     }
 
-    private static byte[] serializeParcelable(Parcelable obj) {
+    static byte[] serializeParcelable(Parcelable obj) {
         try {
             Parcel p = Parcel.obtain();
             Bundle b = new Bundle();
