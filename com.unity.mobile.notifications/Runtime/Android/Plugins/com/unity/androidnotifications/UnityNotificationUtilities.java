@@ -32,7 +32,7 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SHOW_IN_FOREGROUND;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
-public class UnityNotificationUtilities {
+class UnityNotificationUtilities {
     /*
         We serialize notifications and save them to shared prefs, so that if app is killed, we can recreate them.
         The serialized BLOB starts with a four byte magic number descibing serialization type, followed by an integer version.
