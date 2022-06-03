@@ -563,19 +563,38 @@ class AndroidNotificationSimpleTests
         original.FireTime = DateTime.Now;
         original.LargeIcon = "large_icon";
 
-        var deserializedData = SerializeDeserializeNotification(original, notificationId, (prefs) =>
+        AndroidJavaObject context, prefs;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
         {
-            var data = prefs.Call<string>("getString", "data", "");
-            // corrupt data
-            using (var editor = prefs.Call<AndroidJavaObject>("edit"))
-            {
-                editor.Call<AndroidJavaObject>("putString", "data", "jfkasjflksdjflkasdjflkjdsafkjsadfl").Dispose();
-                editor.Call("apply");
-            }
+            var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            context = activity.Call<AndroidJavaObject>("getApplicationContext");
+            var javaNotif = builder.Call<AndroidJavaObject>("build");
+            var testUtils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationTestUtils");
 
-            var data2 = prefs.Call<string>("getString", "data", "");
-            Assert.AreNotEqual(data, data2);
-        });
+            prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", 0 /* MODE_PRIVATE */);
+            testUtils.CallStatic("serializeNotification", prefs, javaNotif);
+        }
+
+        var data = prefs.Call<string>("getString", "data", "");
+        // corrupt data
+        using (var editor = prefs.Call<AndroidJavaObject>("edit"))
+        {
+            editor.Call<AndroidJavaObject>("putString", "data", "jfkasjflksdjflkasdjflkjdsafkjsadfl").Dispose();
+            editor.Call("apply");
+        }
+
+        var data2 = prefs.Call<string>("getString", "data", "");
+        Assert.AreNotEqual(data, data2);
+
+        var utils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        var deserializedNotificationBuilder = utils.CallStatic<AndroidJavaObject>("deserializeNotification", context, prefs);
+        // don't dispose notification, it is kept in AndroidNotificationIntentData
+        Assert.IsNotNull(deserializedNotificationBuilder);
+        var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");
+        Assert.IsNotNull(deserializedNotification);
+        var deserializedData = AndroidNotificationCenter.GetNotificationData(deserializedNotification);
 
         Assert.AreEqual(original.Title, deserializedData.Notification.Title);
         Assert.AreEqual(original.Text, deserializedData.Notification.Text);
