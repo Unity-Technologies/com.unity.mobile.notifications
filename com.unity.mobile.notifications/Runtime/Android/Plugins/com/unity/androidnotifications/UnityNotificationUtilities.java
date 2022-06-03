@@ -42,7 +42,7 @@ class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
     static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
     private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
-    private static final int NOTIFICATION_SERIALIZATION_VERSION = 1;
+    private static final int NOTIFICATION_SERIALIZATION_VERSION = 2;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
 
     static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
@@ -134,25 +134,19 @@ class UnityNotificationUtilities {
 
             // serialize extras
             boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
-            byte[] extras = serializeParcelable(notification.extras);
-            out.writeInt(extras == null ? 0 : extras.length);
-            if (extras != null && extras.length > 0)
-                out.write(extras);
-            else {
-                // parcelling may fail in case it contains binder object, when that happens serialize manually what we care about
-                out.writeInt(notification.extras.getInt(KEY_ID));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
-                serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
-                serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
-                out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
-                out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
-                serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
-                out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
-                out.writeBoolean(showWhen);
-                serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
-                out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
-            }
+
+            out.writeInt(notification.extras.getInt(KEY_ID));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
+            serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
+            serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
+            out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
+            out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
+            serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+            out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
+            out.writeBoolean(showWhen);
+            serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
+            out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
 
             serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
             Integer color = UnityNotificationManager.getNotificationColor(notification);
@@ -285,12 +279,12 @@ class UnityNotificationUtilities {
             long fireTime, repeatInterval;
             boolean usesStopWatch, showWhen, showInForeground = true;
             Bundle extras = null;
-            try {
+            if (version < 2) {
+                // no longer serialized since v2
                 extras = deserializeParcelable(in);
-            } catch (ClassCastException cce) {
-                Log.e(TAG_UNITY, "Unexpect type of deserialized object", cce);
             }
 
+            // before v2 it was extras or variables, since 2 always both
             if (extras == null) {
                 // extras serialized manually
                 id = in.readInt();
