@@ -305,30 +305,6 @@ class AndroidNotificationSimpleTests
         CheckNotificationsMatch(original, deserializedData.Notification);
     }
 
-    [Test]
-    [UnityPlatform(RuntimePlatform.Android)]
-    public void BasicSerializeDeserializeNotification_CanPutSimpleExtras()
-    {
-        const int notificationId = 125;
-
-        var original = new AndroidNotification();
-        original.FireTime = DateTime.Now;
-
-        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        var extras = builder.Call<AndroidJavaObject>("getExtras");
-        extras.Call("putInt", "testInt", 5);
-        extras.Call("putBoolean", "testBool", true);
-        extras.Call("putString", "testString", "the_test");
-
-        var deserializedData = SerializeDeserializeNotification(builder);
-
-        var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
-        Assert.IsNotNull(deserializedExtras);
-        Assert.AreEqual(5, deserializedExtras.Call<int>("getInt", "testInt"));
-        Assert.AreEqual(true, deserializedExtras.Call<bool>("getBoolean", "testBool"));
-        Assert.AreEqual("the_test", deserializedExtras.Call<string>("getString", "testString"));
-    }
-
     AndroidJavaObject CreateBitmap()
     {
         var configClass = new AndroidJavaClass("android.graphics.Bitmap$Config");
