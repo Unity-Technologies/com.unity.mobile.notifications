@@ -1,8 +1,12 @@
 package com.unity.androidnotifications;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import android.app.Notification;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Base64;
 import android.util.Log;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_ID;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_FIRE_TIME;
@@ -11,8 +15,12 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_INTENT
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SHOW_IN_FOREGROUND;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_ICON;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_LARGE_ICON;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_NOTIFICATION;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 import static com.unity.androidnotifications.UnityNotificationUtilities.UNITY_MAGIC_NUMBER;
+import static com.unity.androidnotifications.UnityNotificationUtilities.SAVED_NOTIFICATION_PRIMARY_KEY;
+import static com.unity.androidnotifications.UnityNotificationUtilities.SAVED_NOTIFICATION_FALLBACK_KEY;
+import static com.unity.androidnotifications.UnityNotificationUtilities.serializeNotificationParcel;
 import static com.unity.androidnotifications.UnityNotificationUtilities.serializeParcelable;
 import static com.unity.androidnotifications.UnityNotificationUtilities.serializeString;
 
@@ -112,6 +120,38 @@ public class UnityNotificationTestUtils {
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
             return false;
+        }
+    }
+
+    // copy-paste of serializeNotification when it was primary & fallback keys
+    // minor altereration: call serializeNotificationCustom_v1
+    private static void serializeNotification(SharedPreferences prefs, Notification notification) {
+        try {
+            String serialized = null, fallback = null;
+            ByteArrayOutputStream data = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(data);
+            if (serializeNotificationCustom_v1(notification, out)) {
+                out.flush();
+                byte[] bytes = data.toByteArray();
+                fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
+            }
+            data.reset();
+            Intent intent = new Intent();
+            intent.putExtra(KEY_NOTIFICATION, notification);
+            if (serializeNotificationParcel(intent, out)) {
+                out.close();
+                byte[] bytes = data.toByteArray();
+                serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+            }
+            else
+                serialized = fallback;
+
+            SharedPreferences.Editor editor = prefs.edit().clear();
+            editor.putString(SAVED_NOTIFICATION_PRIMARY_KEY, serialized);
+            editor.putString(SAVED_NOTIFICATION_FALLBACK_KEY, fallback);
+            editor.apply();
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to serialize notification", e);
         }
     }
 }

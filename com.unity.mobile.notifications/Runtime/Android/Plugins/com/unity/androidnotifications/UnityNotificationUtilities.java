@@ -45,8 +45,8 @@ class UnityNotificationUtilities {
     private static final int NOTIFICATION_SERIALIZATION_VERSION = 1;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
 
-    private static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
-    private static final String SAVED_NOTIFICATION_FALLBACK_KEY = "fallback.data";
+    static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
+    static final String SAVED_NOTIFICATION_FALLBACK_KEY = "fallback.data";
 
     protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
@@ -108,7 +108,7 @@ class UnityNotificationUtilities {
         }
     }
 
-    private static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
+    static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
         try {
             byte[] bytes = serializeParcelable(intent);
             if (bytes == null || bytes.length == 0)
