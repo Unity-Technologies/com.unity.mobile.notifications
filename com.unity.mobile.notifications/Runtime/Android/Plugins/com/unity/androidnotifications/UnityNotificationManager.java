@@ -50,6 +50,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Activity mActivity = null;
     protected Class mOpenActivity = null;
     protected UnityNotificationBackgroundThread mBackgroundThread;
+    protected Random mRandom;
 
     protected static final String TAG_UNITY = "UnityNotifications";
 
@@ -81,6 +82,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mContext = context;
         mActivity = activity;
         mBackgroundThread = new UnityNotificationBackgroundThread();
+        mRandom = new Random();
 
         try {
             ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
@@ -303,9 +305,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     private int generateUniqueId() {
         int id = 0;
-        Random random = new Random();
         do {
-            id += random.nextInt(1000);
+            id += mRandom.nextInt(1000);
         } while (mScheduledNotifications.containsKey(Integer.valueOf(id)));
 
         return id;
