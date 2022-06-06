@@ -23,26 +23,32 @@ public class UnityNotificationBackgroundThread extends Thread {
     private static class ScheduleNotificationTask extends Task {
         private int notificationId;
         private Notification.Builder notificationBuilder;
+        private boolean isNew;
 
-        public ScheduleNotificationTask(int id, Notification.Builder builder) {
+        public ScheduleNotificationTask(int id, Notification.Builder builder, boolean addedNew) {
             notificationId = id;
             notificationBuilder = builder;
+            isNew = addedNew;
         }
 
         @Override
         public boolean run(Context context, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
             String id = String.valueOf(notificationId);
             Integer ID = Integer.valueOf(notificationId);
+            boolean didSchedule = false;
             try {
                 UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
-                return notifications.put(ID, notificationBuilder) == null;
+                didSchedule = true;
             } finally {
-                // if failed to schedule or replace, remove from settings and cache, so the status is correctly reported
-                if (!notifications.containsKey(notificationId)) {
+                // if failed to schedule or replace, remove
+                if (!didSchedule) {
+                    notifications.remove(notificationId);
+                    UnityNotificationManager.cancelPendingNotificationIntent(context, notificationId);
                     UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
-                    UnityNotificationManager.removeScheduledNotification(ID);
                 }
             }
+
+            return isNew;
         }
     }
 
@@ -104,17 +110,20 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private static final int TASKS_FOR_HOUSEKEEPING = 50;
     private LinkedTransferQueue<Task> mTasks = new LinkedTransferQueue();
-    private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
+    private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
     private static Context mContext;
     private int mTasksSinceHousekeeping = TASKS_FOR_HOUSEKEEPING;  // we want hoursekeeping at the start
 
-    public UnityNotificationBackgroundThread(Context context) {
+    public UnityNotificationBackgroundThread(Context context, ConcurrentHashMap<Integer, Notification.Builder> scheduledNotifications) {
         mContext = context;
-        loadNotifications();
+        mScheduledNotifications = scheduledNotifications;
+        // rescheduling after reboot may have loaded, otherwise load here
+        if (mScheduledNotifications.size() == 0)
+            loadNotifications();
     }
 
-    public void enqueueNotification(int id, Notification.Builder notificationBuilder) {
-        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(id, notificationBuilder));
+    public void enqueueNotification(int id, Notification.Builder notificationBuilder, boolean addedNew) {
+        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(id, notificationBuilder, addedNew));
     }
 
     public void enqueueCancelNotification(int id) {

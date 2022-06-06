@@ -43,7 +43,7 @@ import com.unity3d.player.UnityPlayer;
 public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
-    private static ConcurrentHashMap<Integer, Object> mScheduledNotifications = new ConcurrentHashMap();
+    private static ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
     private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
 
     public Context mContext = null;
@@ -81,7 +81,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         super();
         mContext = context;
         mActivity = activity;
-        mBackgroundThread = new UnityNotificationBackgroundThread(context);
+        mBackgroundThread = new UnityNotificationBackgroundThread(context, mScheduledNotifications);
         mRandom = new Random();
 
         try {
@@ -322,9 +322,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             extras.putInt(KEY_ID, id);
         }
 
-        // don't replace, put builder as placeholder to report the status correctly
-        mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
-        mBackgroundThread.enqueueNotification(id, notificationBuilder);
+        boolean addedNew = mScheduledNotifications.putIfAbsent(id, notificationBuilder) == null;
+        mBackgroundThread.enqueueNotification(id, notificationBuilder, addedNew);
         return id;
     }
 
@@ -332,7 +331,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Bundle extras = notificationBuilder.getExtras();
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
-        Notification notification = null;
 
         // if less than a second in the future, notify right away
         boolean fireNow = fireTime - Calendar.getInstance().getTime().getTime() < 1000;
@@ -346,35 +344,32 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             if (intent != null) {
                 UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
-                notification = scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
+                scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
             }
         }
 
         if (fireNow) {
-            if (notification == null) {
-                notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
-            }
+            Notification notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
             notify(mContext, id, notification);
         }
     }
 
-    Notification scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
-        return scheduleAlarmWithNotification(mContext, mOpenActivity, notificationBuilder, intent, fireTime);
+    void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
+        scheduleAlarmWithNotification(mContext, mOpenActivity, notificationBuilder, intent, fireTime);
     }
 
-    static Notification scheduleAlarmWithNotification(Context context, Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
+    static void scheduleAlarmWithNotification(Context context, Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
         Bundle extras = notificationBuilder.getExtras();
         int id = extras.getInt(KEY_ID, -1);
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         // fireTime not taken from notification, because we may have adjusted it
 
-        Notification notification = buildNotificationForSending(context, activityClass, notificationBuilder);
-        mScheduledNotifications.put(Integer.valueOf(id), notification);
+        // when rescheduling after boot notification may be absent
+        mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
         PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         UnityNotificationManager.scheduleNotificationIntentAlarm(context, repeatInterval, fireTime, broadcast);
-        return notification;
     }
 
     static void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Context context) {
@@ -428,7 +423,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Set<String> currentIds = new HashSet<>(ids);
             for (String id : invalid) {
                 currentIds.remove(id);
-                removeScheduledNotification(Integer.valueOf(id));
+                mScheduledNotifications.remove(id);
             }
         }
 
@@ -585,7 +580,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        if (haveScheduledNotification(id))
+        if (mScheduledNotifications.containsKey(id))
             return 1;
         if (checkIfPendingNotificationIsRegistered(id))
             return 1;
@@ -689,8 +684,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
                     id = builder.getExtras().getInt(KEY_NOTIFICATION_ID, -1);
                     notif = buildNotificationForSending(context, openActivity, builder);
-                    // if notification is not sendable, it wasn't cached
-                    mScheduledNotifications.put(Integer.valueOf(id), notif);
                 }
 
                 if (notif != null) {
@@ -718,7 +711,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             // if notification is not shown and not repeating, cleanup so it's status does not show as scheduled
             long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, -1);
             if (repeatInterval <= 0) {
-                removeScheduledNotification(id);
+                mScheduledNotifications.remove(id);
                 deleteExpiredNotificationIntent(context, String.valueOf(id));
             }
         }
@@ -916,18 +909,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mActivity.startActivity(settingsIntent);
-    }
-
-    private static boolean haveScheduledNotification(Integer id) {
-        Object value = mScheduledNotifications.get(id);
-        if (value == null)
-            return false;
-        // If map contains builder, in means we're still scheduling
-        return value instanceof Notification.Builder;
-    }
-
-    protected static void removeScheduledNotification(Integer id) {
-        mScheduledNotifications.remove(id);
     }
 }
 
