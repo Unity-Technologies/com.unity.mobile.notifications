@@ -847,6 +847,18 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static Notification getNotificationFromIntent(Context context, Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
+                int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
+                StatusBarNotification[] shownNotifications = getNotificationManager(context).getActiveNotifications();
+                for (StatusBarNotification n : shownNotifications) {
+                    if (n.getId() == id) {
+                        return n.getNotification();
+                    }
+                }
+            }
+        }
+
         Object notification = getNotificationOrBuilderForIntent(context, intent);
         if (notification == null)
             return null;
