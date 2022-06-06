@@ -682,7 +682,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                         openActivity = mUnityNotificationManager.mOpenActivity;
                     }
 
-                    id = builder.getExtras().getInt(KEY_NOTIFICATION_ID, -1);
+                    id = builder.getExtras().getInt(KEY_ID, -1);
                     notif = buildNotificationForSending(context, openActivity, builder);
                 }
 
