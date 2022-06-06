@@ -81,7 +81,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         super();
         mContext = context;
         mActivity = activity;
-        mBackgroundThread = new UnityNotificationBackgroundThread();
+        mBackgroundThread = new UnityNotificationBackgroundThread(context);
         mRandom = new Random();
 
         try {

@@ -1,11 +1,14 @@
 package com.unity.androidnotifications;
 
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_ID;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 import android.app.Notification;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.HashSet;
 import java.util.Set;
@@ -93,10 +96,13 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private static final int TASKS_FOR_HOUSEKEEPING = 50;
     private LinkedTransferQueue<Task> mTasks = new LinkedTransferQueue();
+    private static ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
+    private static Context mContext;
     private int mTasksSinceHousekeeping = TASKS_FOR_HOUSEKEEPING;  // we want hoursekeeping at the start
 
-    public UnityNotificationBackgroundThread() {
-        enqueueHousekeeping();
+    public UnityNotificationBackgroundThread(Context context) {
+        mContext = context;
+        loadNotifications();
     }
 
     public void enqueueNotification(int id, Notification.Builder notificationBuilder) {
@@ -153,5 +159,13 @@ public class UnityNotificationBackgroundThread extends Thread {
         if (performHousekeeping)
             UnityNotificationManager.performNotificationHousekeeping(context, notificationIds);
         UnityNotificationManager.saveScheduledNotificationIDs(context, notificationIds);
+    }
+
+    private void loadNotifications() {
+        List<Notification.Builder> notifications = UnityNotificationManager.loadSavedNotifications(mContext);
+        for (Notification.Builder builder : notifications) {
+            int id = builder.getExtras().getInt(KEY_ID, -1);
+            mScheduledNotifications.put(id, builder);
+        }
     }
 }
