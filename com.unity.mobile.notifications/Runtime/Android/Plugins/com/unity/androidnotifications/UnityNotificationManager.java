@@ -698,22 +698,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Call the system notification service to notify the notification.
     protected static void notify(Context context, int id, Notification notification) {
         boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
-        boolean didShowNotification = false;
         if (!isInForeground() || showInForeground) {
-            didShowNotification = true;
             getNotificationManager(context).notify(id, notification);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (UnityNotificationManager.class) {
                 mVisibleNotifications.add(Integer.valueOf(id));
             }
         }
 
-        if (!didShowNotification) {
-            // if notification is not shown and not repeating, cleanup so it's status does not show as scheduled
-            long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, -1);
-            if (repeatInterval <= 0) {
-                mScheduledNotifications.remove(id);
-                deleteExpiredNotificationIntent(context, String.valueOf(id));
-            }
+        long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, -1);
+        if (repeatInterval <= 0) {
+            mScheduledNotifications.remove(id);
+            cancelPendingNotificationIntent(context, id);
         }
 
         try {
