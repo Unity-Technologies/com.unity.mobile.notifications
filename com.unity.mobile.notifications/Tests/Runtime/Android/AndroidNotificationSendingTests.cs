@@ -4,10 +4,12 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
 using Unity.Notifications.Android;
+using Unity.Notifications.Tests.Sample;
 
 class AndroidNotificationSendingTests
 {
     const string kDefaultTestChannel = "default_test_channel";
+    AndroidNotificationTemplate[] AndroidNotificationsTemplates;
 
     class NotificationReceivedHandler
     {
@@ -34,6 +36,7 @@ class AndroidNotificationSendingTests
         c.Importance = Importance.High;
 
         AndroidNotificationCenter.RegisterNotificationChannel(c);
+        AndroidNotificationsTemplates = Resources.LoadAll<AndroidNotificationTemplate>("AndroidNotifications");
 #endif
     }
 
@@ -57,6 +60,7 @@ class AndroidNotificationSendingTests
     public void AfterEachTest()
     {
 #if !UNITY_EDITOR
+        AndroidNotificationCenter.CancelAllNotifications();
         AndroidNotificationCenter.OnNotificationReceived -= currentHandler.OnReceiveNotification;
         currentHandler = null;
 #endif
@@ -166,6 +170,58 @@ class AndroidNotificationSendingTests
 
         Assert.GreaterOrEqual(currentHandler.receivedNotificationCount, 2);
     }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator BuildNotifications_BuildDuration_NotificationCount_400()
+    {
+        
+        int notificationCount = 400;
+        AndroidNotificationTemplate[] templatesTested = new AndroidNotificationTemplate[] { AndroidNotificationsTemplates[4], AndroidNotificationsTemplates[7], AndroidNotificationsTemplates[13] };
+        List<float> ListTimes = new List<float>();  /// PABAIGT - idet 3 notiffication types;
+        var watch = new System.Diagnostics.Stopwatch();
+
+        foreach (var notificationTemplate in templatesTested)
+        {
+            watch.Start();
+            for (int c=0 ; c<notificationCount ; c++)
+            {
+                var builder = AndroidNotificationCenter.CreateNotificationBuilder(parseNotificationTemplate(AndroidNotificationsTemplates[4]), AndroidNotificationsTemplates[4].Channel);
+            }
+            watch.Stop();
+            Assert.Less(watch.ElapsedMilliseconds, 1000 ,$"Notifications took: {watch.ElapsedMilliseconds}");
+            Debug.Log($"Notifications of type {notificationTemplate.name} took: {watch.ElapsedMilliseconds} ms");  // printing to logs since editor is bugged and does not return the results
+            yield return new WaitForSeconds(1);
+            watch.Reset();
+        }
+    }
+
+    private AndroidNotification parseNotificationTemplate(AndroidNotificationTemplate template)
+    {
+        AndroidNotification newNotification = new AndroidNotification()
+        {
+            Title = template.Title,
+            Text = template.Text,
+
+            SmallIcon = template.SmallIcon,
+            LargeIcon = template.LargeIcon,
+            Style = template.NotificationStyle,
+            FireTime = System.DateTime.Now.AddSeconds(template.FireInSeconds),
+            Color = template.Color,
+            Number = template.Number,
+            ShouldAutoCancel = template.ShouldAutoCancel,
+            UsesStopwatch = template.UsesStopWatch,
+            Group = template.Group,
+            GroupSummary = template.GroupSummary,
+            SortKey = template.SortKey,
+            IntentData = template.IntentData,
+            ShowTimestamp = template.ShowTimestamp,
+            RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval),
+            //ShowInForeground = template.ShowInForeground
+        };
+        return newNotification;
+    }
+
 
     [UnityTest]
     [UnityPlatform(RuntimePlatform.Android)]

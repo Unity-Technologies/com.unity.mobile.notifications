@@ -4,7 +4,8 @@
     "references": [
         "Unity.Notifications.Android",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Unity.Notifications.Tests.Sample"
     ],
     "includePlatforms": [
         "Android",
