@@ -321,7 +321,7 @@ namespace Unity.Notifications.Tests.Sample
 
             for (int notificationCount = 0 ; notificationCount< NotificationBatchSizes[CurrentNotificationBatchSizeIndex] ; notificationCount++ )
             {
-                Debug.Log("Sending notification #"+(notificationCount-1));
+                Debug.Log("Sending notification #"+(notificationCount+1));
                 if (notificationID != 0)
                 {
                     notification.Text = "ID: " + notificationID + " " + notification.Text;

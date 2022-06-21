@@ -178,7 +178,6 @@ class AndroidNotificationSendingTests
         
         int notificationCount = 400;
         AndroidNotificationTemplate[] templatesTested = new AndroidNotificationTemplate[] { AndroidNotificationsTemplates[4], AndroidNotificationsTemplates[7], AndroidNotificationsTemplates[13] };
-        List<float> ListTimes = new List<float>();  /// PABAIGT - idet 3 notiffication types;
         var watch = new System.Diagnostics.Stopwatch();
 
         foreach (var notificationTemplate in templatesTested)
