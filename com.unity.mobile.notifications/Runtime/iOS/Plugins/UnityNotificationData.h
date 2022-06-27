@@ -49,6 +49,7 @@ typedef struct iOSNotificationData
             int minute;
             int second;
             unsigned char repeats;
+            unsigned char originalUtc;
         } calendar;
 
         struct

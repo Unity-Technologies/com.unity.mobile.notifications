@@ -49,6 +49,7 @@ namespace Unity.Notifications.iOS
         public Int32 minute;
         public Int32 second;
         public Byte repeats;
+        public Byte originalUtc;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -273,7 +274,14 @@ namespace Unity.Notifications.iOS
                         }
                     case iOSNotificationTriggerType.Calendar:
                         {
-                            var trigger = ((iOSNotificationCalendarTrigger)value).ToUtc();
+                            var trigger = ((iOSNotificationCalendarTrigger)value);
+                            if (trigger.UtcTime)
+                                data.trigger.calendar.originalUtc = 1;
+                            else
+                            {
+                                data.trigger.calendar.originalUtc = 0;
+                                trigger = trigger.ToUtc();
+                            }
                             data.trigger.calendar.year = trigger.Year != null ? trigger.Year.Value : -1;
                             data.trigger.calendar.month = trigger.Month != null ? trigger.Month.Value : -1;
                             data.trigger.calendar.day = trigger.Day != null ? trigger.Day.Value : -1;
@@ -313,17 +321,22 @@ namespace Unity.Notifications.iOS
                             Repeats = data.trigger.timeInterval.repeats != 0,
                         };
                     case iOSNotificationTriggerType.Calendar:
-                        return new iOSNotificationCalendarTrigger()
                         {
-                            Year = (data.trigger.calendar.year > 0) ? (int?)data.trigger.calendar.year : null,
-                            Month = (data.trigger.calendar.month > 0) ? (int?)data.trigger.calendar.month : null,
-                            Day = (data.trigger.calendar.day > 0) ? (int?)data.trigger.calendar.day : null,
-                            Hour = (data.trigger.calendar.hour >= 0) ? (int?)data.trigger.calendar.hour : null,
-                            Minute = (data.trigger.calendar.minute >= 0) ? (int?)data.trigger.calendar.minute : null,
-                            Second = (data.trigger.calendar.second >= 0) ? (int?)data.trigger.calendar.second : null,
-                            UtcTime = true,
-                            Repeats = data.trigger.calendar.repeats != 0
-                        };
+                            var trigger = new iOSNotificationCalendarTrigger()
+                            {
+                                Year = (data.trigger.calendar.year > 0) ? (int?)data.trigger.calendar.year : null,
+                                Month = (data.trigger.calendar.month > 0) ? (int?)data.trigger.calendar.month : null,
+                                Day = (data.trigger.calendar.day > 0) ? (int?)data.trigger.calendar.day : null,
+                                Hour = (data.trigger.calendar.hour >= 0) ? (int?)data.trigger.calendar.hour : null,
+                                Minute = (data.trigger.calendar.minute >= 0) ? (int?)data.trigger.calendar.minute : null,
+                                Second = (data.trigger.calendar.second >= 0) ? (int?)data.trigger.calendar.second : null,
+                                UtcTime = true,
+                                Repeats = data.trigger.calendar.repeats != 0
+                            };
+                            if (data.trigger.calendar.originalUtc == 0)
+                                trigger = trigger.ToLocal();
+                            return trigger;
+                        }
                     case iOSNotificationTriggerType.Location:
                         return new iOSNotificationLocationTrigger()
                         {
