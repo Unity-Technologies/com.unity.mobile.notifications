@@ -6,7 +6,7 @@ check_format:
     flavor: b1.small
   commands:
     - git clone --branch stable git@github.cds.internal.unity3d.com:unity/unity-meta.git
-    - perl unity-meta/Tools/Format/format.pl --dry-run --hgarg metahash=badf00d --hgarg metabranch=stable ./com.unity.mobile.notifications/Editor ./com.unity.mobile.notifications/Runtime ./com.unity.mobile.notifications/Tests ./TestProjects/com.unity.mobile-notifications-sample
+    - perl unity-meta/Tools/Format/format.pl --dry-run --hgarg metahash=badf00d --hgarg metabranch=stable ./com.unity.mobile.notifications/Editor ./com.unity.mobile.notifications/Runtime ./com.unity.mobile.notifications/Tests ./TestProjects/Main
   triggers:
     branches:
       only:
