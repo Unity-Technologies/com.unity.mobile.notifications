@@ -472,7 +472,7 @@ class AndroidNotificationSimpleTests
         var manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
         var context = manager.Get<AndroidJavaObject>("mContext");
         var utils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
-        var recoveredBuilder = utils.CallStatic<AndroidJavaObject>("recoverBuilderPreNougat", context, notification);
+        var recoveredBuilder = utils.CallStatic<AndroidJavaObject>("recoverBuilderCustom", context, notification);
         Assert.IsNotNull(recoveredBuilder);
 
         var notificationAfterRecover = recoveredBuilder.Call<AndroidJavaObject>("build");

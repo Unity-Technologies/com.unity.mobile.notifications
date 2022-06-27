@@ -530,12 +530,11 @@ public class UnityNotificationUtilities {
             builder.setExtras(notification.extras);
             return builder;
         }
-        else {
-            return recoverBuilderPreNougat(context, notification);
-        }
+
+        return recoverBuilderCustom(context, notification);
     }
 
-    private static Notification.Builder recoverBuilderPreNougat(Context context, Notification notification) {
+    private static Notification.Builder recoverBuilderCustom(Context context, Notification notification) {
         String channelID = notification.extras.getString(KEY_CHANNEL_ID);
         Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelID);
         UnityNotificationManager.setNotificationIcon(builder, KEY_SMALL_ICON, notification.extras.getString(KEY_SMALL_ICON));
