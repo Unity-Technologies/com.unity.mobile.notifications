@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb7d100a40edf48f99686ea68a90ff4c, type: 3}
+  m_Name: Not shown in foreground
+  m_EditorClassIdentifier: 
+  ButtonName: Not shown in foreground
+  Channel: default_channel
+  FireInSeconds: 10
+  NotificationID: 0
+  Title: Not in foreground
+  Text: This notifications should not appear when app is in foreground
+  SmallIcon: 
+  LargeIcon: 
+  NotificationStyle: 0
+  Color: {r: 0, g: 0, b: 0, a: 1}
+  Number: -1
+  ShouldAutoCancel: 0
+  UsesStopWatch: 0
+  Group: 
+  GroupSummary: 0
+  GroupAlertBehaviours: 0
+  SortKey: 
+  IntentData: 
+  ShowTimestamp: 0
+  RepeatInterval: 0
+  ShowInForeground: 0

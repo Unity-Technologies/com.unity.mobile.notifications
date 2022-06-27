@@ -23,6 +23,7 @@ namespace Unity.Notifications.Tests.Sample
         private Button ButtonModifyExplicitID;
         private Button ButtonCancelExplicitID;
         private Button ButtonCheckStatusExplicitID;
+        private AndroidNotificationTemplate[] AndroidNotificationsTemplates;
 
         public int notificationExplicitID
         {
@@ -107,6 +108,32 @@ namespace Unity.Notifications.Tests.Sample
             }
         }
 
+        private AndroidNotification parseNotificationTemplate(AndroidNotificationTemplate template)
+        {
+            AndroidNotification newNotification = new AndroidNotification()
+            {
+                Title = template.Title,
+                Text = template.Text,
+
+                SmallIcon = template.SmallIcon,
+                LargeIcon = template.LargeIcon,
+                Style = template.NotificationStyle,
+                FireTime = System.DateTime.Now.AddSeconds(template.FireInSeconds),
+                Color = template.Color,
+                Number = template.Number,
+                ShouldAutoCancel = template.ShouldAutoCancel,
+                UsesStopwatch = template.UsesStopWatch,
+                Group = template.Group,
+                GroupSummary = template.GroupSummary,
+                SortKey = template.SortKey,
+                IntentData = template.IntentData,
+                ShowTimestamp = template.ShowTimestamp,
+                RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval),
+                //ShowInForeground = template.ShowInForeground
+            };
+            return newNotification;
+        }
+
         private void InstantiateAllTestButtons()
         {
             m_groups = new Dictionary<string, OrderedDictionary>();
@@ -123,39 +150,16 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["Modify"]["Modify pending Explicit notification"] = new Action(() => { ModifyExplicitNotification(); });
             m_groups["Modify"]["Cancel pending Explicit notification"] = new Action(() => { CancelExplicitNotification(); });
             m_groups["Modify"]["Check status of Explicit notification"] = new Action(() => { CheckStatusOfExplicitNotification (); });
-
-
+            AndroidNotificationsTemplates = Resources.LoadAll<AndroidNotificationTemplate>("AndroidNotifications");
             m_groups["Send"] = new OrderedDictionary();
-            foreach (AndroidNotificationTemplate template in Resources.LoadAll("AndroidNotifications", typeof(AndroidNotificationTemplate)))
+            foreach (AndroidNotificationTemplate template in AndroidNotificationsTemplates)
             {
                 if (template == null) continue;
-                m_groups["Send"][$"[{template.FireInSeconds}s] {template.ButtonName}"] = new Action(() => {
-                    SendNotification(
-                        new AndroidNotification()
-                        {
-                            Title = template.Title,
-                            Text = template.Text,
-
-                            SmallIcon = template.SmallIcon,
-                            LargeIcon = template.LargeIcon,
-                            Style = template.NotificationStyle,
-                            FireTime = System.DateTime.Now.AddSeconds(template.FireInSeconds),
-                            Color = template.Color,
-                            Number = template.Number,
-                            ShouldAutoCancel = template.ShouldAutoCancel,
-                            UsesStopwatch = template.UsesStopWatch,
-                            Group = template.Group,
-                            GroupSummary = template.GroupSummary,
-                            SortKey = template.SortKey,
-                            IntentData = template.IntentData,
-                            ShowTimestamp = template.ShowTimestamp,
-                            RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval)
-                        },
-                        template.Channel, template.NotificationID
-                    );
+                m_groups["Send"][$"[{template.FireInSeconds}s] {template.ButtonName}"] = new Action(() =>
+                {
+                    SendNotification(parseNotificationTemplate(template), template.Channel, template.NotificationID);
                 });
             }
-
             m_groups["Cancellation"] = new OrderedDictionary();
             m_groups["Cancellation"]["Cancel all notifications"] = new Action(() => { CancelAllNotifications(); });
             m_groups["Cancellation"]["Cancel pending notifications"] = new Action(() => { CancelPendingNotifications(); });
@@ -208,7 +212,8 @@ namespace Unity.Notifications.Tests.Sample
                 AndroidNotificationCenter.OpenNotificationSettings("secondary_channel");
             });
             m_groups["Channels"]["Delete All Channels"] = new Action(() => { DeleteAllChannels(); });
-
+            m_groups["Custom sequences"] = new OrderedDictionary();
+            m_groups["Custom sequences"]["Run custom sequence"] = new Action(() => { StartCoroutine(RunCustomSequence()); });
             foreach (KeyValuePair<string, OrderedDictionary> group in m_groups)
             {
                 // Instantiate group
@@ -287,6 +292,7 @@ namespace Unity.Notifications.Tests.Sample
             }
             if (notificationID != 0)
             {
+                notification.Text = "ID: " + notificationID + " " + notification.Text;
                 AndroidNotificationCenter.SendNotificationWithExplicitID(notification, channel, notificationID);
                 notificationExplicitID = notificationID;
             }
@@ -351,6 +357,25 @@ namespace Unity.Notifications.Tests.Sample
         {
             Canvas.ForceUpdateCanvases();
             m_gameObjectReferences.LogsScrollRect.verticalNormalizedPosition = 0f;
+        }
+
+        IEnumerator RunCustomSequence()
+        {
+            AndroidNotificationTemplate ant = AndroidNotificationsTemplates[4];
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 15);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 20);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 28);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 14);
+            yield return new WaitForSeconds(ant.FireInSeconds+5);
+            AndroidNotificationCenter.CancelNotification(15);
+            yield return new WaitForSeconds(5);
+            AndroidNotificationCenter.CancelDisplayedNotification(20);
+            yield return new WaitForSeconds(5);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 99);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 99);
+            yield return new WaitForSeconds(ant.FireInSeconds-1);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 99);
+            SendNotification(parseNotificationTemplate(ant), ant.Channel, 99);
         }
 
 #endif

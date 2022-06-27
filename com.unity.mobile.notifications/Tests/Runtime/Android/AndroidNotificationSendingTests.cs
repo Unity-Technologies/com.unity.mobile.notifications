@@ -317,6 +317,12 @@ class AndroidNotificationSendingTests
         int id = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
         yield return new WaitForSeconds(0.2f);
 
+        // temporary null the manager, cause that's what we have in reality
+        var manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
+        managerClass.SetStatic<AndroidJavaObject>("mUnityNotificationManager", null);
+        // also clear cached notifications, since they don't exist after reboot
+        managerClass.GetStatic<AndroidJavaObject>("mScheduledNotifications").Call("clear");
+
         // simulate reboot by directly cancelling scheduled alarms preserving saves
         managerClass.CallStatic("cancelPendingNotificationIntent", context, id);
         yield return new WaitForSeconds(0.2f);
@@ -327,6 +333,31 @@ class AndroidNotificationSendingTests
 
         Debug.LogWarning("SendNotification_CanReschedule completed");
 
+        // restore manager (to not ruin other tests)
+        managerClass.SetStatic("mUnityNotificationManager", manager);
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator SendNotificationNotShownInForeground_IsDeliveredButNotShown()
+    {
+        var n = new AndroidNotification();
+        n.Title = "SendNotificationNotShownInForeground_ISDeliveredButNotShown";
+        n.Text = "SendNotificationNotShownInForeground_ISDeliveredButNotShown Text";
+        n.FireTime = System.DateTime.Now;
+        n.ShowInForeground = false;
+
+        Debug.LogWarning("SendNotificationNotShownInForeground_ISDeliveredButNotShown sends notification");
+
+        int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
+        yield return WaitForNotification(5.0f);
+
+        Debug.LogWarning("SendNotificationNotShownInForeground_ISDeliveredButNotShown sends completed");
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        yield return new WaitForSeconds(2.0f);  // give some time, since on some devices we don't immediately get infor on delivered notifications
+        var status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
+        Assert.AreEqual(NotificationStatus.Unknown, status);  // status should be unknown, rather than Delivered
     }
 }
