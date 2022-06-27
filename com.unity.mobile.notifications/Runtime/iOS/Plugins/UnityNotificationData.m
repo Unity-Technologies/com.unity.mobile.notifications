@@ -151,6 +151,8 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         notificationData.trigger.calendar.hour = (int)date.hour;
         notificationData.trigger.calendar.minute = (int)date.minute;
         notificationData.trigger.calendar.second = (int)date.second;
+        notificationData.trigger.calendar.repeats = (int)calendarTrigger.repeats;
+        notificationData.trigger.calendar.originalUtc = 1;
     }
     else if ([request.trigger isKindOfClass: [UNLocationNotificationTrigger class]])
     {
