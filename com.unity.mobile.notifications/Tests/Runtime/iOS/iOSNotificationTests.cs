@@ -348,4 +348,42 @@ class iOSNotificationTests
         Assert.AreEqual(4, trigger.Minute);
         Assert.AreEqual(5, trigger.Second);
     }
+
+    [Test]
+    public void iOSNotification_CalendarTrigger_ReturnsSameKindDateTime()
+    {
+        var trigger1 = new iOSNotificationCalendarTrigger()
+        {
+            Hour = 8,
+            Minute = 30,
+            UtcTime = false,
+        };
+
+        var trigger2 = new iOSNotificationCalendarTrigger()
+        {
+            Hour = 8,
+            Minute = 30,
+            UtcTime = false,
+        };
+
+        var notification = new iOSNotification()
+        {
+            Title = "text",
+            Body = "text",
+            Trigger = trigger1,
+        };
+
+        var retTrigger = (iOSNotificationCalendarTrigger)notification.Trigger;
+
+        Assert.AreEqual(trigger1.Hour, retTrigger.Hour);
+        Assert.AreEqual(trigger1.Minute, retTrigger.Minute);
+        Assert.AreEqual(trigger1.UtcTime, retTrigger.UtcTime);
+
+        notification.Trigger = trigger2;
+        retTrigger = (iOSNotificationCalendarTrigger)notification.Trigger;
+
+        Assert.AreEqual(trigger2.Hour, retTrigger.Hour);
+        Assert.AreEqual(trigger2.Minute, retTrigger.Minute);
+        Assert.AreEqual(trigger2.UtcTime, retTrigger.UtcTime);
+    }
 }
