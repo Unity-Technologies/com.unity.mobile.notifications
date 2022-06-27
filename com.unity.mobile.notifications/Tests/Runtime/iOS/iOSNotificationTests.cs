@@ -187,6 +187,8 @@ class iOSNotificationTests
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsNotNull(lastReceivedNotification);
         Assert.AreEqual(text, lastReceivedNotification.Title);
+        var retTrigger = (iOSNotificationCalendarTrigger)lastReceivedNotification.Trigger;
+        Assert.AreEqual(useUtc, retTrigger.UtcTime);
     }
 
     [UnityTest]
