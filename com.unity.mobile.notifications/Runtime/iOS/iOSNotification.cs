@@ -49,7 +49,6 @@ namespace Unity.Notifications.iOS
         public Int32 minute;
         public Int32 second;
         public Byte repeats;
-        public Byte originalUtc;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -275,13 +274,11 @@ namespace Unity.Notifications.iOS
                     case iOSNotificationTriggerType.Calendar:
                         {
                             var trigger = ((iOSNotificationCalendarTrigger)value);
-                            if (trigger.UtcTime)
-                                data.trigger.calendar.originalUtc = 1;
-                            else
-                            {
-                                data.trigger.calendar.originalUtc = 0;
+                            if (userInfo == null)
+                                userInfo = new Dictionary<string, string>();
+                            userInfo["OriginalUtc"] = trigger.UtcTime ? "1" : "0";
+                            if (!trigger.UtcTime)
                                 trigger = trigger.ToUtc();
-                            }
                             data.trigger.calendar.year = trigger.Year != null ? trigger.Year.Value : -1;
                             data.trigger.calendar.month = trigger.Month != null ? trigger.Month.Value : -1;
                             data.trigger.calendar.day = trigger.Day != null ? trigger.Day.Value : -1;
@@ -333,7 +330,7 @@ namespace Unity.Notifications.iOS
                                 UtcTime = true,
                                 Repeats = data.trigger.calendar.repeats != 0
                             };
-                            if (data.trigger.calendar.originalUtc == 0)
+                            if (userInfo != null && userInfo["OriginalUtc"] == "0")
                                 trigger = trigger.ToLocal();
                             return trigger;
                         }
