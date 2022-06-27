@@ -314,7 +314,7 @@ class iOSNotificationTests
     }
 
     [Test]
-    public void OSNotificationCalendarTrigger_AssignNonEmptyComponents_Works()
+    public void iOSNotificationCalendarTrigger_AssignNonEmptyComponents_Works()
     {
         var dt = new DateTime(2025, 1, 2, 3, 4, 5);
 
