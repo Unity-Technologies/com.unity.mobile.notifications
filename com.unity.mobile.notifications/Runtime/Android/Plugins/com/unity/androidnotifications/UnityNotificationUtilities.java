@@ -524,11 +524,17 @@ public class UnityNotificationUtilities {
     }
 
     protected static Notification.Builder recoverBuilder(Context context, Notification notification) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Notification.Builder builder = Notification.Builder.recoverBuilder(context, notification);
-            // extras not recovered, transfer manually
-            builder.setExtras(notification.extras);
-            return builder;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Notification.Builder builder = Notification.Builder.recoverBuilder(context, notification);
+                // extras not recovered, transfer manually
+                builder.setExtras(notification.extras);
+                return builder;
+            }
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to recover builder for notification!", e);
+        } catch (OutOfMemoryError e) {
+            Log.e(TAG_UNITY, "Failed to recover builder for notification!", e);
         }
 
         return recoverBuilderCustom(context, notification);
