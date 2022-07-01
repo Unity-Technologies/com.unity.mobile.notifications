@@ -380,8 +380,8 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
                 if (soundName != nil)
                 {
                     if (data->soundVolume < 0)
-                        return [UNNotificationSound criticalSoundNamed: soundName withAudioVolume: data->soundVolume];
-                    return [UNNotificationSound criticalSoundNamed: soundName];
+                        return [UNNotificationSound criticalSoundNamed: soundName];
+                    return [UNNotificationSound criticalSoundNamed: soundName withAudioVolume: data->soundVolume];
                 }
                 if (data->soundVolume >= 0)
                     return [UNNotificationSound defaultCriticalSoundWithAudioVolume: data->soundVolume];
