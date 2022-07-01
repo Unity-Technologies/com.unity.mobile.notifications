@@ -226,6 +226,7 @@ namespace Unity.Notifications.Tests.Sample
                         ForegroundPresentationOption = template.PresentationOptions,
                         Badge = template.Badge,
                         Data = template.Data,
+                        SoundType = template.SoundType,
                         Trigger = new iOSNotificationTimeIntervalTrigger()
                         {
                             TimeInterval = TimeSpan.FromSeconds(template.TimeTriggerInterval),

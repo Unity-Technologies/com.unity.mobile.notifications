@@ -36,6 +36,7 @@ namespace Unity.Notifications.Tests.Sample
         [Header("Time Trigger")]
         public Int32 TimeTriggerInterval;
         public bool Repeats = false;
+        public NotificationSoundType SoundType;
 
         [Serializable]
         public struct UserDataItem
