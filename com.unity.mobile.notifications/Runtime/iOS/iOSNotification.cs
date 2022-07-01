@@ -268,11 +268,7 @@ namespace Unity.Notifications.iOS
         /// See Apple documentation for supported values.
         /// </summary>
         /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc"/>
-        public float? SoundVolume
-        {
-            get { return data.soundVolume < 0 ? null : data.soundVolume; }
-            set { data.soundVolume = value == null ? -1.0f : value.Value; }
-        }
+        public float? SoundVolume { get; set; }
 
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
@@ -461,6 +457,11 @@ namespace Unity.Notifications.iOS
         {
             if (data.identifier == null)
                 data.identifier = GenerateUniqueID();
+            if (SoundVolume.HasValue)
+                data.soundVolume = SoundVolume.Value;
+            else
+                data.soundVolume = -1.0f;
+
             iOSNotificationWithUserInfo ret;
             ret.data = data;
             ret.userInfo = userInfo;
