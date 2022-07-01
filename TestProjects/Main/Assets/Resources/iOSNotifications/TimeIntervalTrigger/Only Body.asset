@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
   m_Name: Only Body
   m_EditorClassIdentifier: 
-  ButtonName: Empty notification + body
+  ButtonName: Empty notification + body (silent)
   Identifier: 
   CategoryIdentifier: 
   ThreadIdentifier: 
@@ -25,3 +25,4 @@ MonoBehaviour:
   Data: 
   TimeTriggerInterval: 1
   Repeats: 0
+  SoundType: 4
