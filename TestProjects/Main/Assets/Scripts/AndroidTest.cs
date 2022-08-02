@@ -273,10 +273,11 @@ namespace Unity.Notifications.Tests.Sample
 
         public void ChangeNotificationBatchSize(int[] notificationBatchSizes)
         {
-            if ( CurrentNotificationBatchSizeIndex == notificationBatchSizes.Length-1)
+            if (CurrentNotificationBatchSizeIndex == notificationBatchSizes.Length-1)
             {
                 CurrentNotificationBatchSizeIndex = 0;
-            } else
+            }
+            else
             {
                 CurrentNotificationBatchSizeIndex++;
             }
