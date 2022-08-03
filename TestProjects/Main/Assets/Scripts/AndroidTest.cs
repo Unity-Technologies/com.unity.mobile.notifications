@@ -24,6 +24,20 @@ namespace Unity.Notifications.Tests.Sample
         private Button ButtonCancelExplicitID;
         private Button ButtonCheckStatusExplicitID;
         private AndroidNotificationTemplate[] AndroidNotificationsTemplates;
+        private Text NotificationBatchSizeButtonText;
+        int[] NotificationBatchSizes = new int[] { 1,100,500 };
+        private int _CurrentNotificationBatchSizeIndex = 0;
+        public int CurrentNotificationBatchSizeIndex
+        {
+            get { return _CurrentNotificationBatchSizeIndex; }
+            set
+            {
+                _CurrentNotificationBatchSizeIndex = value;
+                NotificationBatchSizeButtonText.text = "Notification batch size: " + NotificationBatchSizes[_CurrentNotificationBatchSizeIndex];
+            }
+        }
+
+        private int NotificationCounter=0;
 
         public int notificationExplicitID
         {
@@ -66,6 +80,8 @@ namespace Unity.Notifications.Tests.Sample
                 AndroidNotificationCenter.CheckScheduledNotificationStatus(notificationExplicitID);
                 notificationExplicitID = 0;
             }
+            NotificationCounter++;
+            Debug.Log("Notifications received in total: "+NotificationCounter);
         }
 
         void Start()
@@ -140,10 +156,9 @@ namespace Unity.Notifications.Tests.Sample
 
             m_groups["General"] = new OrderedDictionary();
             m_groups["General"]["Clear Log"] = new Action(() => { m_LOGGER.Clear(); });
-            m_groups["General"]["Open Settings"] = new Action(() =>
-            {
-                AndroidNotificationCenter.OpenNotificationSettings();
-            });
+            m_groups["General"]["Open Settings"] = new Action(() => { AndroidNotificationCenter.OpenNotificationSettings(); });
+            m_groups["General"]["Notification batch size: "+NotificationBatchSizes[_CurrentNotificationBatchSizeIndex]] = new Action(() => { ChangeNotificationBatchSize(NotificationBatchSizes); });
+            m_groups["General"]["Reset notification counter"] = new Action(() => { NotificationCounter = 0; });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -220,13 +235,13 @@ namespace Unity.Notifications.Tests.Sample
                 Transform buttonGroup =
                     GameObject.Instantiate(m_gameObjectReferences.ButtonGroupTemplate, m_gameObjectReferences.ButtonScrollViewContent);
                 Transform buttonGroupName = buttonGroup.GetChild(0).transform;
-                Transform buttonGameObject = buttonGroup.GetChild(1).transform;
+                Transform buttonGameObject = buttonGroup.GetChild(1).GetChild(0).transform;
                 // Set group name
                 buttonGroupName.GetComponentInChildren<Text>().text = group.Key.ToString();
                 // Instantiate buttons
                 foreach (DictionaryEntry test in group.Value)
                 {
-                    Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
+                    Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup.GetChild(1));
                     button.name = group.Key.ToString() + "/" + test.Key.ToString();
                     button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                     button.GetComponent<Button>().onClick.AddListener(delegate {
@@ -243,6 +258,8 @@ namespace Unity.Notifications.Tests.Sample
                 }
                 buttonGameObject.gameObject.SetActive(false);
             }
+
+            NotificationBatchSizeButtonText = GameObject.Find("General/Notification batch size: "+NotificationBatchSizes[_CurrentNotificationBatchSizeIndex]).transform.GetChild(0).GetComponent<Text>();
             ButtonModifyExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
             ButtonModifyExplicitID.interactable = false;
             ButtonCancelExplicitID = GameObject.Find("Modify/Cancel pending Explicit notification").GetComponent<Button>();
@@ -253,6 +270,18 @@ namespace Unity.Notifications.Tests.Sample
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
         }
 
+
+        public void ChangeNotificationBatchSize(int[] notificationBatchSizes)
+        {
+            if (CurrentNotificationBatchSizeIndex == notificationBatchSizes.Length-1)
+            {
+                CurrentNotificationBatchSizeIndex = 0;
+            }
+            else
+            {
+                CurrentNotificationBatchSizeIndex++;
+            }
+        }
         public void ModifyExplicitNotification()
         {
             AndroidNotification template = new AndroidNotification() //TODO: TEMPORARY,Implement GUI for Notification building
@@ -290,15 +319,20 @@ namespace Unity.Notifications.Tests.Sample
                     .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                     .Properties(notification, 1);
             }
-            if (notificationID != 0)
+
+            for (int notificationCount = 0 ; notificationCount< NotificationBatchSizes[CurrentNotificationBatchSizeIndex] ; notificationCount++ )
             {
-                notification.Text = "ID: " + notificationID + " " + notification.Text;
-                AndroidNotificationCenter.SendNotificationWithExplicitID(notification, channel, notificationID);
-                notificationExplicitID = notificationID;
-            }
-            else
-            {
-                AndroidNotificationCenter.SendNotification(notification, channel);
+                Debug.Log("Sending notification #"+(notificationCount+1));
+                if (notificationID != 0)
+                {
+                    notification.Text = "ID: " + notificationID + " " + notification.Text;
+                    AndroidNotificationCenter.SendNotificationWithExplicitID(notification, channel, notificationID);
+                    notificationExplicitID = notificationID;
+                }
+                else
+                {
+                    AndroidNotificationCenter.SendNotification(notification, channel);
+                }
             }
         }
 
