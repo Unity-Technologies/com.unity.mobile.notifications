@@ -396,7 +396,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
                     return [UNNotificationSound ringtoneSoundNamed: soundName];
                 return UNNotificationSound.defaultRingtoneSound;
             }
-            // continue to default
+        // continue to default
         case kSoundTypeDefault:
         default:
         default_fallback:
