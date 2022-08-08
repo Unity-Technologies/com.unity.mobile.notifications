@@ -72,39 +72,37 @@ class UnityNotificationUtilities {
        Unfortunately, while Notification itself is Parcelable and can be marshalled to bytes,
        it's contents are not guaranteed to be (Binder objects).
        Hence what we try to do here is:
-       - serialize as is
-       - fallback 1: serialize our known properties + serialize extras as is
-       - fallback 2: serialize our known stuff
-       When notification is serialized as-is, it may contain references to resources and in case
-       of app update may fail to deserialize due to resources now missing, hence always save fallback version.
+       - serialize as is if notification is possibly customized by user
+       - otherwise serialize our stuff, since there is nothing more
     */
     protected static void serializeNotification(SharedPreferences prefs, Notification notification, boolean serializeParcel) {
         try {
-            String serialized = null, fallback = null;
+            String serialized;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
-            if (serializeNotificationCustom(notification, out)) {
-                out.flush();
-                byte[] bytes = data.toByteArray();
-                fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
-            }
-            data.reset();
-            Intent intent = new Intent();
-            intent.putExtra(KEY_NOTIFICATION, notification);
-            if (serializeNotificationParcel(intent, out)) {
-                out.close();
-                byte[] bytes = data.toByteArray();
-                serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+            if (serializeParcel) {
+                Intent intent = new Intent();
+                intent.putExtra(KEY_NOTIFICATION, notification);
+                if (serializeNotificationParcel(intent, out)) {
+                    out.close();
+                    byte[] bytes = data.toByteArray();
+                    serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+                } else {
+                    return; // failed
+                }
             }
             else {
-                serialized = fallback;
-                fallback = null;
+                if (serializeNotificationCustom(notification, out)) {
+                    out.flush();
+                    byte[] bytes = data.toByteArray();
+                    serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+                } else {
+                    return; // failed
+                }
             }
 
             SharedPreferences.Editor editor = prefs.edit().clear();
             editor.putString(SAVED_NOTIFICATION_PRIMARY_KEY, serialized);
-            if (fallback != null)
-                editor.putString(SAVED_NOTIFICATION_FALLBACK_KEY, fallback);
             editor.apply();
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
