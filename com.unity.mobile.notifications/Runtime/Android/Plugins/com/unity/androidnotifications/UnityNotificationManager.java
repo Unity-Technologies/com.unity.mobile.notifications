@@ -312,7 +312,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return id;
     }
 
-    public int scheduleNotification(Notification.Builder notificationBuilder) {
+    public int scheduleNotification(Notification.Builder notificationBuilder, boolean customized) {
         Bundle extras = notificationBuilder.getExtras();
         int id;
         if (extras.containsKey(KEY_ID))
