@@ -343,7 +343,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Intent intent = buildNotificationIntent(mContext);
 
             if (intent != null) {
-                UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
+                saveNotification(mContext, notificationBuilder.build());
                 scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
             }
         }
