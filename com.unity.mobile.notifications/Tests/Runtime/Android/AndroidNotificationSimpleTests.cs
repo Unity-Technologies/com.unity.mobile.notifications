@@ -221,8 +221,10 @@ class AndroidNotificationSimpleTests
         using (var byteStream = new AndroidJavaObject("java.io.ByteArrayInputStream", serializedBytes))
         {
             var dataStream = new AndroidJavaObject("java.io.DataInputStream", byteStream);
+            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             // don't dispose notification, it is kept in AndroidNotificationIntentData
-            using (var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", dataStream))
+            using (var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", activity, dataStream))
             {
                 Assert.IsNotNull(deserializedNotificationBuilder);
                 var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");

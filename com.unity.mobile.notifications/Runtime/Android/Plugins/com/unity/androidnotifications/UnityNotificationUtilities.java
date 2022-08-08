@@ -225,9 +225,9 @@ class UnityNotificationUtilities {
         if (notification != null)
             return notification;
         data.reset();
-        Notification.Builder builder = deserializeNotificationCustom(in);
+        Notification.Builder builder = deserializeNotificationCustom(context, in);
         if (builder == null) {
-            builder = deserializedFromOldIntent(bytes);
+            builder = deserializedFromOldIntent(context, bytes);
         }
         return builder;
     }
@@ -268,7 +268,7 @@ class UnityNotificationUtilities {
         return null;
     }
 
-    private static Notification.Builder deserializeNotificationCustom(DataInputStream in) {
+    private static Notification.Builder deserializeNotificationCustom(Context context, DataInputStream in) {
         try {
             if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER))
                 return null;
@@ -329,7 +329,7 @@ class UnityNotificationUtilities {
             String sortKey = deserializeString(in);
             long when = showWhen ? in.readLong() : 0;
 
-            Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
+            Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelId);
             if (extras != null)
                 builder.setExtras(extras);
             else {
@@ -377,7 +377,7 @@ class UnityNotificationUtilities {
         return null;
     }
 
-    private static Notification.Builder deserializedFromOldIntent(byte[] bytes) {
+    private static Notification.Builder deserializedFromOldIntent(Context context, byte[] bytes) {
         try {
             Parcel p = Parcel.obtain();
             p.unmarshall(bytes, 0, bytes.length);
@@ -405,7 +405,7 @@ class UnityNotificationUtilities {
             int groupAlertBehaviour = bundle.getInt("groupAlertBehaviour", -1);
             boolean showTimestamp = bundle.getBoolean("showTimestamp", false);
 
-            Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
+            Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelId);
             builder.getExtras().putInt(KEY_ID, id);
             builder.setContentTitle(textTitle);
             builder.setContentText(textContent);
