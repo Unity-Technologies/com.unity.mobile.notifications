@@ -287,7 +287,7 @@ class UnityNotificationUtilities {
                 extras = deserializeParcelable(in);
             }
 
-            // before v2 it was extras or variables, since 2 always both
+            // before v2 it was extras or variables, since 2 always variables
             if (extras == null) {
                 // extras serialized manually
                 id = in.readInt();
