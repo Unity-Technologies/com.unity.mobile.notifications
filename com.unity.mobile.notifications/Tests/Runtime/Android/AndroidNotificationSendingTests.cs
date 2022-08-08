@@ -198,6 +198,35 @@ class AndroidNotificationSendingTests
         Debug.LogWarning("NotificationIsScheduled_NotificationStatusIsCorrectlyReported completed");
     }
 
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator ArrivedAndUserDismissedNotification_DoesNotReportStatusAsScheduled()
+    {
+        var n = new AndroidNotification("ArrivedNotificationAndDissmissed", "ArrivedNotificationAndDissmissed", System.DateTime.Now);
+        yield return DismissedNotification_DoesNotReportStatusAsScheduled(n);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator ArrivedAndUserDismissedScheduledNotification_DoesNotReportStatusAsScheduled()
+    {
+        var n = new AndroidNotification("ArrivedNotificationAndDissmissedScheduled", "ArrivedNotificationAndDissmissedScheduled", System.DateTime.Now.AddSeconds(2));
+        yield return DismissedNotification_DoesNotReportStatusAsScheduled(n);
+    }
+
+    public IEnumerator DismissedNotification_DoesNotReportStatusAsScheduled(AndroidNotification n)
+    {
+        int originalId = AndroidNotificationCenter.SendNotification(n, kDefaultTestChannel);
+        yield return WaitForNotification(8.0f);
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+
+        AndroidNotificationCenter.CancelDisplayedNotification(originalId);
+        yield return new WaitForSeconds(2.0f); // cancel is async
+        var status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
+        Assert.AreEqual(NotificationStatus.Unknown, status);
+    }
+
     [Test]
     [UnityPlatform(RuntimePlatform.Android)]
     public void CreateNotificationChannelWithInitializedSettings_ChannelSettingsAreSaved()

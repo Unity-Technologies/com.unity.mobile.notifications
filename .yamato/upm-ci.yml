@@ -52,9 +52,6 @@ test_{{ platform.name }}_{{ editor.version }}:
   commands:
     - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
     - upm-ci package test --package-path com.unity.mobile.notifications --unity-version {{ editor.version }} --platform editmode
-    {% if editor.version == "2018.4" %}
-    - upm-ci~/tools/utr/utr --suite=editor --editor-location=.Editor --testproject=TestProjects/NotificationSamples_2018_4_dotnet3.5 --artifacts_path=upm-ci~/test-results/test_2018_4_dotnet3.5/ --api-profile=NET_2_0_Subset
-    {% endif %}
   artifacts:
     logs:
       paths:
@@ -78,11 +75,11 @@ test_Android_{{ editor.version }}:
     - curl -s {{ utr.url_win }} --output utr.bat
     - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
-    - utr.bat --testproject=TestProjects\com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - utr.bat --testproject=TestProjects\Main --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-       utr.bat --testproject=TestProjects\com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=mono --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
+       utr.bat --testproject=TestProjects\Main --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp  --architecture=arm64--artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
   after:
     - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
     - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d > upm-ci~/test-results/android/android_device_log.txt
@@ -99,7 +96,7 @@ test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
     type: Unity::VM::osx
-    image: mobile/ios-macos-10.15:latest
+    image: mobile/ios-macos-11:latest
     flavor: i1.large
   variables:
     IOS_SIMULATOR_SDK: 1
@@ -108,8 +105,8 @@ test_iOS_{{ editor.version }}:
     - chmod u+x utr
     - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
-    - ./utr --testproject=TestProjects/com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
-    - ./utr --testproject=TestProjects/com.unity.mobile-notifications-sample --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
+    - ./utr --testproject=TestProjects/Main --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - ./utr --testproject=TestProjects/Main --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
   artifacts:
     packages:
       paths:
