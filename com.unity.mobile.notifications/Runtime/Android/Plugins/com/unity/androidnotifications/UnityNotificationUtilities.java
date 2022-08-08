@@ -96,12 +96,15 @@ class UnityNotificationUtilities {
                 byte[] bytes = data.toByteArray();
                 serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
             }
-            else
+            else {
                 serialized = fallback;
+                fallback = null;
+            }
 
             SharedPreferences.Editor editor = prefs.edit().clear();
             editor.putString(SAVED_NOTIFICATION_PRIMARY_KEY, serialized);
-            editor.putString(SAVED_NOTIFICATION_FALLBACK_KEY, fallback);
+            if (fallback != null)
+                editor.putString(SAVED_NOTIFICATION_FALLBACK_KEY, fallback);
             editor.apply();
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
