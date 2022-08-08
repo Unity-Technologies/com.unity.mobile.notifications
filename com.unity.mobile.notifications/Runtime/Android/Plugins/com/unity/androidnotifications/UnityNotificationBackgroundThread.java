@@ -23,11 +23,13 @@ public class UnityNotificationBackgroundThread extends Thread {
     private static class ScheduleNotificationTask extends Task {
         private int notificationId;
         private Notification.Builder notificationBuilder;
+        private boolean isCustomized;
         private boolean isNew;
 
-        public ScheduleNotificationTask(int id, Notification.Builder builder, boolean addedNew) {
+        public ScheduleNotificationTask(int id, Notification.Builder builder, boolean customized, boolean addedNew) {
             notificationId = id;
             notificationBuilder = builder;
+            isCustomized = customized;
             isNew = addedNew;
         }
 
@@ -37,7 +39,7 @@ public class UnityNotificationBackgroundThread extends Thread {
             Integer ID = Integer.valueOf(notificationId);
             boolean didSchedule = false;
             try {
-                UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder);
+                UnityNotificationManager.mUnityNotificationManager.performNotificationScheduling(notificationId, notificationBuilder, isCustomized);
                 didSchedule = true;
             } finally {
                 // if failed to schedule or replace, remove
@@ -122,8 +124,8 @@ public class UnityNotificationBackgroundThread extends Thread {
             loadNotifications();
     }
 
-    public void enqueueNotification(int id, Notification.Builder notificationBuilder, boolean addedNew) {
-        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(id, notificationBuilder, addedNew));
+    public void enqueueNotification(int id, Notification.Builder notificationBuilder, boolean customized, boolean addedNew) {
+        mTasks.add(new UnityNotificationBackgroundThread.ScheduleNotificationTask(id, notificationBuilder, customized, addedNew));
     }
 
     public void enqueueCancelNotification(int id) {

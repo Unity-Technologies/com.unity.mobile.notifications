@@ -78,7 +78,7 @@ class UnityNotificationUtilities {
        When notification is serialized as-is, it may contain references to resources and in case
        of app update may fail to deserialize due to resources now missing, hence always save fallback version.
     */
-    protected static void serializeNotification(SharedPreferences prefs, Notification notification) {
+    protected static void serializeNotification(SharedPreferences prefs, Notification notification, boolean serializeParcel) {
         try {
             String serialized = null, fallback = null;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
