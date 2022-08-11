@@ -78,6 +78,9 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->subtitle = NULL;
     notificationData->categoryIdentifier = NULL;
     notificationData->threadIdentifier = NULL;
+    notificationData->soundType = kSoundTypeDefault;
+    notificationData->soundVolume = -1.0f;
+    notificationData->soundName = NULL;
     notificationData->triggerType = PUSH_TRIGGER;
     notificationData->userInfo = NULL;
 }
@@ -200,6 +203,9 @@ void freeiOSNotificationData(iOSNotificationData* notificationData)
 
     if (notificationData->threadIdentifier != NULL)
         free(notificationData->threadIdentifier);
+
+    if (notificationData->soundName != NULL)
+        free(notificationData->soundName);
 
     if (notificationData->userInfo != NULL)
     {
