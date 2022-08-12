@@ -17,7 +17,7 @@ class AndroidNotificationSimpleTests
     {
         var assets = AssetDatabase.FindAssets("UnityNotificationTestUtils");
         if (assets.Length != 1)
-            throw new Exception("Something is wrong");
+            throw new Exception("UnityNotificationTestUtils.java not found");
         return (PluginImporter)AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(assets[0]));
     }
 #endif
