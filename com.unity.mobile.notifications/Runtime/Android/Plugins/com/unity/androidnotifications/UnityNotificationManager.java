@@ -347,7 +347,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         if (fireNow) {
-            Notification notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
+            Notification notification = buildNotificationForSending(mOpenActivity, notificationBuilder);
             notify(id, notification);
         }
     }
@@ -385,29 +385,29 @@ public class UnityNotificationManager extends BroadcastReceiver {
         scheduleAlarmWithNotification(context, openActivity, notificationBuilder, intent, fireTime);
     }
 
-    protected static Notification buildNotificationForSending(Context context, Class openActivity, Notification.Builder builder) {
+    private Notification buildNotificationForSending(Class openActivity, Notification.Builder builder) {
         int id = builder.getExtras().getInt(KEY_ID, -1);
-        Intent openAppIntent = buildOpenAppIntent(context, openActivity);
+        Intent openAppIntent = buildOpenAppIntent(openActivity);
         openAppIntent.putExtra(KEY_NOTIFICATION_ID, id);
-        PendingIntent pendingIntent = getActivityPendingIntent(context, id, openAppIntent, 0);
+        PendingIntent pendingIntent = getActivityPendingIntent(mContext, id, openAppIntent, 0);
         builder.setContentIntent(pendingIntent);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             // Can't check StatusBar notifications pre-M, so ask to be notified when dismissed
-            Intent deleteIntent = new Intent(context, UnityNotificationManager.class);
+            Intent deleteIntent = new Intent(mContext, UnityNotificationManager.class);
             deleteIntent.setAction(KEY_NOTIFICATION_DISMISSED); // need action to distinguish intent from content one
             deleteIntent.putExtra(KEY_NOTIFICATION_DISMISSED, id);
-            PendingIntent deletePending = getBroadcastPendingIntent(context, id, deleteIntent, 0);
+            PendingIntent deletePending = getBroadcastPendingIntent(mContext, id, deleteIntent, 0);
             builder.setDeleteIntent(deletePending);
         }
 
-        finalizeNotificationForDisplay(context, builder);
+        finalizeNotificationForDisplay(builder);
         return builder.build();
     }
 
     // Build an Intent to open the given activity with the data from input Intent.
-    protected static Intent buildOpenAppIntent(Context context, Class className) {
-        Intent openAppIntent = new Intent(context, className);
+    private Intent buildOpenAppIntent(Class className) {
+        Intent openAppIntent = new Intent(mContext, className);
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         return openAppIntent;
@@ -682,7 +682,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 }
 
                 id = builder.getExtras().getInt(KEY_ID, -1);
-                notif = buildNotificationForSending(mContext, openActivity, builder);
+                notif = buildNotificationForSending(openActivity, builder);
             }
 
             if (notif != null) {
@@ -731,17 +731,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return 0;
     }
 
-    public static void finalizeNotificationForDisplay(Context context, Notification.Builder notificationBuilder) {
+    private void finalizeNotificationForDisplay(Notification.Builder notificationBuilder) {
         String icon = notificationBuilder.getExtras().getString(KEY_SMALL_ICON);
-        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
         if (iconId == 0) {
-            iconId = context.getApplicationInfo().icon;
+            iconId = mContext.getApplicationInfo().icon;
         }
         notificationBuilder.setSmallIcon(iconId);
         icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
-        iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
+        iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
         if (iconId != 0) {
-            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), iconId));
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), iconId));
         }
     }
 
