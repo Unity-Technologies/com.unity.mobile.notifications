@@ -71,18 +71,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
     static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
-    // Constructor with zero parameter is necessary for system to call onReceive() callback.
-    public UnityNotificationManager() {
-        super();
-    }
-
-    // Called from Unity managed code to do initialization.
-    public UnityNotificationManager(Context context, Activity activity) {
-        super();
-        mContext = context;
+    private void initialize(Activity activity) {
+        if (mContext == null)
+            mContext = activity.getApplicationContext();
         mActivity = activity;
-        mBackgroundThread = new UnityNotificationBackgroundThread(context, mScheduledNotifications);
-        mRandom = new Random();
+        if (mBackgroundThread == null)
+            mBackgroundThread = new UnityNotificationBackgroundThread(mContext, mScheduledNotifications);
+        if (mRandom == null)
+            mRandom = new Random();
 
         try {
             ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
@@ -91,15 +87,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Boolean rescheduleOnRestart = bundle.getBoolean("reschedule_notifications_on_restart");
 
             if (rescheduleOnRestart) {
-                ComponentName receiver = new ComponentName(context, UnityNotificationRestartOnBootReceiver.class);
-                PackageManager pm = context.getPackageManager();
+                ComponentName receiver = new ComponentName(mContext, UnityNotificationRestartOnBootReceiver.class);
+                PackageManager pm = mContext.getPackageManager();
 
                 pm.setComponentEnabledSetting(receiver,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP);
             }
 
-            mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(context, false);
+            mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, false);
             if (mOpenActivity == null)
                 mOpenActivity = activity.getClass();
         } catch (PackageManager.NameNotFoundException e) {
@@ -117,9 +113,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Called from managed code.
     public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
-        if (mUnityNotificationManager == null)
-            mUnityNotificationManager = new UnityNotificationManager(context, activity);
+        if (mUnityNotificationManager == null) {
+            mUnityNotificationManager = new UnityNotificationManager();
+        }
 
+        mUnityNotificationManager.initialize(activity);
         return mUnityNotificationManager;
     }
 
