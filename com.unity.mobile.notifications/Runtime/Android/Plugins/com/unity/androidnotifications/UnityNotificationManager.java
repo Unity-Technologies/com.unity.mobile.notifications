@@ -651,6 +651,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        getNotificationManagerImpl(context).onReceive(intent);
+    }
+
+    public void onReceive(Intent intent) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
                 int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
@@ -660,7 +664,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 return;
             }
         }
-        Object notification = getNotificationOrBuilderForIntent(context, intent);
+        Object notification = getNotificationOrBuilderForIntent(mContext, intent);
         if (notification != null) {
             Notification notif = null;
             int id = -1;
@@ -677,19 +681,19 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 }
 
                 Class openActivity;
-                if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
-                    openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
+                if (mOpenActivity == null) {
+                    openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, true);
                 }
                 else {
-                    openActivity = mUnityNotificationManager.mOpenActivity;
+                    openActivity = mOpenActivity;
                 }
 
                 id = builder.getExtras().getInt(KEY_ID, -1);
-                notif = buildNotificationForSending(context, openActivity, builder);
+                notif = buildNotificationForSending(mContext, openActivity, builder);
             }
 
             if (notif != null) {
-                UnityNotificationManager.notify(context, id, notif);
+                UnityNotificationManager.notify(mContext, id, notif);
             }
         }
     }
