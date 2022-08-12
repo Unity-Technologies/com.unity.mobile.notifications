@@ -416,7 +416,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     void performNotificationHousekeeping(Set<String> ids) {
         Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
 
-        Set<String> invalid = findInvalidNotificationIds(mContext, ids);
+        Set<String> invalid = findInvalidNotificationIds(ids);
         synchronized (UnityNotificationManager.class) {
             Set<String> currentIds = new HashSet<>(ids);
             for (String id : invalid) {
@@ -430,20 +430,20 @@ public class UnityNotificationManager extends BroadcastReceiver {
             deleteExpiredNotificationIntent(id);
     }
 
-    private static Set<String> findInvalidNotificationIds(Context context, Set<String> ids) {
-        Intent intent = buildNotificationIntent(context);
+    private Set<String> findInvalidNotificationIds(Set<String> ids) {
+        Intent intent = buildNotificationIntent(mContext);
         HashSet<String> invalid = new HashSet<String>();
         for (String id : ids) {
             // Get the given broadcast PendingIntent by id as request code.
             // FLAG_NO_CREATE is set to return null if the described PendingIntent doesn't exist.
-            PendingIntent broadcast = getBroadcastPendingIntent(context, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
+            PendingIntent broadcast = getBroadcastPendingIntent(mContext, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
             if (broadcast == null) {
                 invalid.add(id);
             }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            StatusBarNotification[] active = getNotificationManager(context).getActiveNotifications();
+            StatusBarNotification[] active = getNotificationManager().getActiveNotifications();
             for (StatusBarNotification notification : active) {
                 // any notifications in status bar are still valid
                 String id = String.valueOf(notification.getId());
