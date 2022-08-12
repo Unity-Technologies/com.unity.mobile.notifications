@@ -71,7 +71,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
     static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
-    private void initialize(Activity activity) {
+    private void initialize(Activity activity, NotificationCallback notificationCallback) {
         if (mContext == null)
             mContext = activity.getApplicationContext();
         mActivity = activity;
@@ -79,6 +79,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             mBackgroundThread = new UnityNotificationBackgroundThread(mContext, mScheduledNotifications);
         if (mRandom == null)
             mRandom = new Random();
+        mNotificationCallback = notificationCallback;
 
         try {
             ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
@@ -117,12 +118,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Called from managed code.
-    public static synchronized UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
+    public static synchronized UnityNotificationManager getNotificationManagerImpl(Activity activity, NotificationCallback notificationCallback) {
         if (mUnityNotificationManager == null) {
             mUnityNotificationManager = new UnityNotificationManager();
         }
 
-        mUnityNotificationManager.initialize(activity);
+        mUnityNotificationManager.initialize(activity, notificationCallback);
         return mUnityNotificationManager;
     }
 
@@ -133,11 +134,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Get system notification service.
     public static NotificationManager getNotificationManager(Context context) {
         return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    // Called from managed code.
-    public void setNotificationCallback(NotificationCallback notificationCallback) {
-        UnityNotificationManager.mNotificationCallback = notificationCallback;
     }
 
     public void registerNotificationChannel(

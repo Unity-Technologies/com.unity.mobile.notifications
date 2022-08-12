@@ -570,11 +570,9 @@ namespace Unity.Notifications.Android
 #elif UNITY_ANDROID
             var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             s_CurrentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-            var context = s_CurrentActivity.Call<AndroidJavaObject>("getApplicationContext");
 
             var notificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-            var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
-            notificationManager.Call("setNotificationCallback", new NotificationCallback());
+            var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", s_CurrentActivity, new NotificationCallback());
             s_Jni = new JniApi(notificationManagerClass, notificationManager);
 
             s_Initialized = true;
