@@ -651,50 +651,46 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
-                    int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
-                    if (removedId > 0) synchronized (UnityNotificationManager.class) {
-                        mVisibleNotifications.remove(removedId);
-                    }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
+                int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
+                if (removedId > 0) synchronized (UnityNotificationManager.class) {
+                    mVisibleNotifications.remove(removedId);
+                }
+                return;
+            }
+        }
+        Object notification = getNotificationOrBuilderForIntent(context, intent);
+        if (notification != null) {
+            Notification notif = null;
+            int id = -1;
+            boolean sendable = notification instanceof Notification;
+            if (sendable) {
+                notif = (Notification) notification;
+                id = notif.extras.getInt(KEY_ID, -1);
+            } else {
+                Notification.Builder builder = (Notification.Builder)notification;
+                // this is different instance and does not have mOpenActivity
+                if (builder == null) {
+                    Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
                     return;
                 }
-            }
-            Object notification = getNotificationOrBuilderForIntent(context, intent);
-            if (notification != null) {
-                Notification notif = null;
-                int id = -1;
-                boolean sendable = notification instanceof Notification;
-                if (sendable) {
-                    notif = (Notification) notification;
-                    id = notif.extras.getInt(KEY_ID, -1);
-                } else {
-                    Notification.Builder builder = (Notification.Builder)notification;
-                    // this is different instance and does not have mOpenActivity
-                    if (builder == null) {
-                        Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
-                        return;
-                    }
 
-                    Class openActivity;
-                    if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
-                        openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
-                    }
-                    else {
-                        openActivity = mUnityNotificationManager.mOpenActivity;
-                    }
-
-                    id = builder.getExtras().getInt(KEY_ID, -1);
-                    notif = buildNotificationForSending(context, openActivity, builder);
+                Class openActivity;
+                if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
+                    openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
+                }
+                else {
+                    openActivity = mUnityNotificationManager.mOpenActivity;
                 }
 
-                if (notif != null) {
-                    UnityNotificationManager.notify(context, id, notif);
-                }
+                id = builder.getExtras().getInt(KEY_ID, -1);
+                notif = buildNotificationForSending(context, openActivity, builder);
             }
-        } catch (BadParcelableException e) {
-            Log.w(TAG_UNITY, e.toString());
+
+            if (notif != null) {
+                UnityNotificationManager.notify(context, id, notif);
+            }
         }
     }
 
