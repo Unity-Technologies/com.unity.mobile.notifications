@@ -840,11 +840,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
     }
 
-    public static Notification getNotificationFromIntent(Context context, Intent intent) {
+    public Notification getNotificationFromIntent(Intent intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
                 int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
-                StatusBarNotification[] shownNotifications = getNotificationManager(context).getActiveNotifications();
+                StatusBarNotification[] shownNotifications = getNotificationManager().getActiveNotifications();
                 for (StatusBarNotification n : shownNotifications) {
                     if (n.getId() == id) {
                         return n.getNotification();
@@ -853,7 +853,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        Object notification = getNotificationOrBuilderForIntent(context, intent);
+        Object notification = getNotificationOrBuilderForIntent(mContext, intent);
         if (notification == null)
             return null;
         if (notification instanceof Notification)
