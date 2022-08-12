@@ -107,12 +107,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mBackgroundThread.start();
     }
 
-    public static UnityNotificationManager getNotificationManagerImpl(Context context) {
-        return getNotificationManagerImpl(context, (Activity) context);
+    public static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
+        if (mUnityNotificationManager == null) {
+            mUnityNotificationManager = new UnityNotificationManager();
+        }
+
+        mUnityNotificationManager.mContext = context.getApplicationContext();
+        return mUnityNotificationManager;
     }
 
     // Called from managed code.
-    public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
+    public static synchronized UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
         if (mUnityNotificationManager == null) {
             mUnityNotificationManager = new UnityNotificationManager();
         }
