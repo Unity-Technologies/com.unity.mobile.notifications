@@ -52,24 +52,24 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected UnityNotificationBackgroundThread mBackgroundThread;
     protected Random mRandom;
 
-    protected static final String TAG_UNITY = "UnityNotifications";
+    static final String TAG_UNITY = "UnityNotifications";
 
-    protected static final String KEY_FIRE_TIME = "fireTime";
-    protected static final String KEY_ID = "id";
-    protected static final String KEY_INTENT_DATA = "data";
-    protected static final String KEY_LARGE_ICON = "largeIcon";
-    protected static final String KEY_REPEAT_INTERVAL = "repeatInterval";
-    protected static final String KEY_NOTIFICATION = "unityNotification";
-    protected static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
-    protected static final String KEY_SMALL_ICON = "smallIcon";
-    protected static final String KEY_CHANNEL_ID = "channelID";
-    protected static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
-    protected static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
+    static final String KEY_FIRE_TIME = "fireTime";
+    static final String KEY_ID = "id";
+    static final String KEY_INTENT_DATA = "data";
+    static final String KEY_LARGE_ICON = "largeIcon";
+    static final String KEY_REPEAT_INTERVAL = "repeatInterval";
+    static final String KEY_NOTIFICATION = "unityNotification";
+    static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
+    static final String KEY_SMALL_ICON = "smallIcon";
+    static final String KEY_CHANNEL_ID = "channelID";
+    static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
+    static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
 
-    protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
-    protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
-    protected static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
-    protected static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
+    static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
+    static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
+    static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
+    static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
     // Constructor with zero parameter is necessary for system to call onReceive() callback.
     public UnityNotificationManager() {
