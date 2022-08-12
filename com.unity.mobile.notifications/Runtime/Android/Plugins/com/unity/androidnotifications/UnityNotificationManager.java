@@ -338,7 +338,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 fireTime += repeatInterval;
             }
 
-            Intent intent = buildNotificationIntent(mContext);
+            Intent intent = buildNotificationIntent();
 
             if (intent != null) {
                 UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
@@ -370,19 +370,19 @@ public class UnityNotificationManager extends BroadcastReceiver {
         UnityNotificationManager.scheduleNotificationIntentAlarm(context, repeatInterval, fireTime, broadcast);
     }
 
-    static void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Context context) {
+    void scheduleAlarmWithNotification(Notification.Builder notificationBuilder) {
         long fireTime = notificationBuilder.getExtras().getLong(KEY_FIRE_TIME, 0L);
-        Intent intent = buildNotificationIntent(context);
+        Intent intent = buildNotificationIntent();
 
         Class openActivity;
-        if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
-            openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
+        if (mOpenActivity == null) {
+            openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, true);
         }
         else {
             openActivity = mUnityNotificationManager.mOpenActivity;
         }
 
-        scheduleAlarmWithNotification(context, openActivity, notificationBuilder, intent, fireTime);
+        scheduleAlarmWithNotification(mContext, openActivity, notificationBuilder, intent, fireTime);
     }
 
     private Notification buildNotificationForSending(Class openActivity, Notification.Builder builder) {
@@ -431,7 +431,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private Set<String> findInvalidNotificationIds(Set<String> ids) {
-        Intent intent = buildNotificationIntent(mContext);
+        Intent intent = buildNotificationIntent();
         HashSet<String> invalid = new HashSet<String>();
         for (String id : ids) {
             // Get the given broadcast PendingIntent by id as request code.
@@ -469,8 +469,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return invalid;
     }
 
-    protected static Intent buildNotificationIntent(Context context) {
-        Intent intent = new Intent(context, UnityNotificationManager.class);
+    private Intent buildNotificationIntent() {
+        Intent intent = new Intent(mContext, UnityNotificationManager.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
     }
