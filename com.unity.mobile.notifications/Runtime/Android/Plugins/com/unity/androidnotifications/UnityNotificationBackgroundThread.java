@@ -4,7 +4,6 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_ID;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 import android.app.Notification;
-import android.content.Context;
 import android.util.Log;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +16,7 @@ import java.util.Set;
 public class UnityNotificationBackgroundThread extends Thread {
     private static abstract class Task {
         // returns true if notificationIds was modified (needs to be saved)
-        public abstract boolean run(Context context, ConcurrentHashMap<Integer, Notification.Builder> notifications);
+        public abstract boolean run(UnityNotificationManager manager, ConcurrentHashMap<Integer, Notification.Builder> notifications);
     }
 
     private static class ScheduleNotificationTask extends Task {
@@ -32,7 +31,7 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
 
         @Override
-        public boolean run(Context context, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
+        public boolean run(UnityNotificationManager manager, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
             String id = String.valueOf(notificationId);
             Integer ID = Integer.valueOf(notificationId);
             boolean didSchedule = false;
@@ -43,8 +42,8 @@ public class UnityNotificationBackgroundThread extends Thread {
                 // if failed to schedule or replace, remove
                 if (!didSchedule) {
                     notifications.remove(notificationId);
-                    UnityNotificationManager.cancelPendingNotificationIntent(context, notificationId);
-                    UnityNotificationManager.deleteExpiredNotificationIntent(context, id);
+                    manager.cancelPendingNotificationIntent(notificationId);
+                    manager.deleteExpiredNotificationIntent(id);
                 }
             }
 
@@ -60,10 +59,10 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
 
         @Override
-        public boolean run(Context context, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
-            UnityNotificationManager.cancelPendingNotificationIntent(context, notificationId);
+        public boolean run(UnityNotificationManager manager, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
+            manager.cancelPendingNotificationIntent(notificationId);
             if (notifications.remove(notificationId) != null) {
-                UnityNotificationManager.deleteExpiredNotificationIntent(context, String.valueOf(notificationId));
+                manager.deleteExpiredNotificationIntent(String.valueOf(notificationId));
                 return true;
             }
 
@@ -73,15 +72,15 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private static class CancelAllNotificationsTask extends Task {
         @Override
-        public boolean run(Context context, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
+        public boolean run(UnityNotificationManager manager, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
             if (notifications.isEmpty())
                 return false;
 
             Enumeration<Integer> ids = notifications.keys();
             while (ids.hasMoreElements()) {
                 Integer notificationId = ids.nextElement();
-                UnityNotificationManager.cancelPendingNotificationIntent(context, notificationId);
-                UnityNotificationManager.deleteExpiredNotificationIntent(context, String.valueOf(notificationId));
+                manager.cancelPendingNotificationIntent(notificationId);
+                manager.deleteExpiredNotificationIntent(String.valueOf(notificationId));
             }
 
             notifications.clear();
@@ -97,13 +96,13 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
 
         @Override
-        public boolean run(Context context, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
+        public boolean run(UnityNotificationManager manager, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
             HashSet<String> notificationIds = new HashSet<>();
             Enumeration<Integer> ids = notifications.keys();
             while (ids.hasMoreElements()) {
                 notificationIds.add(String.valueOf(ids.nextElement()));
             }
-            thread.performHousekeeping(context, notificationIds);
+            thread.performHousekeeping(notificationIds);
             return false;
         }
     }
@@ -111,11 +110,11 @@ public class UnityNotificationBackgroundThread extends Thread {
     private static final int TASKS_FOR_HOUSEKEEPING = 50;
     private LinkedTransferQueue<Task> mTasks = new LinkedTransferQueue();
     private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
-    private static Context mContext;
+    private UnityNotificationManager mManager;
     private int mTasksSinceHousekeeping = TASKS_FOR_HOUSEKEEPING;  // we want hoursekeeping at the start
 
-    public UnityNotificationBackgroundThread(Context context, ConcurrentHashMap<Integer, Notification.Builder> scheduledNotifications) {
-        mContext = context;
+    public UnityNotificationBackgroundThread(UnityNotificationManager manager, ConcurrentHashMap<Integer, Notification.Builder> scheduledNotifications) {
+        mManager = manager;
         mScheduledNotifications = scheduledNotifications;
         // rescheduling after reboot may have loaded, otherwise load here
         if (mScheduledNotifications.size() == 0)
@@ -144,7 +143,7 @@ public class UnityNotificationBackgroundThread extends Thread {
         while (true) {
             try {
                 Task task = mTasks.take();
-                haveChanges |= executeTask(mContext, task, mScheduledNotifications);
+                haveChanges |= executeTask(mManager, task, mScheduledNotifications);
                 if (!(task instanceof HousekeepingTask))
                     ++mTasksSinceHousekeeping;
                 if (mTasks.size() == 0 && haveChanges) {
@@ -158,26 +157,26 @@ public class UnityNotificationBackgroundThread extends Thread {
         }
     }
 
-    private boolean executeTask(Context context, Task task, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
+    private boolean executeTask(UnityNotificationManager manager, Task task, ConcurrentHashMap<Integer, Notification.Builder> notifications) {
         try {
-            return task.run(context, notifications);
+            return task.run(manager, notifications);
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Exception executing notification task", e);
             return false;
         }
     }
 
-    private void performHousekeeping(Context context, Set<String> notificationIds) {
+    private void performHousekeeping(Set<String> notificationIds) {
         // don't do housekeeping if last task we did was housekeeping (other=1)
         boolean performHousekeeping = mTasksSinceHousekeeping >= TASKS_FOR_HOUSEKEEPING;
         mTasksSinceHousekeeping = 0;
         if (performHousekeeping)
-            UnityNotificationManager.performNotificationHousekeeping(context, notificationIds);
-        UnityNotificationManager.saveScheduledNotificationIDs(context, notificationIds);
+            mManager.performNotificationHousekeeping(notificationIds);
+        mManager.saveScheduledNotificationIDs(notificationIds);
     }
 
     private void loadNotifications() {
-        List<Notification.Builder> notifications = UnityNotificationManager.loadSavedNotifications(mContext);
+        List<Notification.Builder> notifications = mManager.loadSavedNotifications();
         for (Notification.Builder builder : notifications) {
             int id = builder.getExtras().getInt(KEY_ID, -1);
             mScheduledNotifications.put(id, builder);

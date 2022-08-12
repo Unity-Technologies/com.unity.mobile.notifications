@@ -75,7 +75,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             mContext = activity.getApplicationContext();
         mActivity = activity;
         if (mBackgroundThread == null)
-            mBackgroundThread = new UnityNotificationBackgroundThread(mContext, mScheduledNotifications);
+            mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
         if (mRandom == null)
             mRandom = new Random();
         mNotificationCallback = notificationCallback;
@@ -348,7 +348,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (fireNow) {
             Notification notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
-            notify(mContext, id, notification);
+            notify(id, notification);
         }
     }
 
@@ -413,10 +413,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return openAppIntent;
     }
 
-    protected static void performNotificationHousekeeping(Context context, Set<String> ids) {
+    void performNotificationHousekeeping(Set<String> ids) {
         Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
 
-        Set<String> invalid = findInvalidNotificationIds(context, ids);
+        Set<String> invalid = findInvalidNotificationIds(mContext, ids);
         synchronized (UnityNotificationManager.class) {
             Set<String> currentIds = new HashSet<>(ids);
             for (String id : invalid) {
@@ -427,7 +427,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         // in case we have saved intents, clear them
         for (String id : invalid)
-            deleteExpiredNotificationIntent(context, id);
+            deleteExpiredNotificationIntent(id);
     }
 
     private static Set<String> findInvalidNotificationIds(Context context, Set<String> ids) {
@@ -503,21 +503,21 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Load all the notification intents from SharedPreferences.
-    protected static synchronized List<Notification.Builder> loadSavedNotifications(Context context) {
-        Set<String> ids = getScheduledNotificationIDs(context);
+    synchronized List<Notification.Builder> loadSavedNotifications() {
+        Set<String> ids = getScheduledNotificationIDs(mContext);
 
         List<Notification.Builder> intent_data_list = new ArrayList();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
         for (String id : ids) {
-            SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+            SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             Notification.Builder builder = null;
-            Object notification = UnityNotificationUtilities.deserializeNotification(context, prefs);
+            Object notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
             if (notification != null) {
                 if (notification instanceof Notification.Builder)
                     builder = (Notification.Builder)notification;
                 else
-                    builder = UnityNotificationUtilities.recoverBuilder(context, (Notification)notification);
+                    builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
             }
 
             if (builder != null)
@@ -530,9 +530,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
             ids = new HashSet<>(ids);
             for (String id : idsMarkedForRemoval) {
                 ids.remove(id);
-                deleteExpiredNotificationIntent(context, id);
+                deleteExpiredNotificationIntent(id);
             }
-            saveScheduledNotificationIDs(context, ids);
+            saveScheduledNotificationIDs(ids);
         }
 
         return intent_data_list;
@@ -603,8 +603,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return ids;
     }
 
-    protected static synchronized void saveScheduledNotificationIDs(Context context, Set<String> ids) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
+    synchronized void saveScheduledNotificationIDs(Set<String> ids) {
+        SharedPreferences.Editor editor = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
         editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
         editor.apply();
     }
@@ -615,22 +615,20 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Cancel a pending notification by id.
-    protected static void cancelPendingNotificationIntent(Context context, int id) {
-        Intent intent = new Intent(context, UnityNotificationManager.class);
-        PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_NO_CREATE);
+    void cancelPendingNotificationIntent(int id) {
+        Intent intent = new Intent(mContext, UnityNotificationManager.class);
+        PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_NO_CREATE);
 
         if (broadcast != null) {
-            if (context != null) {
-                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                alarmManager.cancel(broadcast);
-            }
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(broadcast);
             broadcast.cancel();
         }
     }
 
     // Delete the notification intent from SharedPreferences by id.
-    protected static synchronized void deleteExpiredNotificationIntent(Context context, String id) {
-        SharedPreferences notificationPrefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+    synchronized void deleteExpiredNotificationIntent(String id) {
+        SharedPreferences notificationPrefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
         notificationPrefs.edit().clear().apply();
     }
 
@@ -688,16 +686,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
 
             if (notif != null) {
-                UnityNotificationManager.notify(mContext, id, notif);
+                notify(id, notif);
             }
         }
     }
 
     // Call the system notification service to notify the notification.
-    protected static void notify(Context context, int id, Notification notification) {
+    private void notify(int id, Notification notification) {
         boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
-            getNotificationManager(context).notify(id, notification);
+            getNotificationManager().notify(id, notification);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (UnityNotificationManager.class) {
                 mVisibleNotifications.add(Integer.valueOf(id));
             }
@@ -706,7 +704,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, -1);
         if (repeatInterval <= 0) {
             mScheduledNotifications.remove(id);
-            cancelPendingNotificationIntent(context, id);
+            cancelPendingNotificationIntent(id);
         }
 
         try {
@@ -752,7 +750,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     @SuppressWarnings("deprecation")
-    protected static Notification.Builder createNotificationBuilder(Context context, String channelID) {
+    static Notification.Builder createNotificationBuilder(Context context, String channelID) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             Notification.Builder notificationBuilder = new Notification.Builder(context);
 

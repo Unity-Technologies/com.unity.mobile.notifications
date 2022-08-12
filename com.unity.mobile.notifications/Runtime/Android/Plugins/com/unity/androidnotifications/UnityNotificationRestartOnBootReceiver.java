@@ -23,7 +23,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     }
 
     private static void rescheduleSavedNotifications(Context context) {
-        List<Notification.Builder> saved_notifications = UnityNotificationManager.loadSavedNotifications(context);
+        List<Notification.Builder> saved_notifications = UnityNotificationManager.getNotificationManagerImpl(context).loadSavedNotifications();
 
         for (Notification.Builder notificationBuilder : saved_notifications) {
             Bundle extras = notificationBuilder.getExtras();
