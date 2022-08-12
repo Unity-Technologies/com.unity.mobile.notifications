@@ -660,7 +660,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 return;
             }
         }
-        Object notification = getNotificationOrBuilderForIntent(mContext, intent);
+        Object notification = getNotificationOrBuilderForIntent(intent);
         if (notification != null) {
             Notification notif = null;
             int id = -1;
@@ -853,7 +853,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        Object notification = getNotificationOrBuilderForIntent(mContext, intent);
+        Object notification = getNotificationOrBuilderForIntent(intent);
         if (notification == null)
             return null;
         if (notification instanceof Notification)
@@ -862,7 +862,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return builder.build();
     }
 
-    public static Object getNotificationOrBuilderForIntent(Context context, Intent intent) {
+    private Object getNotificationOrBuilderForIntent(Intent intent) {
         Object notification = null;
         boolean sendable = false;
         if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
@@ -872,8 +872,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 sendable = true;
             } else {
                 // in case we don't have cached notification, deserialize from storage
-                SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(String.valueOf(id)), Context.MODE_PRIVATE);
-                notification = UnityNotificationUtilities.deserializeNotification(context, prefs);
+                SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(String.valueOf(id)), Context.MODE_PRIVATE);
+                notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
             }
         } else if (intent.hasExtra(KEY_NOTIFICATION)) {
             // old code path where Notification object is in intent
@@ -887,7 +887,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         Notification.Builder builder;
         if (notification instanceof Notification) {
-            builder = UnityNotificationUtilities.recoverBuilder(context, (Notification)notification);
+            builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
         }
         else {
             builder = (Notification.Builder)notification;
