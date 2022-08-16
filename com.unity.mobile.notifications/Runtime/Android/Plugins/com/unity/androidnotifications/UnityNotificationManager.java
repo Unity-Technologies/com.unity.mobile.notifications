@@ -190,15 +190,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return String.format("unity_notification_channel_%s", id);
     }
 
-    private static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
+    public NotificationChannelWrapper getNotificationChannel(String id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel ch = getNotificationManager(context).getNotificationChannel(id);
+            NotificationChannel ch = getNotificationManager(mContext).getNotificationChannel(id);
             if (ch == null)
                 return null;
             return notificationChannelToWrapper(ch);
         }
 
-        SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         NotificationChannelWrapper channel = new NotificationChannelWrapper();
 
         channel.id = id;
@@ -246,10 +246,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
 
         return wrapper;
-    }
-
-    public NotificationChannelWrapper getNotificationChannel(String id) {
-        return UnityNotificationManager.getNotificationChannel(mContext, id);
     }
 
     public void deleteNotificationChannel(String id) {
