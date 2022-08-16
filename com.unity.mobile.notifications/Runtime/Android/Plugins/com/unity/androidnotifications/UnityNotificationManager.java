@@ -43,13 +43,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
     private static ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
-    private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
 
     private Context mContext = null;
     private Activity mActivity = null;
     private Class mOpenActivity = null;
     private UnityNotificationBackgroundThread mBackgroundThread;
     private Random mRandom;
+    private HashSet<Integer> mVisibleNotifications;
 
     static final String TAG_UNITY = "UnityNotifications";
 
@@ -78,6 +78,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
         if (mRandom == null)
             mRandom = new Random();
+        if (mVisibleNotifications == null)
+            mVisibleNotifications = new HashSet<>();
         mNotificationCallback = notificationCallback;
 
         try {
@@ -113,6 +115,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         mUnityNotificationManager.mContext = context.getApplicationContext();
+        mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
         return mUnityNotificationManager;
     }
 
