@@ -365,7 +365,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     private Notification buildNotificationForSending(Class openActivity, Notification.Builder builder) {
         int id = builder.getExtras().getInt(KEY_ID, -1);
-        Intent openAppIntent = buildOpenAppIntent(openActivity);
+        Intent openAppIntent = new Intent(mContext, openActivity);
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         openAppIntent.putExtra(KEY_NOTIFICATION_ID, id);
         PendingIntent pendingIntent = getActivityPendingIntent(id, openAppIntent, 0);
         builder.setContentIntent(pendingIntent);
@@ -381,14 +382,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         finalizeNotificationForDisplay(builder);
         return builder.build();
-    }
-
-    // Build an Intent to open the given activity with the data from input Intent.
-    private Intent buildOpenAppIntent(Class className) {
-        Intent openAppIntent = new Intent(mContext, className);
-        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        return openAppIntent;
     }
 
     void performNotificationHousekeeping(Set<String> ids) {
