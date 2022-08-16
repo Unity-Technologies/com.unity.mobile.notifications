@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.unity3d.player.UnityPlayer;
 
 public class UnityNotificationManager extends BroadcastReceiver {
-    protected static UnityNotificationManager mUnityNotificationManager;
+    static UnityNotificationManager mUnityNotificationManager;
 
     private Context mContext = null;
     private Activity mActivity = null;
