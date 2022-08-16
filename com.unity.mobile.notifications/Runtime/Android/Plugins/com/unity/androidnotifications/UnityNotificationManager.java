@@ -500,7 +500,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Load all the notification intents from SharedPreferences.
     synchronized List<Notification.Builder> loadSavedNotifications() {
-        Set<String> ids = getScheduledNotificationIDs(mContext);
+        Set<String> ids = getScheduledNotificationIDs();
 
         List<Notification.Builder> intent_data_list = new ArrayList();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
@@ -593,8 +593,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mBackgroundThread.enqueueCancelAllNotifications();
     }
 
-    protected static synchronized Set<String> getScheduledNotificationIDs(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+    private synchronized Set<String> getScheduledNotificationIDs() {
+        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
         return ids;
     }
