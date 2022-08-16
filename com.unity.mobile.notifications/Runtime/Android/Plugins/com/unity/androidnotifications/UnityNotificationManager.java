@@ -337,7 +337,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Intent intent = buildNotificationIntent();
 
             if (intent != null) {
-                UnityNotificationManager.saveNotification(mContext, notificationBuilder.build());
+                saveNotification(notificationBuilder.build());
                 scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
             }
         }
@@ -487,9 +487,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
-    protected static synchronized void saveNotification(Context context, Notification notification) {
+    synchronized void saveNotification(Notification notification) {
         String notification_id = Integer.toString(notification.extras.getInt(KEY_ID, -1));
-        SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
         UnityNotificationUtilities.serializeNotification(prefs, notification);
     }
 
