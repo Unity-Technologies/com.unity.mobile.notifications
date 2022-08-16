@@ -127,12 +127,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public NotificationManager getNotificationManager() {
-        return getNotificationManager(mContext);
-    }
-
-    // Get system notification service.
-    public static NotificationManager getNotificationManager(Context context) {
-        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public void registerNotificationChannel(
@@ -192,7 +187,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     public NotificationChannelWrapper getNotificationChannel(String id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel ch = getNotificationManager(mContext).getNotificationChannel(id);
+            NotificationChannel ch = getNotificationManagerImpl(mContext).getNotificationManager().getNotificationChannel(id);
             if (ch == null)
                 return null;
             return notificationChannelToWrapper(ch);
