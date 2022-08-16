@@ -468,8 +468,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         UnityNotificationUtilities.serializeNotification(prefs, notification);
     }
 
-    static String getSharedPrefsNameByNotificationId(String id)
-    {
+    static String getSharedPrefsNameByNotificationId(String id) {
         return String.format("u_notification_data_%s", id);
     }
 
