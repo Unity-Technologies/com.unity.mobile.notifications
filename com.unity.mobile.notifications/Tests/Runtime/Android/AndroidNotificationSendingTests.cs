@@ -358,6 +358,10 @@ class AndroidNotificationSendingTests
         // simulate reboot by calling reschedule method, that is called after reboot
         rebootClass.CallStatic("rescheduleSavedNotifications", context);
 
+        var newManager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
+        // new manager was supposed to be created, assign callback from original one to get notifications
+        newManager.Set("mNotificationCallback", manager.Get<AndroidJavaObject>("mNotificationCallback"));
+
         yield return WaitForNotification(120.0f);
 
         Debug.LogWarning("SendNotification_CanReschedule completed");
