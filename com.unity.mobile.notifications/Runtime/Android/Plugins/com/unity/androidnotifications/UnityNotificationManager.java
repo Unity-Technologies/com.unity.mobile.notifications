@@ -185,7 +185,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    protected static String getSharedPrefsNameByChannelId(String id)
+    private static String getSharedPrefsNameByChannelId(String id)
     {
         return String.format("unity_notification_channel_%s", id);
     }
