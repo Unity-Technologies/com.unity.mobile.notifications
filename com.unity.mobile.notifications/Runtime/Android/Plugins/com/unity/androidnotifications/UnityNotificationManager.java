@@ -362,7 +362,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
-        PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent broadcast = getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
     }
 
@@ -385,7 +385,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         int id = builder.getExtras().getInt(KEY_ID, -1);
         Intent openAppIntent = buildOpenAppIntent(openActivity);
         openAppIntent.putExtra(KEY_NOTIFICATION_ID, id);
-        PendingIntent pendingIntent = getActivityPendingIntent(mContext, id, openAppIntent, 0);
+        PendingIntent pendingIntent = getActivityPendingIntent(id, openAppIntent, 0);
         builder.setContentIntent(pendingIntent);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -393,7 +393,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Intent deleteIntent = new Intent(mContext, UnityNotificationManager.class);
             deleteIntent.setAction(KEY_NOTIFICATION_DISMISSED); // need action to distinguish intent from content one
             deleteIntent.putExtra(KEY_NOTIFICATION_DISMISSED, id);
-            PendingIntent deletePending = getBroadcastPendingIntent(mContext, id, deleteIntent, 0);
+            PendingIntent deletePending = getBroadcastPendingIntent(id, deleteIntent, 0);
             builder.setDeleteIntent(deletePending);
         }
 
@@ -432,7 +432,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         for (String id : ids) {
             // Get the given broadcast PendingIntent by id as request code.
             // FLAG_NO_CREATE is set to return null if the described PendingIntent doesn't exist.
-            PendingIntent broadcast = getBroadcastPendingIntent(mContext, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
+            PendingIntent broadcast = getBroadcastPendingIntent(Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
             if (broadcast == null) {
                 invalid.add(id);
             }
@@ -471,18 +471,18 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return intent;
     }
 
-    public static PendingIntent getActivityPendingIntent(Context context, int id, Intent intent, int flags) {
+    private PendingIntent getActivityPendingIntent(int id, Intent intent, int flags) {
         if (Build.VERSION.SDK_INT >= 23)
-            return PendingIntent.getActivity(context, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
+            return PendingIntent.getActivity(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
         else
-            return PendingIntent.getActivity(context, id, intent, flags);
+            return PendingIntent.getActivity(mContext, id, intent, flags);
     }
 
-    public static PendingIntent getBroadcastPendingIntent(Context context, int id, Intent intent, int flags) {
+    private PendingIntent getBroadcastPendingIntent(int id, Intent intent, int flags) {
         if (Build.VERSION.SDK_INT >= 23)
-            return PendingIntent.getBroadcast(context, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
+            return PendingIntent.getBroadcast(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
         else
-            return PendingIntent.getBroadcast(context, id, intent, flags);
+            return PendingIntent.getBroadcast(mContext, id, intent, flags);
     }
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
@@ -585,7 +585,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Check if the pending notification with the given id has been registered.
     public boolean checkIfPendingNotificationIsRegistered(int id) {
         Intent intent = new Intent(mActivity, UnityNotificationManager.class);
-        return (getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_NO_CREATE) != null);
+        return (getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_NO_CREATE) != null);
     }
 
     // Cancel all the pending notifications.
@@ -613,7 +613,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Cancel a pending notification by id.
     void cancelPendingNotificationIntent(int id) {
         Intent intent = new Intent(mContext, UnityNotificationManager.class);
-        PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_NO_CREATE);
+        PendingIntent broadcast = getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_NO_CREATE);
 
         if (broadcast != null) {
             AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
