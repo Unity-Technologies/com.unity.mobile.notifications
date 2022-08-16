@@ -349,10 +349,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
-        scheduleAlarmWithNotification(mContext, mOpenActivity, notificationBuilder, intent, fireTime);
+        scheduleAlarmWithNotification(mOpenActivity, notificationBuilder, intent, fireTime);
     }
 
-    static void scheduleAlarmWithNotification(Context context, Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
+    private void scheduleAlarmWithNotification(Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
         Bundle extras = notificationBuilder.getExtras();
         int id = extras.getInt(KEY_ID, -1);
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
@@ -362,8 +362,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
-        PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        UnityNotificationManager.scheduleNotificationIntentAlarm(context, repeatInterval, fireTime, broadcast);
+        PendingIntent broadcast = getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        UnityNotificationManager.scheduleNotificationIntentAlarm(mContext, repeatInterval, fireTime, broadcast);
     }
 
     void scheduleAlarmWithNotification(Notification.Builder notificationBuilder) {
@@ -378,7 +378,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             openActivity = mUnityNotificationManager.mOpenActivity;
         }
 
-        scheduleAlarmWithNotification(mContext, openActivity, notificationBuilder, intent, fireTime);
+        scheduleAlarmWithNotification(openActivity, notificationBuilder, intent, fireTime);
     }
 
     private Notification buildNotificationForSending(Class openActivity, Notification.Builder builder) {
