@@ -614,6 +614,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        // This method is called on OS created instance and that instance is recreated during various times
+        // for example sending app to background will cause new instance to be created when alarm fires
+        // since we also create one instance for our uses, always forward to that instance (creating if necessary)
         getNotificationManagerImpl(context).onReceive(intent);
     }
 
