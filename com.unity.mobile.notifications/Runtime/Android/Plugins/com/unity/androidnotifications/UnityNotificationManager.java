@@ -112,10 +112,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
         if (mUnityNotificationManager == null) {
             mUnityNotificationManager = new UnityNotificationManager();
+            mUnityNotificationManager.mContext = context.getApplicationContext();
+            mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
         }
 
-        mUnityNotificationManager.mContext = context.getApplicationContext();
-        mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
         return mUnityNotificationManager;
     }
 
