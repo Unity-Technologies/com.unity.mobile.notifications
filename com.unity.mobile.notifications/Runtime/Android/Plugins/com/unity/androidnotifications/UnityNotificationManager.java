@@ -45,11 +45,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private static ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
     private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
 
-    public Context mContext = null;
-    protected Activity mActivity = null;
-    protected Class mOpenActivity = null;
-    protected UnityNotificationBackgroundThread mBackgroundThread;
-    protected Random mRandom;
+    private Context mContext = null;
+    private Activity mActivity = null;
+    private Class mOpenActivity = null;
+    private UnityNotificationBackgroundThread mBackgroundThread;
+    private Random mRandom;
 
     static final String TAG_UNITY = "UnityNotifications";
 
