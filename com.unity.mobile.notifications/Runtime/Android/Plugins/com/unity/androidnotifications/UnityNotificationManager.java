@@ -42,7 +42,6 @@ import com.unity3d.player.UnityPlayer;
 public class UnityNotificationManager extends BroadcastReceiver {
     protected static NotificationCallback mNotificationCallback;
     protected static UnityNotificationManager mUnityNotificationManager;
-    private static ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
 
     private Context mContext = null;
     private Activity mActivity = null;
@@ -50,6 +49,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private UnityNotificationBackgroundThread mBackgroundThread;
     private Random mRandom;
     private HashSet<Integer> mVisibleNotifications;
+    private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
 
     static final String TAG_UNITY = "UnityNotifications";
 
@@ -74,6 +74,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (mContext == null)
             mContext = activity.getApplicationContext();
         mActivity = activity;
+        if (mScheduledNotifications == null)
+            mScheduledNotifications = new ConcurrentHashMap();
         if (mBackgroundThread == null)
             mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
         if (mRandom == null)
@@ -114,6 +116,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             mUnityNotificationManager = new UnityNotificationManager();
             mUnityNotificationManager.mContext = context.getApplicationContext();
             mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
+            mUnityNotificationManager.mScheduledNotifications = new ConcurrentHashMap();
         }
 
         return mUnityNotificationManager;
