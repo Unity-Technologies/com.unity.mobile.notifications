@@ -344,10 +344,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
-        scheduleAlarmWithNotification(mOpenActivity, notificationBuilder, intent, fireTime);
-    }
-
-    private void scheduleAlarmWithNotification(Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
         Bundle extras = notificationBuilder.getExtras();
         int id = extras.getInt(KEY_ID, -1);
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
@@ -364,16 +360,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     void scheduleAlarmWithNotification(Notification.Builder notificationBuilder) {
         long fireTime = notificationBuilder.getExtras().getLong(KEY_FIRE_TIME, 0L);
         Intent intent = buildNotificationIntent();
-
-        Class openActivity;
-        if (mOpenActivity == null) {
-            openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, true);
-        }
-        else {
-            openActivity = mUnityNotificationManager.mOpenActivity;
-        }
-
-        scheduleAlarmWithNotification(openActivity, notificationBuilder, intent, fireTime);
+        scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
     }
 
     private Notification buildNotificationForSending(Class openActivity, Notification.Builder builder) {
