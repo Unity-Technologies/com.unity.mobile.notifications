@@ -321,7 +321,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return id;
     }
 
-    protected void performNotificationScheduling(int id, Notification.Builder notificationBuilder) {
+    void performNotificationScheduling(int id, Notification.Builder notificationBuilder) {
         Bundle extras = notificationBuilder.getExtras();
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
@@ -493,7 +493,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         UnityNotificationUtilities.serializeNotification(prefs, notification);
     }
 
-    protected static String getSharedPrefsNameByNotificationId(String id)
+    static String getSharedPrefsNameByNotificationId(String id)
     {
         return String.format("u_notification_data_%s", id);
     }
