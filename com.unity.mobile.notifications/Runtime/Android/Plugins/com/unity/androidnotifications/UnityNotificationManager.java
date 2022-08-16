@@ -71,8 +71,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
     private void initialize(Activity activity, NotificationCallback notificationCallback) {
-        if (mContext == null)
-            mContext = activity.getApplicationContext();
+        // always assign these, as callback here is always new, activity and context might be
+        mContext = activity.getApplicationContext();
         mActivity = activity;
         mNotificationCallback = notificationCallback;
         if (mScheduledNotifications == null)
@@ -114,11 +114,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
         if (mUnityNotificationManager == null) {
             mUnityNotificationManager = new UnityNotificationManager();
-            mUnityNotificationManager.mContext = context.getApplicationContext();
             mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
             mUnityNotificationManager.mScheduledNotifications = new ConcurrentHashMap();
         }
 
+        // always assign context, as it might change
+        mUnityNotificationManager.mContext = context.getApplicationContext();
         return mUnityNotificationManager;
     }
 
