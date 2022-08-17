@@ -428,7 +428,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 invalid.remove(id);
             }
         }
-        else synchronized (UnityNotificationManager.class) {
+        else synchronized (this) {
             for (Integer visibleId : mVisibleNotifications) {
                 String id = String.valueOf(visibleId);
                 invalid.remove(id);
@@ -548,7 +548,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 if (id == n.getId())
                     return 2;
             }
-        } else synchronized (UnityNotificationManager.class) {
+        } else synchronized (this) {
             for (Integer notificationId : mVisibleNotifications) {
                 if (notificationId.intValue() == id)
                     return 2;
@@ -631,7 +631,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
                 int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
-                if (removedId > 0) synchronized (UnityNotificationManager.class) {
+                if (removedId > 0) synchronized (this) {
                     mVisibleNotifications.remove(removedId);
                 }
                 return;
@@ -676,7 +676,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
             getNotificationManager().notify(id, notification);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (UnityNotificationManager.class) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (this) {
                 mVisibleNotifications.add(Integer.valueOf(id));
             }
         }
