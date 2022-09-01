@@ -23,7 +23,8 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     }
 
     private static void rescheduleSavedNotifications(Context context) {
-        List<Notification.Builder> saved_notifications = UnityNotificationManager.loadSavedNotifications(context);
+        UnityNotificationManager manager = UnityNotificationManager.getNotificationManagerImpl(context);
+        List<Notification.Builder> saved_notifications = manager.loadSavedNotifications();
 
         for (Notification.Builder notificationBuilder : saved_notifications) {
             Bundle extras = notificationBuilder.getExtras();
@@ -35,7 +36,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
             boolean isRepeatable = repeatInterval > 0;
 
             if (fireTimeDate.after(currentDate) || isRepeatable) {
-                UnityNotificationManager.scheduleAlarmWithNotification(notificationBuilder, context);
+                manager.scheduleAlarmWithNotification(notificationBuilder);
             }
         }
     }
