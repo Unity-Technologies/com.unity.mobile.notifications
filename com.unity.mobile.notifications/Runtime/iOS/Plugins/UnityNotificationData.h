@@ -69,6 +69,7 @@ typedef struct iOSNotificationData
             float radius;
             unsigned char notifyOnEntry;
             unsigned char notifyOnExit;
+            unsigned char repeats;
         } location;
     } trigger;
 } iOSNotificationData;

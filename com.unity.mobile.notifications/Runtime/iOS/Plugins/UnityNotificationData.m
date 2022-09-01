@@ -169,6 +169,7 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         notificationData.trigger.location.radius = region.radius;
         notificationData.trigger.location.notifyOnExit = region.notifyOnEntry;
         notificationData.trigger.location.notifyOnEntry = region.notifyOnExit;
+        notificationData.trigger.location.repeats = locationTrigger.repeats;
 #endif
     }
     else if ([request.trigger isKindOfClass: [UNPushNotificationTrigger class]])

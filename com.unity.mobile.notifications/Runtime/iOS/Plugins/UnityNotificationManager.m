@@ -342,7 +342,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         region.notifyOnEntry = data->trigger.location.notifyOnEntry;
         region.notifyOnExit = data->trigger.location.notifyOnExit;
 
-        trigger = [UNLocationNotificationTrigger triggerWithRegion: region repeats: NO];
+        trigger = [UNLocationNotificationTrigger triggerWithRegion: region repeats: data->trigger.location.repeats];
 #else
         return;
 #endif

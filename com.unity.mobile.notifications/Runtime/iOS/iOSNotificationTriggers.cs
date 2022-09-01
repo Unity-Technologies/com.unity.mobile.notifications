@@ -99,6 +99,11 @@ namespace Unity.Notifications.iOS
         /// When this property is enabled, a device crossing from inside the region to outside the region triggers the delivery of a notification
         /// </summary>
         public bool NotifyOnExit { get; set; }
+
+        /// <summary>
+        /// Whether the notification should repeat.
+        /// </summary>
+        public bool Repeats { get; set; }
     }
 
     /// <summary>
