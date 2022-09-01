@@ -344,13 +344,13 @@ namespace Unity.Notifications.Tests.Sample
                 Transform buttonGroup =
                     GameObject.Instantiate(m_gameObjectReferences.ButtonGroupTemplate, m_gameObjectReferences.ButtonScrollViewContent);
                 Transform buttonGroupName = buttonGroup.GetChild(0).transform;
-                Transform buttonGameObject = buttonGroup.GetChild(1).transform;
+                Transform buttonGameObject = buttonGroup.GetChild(1).GetChild(0).transform;
                 // Set group name
                 buttonGroupName.GetComponentInChildren<Text>().text = group.Key.ToString();
                 // Instantiate buttons
                 foreach (DictionaryEntry test in group.Value)
                 {
-                    Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup);
+                    Transform button = GameObject.Instantiate(buttonGameObject, buttonGroup.GetChild(1));
                     button.gameObject.GetComponentInChildren<Text>().text = test.Key.ToString();
                     button.GetComponent<Button>().onClick.AddListener(delegate
                     {
