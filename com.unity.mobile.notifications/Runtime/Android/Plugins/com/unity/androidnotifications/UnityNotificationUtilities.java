@@ -32,7 +32,7 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SHOW_IN_FOREGROUND;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
-public class UnityNotificationUtilities {
+class UnityNotificationUtilities {
     /*
         We serialize notifications and save them to shared prefs, so that if app is killed, we can recreate them.
         The serialized BLOB starts with a four byte magic number descibing serialization type, followed by an integer version.
@@ -40,13 +40,13 @@ public class UnityNotificationUtilities {
         In real life app can get updated having old serialized notifications present, so we should be able to deserialize them.
     */
     // magic stands for "Unity Mobile Notifications Notification"
-    private static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
+    static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
     private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
-    private static final int NOTIFICATION_SERIALIZATION_VERSION = 1;
+    private static final int NOTIFICATION_SERIALIZATION_VERSION = 2;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
 
-    private static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
-    private static final String SAVED_NOTIFICATION_FALLBACK_KEY = "fallback.data";
+    static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
+    static final String SAVED_NOTIFICATION_FALLBACK_KEY = "fallback.data";
 
     protected static int findResourceIdInContextByName(Context context, String name) {
         if (name == null)
@@ -72,43 +72,44 @@ public class UnityNotificationUtilities {
        Unfortunately, while Notification itself is Parcelable and can be marshalled to bytes,
        it's contents are not guaranteed to be (Binder objects).
        Hence what we try to do here is:
-       - serialize as is
-       - fallback 1: serialize our known properties + serialize extras as is
-       - fallback 2: serialize our known stuff
-       When notification is serialized as-is, it may contain references to resources and in case
-       of app update may fail to deserialize due to resources now missing, hence always save fallback version.
+       - serialize as is if notification is possibly customized by user
+       - otherwise serialize our stuff, since there is nothing more
     */
-    protected static void serializeNotification(SharedPreferences prefs, Notification notification) {
+    protected static void serializeNotification(SharedPreferences prefs, Notification notification, boolean serializeParcel) {
         try {
-            String serialized = null, fallback = null;
+            String serialized;
             ByteArrayOutputStream data = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(data);
-            if (serializeNotificationCustom(notification, out)) {
-                out.flush();
-                byte[] bytes = data.toByteArray();
-                fallback = Base64.encodeToString(bytes, 0, bytes.length, 0);
+            if (serializeParcel) {
+                Intent intent = new Intent();
+                intent.putExtra(KEY_NOTIFICATION, notification);
+                if (serializeNotificationParcel(intent, out)) {
+                    out.close();
+                    byte[] bytes = data.toByteArray();
+                    serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+                } else {
+                    return; // failed
+                }
             }
-            data.reset();
-            Intent intent = new Intent();
-            intent.putExtra(KEY_NOTIFICATION, notification);
-            if (serializeNotificationParcel(intent, out)) {
-                out.close();
-                byte[] bytes = data.toByteArray();
-                serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+            else {
+                if (serializeNotificationCustom(notification, out)) {
+                    out.flush();
+                    byte[] bytes = data.toByteArray();
+                    serialized = Base64.encodeToString(bytes, 0, bytes.length, 0);
+                } else {
+                    return; // failed
+                }
             }
-            else
-                serialized = fallback;
 
             SharedPreferences.Editor editor = prefs.edit().clear();
             editor.putString(SAVED_NOTIFICATION_PRIMARY_KEY, serialized);
-            editor.putString(SAVED_NOTIFICATION_FALLBACK_KEY, fallback);
             editor.apply();
         } catch (Exception e) {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
         }
     }
 
-    private static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
+    static boolean serializeNotificationParcel(Intent intent, DataOutputStream out) {
         try {
             byte[] bytes = serializeParcelable(intent);
             if (bytes == null || bytes.length == 0)
@@ -134,25 +135,19 @@ public class UnityNotificationUtilities {
 
             // serialize extras
             boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
-            byte[] extras = serializeParcelable(notification.extras);
-            out.writeInt(extras == null ? 0 : extras.length);
-            if (extras != null && extras.length > 0)
-                out.write(extras);
-            else {
-                // parcelling may fail in case it contains binder object, when that happens serialize manually what we care about
-                out.writeInt(notification.extras.getInt(KEY_ID));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
-                serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
-                serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
-                out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
-                out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
-                serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
-                out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
-                out.writeBoolean(showWhen);
-                serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
-                out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
-            }
+
+            out.writeInt(notification.extras.getInt(KEY_ID));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
+            serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
+            serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
+            out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
+            out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
+            serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+            out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
+            out.writeBoolean(showWhen);
+            serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
+            out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
 
             serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
             Integer color = UnityNotificationManager.getNotificationColor(notification);
@@ -175,7 +170,7 @@ public class UnityNotificationUtilities {
         }
     }
 
-    private static void serializeString(DataOutputStream out, String s) throws IOException {
+    static void serializeString(DataOutputStream out, String s) throws IOException {
         if (s == null || s.length() == 0)
             out.writeInt(0);
         else {
@@ -185,7 +180,7 @@ public class UnityNotificationUtilities {
         }
     }
 
-    private static byte[] serializeParcelable(Parcelable obj) {
+    static byte[] serializeParcelable(Parcelable obj) {
         try {
             Parcel p = Parcel.obtain();
             Bundle b = new Bundle();
@@ -228,9 +223,9 @@ public class UnityNotificationUtilities {
         if (notification != null)
             return notification;
         data.reset();
-        Notification.Builder builder = deserializeNotificationCustom(in);
+        Notification.Builder builder = deserializeNotificationCustom(context, in);
         if (builder == null) {
-            builder = deserializedFromOldIntent(bytes);
+            builder = deserializedFromOldIntent(context, bytes);
         }
         return builder;
     }
@@ -271,7 +266,7 @@ public class UnityNotificationUtilities {
         return null;
     }
 
-    private static Notification.Builder deserializeNotificationCustom(DataInputStream in) {
+    private static Notification.Builder deserializeNotificationCustom(Context context, DataInputStream in) {
         try {
             if (!readAndCheckMagicNumber(in, UNITY_MAGIC_NUMBER))
                 return null;
@@ -285,12 +280,12 @@ public class UnityNotificationUtilities {
             long fireTime, repeatInterval;
             boolean usesStopWatch, showWhen, showInForeground = true;
             Bundle extras = null;
-            try {
+            if (version < 2) {
+                // no longer serialized since v2
                 extras = deserializeParcelable(in);
-            } catch (ClassCastException cce) {
-                Log.e(TAG_UNITY, "Unexpect type of deserialized object", cce);
             }
 
+            // before v2 it was extras or variables, since 2 always variables
             if (extras == null) {
                 // extras serialized manually
                 id = in.readInt();
@@ -332,7 +327,7 @@ public class UnityNotificationUtilities {
             String sortKey = deserializeString(in);
             long when = showWhen ? in.readLong() : 0;
 
-            Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
+            Notification.Builder builder = UnityNotificationManager.getNotificationManagerImpl(context).createNotificationBuilder(channelId);
             if (extras != null)
                 builder.setExtras(extras);
             else {
@@ -380,7 +375,7 @@ public class UnityNotificationUtilities {
         return null;
     }
 
-    private static Notification.Builder deserializedFromOldIntent(byte[] bytes) {
+    private static Notification.Builder deserializedFromOldIntent(Context context, byte[] bytes) {
         try {
             Parcel p = Parcel.obtain();
             p.unmarshall(bytes, 0, bytes.length);
@@ -408,7 +403,7 @@ public class UnityNotificationUtilities {
             int groupAlertBehaviour = bundle.getInt("groupAlertBehaviour", -1);
             boolean showTimestamp = bundle.getBoolean("showTimestamp", false);
 
-            Notification.Builder builder = UnityNotificationManager.mUnityNotificationManager.createNotificationBuilder(channelId);
+            Notification.Builder builder = UnityNotificationManager.getNotificationManagerImpl(context).createNotificationBuilder(channelId);
             builder.getExtras().putInt(KEY_ID, id);
             builder.setContentTitle(textTitle);
             builder.setContentText(textContent);
@@ -581,54 +576,5 @@ public class UnityNotificationUtilities {
             builder.getExtras().putString(KEY_INTENT_DATA, intentData);
 
         return builder;
-    }
-
-    // for testing purposes: copy-paste of what serialization was in version 0
-    // except for hardcoded version 0
-    private static boolean serializeNotificationCustom_v0(Notification notification, DataOutputStream out) {
-        try {
-            out.write(UNITY_MAGIC_NUMBER);
-            out.writeInt(0);  // NOTIFICATION_SERIALIZATION_VERSION
-
-            // serialize extras
-            boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
-            byte[] extras = serializeParcelable(notification.extras);
-            out.writeInt(extras == null ? 0 : extras.length);
-            if (extras != null && extras.length > 0)
-                out.write(extras);
-            else {
-                // parcelling may fail in case it contains binder object, when that happens serialize manually what we care about
-                out.writeInt(notification.extras.getInt(KEY_ID));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
-                serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
-                serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
-                serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
-                out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
-                out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
-                serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
-                out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
-                out.writeBoolean(showWhen);
-                serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
-            }
-
-            serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
-            Integer color = UnityNotificationManager.getNotificationColor(notification);
-            out.writeBoolean(color != null);
-            if (color != null)
-                out.writeInt(color);
-            out.writeInt(notification.number);
-            out.writeBoolean(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
-            serializeString(out, notification.getGroup());
-            out.writeBoolean(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));
-            out.writeInt(UnityNotificationManager.getNotificationGroupAlertBehavior(notification));
-            serializeString(out, notification.getSortKey());
-            if (showWhen)
-                out.writeLong(notification.when);
-
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG_UNITY, "Failed to serialize notification", e);
-            return false;
-        }
     }
 }

@@ -114,7 +114,7 @@ namespace Unity.Notifications.Android
             setNotificationGroupAlertBehavior = JniApi.FindMethod(clazz, "setNotificationGroupAlertBehavior", "(Landroid/app/Notification$Builder;I)V", true);
             getNotificationGroupAlertBehavior = JniApi.FindMethod(clazz, "getNotificationGroupAlertBehavior", "(Landroid/app/Notification;)I", true);
             getNotificationChannelId = JniApi.FindMethod(clazz, "getNotificationChannelId", "(Landroid/app/Notification;)Ljava/lang/String;", true);
-            scheduleNotification = JniApi.FindMethod(clazz, "scheduleNotification", "(Landroid/app/Notification$Builder;)I", false);
+            scheduleNotification = JniApi.FindMethod(clazz, "scheduleNotification", "(Landroid/app/Notification$Builder;Z)I", false);
             createNotificationBuilder = JniApi.FindMethod(clazz, "createNotificationBuilder", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
         }
 
@@ -195,9 +195,9 @@ namespace Unity.Notifications.Android
             self.Call("deleteNotificationChannel", channelId);
         }
 
-        public int ScheduleNotification(AndroidJavaObject notificationBuilder)
+        public int ScheduleNotification(AndroidJavaObject notificationBuilder, bool customized)
         {
-            return self.Call<int>(scheduleNotification, notificationBuilder);
+            return self.Call<int>(scheduleNotification, notificationBuilder, customized);
         }
 
         public bool CheckIfPendingNotificationIsRegistered(int id)
@@ -678,11 +678,8 @@ namespace Unity.Notifications.Android
             if (!Initialize())
                 return -1;
 
-            int id;
             using (var builder = CreateNotificationBuilder(notification, channelId))
-                SendNotification(builder, out id);
-
-            return id;
+                return ScheduleNotification(builder, false);
         }
 
         /// <summary>
@@ -696,9 +693,7 @@ namespace Unity.Notifications.Android
         {
             if (Initialize())
                 using (var builder = CreateNotificationBuilder(id, notification, channelId))
-                {
-                    SendNotification(builder);
-                }
+                    ScheduleNotification(builder, false);
         }
 
         /// <summary>
@@ -708,7 +703,7 @@ namespace Unity.Notifications.Android
         public static void SendNotification(AndroidJavaObject notificationBuilder)
         {
             if (Initialize())
-                s_Jni.NotificationManager.ScheduleNotification(notificationBuilder);
+                ScheduleNotification(notificationBuilder, true);
         }
 
         /// <summary>
@@ -720,7 +715,12 @@ namespace Unity.Notifications.Android
         {
             id = -1;
             if (Initialize())
-                id = s_Jni.NotificationManager.ScheduleNotification(notificationBuilder);
+                id = ScheduleNotification(notificationBuilder, true);
+        }
+
+        static int ScheduleNotification(AndroidJavaObject notificationBuilder, bool customized)
+        {
+            return s_Jni.NotificationManager.ScheduleNotification(notificationBuilder, customized);
         }
 
         /// <summary>

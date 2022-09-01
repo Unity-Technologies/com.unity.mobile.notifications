@@ -3,10 +3,42 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Unity.Notifications.Android;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 class AndroidNotificationSimpleTests
+    : IPrebuildSetup, IPostBuildCleanup
 {
     const string kChannelId = "SerializeDeserializeNotificationChannel";
+
+#if UNITY_EDITOR
+    PluginImporter GetTestUtils()
+    {
+        var assets = AssetDatabase.FindAssets("UnityNotificationTestUtils");
+        if (assets.Length != 1)
+            throw new Exception("UnityNotificationTestUtils.java not found");
+        return (PluginImporter)AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(assets[0]));
+    }
+#endif
+
+    public void Setup()
+    {
+#if UNITY_EDITOR
+        var testUtils = GetTestUtils();
+        testUtils.SetCompatibleWithPlatform(BuildTarget.Android, true);
+        testUtils.SaveAndReimport();
+#endif
+    }
+
+    public void Cleanup()
+    {
+#if UNITY_EDITOR
+        var testUtils = GetTestUtils();
+        testUtils.SetCompatibleWithPlatform(BuildTarget.Android, false);
+        testUtils.SaveAndReimport();
+#endif
+    }
 
     [OneTimeSetUp]
     public void BeforeAllTests()
@@ -168,10 +200,10 @@ class AndroidNotificationSimpleTests
 
     AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder)
     {
-        return SerializeDeserializeNotification(builder, "serializeNotificationCustom");
+        return SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom(u, s, j));
     }
 
-    AndroidNotificationIntentData SerializeDeserializeNotification(AndroidJavaObject builder, string serializeMethod)
+    AndroidNotificationIntentData SerializeDeserializeNotificationWithFunc(AndroidJavaObject builder, Func<AndroidJavaClass, AndroidJavaObject, AndroidJavaObject, bool> serialize)
     {
         var javaNotif = builder.Call<AndroidJavaObject>("build");
         var utilsClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
@@ -179,7 +211,7 @@ class AndroidNotificationSimpleTests
         using (var byteStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
         {
             var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream);
-            var didSerialize = utilsClass.CallStatic<bool>(serializeMethod, javaNotif, dataStream);
+            var didSerialize = serialize(utilsClass, dataStream, javaNotif);
             Assert.IsTrue(didSerialize);
             dataStream.Call("close");
             serializedBytes = byteStream.Call<AndroidJavaObject>("toByteArray");
@@ -189,14 +221,50 @@ class AndroidNotificationSimpleTests
         using (var byteStream = new AndroidJavaObject("java.io.ByteArrayInputStream", serializedBytes))
         {
             var dataStream = new AndroidJavaObject("java.io.DataInputStream", byteStream);
+            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
             // don't dispose notification, it is kept in AndroidNotificationIntentData
-            using (var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", dataStream))
+            using (var deserializedNotificationBuilder = utilsClass.CallStatic<AndroidJavaObject>("deserializeNotificationCustom", activity, dataStream))
             {
                 Assert.IsNotNull(deserializedNotificationBuilder);
                 var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");
                 Assert.IsNotNull(deserializedNotification);
                 return AndroidNotificationCenter.GetNotificationData(deserializedNotification);
             }
+        }
+    }
+
+    static bool SerializeNotificationCustom(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        using (var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream))
+        {
+            var didSerialize = utilsClass.CallStatic<bool>("serializeNotificationCustom", javaNotif, dataStream);
+            dataStream.Call("close");
+            return didSerialize;
+        }
+    }
+
+    static bool SerializeNotificationCustom_v0(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        return SerializeNotificationCustom_old("serializeNotificationCustom_v0", byteStream, javaNotif);
+    }
+
+    static bool SerializeNotificationCustom_v1(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        return SerializeNotificationCustom_old("serializeNotificationCustom_v1", byteStream, javaNotif);
+    }
+
+    static bool SerializeNotificationCustom_old(string method, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        using (var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream))
+        {
+            bool didSerialize;
+            using (var testUtils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationTestUtils"))
+            {
+                didSerialize = testUtils.CallStatic<bool>(method, javaNotif, dataStream);
+            }
+            dataStream.Call("close");
+            return didSerialize;
         }
     }
 
@@ -237,30 +305,6 @@ class AndroidNotificationSimpleTests
         Assert.AreEqual(notificationId, deserializedData.Id);
         Assert.AreEqual(kChannelId, deserializedData.Channel);
         CheckNotificationsMatch(original, deserializedData.Notification);
-    }
-
-    [Test]
-    [UnityPlatform(RuntimePlatform.Android)]
-    public void BasicSerializeDeserializeNotification_CanPutSimpleExtras()
-    {
-        const int notificationId = 125;
-
-        var original = new AndroidNotification();
-        original.FireTime = DateTime.Now;
-
-        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
-        var extras = builder.Call<AndroidJavaObject>("getExtras");
-        extras.Call("putInt", "testInt", 5);
-        extras.Call("putBoolean", "testBool", true);
-        extras.Call("putString", "testString", "the_test");
-
-        var deserializedData = SerializeDeserializeNotification(builder);
-
-        var deserializedExtras = deserializedData.NativeNotification.Get<AndroidJavaObject>("extras");
-        Assert.IsNotNull(deserializedExtras);
-        Assert.AreEqual(5, deserializedExtras.Call<int>("getInt", "testInt"));
-        Assert.AreEqual(true, deserializedExtras.Call<bool>("getBoolean", "testBool"));
-        Assert.AreEqual("the_test", deserializedExtras.Call<string>("getString", "testString"));
     }
 
     AndroidJavaObject CreateBitmap()
@@ -497,19 +541,38 @@ class AndroidNotificationSimpleTests
         original.FireTime = DateTime.Now;
         original.LargeIcon = "large_icon";
 
-        var deserializedData = SerializeDeserializeNotification(original, notificationId, (prefs) =>
+        AndroidJavaObject context, prefs;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
         {
-            var data = prefs.Call<string>("getString", "data", "");
-            // corrupt data
-            using (var editor = prefs.Call<AndroidJavaObject>("edit"))
-            {
-                editor.Call<AndroidJavaObject>("putString", "data", "jfkasjflksdjflkasdjflkjdsafkjsadfl").Dispose();
-                editor.Call("apply");
-            }
+            var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            context = activity.Call<AndroidJavaObject>("getApplicationContext");
+            var javaNotif = builder.Call<AndroidJavaObject>("build");
+            var testUtils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationTestUtils");
 
-            var data2 = prefs.Call<string>("getString", "data", "");
-            Assert.AreNotEqual(data, data2);
-        });
+            prefs = context.Call<AndroidJavaObject>("getSharedPreferences", "android.notification.test.key", 0 /* MODE_PRIVATE */);
+            testUtils.CallStatic("serializeNotification", prefs, javaNotif);
+        }
+
+        var data = prefs.Call<string>("getString", "data", "");
+        // corrupt data
+        using (var editor = prefs.Call<AndroidJavaObject>("edit"))
+        {
+            editor.Call<AndroidJavaObject>("putString", "data", "jfkasjflksdjflkasdjflkjdsafkjsadfl").Dispose();
+            editor.Call("apply");
+        }
+
+        var data2 = prefs.Call<string>("getString", "data", "");
+        Assert.AreNotEqual(data, data2);
+
+        var utils = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationUtilities");
+        var deserializedNotificationBuilder = utils.CallStatic<AndroidJavaObject>("deserializeNotification", context, prefs);
+        // don't dispose notification, it is kept in AndroidNotificationIntentData
+        Assert.IsNotNull(deserializedNotificationBuilder);
+        var deserializedNotification = deserializedNotificationBuilder.Call<AndroidJavaObject>("build");
+        Assert.IsNotNull(deserializedNotification);
+        var deserializedData = AndroidNotificationCenter.GetNotificationData(deserializedNotification);
 
         Assert.AreEqual(original.Title, deserializedData.Notification.Title);
         Assert.AreEqual(original.Text, deserializedData.Notification.Text);
@@ -535,11 +598,36 @@ class AndroidNotificationSimpleTests
             extras.Call("putParcelable", "binder_item", bitmap);
 
             // Serialize like we did in version 0
-            deserialized = SerializeDeserializeNotification(builder, "serializeNotificationCustom_v0");
+            deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v0(u, s, j));
         }
 
         Assert.IsNotNull(deserialized);
         original.ShowInForeground = true;  // v0 did not have this, so should default to true
+        CheckNotificationsMatch(original, deserialized.Notification);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CanDeserializeCustomSerializedNotification_v1()
+    {
+        const int notificationId = 255;
+
+        var original = CreateNotificationWithAllParameters();
+
+        AndroidNotificationIntentData deserialized;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            // put something to extrax to force completely custom serialization of them
+            var bitmap = CreateBitmap();
+            Assert.IsNotNull(bitmap);
+            var extras = builder.Call<AndroidJavaObject>("getExtras");
+            extras.Call("putParcelable", "binder_item", bitmap);
+
+            // Serialize like we did in version 0
+            deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v1(u, s, j));
+        }
+
+        Assert.IsNotNull(deserialized);
         CheckNotificationsMatch(original, deserialized.Notification);
     }
 }

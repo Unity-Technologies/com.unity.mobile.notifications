@@ -308,7 +308,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return id;
     }
 
-    public int scheduleNotification(Notification.Builder notificationBuilder) {
+    public int scheduleNotification(Notification.Builder notificationBuilder, boolean customized) {
         Bundle extras = notificationBuilder.getExtras();
         int id;
         if (extras.containsKey(KEY_ID))
@@ -319,11 +319,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         boolean addedNew = mScheduledNotifications.putIfAbsent(id, notificationBuilder) == null;
-        mBackgroundThread.enqueueNotification(id, notificationBuilder, addedNew);
+        mBackgroundThread.enqueueNotification(id, notificationBuilder, customized, addedNew);
         return id;
     }
 
-    void performNotificationScheduling(int id, Notification.Builder notificationBuilder) {
+    void performNotificationScheduling(int id, Notification.Builder notificationBuilder, boolean customized) {
         Bundle extras = notificationBuilder.getExtras();
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
@@ -339,7 +339,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Intent intent = buildNotificationIntent();
 
             if (intent != null) {
-                saveNotification(notificationBuilder.build());
+                saveNotification(notificationBuilder.build(), customized);
                 scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
             }
         }
@@ -467,10 +467,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
-    synchronized void saveNotification(Notification notification) {
+    synchronized void saveNotification(Notification notification, boolean customized) {
         String notification_id = Integer.toString(notification.extras.getInt(KEY_ID, -1));
         SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
-        UnityNotificationUtilities.serializeNotification(prefs, notification);
+        UnityNotificationUtilities.serializeNotification(prefs, notification, customized);
     }
 
     static String getSharedPrefsNameByNotificationId(String id) {
