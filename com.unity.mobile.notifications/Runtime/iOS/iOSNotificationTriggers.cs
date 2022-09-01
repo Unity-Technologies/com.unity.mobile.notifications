@@ -62,6 +62,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The center point of the geographic area.
         /// </summary>
+        [Obsolete("Use Latitude and Longitude", false)]
         public Vector2 Center
         {
             get
