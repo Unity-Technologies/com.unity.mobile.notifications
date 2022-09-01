@@ -321,10 +321,12 @@ namespace Unity.Notifications.Tests.Sample
                             Data = template.Data,
                             Trigger = new iOSNotificationLocationTrigger()
                             {
-                                Center = new Vector2(template.CenterX, template.CenterY),
+                                Latitude = template.Latitude,
+                                Longitude = template.Longitude,
                                 Radius = template.Radius,
                                 NotifyOnEntry = template.NotifyOnEntry,
-                                NotifyOnExit = template.NotifyOnExit
+                                NotifyOnExit = template.NotifyOnExit,
+                                Repeats = template.Repeats,
                             }
                         }
                     );
