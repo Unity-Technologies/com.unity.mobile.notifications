@@ -62,7 +62,28 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The center point of the geographic area.
         /// </summary>
-        public Vector2 Center { get; set; }
+        public Vector2 Center
+        {
+            get
+            {
+                return new Vector2((float)Latitude, (float)Longitude);
+            }
+            set
+            {
+                Latitude = value.x;
+                Longitude = value.y;
+            }
+        }
+
+        /// <summary>
+        /// The latitude of the center point of the geographic area.
+        /// </summary>
+        public double Latitude { get; set; }
+
+        /// <summary>
+        /// The longitude of the center point of the geographic area.
+        /// </summary>
+        public double Longitude { get; set; }
 
         /// <summary>
         /// The radius (measured in meters) that defines the geographic area’s outer boundary.
