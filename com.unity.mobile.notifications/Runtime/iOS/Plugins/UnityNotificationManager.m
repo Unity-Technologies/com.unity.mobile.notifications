@@ -335,7 +335,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     else if (data->triggerType == LOCATION_TRIGGER)
     {
 #if UNITY_USES_LOCATION
-        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->trigger.location.centerX, data->trigger.location.centerY);
+        CLLocationCoordinate2D center = CLLocationCoordinate2DMake(data->trigger.location.latitude, data->trigger.location.longitude);
 
         CLCircularRegion* region = [[CLCircularRegion alloc] initWithCenter: center
                                     radius: data->trigger.location.radius identifier: identifier];

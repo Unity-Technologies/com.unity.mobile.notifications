@@ -64,8 +64,8 @@ typedef struct iOSNotificationData
 
         struct
         {
-            float centerX;
-            float centerY;
+            double latitude;
+            double longitude;
             float radius;
             unsigned char notifyOnEntry;
             unsigned char notifyOnExit;
