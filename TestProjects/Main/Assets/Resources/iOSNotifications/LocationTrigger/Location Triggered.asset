@@ -13,18 +13,19 @@ MonoBehaviour:
   m_Name: Location Triggered
   m_EditorClassIdentifier: 
   ButtonName: Send A Notification (Location Trigger)
-  Identifier: 
+  Identifier: loc_not
   CategoryIdentifier: category_indentifier
   ThreadIdentifier: thread_identifier
   Title: Location Notification Title
   Subtitle: This is a subtitle
   Body: And this is the body of this notification
-  ShowInForeground: 0
+  ShowInForeground: 1
   PresentationOptions: 6
   Badge: -1
   Data: This notification also includes some data
-  CenterX: 22.2847
-  CenterY: 114.1582
+  Latitude: 22.2847
+  Longitude: 114.1582
   Radius: 5000
   NotifyOnEntry: 1
   NotifyOnExit: 1
+  Repeats: 1
