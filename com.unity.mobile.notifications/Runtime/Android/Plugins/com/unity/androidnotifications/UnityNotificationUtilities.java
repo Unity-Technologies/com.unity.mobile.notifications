@@ -327,7 +327,7 @@ class UnityNotificationUtilities {
             String sortKey = deserializeString(in);
             long when = showWhen ? in.readLong() : 0;
 
-            Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelId);
+            Notification.Builder builder = UnityNotificationManager.getNotificationManagerImpl(context).createNotificationBuilder(channelId);
             if (extras != null)
                 builder.setExtras(extras);
             else {
@@ -403,7 +403,7 @@ class UnityNotificationUtilities {
             int groupAlertBehaviour = bundle.getInt("groupAlertBehaviour", -1);
             boolean showTimestamp = bundle.getBoolean("showTimestamp", false);
 
-            Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelId);
+            Notification.Builder builder = UnityNotificationManager.getNotificationManagerImpl(context).createNotificationBuilder(channelId);
             builder.getExtras().putInt(KEY_ID, id);
             builder.setContentTitle(textTitle);
             builder.setContentText(textContent);
