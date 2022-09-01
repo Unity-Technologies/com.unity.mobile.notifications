@@ -32,6 +32,34 @@ namespace Unity.Notifications.iOS
         Alert = 1 << 2,
     }
 
+    /// <summary>
+    /// The type of sound to use for the notification.
+    /// See Apple documentation for details.
+    /// </summary>
+    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc"/>
+    public enum NotificationSoundType
+    {
+        /// <summary>
+        /// Play the default sound.
+        /// </summary>
+        Default = 0,
+
+        /// <summary>
+        /// Critical sound (bypass Do Not Disturb)
+        /// </summary>
+        Critical = 1,
+
+        /// <summary>
+        /// Ringtone sound.
+        /// </summary>
+        Ringtone = 2,
+
+        /// <summary>
+        /// No sound.
+        /// </summary>
+        None = 4,
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct TimeTriggerData
     {
@@ -82,6 +110,9 @@ namespace Unity.Notifications.iOS
         public string subtitle;
         public string categoryIdentifier;
         public string threadIdentifier;
+        public Int32 soundType;
+        public float soundVolume;
+        public string soundName;
 
         public IntPtr userInfo;
         public IntPtr attachments;
@@ -212,6 +243,32 @@ namespace Unity.Notifications.iOS
             get { return data.badge; }
             set { data.badge = value; }
         }
+
+        /// <summary>
+        /// The type of sound to be played.
+        /// </summary>
+        public NotificationSoundType SoundType
+        {
+            get { return (NotificationSoundType)data.soundType; }
+            set { data.soundType = (int)value; }
+        }
+
+        /// <summary>
+        /// The name of the sound to be played. Use null for system default sound.
+        /// See Apple documentation for named sounds and sound file placement.
+        /// </summary>
+        public string SoundName
+        {
+            get { return data.soundName; }
+            set { data.soundName = value; }
+        }
+
+        /// <summary>
+        /// The volume for the sound. Use null to use the default volume.
+        /// See Apple documentation for supported values.
+        /// </summary>
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc"/>
+        public float? SoundVolume { get; set; }
 
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
@@ -400,6 +457,11 @@ namespace Unity.Notifications.iOS
         {
             if (data.identifier == null)
                 data.identifier = GenerateUniqueID();
+            if (SoundVolume.HasValue)
+                data.soundVolume = SoundVolume.Value;
+            else
+                data.soundVolume = -1.0f;
+
             iOSNotificationWithUserInfo ret;
             ret.data = data;
             ret.userInfo = userInfo;

@@ -19,7 +19,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.BadParcelableException;
 import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -41,48 +40,49 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.unity3d.player.UnityPlayer;
 
 public class UnityNotificationManager extends BroadcastReceiver {
-    protected static NotificationCallback mNotificationCallback;
-    protected static UnityNotificationManager mUnityNotificationManager;
-    private static ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications = new ConcurrentHashMap();
-    private static HashSet<Integer> mVisibleNotifications = new HashSet<>();
+    static UnityNotificationManager mUnityNotificationManager;
 
-    public Context mContext = null;
-    protected Activity mActivity = null;
-    protected Class mOpenActivity = null;
-    protected UnityNotificationBackgroundThread mBackgroundThread;
-    protected Random mRandom;
+    private Context mContext = null;
+    private Activity mActivity = null;
+    private Class mOpenActivity = null;
+    private UnityNotificationBackgroundThread mBackgroundThread;
+    private Random mRandom;
+    private HashSet<Integer> mVisibleNotifications;
+    private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
+    private NotificationCallback mNotificationCallback;
 
-    protected static final String TAG_UNITY = "UnityNotifications";
+    static final String TAG_UNITY = "UnityNotifications";
 
-    protected static final String KEY_FIRE_TIME = "fireTime";
-    protected static final String KEY_ID = "id";
-    protected static final String KEY_INTENT_DATA = "data";
-    protected static final String KEY_LARGE_ICON = "largeIcon";
-    protected static final String KEY_REPEAT_INTERVAL = "repeatInterval";
-    protected static final String KEY_NOTIFICATION = "unityNotification";
-    protected static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
-    protected static final String KEY_SMALL_ICON = "smallIcon";
-    protected static final String KEY_CHANNEL_ID = "channelID";
-    protected static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
-    protected static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
+    static final String KEY_FIRE_TIME = "fireTime";
+    static final String KEY_ID = "id";
+    static final String KEY_INTENT_DATA = "data";
+    static final String KEY_LARGE_ICON = "largeIcon";
+    static final String KEY_REPEAT_INTERVAL = "repeatInterval";
+    static final String KEY_NOTIFICATION = "unityNotification";
+    static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
+    static final String KEY_SMALL_ICON = "smallIcon";
+    static final String KEY_CHANNEL_ID = "channelID";
+    static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
+    static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
 
-    protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
-    protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
-    protected static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
-    protected static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
+    static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
+    static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
+    static final String NOTIFICATION_IDS_SHARED_PREFS = "UNITY_STORED_NOTIFICATION_IDS";
+    static final String NOTIFICATION_IDS_SHARED_PREFS_KEY = "UNITY_NOTIFICATION_IDS";
 
-    // Constructor with zero parameter is necessary for system to call onReceive() callback.
-    public UnityNotificationManager() {
-        super();
-    }
-
-    // Called from Unity managed code to do initialization.
-    public UnityNotificationManager(Context context, Activity activity) {
-        super();
-        mContext = context;
+    private void initialize(Activity activity, NotificationCallback notificationCallback) {
+        // always assign these, as callback here is always new, activity and context might be
+        mContext = activity.getApplicationContext();
         mActivity = activity;
-        mBackgroundThread = new UnityNotificationBackgroundThread(context, mScheduledNotifications);
-        mRandom = new Random();
+        mNotificationCallback = notificationCallback;
+        if (mScheduledNotifications == null)
+            mScheduledNotifications = new ConcurrentHashMap();
+        if (mBackgroundThread == null)
+            mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
+        if (mRandom == null)
+            mRandom = new Random();
+        if (mVisibleNotifications == null)
+            mVisibleNotifications = new HashSet<>();
 
         try {
             ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
@@ -91,15 +91,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Boolean rescheduleOnRestart = bundle.getBoolean("reschedule_notifications_on_restart");
 
             if (rescheduleOnRestart) {
-                ComponentName receiver = new ComponentName(context, UnityNotificationRestartOnBootReceiver.class);
-                PackageManager pm = context.getPackageManager();
+                ComponentName receiver = new ComponentName(mContext, UnityNotificationRestartOnBootReceiver.class);
+                PackageManager pm = mContext.getPackageManager();
 
                 pm.setComponentEnabledSetting(receiver,
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP);
             }
 
-            mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(context, false);
+            mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, false);
             if (mOpenActivity == null)
                 mOpenActivity = activity.getClass();
         } catch (PackageManager.NameNotFoundException e) {
@@ -111,30 +111,30 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mBackgroundThread.start();
     }
 
-    public static UnityNotificationManager getNotificationManagerImpl(Context context) {
-        return getNotificationManagerImpl(context, (Activity) context);
+    static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
+        if (mUnityNotificationManager == null) {
+            mUnityNotificationManager = new UnityNotificationManager();
+            mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
+            mUnityNotificationManager.mScheduledNotifications = new ConcurrentHashMap();
+        }
+
+        // always assign context, as it might change
+        mUnityNotificationManager.mContext = context.getApplicationContext();
+        return mUnityNotificationManager;
     }
 
     // Called from managed code.
-    public static UnityNotificationManager getNotificationManagerImpl(Context context, Activity activity) {
-        if (mUnityNotificationManager == null)
-            mUnityNotificationManager = new UnityNotificationManager(context, activity);
+    public static synchronized UnityNotificationManager getNotificationManagerImpl(Activity activity, NotificationCallback notificationCallback) {
+        if (mUnityNotificationManager == null) {
+            mUnityNotificationManager = new UnityNotificationManager();
+        }
 
+        mUnityNotificationManager.initialize(activity, notificationCallback);
         return mUnityNotificationManager;
     }
 
     public NotificationManager getNotificationManager() {
-        return getNotificationManager(mContext);
-    }
-
-    // Get system notification service.
-    public static NotificationManager getNotificationManager(Context context) {
-        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    // Called from managed code.
-    public void setNotificationCallback(NotificationCallback notificationCallback) {
-        UnityNotificationManager.mNotificationCallback = notificationCallback;
+        return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public void registerNotificationChannel(
@@ -187,20 +187,20 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
-    protected static String getSharedPrefsNameByChannelId(String id)
+    private static String getSharedPrefsNameByChannelId(String id)
     {
         return String.format("unity_notification_channel_%s", id);
     }
 
-    private static NotificationChannelWrapper getNotificationChannel(Context context, String id) {
+    public NotificationChannelWrapper getNotificationChannel(String id) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel ch = getNotificationManager(context).getNotificationChannel(id);
+            NotificationChannel ch = getNotificationManagerImpl(mContext).getNotificationManager().getNotificationChannel(id);
             if (ch == null)
                 return null;
             return notificationChannelToWrapper(ch);
         }
 
-        SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByChannelId(id), Context.MODE_PRIVATE);
         NotificationChannelWrapper channel = new NotificationChannelWrapper();
 
         channel.id = id;
@@ -248,10 +248,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
 
         return wrapper;
-    }
-
-    public NotificationChannelWrapper getNotificationChannel(String id) {
-        return UnityNotificationManager.getNotificationChannel(mContext, id);
     }
 
     public void deleteNotificationChannel(String id) {
@@ -327,7 +323,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return id;
     }
 
-    protected void performNotificationScheduling(int id, Notification.Builder notificationBuilder, boolean customized) {
+    void performNotificationScheduling(int id, Notification.Builder notificationBuilder, boolean customized) {
         Bundle extras = notificationBuilder.getExtras();
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
         long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
@@ -340,25 +336,21 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 fireTime += repeatInterval;
             }
 
-            Intent intent = buildNotificationIntent(mContext);
+            Intent intent = buildNotificationIntent();
 
             if (intent != null) {
-                saveNotification(mContext, notificationBuilder.build(), customized);
+                saveNotification(notificationBuilder.build(), customized);
                 scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
             }
         }
 
         if (fireNow) {
-            Notification notification = buildNotificationForSending(mContext, mOpenActivity, notificationBuilder);
-            notify(mContext, id, notification);
+            Notification notification = buildNotificationForSending(mOpenActivity, notificationBuilder);
+            notify(id, notification);
         }
     }
 
     void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Intent intent, long fireTime) {
-        scheduleAlarmWithNotification(mContext, mOpenActivity, notificationBuilder, intent, fireTime);
-    }
-
-    static void scheduleAlarmWithNotification(Context context, Class activityClass, Notification.Builder notificationBuilder, Intent intent, long fireTime) {
         Bundle extras = notificationBuilder.getExtras();
         int id = extras.getInt(KEY_ID, -1);
         long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
@@ -368,91 +360,73 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
-        PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        UnityNotificationManager.scheduleNotificationIntentAlarm(context, repeatInterval, fireTime, broadcast);
+        PendingIntent broadcast = getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        scheduleNotificationIntentAlarm(repeatInterval, fireTime, broadcast);
     }
 
-    static void scheduleAlarmWithNotification(Notification.Builder notificationBuilder, Context context) {
+    void scheduleAlarmWithNotification(Notification.Builder notificationBuilder) {
         long fireTime = notificationBuilder.getExtras().getLong(KEY_FIRE_TIME, 0L);
-        Intent intent = buildNotificationIntent(context);
-
-        Class openActivity;
-        if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
-            openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
-        }
-        else {
-            openActivity = mUnityNotificationManager.mOpenActivity;
-        }
-
-        scheduleAlarmWithNotification(context, openActivity, notificationBuilder, intent, fireTime);
+        Intent intent = buildNotificationIntent();
+        scheduleAlarmWithNotification(notificationBuilder, intent, fireTime);
     }
 
-    protected static Notification buildNotificationForSending(Context context, Class openActivity, Notification.Builder builder) {
+    private Notification buildNotificationForSending(Class openActivity, Notification.Builder builder) {
         int id = builder.getExtras().getInt(KEY_ID, -1);
-        Intent openAppIntent = buildOpenAppIntent(context, openActivity);
+        Intent openAppIntent = new Intent(mContext, openActivity);
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         openAppIntent.putExtra(KEY_NOTIFICATION_ID, id);
-        PendingIntent pendingIntent = getActivityPendingIntent(context, id, openAppIntent, 0);
+        PendingIntent pendingIntent = getActivityPendingIntent(id, openAppIntent, 0);
         builder.setContentIntent(pendingIntent);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             // Can't check StatusBar notifications pre-M, so ask to be notified when dismissed
-            Intent deleteIntent = new Intent(context, UnityNotificationManager.class);
+            Intent deleteIntent = new Intent(mContext, UnityNotificationManager.class);
             deleteIntent.setAction(KEY_NOTIFICATION_DISMISSED); // need action to distinguish intent from content one
             deleteIntent.putExtra(KEY_NOTIFICATION_DISMISSED, id);
-            PendingIntent deletePending = getBroadcastPendingIntent(context, id, deleteIntent, 0);
+            PendingIntent deletePending = getBroadcastPendingIntent(id, deleteIntent, 0);
             builder.setDeleteIntent(deletePending);
         }
 
-        finalizeNotificationForDisplay(context, builder);
+        finalizeNotificationForDisplay(builder);
         return builder.build();
     }
 
-    // Build an Intent to open the given activity with the data from input Intent.
-    protected static Intent buildOpenAppIntent(Context context, Class className) {
-        Intent openAppIntent = new Intent(context, className);
-        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        return openAppIntent;
-    }
-
-    protected static void performNotificationHousekeeping(Context context, Set<String> ids) {
+    void performNotificationHousekeeping(Set<String> ids) {
         Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
 
-        Set<String> invalid = findInvalidNotificationIds(context, ids);
-        synchronized (UnityNotificationManager.class) {
-            Set<String> currentIds = new HashSet<>(ids);
-            for (String id : invalid) {
-                currentIds.remove(id);
-                mScheduledNotifications.remove(id);
-            }
+        Set<String> invalid = findInvalidNotificationIds(ids);
+        Set<String> currentIds = new HashSet<>(ids);
+        for (String id : invalid) {
+            currentIds.remove(id);
+            mScheduledNotifications.remove(id);
         }
 
         // in case we have saved intents, clear them
         for (String id : invalid)
-            deleteExpiredNotificationIntent(context, id);
+            deleteExpiredNotificationIntent(id);
     }
 
-    private static Set<String> findInvalidNotificationIds(Context context, Set<String> ids) {
-        Intent intent = buildNotificationIntent(context);
+    private Set<String> findInvalidNotificationIds(Set<String> ids) {
+        Intent intent = buildNotificationIntent();
         HashSet<String> invalid = new HashSet<String>();
         for (String id : ids) {
             // Get the given broadcast PendingIntent by id as request code.
             // FLAG_NO_CREATE is set to return null if the described PendingIntent doesn't exist.
-            PendingIntent broadcast = getBroadcastPendingIntent(context, Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
+            PendingIntent broadcast = getBroadcastPendingIntent(Integer.valueOf(id), intent, PendingIntent.FLAG_NO_CREATE);
             if (broadcast == null) {
                 invalid.add(id);
             }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            StatusBarNotification[] active = getNotificationManager(context).getActiveNotifications();
+            StatusBarNotification[] active = getNotificationManager().getActiveNotifications();
             for (StatusBarNotification notification : active) {
                 // any notifications in status bar are still valid
                 String id = String.valueOf(notification.getId());
                 invalid.remove(id);
             }
         }
-        else synchronized (UnityNotificationManager.class) {
+        else synchronized (this) {
             for (Integer visibleId : mVisibleNotifications) {
                 String id = String.valueOf(visibleId);
                 invalid.remove(id);
@@ -471,55 +445,54 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return invalid;
     }
 
-    protected static Intent buildNotificationIntent(Context context) {
-        Intent intent = new Intent(context, UnityNotificationManager.class);
+    private Intent buildNotificationIntent() {
+        Intent intent = new Intent(mContext, UnityNotificationManager.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
     }
 
-    public static PendingIntent getActivityPendingIntent(Context context, int id, Intent intent, int flags) {
+    private PendingIntent getActivityPendingIntent(int id, Intent intent, int flags) {
         if (Build.VERSION.SDK_INT >= 23)
-            return PendingIntent.getActivity(context, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
+            return PendingIntent.getActivity(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
         else
-            return PendingIntent.getActivity(context, id, intent, flags);
+            return PendingIntent.getActivity(mContext, id, intent, flags);
     }
 
-    public static PendingIntent getBroadcastPendingIntent(Context context, int id, Intent intent, int flags) {
+    private PendingIntent getBroadcastPendingIntent(int id, Intent intent, int flags) {
         if (Build.VERSION.SDK_INT >= 23)
-            return PendingIntent.getBroadcast(context, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
+            return PendingIntent.getBroadcast(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
         else
-            return PendingIntent.getBroadcast(context, id, intent, flags);
+            return PendingIntent.getBroadcast(mContext, id, intent, flags);
     }
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
     // which will be consumed by UnityNotificationRestartOnBootReceiver for device reboot.
-    protected static synchronized void saveNotification(Context context, Notification notification, boolean customized) {
+    synchronized void saveNotification(Notification notification, boolean customized) {
         String notification_id = Integer.toString(notification.extras.getInt(KEY_ID, -1));
-        SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
+        SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(notification_id), Context.MODE_PRIVATE);
         UnityNotificationUtilities.serializeNotification(prefs, notification, customized);
     }
 
-    protected static String getSharedPrefsNameByNotificationId(String id)
-    {
+    static String getSharedPrefsNameByNotificationId(String id) {
         return String.format("u_notification_data_%s", id);
     }
 
     // Load all the notification intents from SharedPreferences.
-    protected static synchronized List<Notification.Builder> loadSavedNotifications(Context context) {
-        Set<String> ids = getScheduledNotificationIDs(context);
+    synchronized List<Notification.Builder> loadSavedNotifications() {
+        Set<String> ids = getScheduledNotificationIDs();
 
         List<Notification.Builder> intent_data_list = new ArrayList();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
         for (String id : ids) {
-            SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+            SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
             Notification.Builder builder = null;
-            Object notification = UnityNotificationUtilities.deserializeNotification(context, prefs);
+            Object notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
             if (notification != null) {
                 if (notification instanceof Notification.Builder)
                     builder = (Notification.Builder)notification;
                 else
-                    builder = UnityNotificationUtilities.recoverBuilder(context, (Notification)notification);
+                    builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
             }
 
             if (builder != null)
@@ -532,9 +505,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
             ids = new HashSet<>(ids);
             for (String id : idsMarkedForRemoval) {
                 ids.remove(id);
-                deleteExpiredNotificationIntent(context, id);
+                deleteExpiredNotificationIntent(id);
             }
-            saveScheduledNotificationIDs(context, ids);
+            saveScheduledNotificationIDs(ids);
         }
 
         return intent_data_list;
@@ -552,8 +525,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Call AlarmManager to set the broadcast intent with fire time and interval.
-    protected static void scheduleNotificationIntentAlarm(Context context, long repeatInterval, long fireTime, PendingIntent broadcast) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    private void scheduleNotificationIntentAlarm(long repeatInterval, long fireTime, PendingIntent broadcast) {
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
         if (repeatInterval <= 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && canScheduleExactAlarms(alarmManager)) {
@@ -573,7 +546,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 if (id == n.getId())
                     return 2;
             }
-        } else synchronized (UnityNotificationManager.class) {
+        } else synchronized (this) {
             for (Integer notificationId : mVisibleNotifications) {
                 if (notificationId.intValue() == id)
                     return 2;
@@ -591,7 +564,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     // Check if the pending notification with the given id has been registered.
     public boolean checkIfPendingNotificationIsRegistered(int id) {
         Intent intent = new Intent(mActivity, UnityNotificationManager.class);
-        return (getBroadcastPendingIntent(mContext, id, intent, PendingIntent.FLAG_NO_CREATE) != null);
+        return (getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_NO_CREATE) != null);
     }
 
     // Cancel all the pending notifications.
@@ -599,14 +572,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mBackgroundThread.enqueueCancelAllNotifications();
     }
 
-    protected static synchronized Set<String> getScheduledNotificationIDs(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
+    private synchronized Set<String> getScheduledNotificationIDs() {
+        SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE);
         Set<String> ids = prefs.getStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, new HashSet<String>());
         return ids;
     }
 
-    protected static synchronized void saveScheduledNotificationIDs(Context context, Set<String> ids) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
+    synchronized void saveScheduledNotificationIDs(Set<String> ids) {
+        SharedPreferences.Editor editor = mContext.getSharedPreferences(NOTIFICATION_IDS_SHARED_PREFS, Context.MODE_PRIVATE).edit().clear();
         editor.putStringSet(NOTIFICATION_IDS_SHARED_PREFS_KEY, ids);
         editor.apply();
     }
@@ -617,22 +590,20 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     // Cancel a pending notification by id.
-    protected static void cancelPendingNotificationIntent(Context context, int id) {
-        Intent intent = new Intent(context, UnityNotificationManager.class);
-        PendingIntent broadcast = getBroadcastPendingIntent(context, id, intent, PendingIntent.FLAG_NO_CREATE);
+    void cancelPendingNotificationIntent(int id) {
+        Intent intent = new Intent(mContext, UnityNotificationManager.class);
+        PendingIntent broadcast = getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_NO_CREATE);
 
         if (broadcast != null) {
-            if (context != null) {
-                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                alarmManager.cancel(broadcast);
-            }
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(broadcast);
             broadcast.cancel();
         }
     }
 
     // Delete the notification intent from SharedPreferences by id.
-    protected static synchronized void deleteExpiredNotificationIntent(Context context, String id) {
-        SharedPreferences notificationPrefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
+    synchronized void deleteExpiredNotificationIntent(String id) {
+        SharedPreferences notificationPrefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(id), Context.MODE_PRIVATE);
         notificationPrefs.edit().clear().apply();
     }
 
@@ -648,59 +619,62 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
-                    int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
-                    if (removedId > 0) synchronized (UnityNotificationManager.class) {
-                        mVisibleNotifications.remove(removedId);
-                    }
+        // This method is called on OS created instance and that instance is recreated during various times
+        // for example sending app to background will cause new instance to be created when alarm fires
+        // since we also create one instance for our uses, always forward to that instance (creating if necessary)
+        getNotificationManagerImpl(context).onReceive(intent);
+    }
+
+    public void onReceive(Intent intent) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
+                int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
+                if (removedId > 0) synchronized (this) {
+                    mVisibleNotifications.remove(removedId);
+                }
+                return;
+            }
+        }
+        Object notification = getNotificationOrBuilderForIntent(intent);
+        if (notification != null) {
+            Notification notif = null;
+            int id = -1;
+            boolean sendable = notification instanceof Notification;
+            if (sendable) {
+                notif = (Notification) notification;
+                id = notif.extras.getInt(KEY_ID, -1);
+            } else {
+                Notification.Builder builder = (Notification.Builder)notification;
+                // this is different instance and does not have mOpenActivity
+                if (builder == null) {
+                    Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
                     return;
                 }
-            }
-            Object notification = getNotificationOrBuilderForIntent(context, intent);
-            if (notification != null) {
-                Notification notif = null;
-                int id = -1;
-                boolean sendable = notification instanceof Notification;
-                if (sendable) {
-                    notif = (Notification) notification;
-                    id = notif.extras.getInt(KEY_ID, -1);
-                } else {
-                    Notification.Builder builder = (Notification.Builder)notification;
-                    // this is different instance and does not have mOpenActivity
-                    if (builder == null) {
-                        Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
-                        return;
-                    }
 
-                    Class openActivity;
-                    if (mUnityNotificationManager == null || mUnityNotificationManager.mOpenActivity == null) {
-                        openActivity = UnityNotificationUtilities.getOpenAppActivity(context, true);
-                    }
-                    else {
-                        openActivity = mUnityNotificationManager.mOpenActivity;
-                    }
-
-                    id = builder.getExtras().getInt(KEY_ID, -1);
-                    notif = buildNotificationForSending(context, openActivity, builder);
+                Class openActivity;
+                if (mOpenActivity == null) {
+                    openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, true);
+                }
+                else {
+                    openActivity = mOpenActivity;
                 }
 
-                if (notif != null) {
-                    UnityNotificationManager.notify(context, id, notif);
-                }
+                id = builder.getExtras().getInt(KEY_ID, -1);
+                notif = buildNotificationForSending(openActivity, builder);
             }
-        } catch (BadParcelableException e) {
-            Log.w(TAG_UNITY, e.toString());
+
+            if (notif != null) {
+                notify(id, notif);
+            }
         }
     }
 
     // Call the system notification service to notify the notification.
-    protected static void notify(Context context, int id, Notification notification) {
+    private void notify(int id, Notification notification) {
         boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
-            getNotificationManager(context).notify(id, notification);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (UnityNotificationManager.class) {
+            getNotificationManager().notify(id, notification);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (this) {
                 mVisibleNotifications.add(Integer.valueOf(id));
             }
         }
@@ -708,7 +682,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, -1);
         if (repeatInterval <= 0) {
             mScheduledNotifications.remove(id);
-            cancelPendingNotificationIntent(context, id);
+            cancelPendingNotificationIntent(id);
         }
 
         try {
@@ -735,31 +709,27 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return 0;
     }
 
-    public static void finalizeNotificationForDisplay(Context context, Notification.Builder notificationBuilder) {
+    private void finalizeNotificationForDisplay(Notification.Builder notificationBuilder) {
         String icon = notificationBuilder.getExtras().getString(KEY_SMALL_ICON);
-        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
         if (iconId == 0) {
-            iconId = context.getApplicationInfo().icon;
+            iconId = mContext.getApplicationInfo().icon;
         }
         notificationBuilder.setSmallIcon(iconId);
         icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
-        iconId = UnityNotificationUtilities.findResourceIdInContextByName(context, icon);
+        iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
         if (iconId != 0) {
-            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), iconId));
+            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), iconId));
         }
     }
 
-    public Notification.Builder createNotificationBuilder(String channelID) {
-        return createNotificationBuilder(mContext, channelID);
-    }
-
     @SuppressWarnings("deprecation")
-    protected static Notification.Builder createNotificationBuilder(Context context, String channelID) {
+    public Notification.Builder createNotificationBuilder(String channelID) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            Notification.Builder notificationBuilder = new Notification.Builder(context);
+            Notification.Builder notificationBuilder = new Notification.Builder(mContext);
 
             // For device below Android O, we use the values from NotificationChannelWrapper to set visibility, priority etc.
-            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(context, channelID);
+            NotificationChannelWrapper fakeNotificationChannel = getNotificationChannel(channelID);
 
             if (fakeNotificationChannel.vibrationPattern != null && fakeNotificationChannel.vibrationPattern.length > 0) {
                 notificationBuilder.setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND);
@@ -795,7 +765,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
             return notificationBuilder;
         } else {
-            return new Notification.Builder(context, channelID);
+            return new Notification.Builder(mContext, channelID);
         }
     }
 
@@ -841,11 +811,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE);
     }
 
-    public static Notification getNotificationFromIntent(Context context, Intent intent) {
+    public Notification getNotificationFromIntent(Intent intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
                 int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
-                StatusBarNotification[] shownNotifications = getNotificationManager(context).getActiveNotifications();
+                StatusBarNotification[] shownNotifications = getNotificationManager().getActiveNotifications();
                 for (StatusBarNotification n : shownNotifications) {
                     if (n.getId() == id) {
                         return n.getNotification();
@@ -854,7 +824,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        Object notification = getNotificationOrBuilderForIntent(context, intent);
+        Object notification = getNotificationOrBuilderForIntent(intent);
         if (notification == null)
             return null;
         if (notification instanceof Notification)
@@ -863,7 +833,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return builder.build();
     }
 
-    public static Object getNotificationOrBuilderForIntent(Context context, Intent intent) {
+    private Object getNotificationOrBuilderForIntent(Intent intent) {
         Object notification = null;
         boolean sendable = false;
         if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
@@ -873,8 +843,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 sendable = true;
             } else {
                 // in case we don't have cached notification, deserialize from storage
-                SharedPreferences prefs = context.getSharedPreferences(getSharedPrefsNameByNotificationId(String.valueOf(id)), Context.MODE_PRIVATE);
-                notification = UnityNotificationUtilities.deserializeNotification(context, prefs);
+                SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(String.valueOf(id)), Context.MODE_PRIVATE);
+                notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
             }
         } else if (intent.hasExtra(KEY_NOTIFICATION)) {
             // old code path where Notification object is in intent
@@ -888,7 +858,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         Notification.Builder builder;
         if (notification instanceof Notification) {
-            builder = UnityNotificationUtilities.recoverBuilder(context, (Notification)notification);
+            builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
         }
         else {
             builder = (Notification.Builder)notification;

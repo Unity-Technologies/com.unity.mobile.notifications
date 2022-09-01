@@ -297,8 +297,9 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     if (data->threadIdentifier != NULL)
         content.threadIdentifier = [NSString stringWithUTF8String: data->threadIdentifier];
 
-    // TODO add a way to specify custom sounds.
-    content.sound = [UNNotificationSound defaultSound];
+    UNNotificationSound* sound = [self soundForNotification: data];
+    if (sound != nil)
+        content.sound = sound;
 
     content.attachments = (__bridge_transfer NSArray<UNNotificationAttachment*>*)data->attachments;
     data->attachments = NULL;
@@ -361,6 +362,48 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
 
         [self updateScheduledNotificationList];
     }];
+}
+
+- (UNNotificationSound*)soundForNotification:(const iOSNotificationData*)data
+{
+    NSString* soundName = nil;
+    if (data->soundName != NULL)
+        soundName = [NSString stringWithUTF8String: data->soundName];
+
+    switch (data->soundType)
+    {
+        case kSoundTypeNone:
+            return nil;
+        case kSoundTypeCritical:
+            if (@available(iOS 12.0, *))
+            {
+                if (soundName != nil)
+                {
+                    if (data->soundVolume < 0)
+                        return [UNNotificationSound criticalSoundNamed: soundName];
+                    return [UNNotificationSound criticalSoundNamed: soundName withAudioVolume: data->soundVolume];
+                }
+                if (data->soundVolume >= 0)
+                    return [UNNotificationSound defaultCriticalSoundWithAudioVolume: data->soundVolume];
+                return UNNotificationSound.defaultCriticalSound;
+            }
+            else
+                goto default_fallback;
+        case kSoundTypeRingtone:
+            if (@available(iOS 15.2, *))
+            {
+                if (soundName != nil)
+                    return [UNNotificationSound ringtoneSoundNamed: soundName];
+                return UNNotificationSound.defaultRingtoneSound;
+            }
+        // continue to default
+        case kSoundTypeDefault:
+        default:
+        default_fallback:
+            if (soundName != nil)
+                return [UNNotificationSound soundNamed: soundName];
+            return UNNotificationSound.defaultSound;
+    }
 }
 
 @end

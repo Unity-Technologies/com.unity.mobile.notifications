@@ -537,7 +537,7 @@ class UnityNotificationUtilities {
 
     private static Notification.Builder recoverBuilderCustom(Context context, Notification notification) {
         String channelID = notification.extras.getString(KEY_CHANNEL_ID);
-        Notification.Builder builder = UnityNotificationManager.createNotificationBuilder(context, channelID);
+        Notification.Builder builder = UnityNotificationManager.getNotificationManagerImpl(context).createNotificationBuilder(channelID);
         UnityNotificationManager.setNotificationIcon(builder, KEY_SMALL_ICON, notification.extras.getString(KEY_SMALL_ICON));
         String largeIcon = notification.extras.getString(KEY_LARGE_ICON);
         if (largeIcon != null && !largeIcon.isEmpty())

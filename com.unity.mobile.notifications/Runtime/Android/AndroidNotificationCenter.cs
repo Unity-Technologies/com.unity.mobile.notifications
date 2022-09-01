@@ -106,7 +106,7 @@ namespace Unity.Notifications.Android
 
         void CollectMethods(AndroidJavaClass clazz)
         {
-            getNotificationFromIntent = JniApi.FindMethod(clazz, "getNotificationFromIntent", "(Landroid/content/Context;Landroid/content/Intent;)Landroid/app/Notification;", true);
+            getNotificationFromIntent = JniApi.FindMethod(clazz, "getNotificationFromIntent", "(Landroid/content/Intent;)Landroid/app/Notification;", false);
             setNotificationIcon = JniApi.FindMethod(clazz, "setNotificationIcon", "(Landroid/app/Notification$Builder;Ljava/lang/String;Ljava/lang/String;)V", true);
             setNotificationColor = JniApi.FindMethod(clazz, "setNotificationColor", "(Landroid/app/Notification$Builder;I)V", true);
             getNotificationColor = JniApi.FindMethod(clazz, "getNotificationColor", "(Landroid/app/Notification;)Ljava/lang/Integer;", true);
@@ -118,9 +118,9 @@ namespace Unity.Notifications.Android
             createNotificationBuilder = JniApi.FindMethod(clazz, "createNotificationBuilder", "(Ljava/lang/String;)Landroid/app/Notification$Builder;", false);
         }
 
-        public AndroidJavaObject GetNotificationFromIntent(AndroidJavaObject activity, AndroidJavaObject intent)
+        public AndroidJavaObject GetNotificationFromIntent(AndroidJavaObject intent)
         {
-            return klass.CallStatic<AndroidJavaObject>(getNotificationFromIntent, activity, intent);
+            return self.Call<AndroidJavaObject>(getNotificationFromIntent, intent);
         }
 
         public void SetNotificationIcon(AndroidJavaObject builder, AndroidJavaObject keyName, string icon)
@@ -568,13 +568,11 @@ namespace Unity.Notifications.Android
 #if UNITY_EDITOR || !UNITY_ANDROID
             s_CurrentActivity = null;
 #elif UNITY_ANDROID
-            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            s_CurrentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-            var context = s_CurrentActivity.Call<AndroidJavaObject>("getApplicationContext");
+            using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                s_CurrentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 
             var notificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-            var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", context, s_CurrentActivity);
-            notificationManager.Call("setNotificationCallback", new NotificationCallback());
+            var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", s_CurrentActivity, new NotificationCallback());
             s_Jni = new JniApi(notificationManagerClass, notificationManager);
 
             s_Initialized = true;
@@ -841,7 +839,7 @@ namespace Unity.Notifications.Android
                 return null;
 
             var intent = s_CurrentActivity.Call<AndroidJavaObject>("getIntent");
-            var notification = s_Jni.NotificationManager.GetNotificationFromIntent(s_CurrentActivity, intent);
+            var notification = s_Jni.NotificationManager.GetNotificationFromIntent(intent);
             if (notification == null)
                 return null;
             return GetNotificationData(notification);
