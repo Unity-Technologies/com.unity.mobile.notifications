@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [2.1.0] - TBD
+## [2.1.0] - 2022-09-01
 
 TODO
 
