@@ -68,14 +68,14 @@ namespace Unity.Notifications
 
             var settings = NotificationSettingsManager.Initialize().AndroidNotificationSettingsFlat;
 
-            var useCustomActivity = (bool)settings.Find(i => i.Key == "UnityNotificationAndroidUseCustomActivity").Value;
+            var useCustomActivity = (bool)settings.Find(i => i.Key == NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY).Value;
             if (useCustomActivity)
             {
-                var customActivity = (string)settings.Find(i => i.Key == "UnityNotificationAndroidCustomActivityString").Value;
+                var customActivity = (string)settings.Find(i => i.Key == NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS).Value;
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "custom_notification_android_activity", customActivity);
             }
 
-            var enableRescheduleOnRestart = (bool)settings.Find(i => i.Key == "UnityNotificationAndroidRescheduleOnDeviceRestart").Value;
+            var enableRescheduleOnRestart = (bool)settings.Find(i => i.Key == NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART).Value;
             if (enableRescheduleOnRestart)
             {
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "reschedule_notifications_on_restart", "true");

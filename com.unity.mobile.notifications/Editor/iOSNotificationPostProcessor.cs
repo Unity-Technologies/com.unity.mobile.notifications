@@ -35,13 +35,13 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
         var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
 
-        var needLocationFramework = (bool)settings.Find(i => i.Key == "UnityUseLocationNotificationTrigger").Value;
-        var addPushNotificationCapability = (bool)settings.Find(i => i.Key == "UnityAddRemoteNotificationCapability").Value;
+        var needLocationFramework = (bool)settings.Find(i => i.Key == NotificationSettings.iOSSettings.USE_LOCATION_TRIGGER).Value;
+        var addPushNotificationCapability = (bool)settings.Find(i => i.Key == NotificationSettings.iOSSettings.ADD_PUSH_CAPABILITY).Value;
 
         var useReleaseAPSEnv = false;
         if (addPushNotificationCapability)
         {
-            var useReleaseAPSEnvSetting = settings.Find(i => i.Key == "UnityUseAPSReleaseEnvironment");
+            var useReleaseAPSEnvSetting = settings.Find(i => i.Key == NotificationSettings.iOSSettings.USE_APS_RELEASE);
             if (useReleaseAPSEnvSetting != null)
                 useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.Value;
         }
