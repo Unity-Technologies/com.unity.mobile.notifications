@@ -100,6 +100,21 @@ namespace Unity.Notifications
             }
 
             /// <summary>
+            /// A set of flags indicating whether to use exact scheduling and add supporting permissions.
+            /// </summary>
+            public static AndroidExactSchedulingOption ExactSchedulingOption
+            {
+                get
+                {
+                    return GetSettingValue<AndroidExactSchedulingOption>(BuildTargetGroup.Android, EXACT_ALARM);
+                }
+                set
+                {
+                    SetSettingValue<AndroidExactSchedulingOption>(BuildTargetGroup.Android, EXACT_ALARM, value);
+                }
+            }
+
+            /// <summary>
             /// Add image to notification settings.
             /// </summary>
             /// <param name="id">Image identifier</param>
