@@ -50,6 +50,7 @@ namespace Unity.Notifications
         public static class AndroidSettings
         {
             internal static readonly string RESCHEDULE_ON_RESTART = "UnityNotificationAndroidRescheduleOnDeviceRestart";
+            internal static readonly string EXACT_ALARM = "UnityNotificationAndroidScheduleExactAlarms";
             internal static readonly string USE_CUSTOM_ACTIVITY = "UnityNotificationAndroidUseCustomActivity";
             internal static readonly string CUSTOM_ACTIVITY_CLASS = "UnityNotificationAndroidCustomActivityString";
 

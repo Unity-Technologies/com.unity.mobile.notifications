@@ -155,6 +155,11 @@ namespace Unity.Notifications
                     "Enable this to automatically reschedule all non-expired notifications after device restart. By default AndroidSettings removes all scheduled notifications after restarting.",
                     settingsManager.GetOrAddNotificationSettingValue(NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART, false, true)),
                 new NotificationSetting(
+                    NotificationSettings.AndroidSettings.EXACT_ALARM,
+                    "Schedule at exact time",
+                    "Whether notifications should appear at exact time or approximate",
+                    settingsManager.GetOrAddNotificationSettingValue(NotificationSettings.AndroidSettings.EXACT_ALARM, (AndroidExactSchedulingOption)0, true)),
+                new NotificationSetting(
                     NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY,
                     "Use Custom Activity",
                     "Enable this to override the activity which will be opened when the user taps the notification.",
