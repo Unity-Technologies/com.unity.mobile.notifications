@@ -153,24 +153,38 @@ namespace Unity.Notifications
             notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
         }
 
-        internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name)
+        internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name, string maxSdk = null)
         {
             var manifestNode = xmlDoc.SelectSingleNode("manifest");
             if (manifestNode == null)
                 throw new ArgumentException(string.Format("Missing 'manifest' node in '{0}'.", manifestPath));
 
+            XmlElement metaDataNode = null;
             foreach (XmlNode node in manifestNode.ChildNodes)
             {
                 if (!(node is XmlElement) || node.Name != "uses-permission")
                     continue;
 
-                var elementName = ((XmlElement)node).GetAttribute("name", kAndroidNamespaceURI);
+                var element = (XmlElement)node;
+                var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
                 if (elementName == name)
-                    return;
+                {
+                    if (maxSdk == null)
+                        return;
+                    var maxSdkAttr = element.GetAttribute("maxSdkVersion", kAndroidNamespaceURI);
+                    if (!string.IsNullOrEmpty(maxSdkAttr))
+                        return;
+                    metaDataNode = element;
+                }
             }
 
-            XmlElement metaDataNode = xmlDoc.CreateElement("uses-permission");
-            metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
+            if (metaDataNode == null)
+            {
+                metaDataNode = xmlDoc.CreateElement("uses-permission");
+                metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
+            }
+            if (maxSdk != null)
+                metaDataNode.SetAttribute("maxSdkVersion", kAndroidNamespaceURI, maxSdk);
 
             manifestNode.AppendChild(metaDataNode);
         }
