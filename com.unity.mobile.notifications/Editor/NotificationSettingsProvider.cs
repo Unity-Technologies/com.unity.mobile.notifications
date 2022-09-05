@@ -354,6 +354,8 @@ namespace Unity.Notifications
                 {
                     setting.Value = (AndroidExactSchedulingOption)EditorGUILayout.EnumFlagsField((AndroidExactSchedulingOption)setting.Value, dropdownStyle);
                 }
+                else
+                    Debug.LogError("Unsupported setting type: " + setting.Value.GetType());
                 if (EditorGUI.EndChangeCheck())
                 {
                     m_SettingsManager.SaveSetting(setting, buildTarget);
