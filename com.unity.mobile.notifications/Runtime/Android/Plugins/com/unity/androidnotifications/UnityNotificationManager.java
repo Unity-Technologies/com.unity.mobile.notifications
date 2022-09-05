@@ -28,6 +28,7 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIB
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
+import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.Set;
@@ -50,6 +51,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private HashSet<Integer> mVisibleNotifications;
     private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
     private NotificationCallback mNotificationCallback;
+    private int mExactSchedulingSetting = -1;
+    private Method mCanScheduleExactAlarms;
 
     static final String TAG_UNITY = "UnityNotifications";
 
@@ -513,15 +516,28 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return intent_data_list;
     }
 
-    private static boolean canScheduleExactAlarms(AlarmManager alarmManager) {
-        // The commented-out if below is the correct one and should replace the one further down
-        // However it requires compile SDK 31 to compile, cutting edge and not shipped with Unity at the moment of writing this
-        // It means exact timing for notifications is not supported on Android 12+ out of the box
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            //return alarmManager.canScheduleExactAlarms();
-        if (Build.VERSION.SDK_INT >= 31)
+    private boolean canScheduleExactAlarms(AlarmManager alarmManager) {
+        // exact scheduling supported since Android 6
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return false;
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+        if (mExactSchedulingSetting < 0)
+            mExactSchedulingSetting = mContext.getApplicationInfo().metaData.getInt("com.unity.androidnotifications.exact_scheduling", 1);
+        if (mExactSchedulingSetting == 0)
+            return false;
+        if (Build.VERSION.SDK_INT < 31)
+            return true;
+
+        try {
+            if (mCanScheduleExactAlarms == null)
+                mCanScheduleExactAlarms = AlarmManager.class.getMethod("canScheduleExactAlarms");
+            return (boolean)mCanScheduleExactAlarms.invoke(alarmManager);
+        } catch (NoSuchMethodException ex) {
+            Log.e(TAG_UNITY, "No AlarmManager.canScheduleExactAlarms() on Android 31+ device, should not happen", ex);
+            return false;
+        } catch (Exception ex) {
+            Log.e(TAG_UNITY, "AlarmManager.canScheduleExactAlarms() threw", ex);
+            return false;
+        }
     }
 
     // Call AlarmManager to set the broadcast intent with fire time and interval.
