@@ -1,5 +1,6 @@
 #if UNITY_ANDROID
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using UnityEditor;
@@ -68,14 +69,14 @@ namespace Unity.Notifications
 
             var settings = NotificationSettingsManager.Initialize().AndroidNotificationSettingsFlat;
 
-            var useCustomActivity = (bool)settings.Find(i => i.Key == NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY).Value;
+            var useCustomActivity = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY);
             if (useCustomActivity)
             {
-                var customActivity = (string)settings.Find(i => i.Key == NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS).Value;
+                var customActivity = GetSetting<string>(settings, NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS);
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "custom_notification_android_activity", customActivity);
             }
 
-            var enableRescheduleOnRestart = (bool)settings.Find(i => i.Key == NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART).Value;
+            var enableRescheduleOnRestart = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART);
             if (enableRescheduleOnRestart)
             {
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "reschedule_notifications_on_restart", "true");
@@ -83,6 +84,11 @@ namespace Unity.Notifications
             }
 
             manifestDoc.Save(manifestPath);
+        }
+
+        private static T GetSetting<T>(List<NotificationSetting> settings, string key)
+        {
+            return (T)settings.Find(i => i.Key == key).Value;
         }
 
         internal static void InjectReceivers(string manifestPath, XmlDocument manifestXmlDoc)
