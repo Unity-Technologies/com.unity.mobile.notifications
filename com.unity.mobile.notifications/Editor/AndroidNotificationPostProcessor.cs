@@ -83,6 +83,21 @@ namespace Unity.Notifications
                 AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
 
+            var exactScheduling = GetSetting<AndroidExactSchedulingOption>(settings, NotificationSettings.AndroidSettings.EXACT_ALARM);
+            bool enableExact = (exactScheduling & AndroidExactSchedulingOption.ExactWhenAvailable) != 0;
+            AppendAndroidMetadataField(manifestPath, manifestDoc, "com.unity.androidnotifications.exact_scheduling", enableExact ? "1" : "0");
+            if (enableExact)
+            {
+                bool scheduleExact = (exactScheduling & AndroidExactSchedulingOption.AddScheduleExactPermission) != 0;
+                bool useExact = (exactScheduling & AndroidExactSchedulingOption.AddUseExactAlarmPermission) != 0;
+                // as documented here: https://developer.android.com/reference/android/Manifest.permission#USE_EXACT_ALARM
+                // only one of these two attributes should be used or max sdk set so on any device it's one or the other
+                if (scheduleExact)
+                    AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.SCHEDULE_EXACT_ALARM", useExact ? "32" : null);
+                if (useExact)
+                    AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.USE_EXACT_ALARM");
+            }
+
             manifestDoc.Save(manifestPath);
         }
 
