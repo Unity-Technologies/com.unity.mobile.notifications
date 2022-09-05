@@ -522,8 +522,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         // exact scheduling supported since Android 6
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return false;
-        if (mExactSchedulingSetting < 0)
-            mExactSchedulingSetting = mContext.getApplicationInfo().metaData.getInt("com.unity.androidnotifications.exact_scheduling", 1);
+        if (mExactSchedulingSetting < 0) {
+            Bundle metaData = getAppMetadata();
+            if (metaData != null)
+                mExactSchedulingSetting = metaData.getInt("com.unity.androidnotifications.exact_scheduling", 1);
+        }
         if (mExactSchedulingSetting == 0)
             return false;
         if (Build.VERSION.SDK_INT < 31)
