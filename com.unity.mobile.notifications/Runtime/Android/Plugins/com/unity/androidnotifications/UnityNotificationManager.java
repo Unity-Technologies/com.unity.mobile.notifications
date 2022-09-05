@@ -12,7 +12,6 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
@@ -87,29 +86,24 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (mVisibleNotifications == null)
             mVisibleNotifications = new HashSet<>();
 
-        try {
-            ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
+        Bundle metaData = getAppMetadata();
 
-            Boolean rescheduleOnRestart = bundle.getBoolean("reschedule_notifications_on_restart");
+        Boolean rescheduleOnRestart = false;
+        if (metaData != null)
+            rescheduleOnRestart = metaData.getBoolean("reschedule_notifications_on_restart", false);
 
-            if (rescheduleOnRestart) {
-                ComponentName receiver = new ComponentName(mContext, UnityNotificationRestartOnBootReceiver.class);
-                PackageManager pm = mContext.getPackageManager();
+        if (rescheduleOnRestart) {
+            ComponentName receiver = new ComponentName(mContext, UnityNotificationRestartOnBootReceiver.class);
+            PackageManager pm = mContext.getPackageManager();
 
-                pm.setComponentEnabledSetting(receiver,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-            }
-
-            mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, false);
-            if (mOpenActivity == null)
-                mOpenActivity = activity.getClass();
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG_UNITY, "Failed to load meta-data, NameNotFound: " + e.getMessage());
-        } catch (NullPointerException e) {
-            Log.e(TAG_UNITY, "Failed to load meta-data, NullPointer: " + e.getMessage());
+            pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
         }
+
+        mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, false);
+        if (mOpenActivity == null)
+            mOpenActivity = activity.getClass();
 
         mBackgroundThread.start();
     }
@@ -134,6 +128,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         mUnityNotificationManager.initialize(activity, notificationCallback);
         return mUnityNotificationManager;
+    }
+
+    private Bundle getAppMetadata() {
+        try {
+            return mContext.getPackageManager().getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA).metaData;
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
     }
 
     public NotificationManager getNotificationManager() {
