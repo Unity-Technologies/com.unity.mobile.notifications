@@ -123,7 +123,8 @@ In the example below, the center coordinate is defined using the WGS 84 system. 
 ```c#
 var locationTrigger = new iOSNotificationLocationTrigger()
 {
-    Center = new Vector2(2.294498f, 48.858263f),
+    Latitude = 48.858263,
+    Longitude = 2.294498,
     Radius = 250f,
     NotifyOnEntry = true,
     NotifyOnExit = false,
