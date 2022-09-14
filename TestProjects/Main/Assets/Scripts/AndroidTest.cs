@@ -93,6 +93,8 @@ namespace Unity.Notifications.Tests.Sample
             ((Action)m_groups["Channels"]["Create Secondary Simple Channel"]).Invoke();
             ((Action)m_groups["Channels"]["Create Fancy Channel"]).Invoke();
             m_LOGGER.Clear().White("Welcome!");
+
+            HandleNotificationPermission();
             HandleLastNotificationIntent();
         }
 
@@ -103,7 +105,22 @@ namespace Unity.Notifications.Tests.Sample
                 .Gray($"isPaused = {isPaused}", 1);
             if (isPaused == false)
             {
+                HandleNotificationPermission();
                 HandleLastNotificationIntent();
+            }
+        }
+
+        private void HandleNotificationPermission()
+        {
+            var permission = AndroidNotificationCenter.UserPermissionToPost;
+            switch (permission)
+            {
+                case PermissionStatus.Allowed:
+                    m_LOGGER.Green("Permission granted to post notifications");
+                    break;
+                default:
+                    m_LOGGER.Red("No permission to post notifications: " + permission);
+                    break;
             }
         }
 
@@ -159,6 +176,7 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["General"]["Open Settings"] = new Action(() => { AndroidNotificationCenter.OpenNotificationSettings(); });
             m_groups["General"]["Notification batch size: "+NotificationBatchSizes[_CurrentNotificationBatchSizeIndex]] = new Action(() => { ChangeNotificationBatchSize(NotificationBatchSizes); });
             m_groups["General"]["Reset notification counter"] = new Action(() => { NotificationCounter = 0; });
+            m_groups["General"]["Request permission"] = new Action(() => { RequestNotificationPermission(); });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -268,6 +286,31 @@ namespace Unity.Notifications.Tests.Sample
             ButtonCheckStatusExplicitID.interactable = false;
 
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
+        }
+
+        void RequestNotificationPermission()
+        {
+            var permission = AndroidNotificationCenter.UserPermissionToPost;
+            if (permission == PermissionStatus.Allowed)
+                m_LOGGER.Green("Already authorized");
+            if (permission == PermissionStatus.DeniedDontAskAgain)
+                m_LOGGER.Red("Denied, don't ask again");
+            else
+            {
+                m_LOGGER.Blue("Requesting permission");
+                permission = AndroidNotificationCenter.RequestPermissionToPost();
+                switch (permission)
+                {
+                    case PermissionStatus.Allowed:
+                        m_LOGGER.Green("Permission granted");
+                        break;
+                    case PermissionStatus.RequestPending:
+                        return;
+                    default:
+                        m_LOGGER.Red(permission.ToString());
+                        break;
+                }
+            }
         }
 
 
