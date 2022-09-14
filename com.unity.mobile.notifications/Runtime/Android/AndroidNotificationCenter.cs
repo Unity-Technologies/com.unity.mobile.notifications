@@ -547,6 +547,7 @@ namespace Unity.Notifications.Android
 
         private static AndroidJavaObject s_CurrentActivity;
         private static JniApi s_Jni;
+        private static int s_ApiLevel;
         private static bool s_Initialized = false;
 
         /// <summary>
@@ -574,6 +575,9 @@ namespace Unity.Notifications.Android
             var notificationManagerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
             var notificationManager = notificationManagerClass.CallStatic<AndroidJavaObject>("getNotificationManagerImpl", s_CurrentActivity, new NotificationCallback());
             s_Jni = new JniApi(notificationManagerClass, notificationManager);
+
+            using (var version = new AndroidJavaClass("android/os/Build$VERSION"))
+                s_ApiLevel = version.GetStatic<int>("SDK_INT");
 
             s_Initialized = true;
 #endif
