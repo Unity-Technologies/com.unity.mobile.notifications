@@ -77,7 +77,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mNotificationCallback = notificationCallback;
         if (mScheduledNotifications == null)
             mScheduledNotifications = new ConcurrentHashMap();
-        if (mBackgroundThread == null)
+        if (mBackgroundThread == null || !mBackgroundThread.isAlive())
             mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
         if (mRandom == null)
             mRandom = new Random();
@@ -108,7 +108,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Log.e(TAG_UNITY, "Failed to load meta-data, NullPointer: " + e.getMessage());
         }
 
-        mBackgroundThread.start();
+        if (!mBackgroundThread.isAlive())
+            mBackgroundThread.start();
     }
 
     static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
