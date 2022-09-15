@@ -588,7 +588,7 @@ namespace Unity.Notifications.Android
 
         private static AndroidJavaObject s_CurrentActivity;
         private static JniApi s_Jni;
-        private static int s_ApiLevel;
+        private static int s_DeviceApiLevel;
         private static bool s_Initialized = false;
 
         /// <summary>
@@ -618,7 +618,7 @@ namespace Unity.Notifications.Android
             s_Jni = new JniApi(notificationManagerClass, notificationManager);
 
             using (var version = new AndroidJavaClass("android/os/Build$VERSION"))
-                s_ApiLevel = version.GetStatic<int>("SDK_INT");
+                s_DeviceApiLevel = version.GetStatic<int>("SDK_INT");
 
             s_Initialized = true;
 #endif
@@ -640,7 +640,7 @@ namespace Unity.Notifications.Android
             {
                 if (!Initialize())
                     return PermissionStatus.Denied;
-                if (s_ApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
+                if (s_DeviceApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
                     return PermissionStatus.Allowed;
 
                 var permissionStatus = (PermissionStatus)PlayerPrefs.GetInt(SETTING_POST_NOTIFICATIONS_PERMISSION, (int)PermissionStatus.NotRequested);
