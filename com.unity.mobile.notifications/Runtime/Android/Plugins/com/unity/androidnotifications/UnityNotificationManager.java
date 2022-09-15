@@ -138,6 +138,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
+    public int getTargetSdk() {
+        return mContext.getApplicationInfo().targetSdkVersion;
+    }
+
     public void registerNotificationChannel(
             String id,
             String name,

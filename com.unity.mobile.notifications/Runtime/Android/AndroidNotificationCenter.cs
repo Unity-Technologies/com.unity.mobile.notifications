@@ -589,6 +589,7 @@ namespace Unity.Notifications.Android
         private static AndroidJavaObject s_CurrentActivity;
         private static JniApi s_Jni;
         private static int s_DeviceApiLevel;
+        private static int s_TargetApiLevel;
         private static bool s_Initialized = false;
 
         /// <summary>
@@ -619,6 +620,7 @@ namespace Unity.Notifications.Android
 
             using (var version = new AndroidJavaClass("android/os/Build$VERSION"))
                 s_DeviceApiLevel = version.GetStatic<int>("SDK_INT");
+            s_TargetApiLevel = notificationManager.Call<int>("getTargetSdk");
 
             s_Initialized = true;
 #endif
@@ -681,6 +683,12 @@ namespace Unity.Notifications.Android
                 return permissionStatus;
             if (permissionStatus == PermissionStatus.DeniedDontAskAgain)
                 return permissionStatus;
+            // Can only request permission if applications target SDK is 33, not actual device SDK
+            if (s_TargetApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
+            {
+                SetPostPermissionStting(PermissionStatus.DeniedDontAskAgain);
+                return PermissionStatus.DeniedDontAskAgain;
+            }
 
             var callbacks = new PermissionCallbacks();
             callbacks.PermissionGranted += (unused) => SetPostPermissionStting(PermissionStatus.Allowed);
