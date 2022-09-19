@@ -627,7 +627,7 @@ namespace Unity.Notifications.Android
             return s_Initialized;
         }
 
-        static void SetPostPermissionStting(PermissionStatus status)
+        static void SetPostPermissionSetting(PermissionStatus status)
         {
             PlayerPrefs.SetInt(SETTING_POST_NOTIFICATIONS_PERMISSION, (int)status);
         }
@@ -650,7 +650,7 @@ namespace Unity.Notifications.Android
                 if (allowed)
                 {
                     if (permissionStatus != PermissionStatus.Allowed)
-                        SetPostPermissionStting(PermissionStatus.Allowed);
+                        SetPostPermissionSetting(PermissionStatus.Allowed);
                     return PermissionStatus.Allowed;
                 }
 
@@ -660,7 +660,7 @@ namespace Unity.Notifications.Android
                         break;
                     case PermissionStatus.Allowed:
                         permissionStatus = PermissionStatus.Denied;
-                        SetPostPermissionStting(permissionStatus);
+                        SetPostPermissionSetting(permissionStatus);
                         break;
                 }
 
@@ -686,14 +686,14 @@ namespace Unity.Notifications.Android
             // Can only request permission if applications target SDK is 33, not actual device SDK
             if (s_TargetApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
             {
-                SetPostPermissionStting(PermissionStatus.DeniedDontAskAgain);
+                SetPostPermissionSetting(PermissionStatus.DeniedDontAskAgain);
                 return PermissionStatus.DeniedDontAskAgain;
             }
 
             var callbacks = new PermissionCallbacks();
-            callbacks.PermissionGranted += (unused) => SetPostPermissionStting(PermissionStatus.Allowed);
-            callbacks.PermissionDenied += (unused) => SetPostPermissionStting(PermissionStatus.Denied);
-            callbacks.PermissionDeniedAndDontAskAgain += (unused) => SetPostPermissionStting(PermissionStatus.DeniedDontAskAgain);
+            callbacks.PermissionGranted += (unused) => SetPostPermissionSetting(PermissionStatus.Allowed);
+            callbacks.PermissionDenied += (unused) => SetPostPermissionSetting(PermissionStatus.Denied);
+            callbacks.PermissionDeniedAndDontAskAgain += (unused) => SetPostPermissionSetting(PermissionStatus.DeniedDontAskAgain);
             Permission.RequestUserPermission(PERMISSION_POST_NOTIFICATIONS, callbacks);
             return PermissionStatus.RequestPending;
         }
