@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<gpx version="1.1" creator="Xcode">
+    <!-- A location used by location trigger button -->
+    <wpt lat="22.2847" lon="114.1582">
+        <name>Somewhere</name>
+    </wpt>
+</gpx>

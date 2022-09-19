@@ -164,11 +164,12 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         UNLocationNotificationTrigger* locationTrigger = (UNLocationNotificationTrigger*)request.trigger;
         CLCircularRegion *region = (CLCircularRegion*)locationTrigger.region;
 
-        notificationData.trigger.location.centerX = region.center.latitude;
-        notificationData.trigger.location.centerY = region.center.longitude;
+        notificationData.trigger.location.latitude = region.center.latitude;
+        notificationData.trigger.location.longitude = region.center.longitude;
         notificationData.trigger.location.radius = region.radius;
         notificationData.trigger.location.notifyOnExit = region.notifyOnEntry;
         notificationData.trigger.location.notifyOnEntry = region.notifyOnExit;
+        notificationData.trigger.location.repeats = locationTrigger.repeats;
 #endif
     }
     else if ([request.trigger isKindOfClass: [UNPushNotificationTrigger class]])

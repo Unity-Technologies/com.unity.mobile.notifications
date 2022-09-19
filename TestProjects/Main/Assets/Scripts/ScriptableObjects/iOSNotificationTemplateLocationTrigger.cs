@@ -34,11 +34,12 @@ namespace Unity.Notifications.Tests.Sample
 
         [Space(10)]
         [Header("Location Trigger")]
-        public float CenterX = 0f;
-        public float CenterY = 0f;
+        public double Latitude = 0f;
+        public double Longitude = 0f;
         public float Radius = 2f;
         public bool NotifyOnEntry = true;
         public bool NotifyOnExit = false;
+        public bool Repeats = false;
 #endif
     }
 }

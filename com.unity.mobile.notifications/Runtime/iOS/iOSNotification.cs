@@ -82,11 +82,12 @@ namespace Unity.Notifications.iOS
     [StructLayout(LayoutKind.Sequential)]
     internal struct LocationTriggerData
     {
-        public float centerX;
-        public float centerY;
+        public double latitude;
+        public double longitude;
         public float radius;
         public Byte notifyOnEntry;
         public Byte notifyOnExit;
+        public Byte repeats;
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -348,11 +349,12 @@ namespace Unity.Notifications.iOS
                     case iOSNotificationTriggerType.Location:
                         {
                             var trigger = (iOSNotificationLocationTrigger)value;
-                            data.trigger.location.centerX = trigger.Center.x;
-                            data.trigger.location.centerY = trigger.Center.y;
+                            data.trigger.location.latitude = trigger.Latitude;
+                            data.trigger.location.longitude = trigger.Longitude;
                             data.trigger.location.notifyOnEntry = (byte)(trigger.NotifyOnEntry ? 1 : 0);
                             data.trigger.location.notifyOnExit = (byte)(trigger.NotifyOnExit ? 1 : 0);
                             data.trigger.location.radius = trigger.Radius;
+                            data.trigger.location.repeats = (byte)(trigger.Repeats ? 1 : 0);
                             break;
                         }
                     case iOSNotificationTriggerType.Push:
@@ -394,10 +396,12 @@ namespace Unity.Notifications.iOS
                     case iOSNotificationTriggerType.Location:
                         return new iOSNotificationLocationTrigger()
                         {
-                            Center = new Vector2(data.trigger.location.centerX, data.trigger.location.centerY),
+                            Latitude = data.trigger.location.latitude,
+                            Longitude = data.trigger.location.longitude,
                             Radius = data.trigger.location.radius,
                             NotifyOnEntry = data.trigger.location.notifyOnEntry != 0,
-                            NotifyOnExit = data.trigger.location.notifyOnExit != 0
+                            NotifyOnExit = data.trigger.location.notifyOnExit != 0,
+                            Repeats = data.trigger.location.repeats != 0,
                         };
                     case iOSNotificationTriggerType.Push:
                         return new iOSNotificationPushTrigger();

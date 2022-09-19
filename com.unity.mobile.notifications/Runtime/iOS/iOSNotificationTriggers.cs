@@ -62,7 +62,29 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The center point of the geographic area.
         /// </summary>
-        public Vector2 Center { get; set; }
+        [Obsolete("Use Latitude and Longitude", false)]
+        public Vector2 Center
+        {
+            get
+            {
+                return new Vector2((float)Latitude, (float)Longitude);
+            }
+            set
+            {
+                Latitude = value.x;
+                Longitude = value.y;
+            }
+        }
+
+        /// <summary>
+        /// The latitude of the center point of the geographic area.
+        /// </summary>
+        public double Latitude { get; set; }
+
+        /// <summary>
+        /// The longitude of the center point of the geographic area.
+        /// </summary>
+        public double Longitude { get; set; }
 
         /// <summary>
         /// The radius (measured in meters) that defines the geographic area’s outer boundary.
@@ -78,6 +100,11 @@ namespace Unity.Notifications.iOS
         /// When this property is enabled, a device crossing from inside the region to outside the region triggers the delivery of a notification
         /// </summary>
         public bool NotifyOnExit { get; set; }
+
+        /// <summary>
+        /// Whether the notification should repeat.
+        /// </summary>
+        public bool Repeats { get; set; }
     }
 
     /// <summary>

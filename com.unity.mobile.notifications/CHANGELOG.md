@@ -2,6 +2,10 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.1.0] - 2022-09-01
+
+TODO
+
 ## [2.0.2] - 2022-05-13
 
 ### Changes & Improvements:
