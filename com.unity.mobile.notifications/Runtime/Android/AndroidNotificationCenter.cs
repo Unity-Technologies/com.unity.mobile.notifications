@@ -686,7 +686,7 @@ namespace Unity.Notifications.Android
             // Can only request permission if applications target SDK is 33, not actual device SDK
             if (s_TargetApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
             {
-                SetPostPermissionSetting(PermissionStatus.DeniedDontAskAgain);
+                // don't change setting here, in case app gets updated
                 return PermissionStatus.DeniedDontAskAgain;
             }
 
