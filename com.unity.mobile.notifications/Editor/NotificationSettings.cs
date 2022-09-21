@@ -49,6 +49,11 @@ namespace Unity.Notifications
         /// </summary>
         public static class AndroidSettings
         {
+            internal static readonly string RESCHEDULE_ON_RESTART = "UnityNotificationAndroidRescheduleOnDeviceRestart";
+            internal static readonly string EXACT_ALARM = "UnityNotificationAndroidScheduleExactAlarms";
+            internal static readonly string USE_CUSTOM_ACTIVITY = "UnityNotificationAndroidUseCustomActivity";
+            internal static readonly string CUSTOM_ACTIVITY_CLASS = "UnityNotificationAndroidCustomActivityString";
+
             /// <summary>
             /// By default AndroidSettings removes all scheduled notifications when the device is restarted. Enable this to automatically reschedule all non expired notifications when the device is turned back on.
             /// </summary>
@@ -56,11 +61,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.Android, "UnityNotificationAndroidRescheduleOnDeviceRestart");
+                    return GetSettingValue<bool>(BuildTargetGroup.Android, RESCHEDULE_ON_RESTART);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.Android, "UnityNotificationAndroidRescheduleOnDeviceRestart", value);
+                    SetSettingValue<bool>(BuildTargetGroup.Android, RESCHEDULE_ON_RESTART, value);
                 }
             }
 
@@ -71,11 +76,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.Android, "UnityNotificationAndroidUseCustomActivity");
+                    return GetSettingValue<bool>(BuildTargetGroup.Android, USE_CUSTOM_ACTIVITY);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.Android, "UnityNotificationAndroidUseCustomActivity", value);
+                    SetSettingValue<bool>(BuildTargetGroup.Android, USE_CUSTOM_ACTIVITY, value);
                 }
             }
 
@@ -86,11 +91,26 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<string>(BuildTargetGroup.Android, "UnityNotificationAndroidCustomActivityString");
+                    return GetSettingValue<string>(BuildTargetGroup.Android, CUSTOM_ACTIVITY_CLASS);
                 }
                 set
                 {
-                    SetSettingValue<string>(BuildTargetGroup.Android, "UnityNotificationAndroidCustomActivityString", value);
+                    SetSettingValue<string>(BuildTargetGroup.Android, CUSTOM_ACTIVITY_CLASS, value);
+                }
+            }
+
+            /// <summary>
+            /// A set of flags indicating whether to use exact scheduling and add supporting permissions.
+            /// </summary>
+            public static AndroidExactSchedulingOption ExactSchedulingOption
+            {
+                get
+                {
+                    return GetSettingValue<AndroidExactSchedulingOption>(BuildTargetGroup.Android, EXACT_ALARM);
+                }
+                set
+                {
+                    SetSettingValue<AndroidExactSchedulingOption>(BuildTargetGroup.Android, EXACT_ALARM, value);
                 }
             }
 
@@ -155,6 +175,14 @@ namespace Unity.Notifications
         /// </summary>
         public static class iOSSettings
         {
+            internal static readonly string REQUEST_AUTH_ON_LAUNCH = "UnityNotificationRequestAuthorizationOnAppLaunch";
+            internal static readonly string DEFAULT_AUTH_OPTS = "UnityNotificationDefaultAuthorizationOptions";
+            internal static readonly string ADD_PUSH_CAPABILITY = "UnityAddRemoteNotificationCapability";
+            internal static readonly string REQUEST_PUSH_AUTH_ON_LAUNCH = "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch";
+            internal static readonly string PUSH_NOTIFICATION_PRESENTATION = "UnityRemoteNotificationForegroundPresentationOptions";
+            internal static readonly string USE_APS_RELEASE = "UnityUseAPSReleaseEnvironment";
+            internal static readonly string USE_LOCATION_TRIGGER = "UnityUseLocationNotificationTrigger";
+
             /// <summary>
             /// It's recommended to make the authorization request during the app's launch cycle. If this is enabled the user will be shown the authorization pop-up immediately when the app launches. If it’s unchecked you’ll need to manually create an AuthorizationRequest before your app can send or receive notifications.
             /// </summary>
@@ -162,11 +190,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationOnAppLaunch");
+                    return GetSettingValue<bool>(BuildTargetGroup.iOS, REQUEST_AUTH_ON_LAUNCH);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationOnAppLaunch", value);
+                    SetSettingValue<bool>(BuildTargetGroup.iOS, REQUEST_AUTH_ON_LAUNCH, value);
                 }
             }
 
@@ -177,11 +205,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<AuthorizationOption>(BuildTargetGroup.iOS, "UnityNotificationDefaultAuthorizationOptions");
+                    return GetSettingValue<AuthorizationOption>(BuildTargetGroup.iOS, DEFAULT_AUTH_OPTS);
                 }
                 set
                 {
-                    SetSettingValue<AuthorizationOption>(BuildTargetGroup.iOS, "UnityNotificationDefaultAuthorizationOptions", value);
+                    SetSettingValue<AuthorizationOption>(BuildTargetGroup.iOS, DEFAULT_AUTH_OPTS, value);
                 }
             }
 
@@ -192,11 +220,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityAddRemoteNotificationCapability");
+                    return GetSettingValue<bool>(BuildTargetGroup.iOS, ADD_PUSH_CAPABILITY);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityAddRemoteNotificationCapability", value);
+                    SetSettingValue<bool>(BuildTargetGroup.iOS, ADD_PUSH_CAPABILITY, value);
                 }
             }
 
@@ -207,11 +235,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch");
+                    return GetSettingValue<bool>(BuildTargetGroup.iOS, REQUEST_PUSH_AUTH_ON_LAUNCH);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch", value);
+                    SetSettingValue<bool>(BuildTargetGroup.iOS, REQUEST_PUSH_AUTH_ON_LAUNCH, value);
                 }
             }
 
@@ -222,11 +250,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<PresentationOption>(BuildTargetGroup.iOS, "UnityRemoteNotificationForegroundPresentationOptions");
+                    return GetSettingValue<PresentationOption>(BuildTargetGroup.iOS, PUSH_NOTIFICATION_PRESENTATION);
                 }
                 set
                 {
-                    SetSettingValue<PresentationOption>(BuildTargetGroup.iOS, "UnityRemoteNotificationForegroundPresentationOptions", value);
+                    SetSettingValue<PresentationOption>(BuildTargetGroup.iOS, PUSH_NOTIFICATION_PRESENTATION, value);
                 }
             }
 
@@ -237,11 +265,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseAPSReleaseEnvironment");
+                    return GetSettingValue<bool>(BuildTargetGroup.iOS, USE_APS_RELEASE);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseAPSReleaseEnvironment", value);
+                    SetSettingValue<bool>(BuildTargetGroup.iOS, USE_APS_RELEASE, value);
                 }
             }
 
@@ -252,11 +280,11 @@ namespace Unity.Notifications
             {
                 get
                 {
-                    return GetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseLocationNotificationTrigger");
+                    return GetSettingValue<bool>(BuildTargetGroup.iOS, USE_LOCATION_TRIGGER);
                 }
                 set
                 {
-                    SetSettingValue<bool>(BuildTargetGroup.iOS, "UnityUseLocationNotificationTrigger", value);
+                    SetSettingValue<bool>(BuildTargetGroup.iOS, USE_LOCATION_TRIGGER, value);
                 }
             }
         }

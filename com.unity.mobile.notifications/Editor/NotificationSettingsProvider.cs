@@ -350,6 +350,12 @@ namespace Unity.Notifications
                     if ((iOSAuthorizationOption)setting.Value == 0)
                         setting.Value = (AuthorizationOption)(iOSAuthorizationOption.Badge | iOSAuthorizationOption.Sound | iOSAuthorizationOption.Alert);
                 }
+                else if (setting.Value.GetType() == typeof(AndroidExactSchedulingOption))
+                {
+                    setting.Value = (AndroidExactSchedulingOption)EditorGUILayout.EnumFlagsField((AndroidExactSchedulingOption)setting.Value, dropdownStyle);
+                }
+                else
+                    Debug.LogError("Unsupported setting type: " + setting.Value.GetType());
                 if (EditorGUI.EndChangeCheck())
                 {
                     m_SettingsManager.SaveSetting(setting, buildTarget);

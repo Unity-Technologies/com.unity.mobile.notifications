@@ -1,5 +1,6 @@
 #if UNITY_ANDROID
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using UnityEditor;
@@ -68,14 +69,14 @@ namespace Unity.Notifications
 
             var settings = NotificationSettingsManager.Initialize().AndroidNotificationSettingsFlat;
 
-            var useCustomActivity = (bool)settings.Find(i => i.Key == "UnityNotificationAndroidUseCustomActivity").Value;
+            var useCustomActivity = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY);
             if (useCustomActivity)
             {
-                var customActivity = (string)settings.Find(i => i.Key == "UnityNotificationAndroidCustomActivityString").Value;
+                var customActivity = GetSetting<string>(settings, NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS);
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "custom_notification_android_activity", customActivity);
             }
 
-            var enableRescheduleOnRestart = (bool)settings.Find(i => i.Key == "UnityNotificationAndroidRescheduleOnDeviceRestart").Value;
+            var enableRescheduleOnRestart = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART);
             if (enableRescheduleOnRestart)
             {
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "reschedule_notifications_on_restart", "true");
@@ -84,7 +85,27 @@ namespace Unity.Notifications
 
             AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.POST_NOTIFICATIONS");
 
+            var exactScheduling = GetSetting<AndroidExactSchedulingOption>(settings, NotificationSettings.AndroidSettings.EXACT_ALARM);
+            bool enableExact = (exactScheduling & AndroidExactSchedulingOption.ExactWhenAvailable) != 0;
+            AppendAndroidMetadataField(manifestPath, manifestDoc, "com.unity.androidnotifications.exact_scheduling", enableExact ? "1" : "0");
+            if (enableExact)
+            {
+                bool scheduleExact = (exactScheduling & AndroidExactSchedulingOption.AddScheduleExactPermission) != 0;
+                bool useExact = (exactScheduling & AndroidExactSchedulingOption.AddUseExactAlarmPermission) != 0;
+                // as documented here: https://developer.android.com/reference/android/Manifest.permission#USE_EXACT_ALARM
+                // only one of these two attributes should be used or max sdk set so on any device it's one or the other
+                if (scheduleExact)
+                    AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.SCHEDULE_EXACT_ALARM", useExact ? "32" : null);
+                if (useExact)
+                    AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.USE_EXACT_ALARM");
+            }
+
             manifestDoc.Save(manifestPath);
+        }
+
+        private static T GetSetting<T>(List<NotificationSetting> settings, string key)
+        {
+            return (T)settings.Find(i => i.Key == key).Value;
         }
 
         internal static void InjectReceivers(string manifestPath, XmlDocument manifestXmlDoc)
@@ -149,24 +170,38 @@ namespace Unity.Notifications
             notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
         }
 
-        internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name)
+        internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name, string maxSdk = null)
         {
             var manifestNode = xmlDoc.SelectSingleNode("manifest");
             if (manifestNode == null)
                 throw new ArgumentException(string.Format("Missing 'manifest' node in '{0}'.", manifestPath));
 
+            XmlElement metaDataNode = null;
             foreach (XmlNode node in manifestNode.ChildNodes)
             {
                 if (!(node is XmlElement) || node.Name != "uses-permission")
                     continue;
 
-                var elementName = ((XmlElement)node).GetAttribute("name", kAndroidNamespaceURI);
+                var element = (XmlElement)node;
+                var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
                 if (elementName == name)
-                    return;
+                {
+                    if (maxSdk == null)
+                        return;
+                    var maxSdkAttr = element.GetAttribute("maxSdkVersion", kAndroidNamespaceURI);
+                    if (!string.IsNullOrEmpty(maxSdkAttr))
+                        return;
+                    metaDataNode = element;
+                }
             }
 
-            XmlElement metaDataNode = xmlDoc.CreateElement("uses-permission");
-            metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
+            if (metaDataNode == null)
+            {
+                metaDataNode = xmlDoc.CreateElement("uses-permission");
+                metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
+            }
+            if (maxSdk != null)
+                metaDataNode.SetAttribute("maxSdkVersion", kAndroidNamespaceURI, maxSdk);
 
             manifestNode.AppendChild(metaDataNode);
         }
