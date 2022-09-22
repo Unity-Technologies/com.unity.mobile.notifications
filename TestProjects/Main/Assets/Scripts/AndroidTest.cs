@@ -290,26 +290,16 @@ namespace Unity.Notifications.Tests.Sample
 
         void RequestNotificationPermission()
         {
-            var permission = AndroidNotificationCenter.UserPermissionToPost;
-            if (permission == PermissionStatus.Allowed)
-                m_LOGGER.Green("Already authorized");
-            if (permission == PermissionStatus.DeniedDontAskAgain)
-                m_LOGGER.Red("Denied, don't ask again");
-            else
+            var request = new PermissionRequest();
+            switch (request.Status)
             {
-                m_LOGGER.Blue("Requesting permission");
-                permission = AndroidNotificationCenter.RequestPermissionToPost();
-                switch (permission)
-                {
-                    case PermissionStatus.Allowed:
-                        m_LOGGER.Green("Permission granted");
-                        break;
-                    case PermissionStatus.RequestPending:
-                        return;
-                    default:
-                        m_LOGGER.Red(permission.ToString());
-                        break;
-                }
+                case PermissionStatus.Allowed:
+                    m_LOGGER.Green("Already allowed");
+                    break;
+                case PermissionStatus.Denied:
+                case PermissionStatus.DeniedDontAskAgain:
+                    m_LOGGER.Red(request.Status.ToString());
+                    break;
             }
         }
 
