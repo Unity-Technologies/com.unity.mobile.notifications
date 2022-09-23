@@ -15,37 +15,6 @@ using JniFieldID = System.String;
 namespace Unity.Notifications.Android
 {
     /// <summary>
-    /// Represents a status of the Android runtime permission.
-    /// </summary>
-    public enum PermissionStatus
-    {
-        /// <summary>
-        /// No permission as user was not prompted for it.
-        /// </summary>
-        NotRequested = 0,
-
-        /// <summary>
-        /// User gave permission.
-        /// </summary>
-        Allowed = 1,
-
-        /// <summary>
-        /// User denied permission.
-        /// </summary>
-        Denied = 2,
-
-        /// <summary>
-        /// User denied permission and expressed intent to not be prompted again.
-        /// </summary>
-        DeniedDontAskAgain = 3,
-
-        /// <summary>
-        /// A request for permission was made and user hasn't responded yet.
-        /// </summary>
-        RequestPending = 4,
-    }
-
-    /// <summary>
     /// Current status of a scheduled notification, can be queried using CheckScheduledNotificationStatus.
     /// </summary>
     public enum NotificationStatus
@@ -568,7 +537,7 @@ namespace Unity.Notifications.Android
     public class AndroidNotificationCenter
     {
         private static int API_POST_NOTIFICATIONS_PERMISSION_REQUIRED = 33;
-        private static string PERMISSION_POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
+        internal static string PERMISSION_POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
 
         /// <summary>
         /// A PlayerPrefs key used to save users reply to POST_NOTIFICATIONS request (integer value of the PermissionStatus).
@@ -627,7 +596,7 @@ namespace Unity.Notifications.Android
             return s_Initialized;
         }
 
-        static void SetPostPermissionSetting(PermissionStatus status)
+        internal static void SetPostPermissionSetting(PermissionStatus status)
         {
             PlayerPrefs.SetInt(SETTING_POST_NOTIFICATIONS_PERMISSION, (int)status);
         }
@@ -666,36 +635,6 @@ namespace Unity.Notifications.Android
 
                 return permissionStatus;
             }
-        }
-
-        /// <summary>
-        /// Request user permission to post notifications.
-        /// Before Android 13 (API 33) will allow immediately.
-        /// May succeed or fail immediately. Users response is saved to PlayerPrefs.
-        /// Respects users wish to not be asked again.
-        /// </summary>
-        /// <returns>PermissionStatus.RequestPending if user is prompted for permission or immediately known reply.</returns>
-        /// <seealso cref="SETTING_POST_NOTIFICATIONS_PERMISSION"/>
-        public static PermissionStatus RequestPermissionToPost()
-        {
-            var permissionStatus = UserPermissionToPost;
-            if (permissionStatus == PermissionStatus.Allowed)
-                return permissionStatus;
-            if (permissionStatus == PermissionStatus.DeniedDontAskAgain)
-                return permissionStatus;
-            // Can only request permission if applications target SDK is 33, not actual device SDK
-            if (s_TargetApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
-            {
-                // don't change setting here, in case app gets updated
-                return PermissionStatus.DeniedDontAskAgain;
-            }
-
-            var callbacks = new PermissionCallbacks();
-            callbacks.PermissionGranted += (unused) => SetPostPermissionSetting(PermissionStatus.Allowed);
-            callbacks.PermissionDenied += (unused) => SetPostPermissionSetting(PermissionStatus.Denied);
-            callbacks.PermissionDeniedAndDontAskAgain += (unused) => SetPostPermissionSetting(PermissionStatus.DeniedDontAskAgain);
-            Permission.RequestUserPermission(PERMISSION_POST_NOTIFICATIONS, callbacks);
-            return PermissionStatus.RequestPending;
         }
 
         /// <summary>

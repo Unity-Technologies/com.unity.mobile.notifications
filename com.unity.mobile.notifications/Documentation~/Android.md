@@ -23,6 +23,20 @@ After you create a notification channel, you can't change its behavior. For more
 
 On devices that use Android versions prior to 8.0, this package emulates the same behavior by applying notification channel properties, such as `Importance`, to individual notifications.
 
+## Request permission to post notifications
+
+Starting with Android 13.0 (API level 33) notifications can not be posted without users permission. They can still be scheduled, but will work silently with no UI shown to the user. You can request the permission by running this method in the coroutine:
+
+```c#
+IEnumerator RequestNotificationPermission()
+{
+    var request = new PermissionRequest();
+    while (request.Status == PermissionStatus.RequestPending)
+        yield return null;
+    // here use request.Status to determine users response
+}
+```
+
 ## Manage notifications
 
 This package provides a set of APIs to manage notifications. These APIs allow you to perform actions such as sending, updating, and deleting notifications. For more notification-related APIs, see [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html).
