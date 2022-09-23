@@ -23,6 +23,27 @@ After you create a notification channel, you can't change its behavior. For more
 
 On devices that use Android versions prior to 8.0, this package emulates the same behavior by applying notification channel properties, such as `Importance`, to individual notifications.
 
+## Schedule notifications at exact time
+
+Before Android 6.0 notifications can be scheduled only at approximate time.
+
+Since Android 12.0 (API level 31) android.permission.SCHEDULE_EXACT_ALARM permission has to be added to the manifest to enable exact scheduling, see [documentation](https://developer.android.com/reference/android/Manifest.permission#SCHEDULE_EXACT_ALARM).
+
+Since Android 13.0 (API level 33) the android.permission.USE_EXACT_ALARM is and alternative permission to enable exact scheduling.
+
+Unity will schedule notifications at exact times when this is possible.
+
+## Permission to post notifications
+
+Since Android 13.0 it is required to ask user permission to show notifications. When application targets SDK that is less than 33, operating system will ask for permission automatically when application is launched. When targetting SDK 33 or greater, it is up to application itself to ask for permission, otherwise notifications will not show up in the tray. You can request users permission using Unity [Permission](https://docs.unity3d.com/2019.4/Documentation/ScriptReference/Android.Permission.html) struct:
+
+```c#
+if (!Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
+{
+    Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
+}
+```
+
 ## Manage notifications
 
 This package provides a set of APIs to manage notifications. These APIs allow you to perform actions such as sending, updating, and deleting notifications. For more notification-related APIs, see [AndroidNotificationCenter](../api/Unity.Notifications.Android.AndroidNotificationCenter.html).
