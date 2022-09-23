@@ -4,7 +4,7 @@ The Unity Mobile Notifications package adds support for scheduling local one-tim
 
 ### Requirements
 
-- Compatible with Unity 2019.4 or above.
+- Compatible with Unity 2020.3 or above.
 - Compatible with Android 5 (API 21) and iOS 10.0+.
 
 ### Supported features
@@ -21,6 +21,8 @@ The runtime notification APIs are split into two parts for both Android and iOS.
     *   Use the Apple Push Notification Service (APNs) to receive remote notifications.
     *   Modify remote notification content if the device receives notifications from other apps while your app is running.
     *   Group notifications into threads (only supported on iOS 12+).
+    *   Add attachments to notifications.
+    *   Support for notification actions.
 
 ### Installing
 To install the Mobile Notification package, please follow the instructions in the [Package Manager documentation](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html).
