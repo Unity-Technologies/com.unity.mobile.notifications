@@ -384,7 +384,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         try {
             if (mCanScheduleExactAlarms == null)
                 mCanScheduleExactAlarms = AlarmManager.class.getMethod("canScheduleExactAlarms");
-            return (boolean)canScheduleExactAlarms.invoke(alarmManager);
+            return (boolean)mCanScheduleExactAlarms.invoke(alarmManager);
         } catch (NoSuchMethodException ex) {
             Log.e("UnityNotifications", "No AlarmManager.canScheduleExactAlarms() on Android 31+ device, should not happen", ex);
             return false;
