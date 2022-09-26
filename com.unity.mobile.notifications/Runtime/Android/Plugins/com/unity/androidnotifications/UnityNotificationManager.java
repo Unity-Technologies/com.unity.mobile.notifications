@@ -37,6 +37,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Activity mActivity = null;
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
+    protected static Method mCanScheduleExactAlarms;
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -381,7 +382,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return true;
 
         try {
-            Method canScheduleExactAlarms = AlarmManager.class.getMethod("canScheduleExactAlarms");
+            if (mCanScheduleExactAlarms == null)
+                mCanScheduleExactAlarms = AlarmManager.class.getMethod("canScheduleExactAlarms");
             return (boolean)canScheduleExactAlarms.invoke(alarmManager);
         } catch (NoSuchMethodException ex) {
             Log.e("UnityNotifications", "No AlarmManager.canScheduleExactAlarms() on Android 31+ device, should not happen", ex);
