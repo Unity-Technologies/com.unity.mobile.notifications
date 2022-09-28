@@ -22,6 +22,7 @@ import android.util.Log;
 import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.lang.Integer;
+import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     protected Activity mActivity = null;
     protected Class mOpenActivity = null;
     protected boolean mRescheduleOnRestart = false;
+    protected static Method mCanScheduleExactAlarms;
 
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     protected static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
@@ -373,14 +375,23 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private static boolean canScheduleExactAlarms(AlarmManager alarmManager) {
-        // The commented-out if below is the correct one and should replace the one further down
-        // However it requires compile SDK 31 to compile, cutting edge and not shipped with Unity at the moment of writing this
-        // It means exact timing for notifications is not supported on Android 12+ out of the box
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            //return alarmManager.canScheduleExactAlarms();
-        if (Build.VERSION.SDK_INT >= 31)
+        // exact scheduling supported since Android 6
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return false;
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+        if (Build.VERSION.SDK_INT < 31)
+            return true;
+
+        try {
+            if (mCanScheduleExactAlarms == null)
+                mCanScheduleExactAlarms = AlarmManager.class.getMethod("canScheduleExactAlarms");
+            return (boolean)mCanScheduleExactAlarms.invoke(alarmManager);
+        } catch (NoSuchMethodException ex) {
+            Log.e("UnityNotifications", "No AlarmManager.canScheduleExactAlarms() on Android 31+ device, should not happen", ex);
+            return false;
+        } catch (Exception ex) {
+            Log.e("UnityNotifications", "AlarmManager.canScheduleExactAlarms() threw", ex);
+            return false;
+        }
     }
 
     // Call AlarmManager to set the broadcast intent with fire time and interval.

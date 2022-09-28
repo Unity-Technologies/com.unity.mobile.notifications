@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.UI;
 
 #if UNITY_ANDROID || UNITY_EDITOR
@@ -114,6 +115,7 @@ namespace Unity.Notifications.Tests.Sample
 
             m_groups["General"] = new OrderedDictionary();
             m_groups["General"]["Clear Log"] = new Action(() => { m_LOGGER.Clear(); });
+            m_groups["General"]["Request permission"] = new Action(() => { RequestPermissionToPost(); });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -230,6 +232,43 @@ namespace Unity.Notifications.Tests.Sample
             ButtonExplicitID = GameObject.Find("Modify/Modify pending Explicit notification").GetComponent<Button>();
             ButtonExplicitID.interactable = false;
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
+        }
+
+        void RequestPermissionToPost()
+        {
+            using (var version = new AndroidJavaClass("android/os/Build$VERSION"))
+            {
+                var deviceSdk = version.GetStatic<int>("SDK_INT");
+                if (deviceSdk < 33)
+                {
+                    m_LOGGER.Green("No permission required");
+                    return;
+                }
+            }
+
+            if (Permission.HasUserAuthorizedPermission("android.permission.POST_NOTIFICATIONS"))
+            {
+                m_LOGGER.Green("Already granted");
+                return;
+            }
+
+            using (var playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            {
+                using (var activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity"))
+                {
+                    using (var appInfo = activity.Call<AndroidJavaObject>("getApplicationInfo"))
+                    {
+                        var targetSdk = appInfo.Get<int>("targetSdkVersion");
+                        if (targetSdk < 33)
+                        {
+                            m_LOGGER.Red("Requesting permission only supported when targetting SDK 33 or newer");
+                        }
+                    }
+                }
+            }
+
+            m_LOGGER.Blue("Requesting permission. If no pop-up, enable in Settings -> Notifications");
+            Permission.RequestUserPermission("android.permission.POST_NOTIFICATIONS");
         }
 
         public void ModifyExplicitNotification()

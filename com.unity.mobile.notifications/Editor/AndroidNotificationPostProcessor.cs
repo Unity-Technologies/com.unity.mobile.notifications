@@ -68,6 +68,8 @@ namespace Unity.Notifications
                 AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
 
+            AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.POST_NOTIFICATIONS");
+
             manifestDoc.Save(manifestPath);
         }
 
