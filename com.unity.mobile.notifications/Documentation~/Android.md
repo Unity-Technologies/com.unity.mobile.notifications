@@ -23,6 +23,16 @@ After you create a notification channel, you can't change its behavior. For more
 
 On devices that use Android versions prior to 8.0, this package emulates the same behavior by applying notification channel properties, such as `Importance`, to individual notifications.
 
+## Schedule notifications at exact time
+
+Before Android 6.0 notifications can be scheduled only at approximate time.
+
+Since Android 12.0 (API level 31) android.permission.SCHEDULE_EXACT_ALARM permission has to be added to the manifest to enable exact scheduling, see [documentation](https://developer.android.com/reference/android/Manifest.permission#SCHEDULE_EXACT_ALARM).
+
+Since Android 13.0 (API level 33) the android.permission.USE_EXACT_ALARM is and alternative permission to enable exact scheduling.
+
+Android recommends to not use exact scheduling due to higher power consumption it entails. Use notification settings in Unity to enable the automatic addition of the mentioned permissions or to always use inexact scheduling.
+
 ## Request permission to post notifications
 
 Starting with Android 13.0 (API level 33) notifications can not be posted without users permission. They can still be scheduled, but will work silently with no UI shown to the user. You can request the permission by running this method in the coroutine:

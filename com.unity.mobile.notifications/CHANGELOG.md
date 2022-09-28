@@ -2,9 +2,22 @@
 
 All notable changes to this package will be documented in this file.
 
-## [2.1.0] - 2022-09-01
+## [2.1.0] - 2022-09-23
 
-TODO
+### Changes & Improvements:
+- [Android] - Notification scheduling is made faster.
+- [Android] - Notifications can be set to not be shown when app is in foreground (contributed by InnoGames).
+- [Android] - Support for Android 13 notification permission.
+- [Android] - Support for exact scheduling on Android 12 and newer and ability to disable it.
+- [iOS] - Updated AuthorizationStatus enum with new values.
+- [iOS] - Location trigger now uses more accurate latitude/longitude and can repeat.
+- [iOS] [issue 202](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/202) Added support for different sound types and notifications without sound.
+
+### Fixes:
+- [Android] - Scheduled notifications are saved in more lightweight and reliable way.
+- [Android] [issue 196](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/196) Fix occasional Resources$NotFound exception.
+- [Android] [issue 198](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/198) Fix occasional OutOfMemoryError.
+- [iOS] - When using Calendar trigger time type (Local/UTC/...) will be preserved.
 
 ## [2.0.2] - 2022-05-13
 
