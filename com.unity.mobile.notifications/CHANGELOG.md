@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [1.4.4] - 2022-09-30
+
+### Changes & Improvements:
+- [Android] - Support for Android 13 notification permission.
+- [Android] - Support for exact scheduling on Android 12 and newer and ability to disable it.
+
 ## [1.4.3] - 2022-04-15
 
 ### Fixes:
