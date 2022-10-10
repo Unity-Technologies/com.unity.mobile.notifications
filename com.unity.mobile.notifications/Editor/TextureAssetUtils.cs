@@ -73,22 +73,22 @@ namespace Unity.Notifications
                 texture = new Texture2D(sourceTexture.width, sourceTexture.height, TextureFormat.RGBA32, true, false);
                 for (var i = 0; i < sourceTexture.mipmapCount; i++)
                 {
-                    var c_0 = sourceTexture.GetPixels(i);
-                    var c_1 = texture.GetPixels(i);
+                    var c_0 = sourceTexture.GetPixels32(i);
+                    var c_1 = texture.GetPixels32(i);
                     for (var i1 = 0; i1 < c_0.Length; i1++)
                     {
                         var a = c_0[i1].r + c_0[i1].g + c_0[i1].b;
-                        c_1[i1].r = c_1[i1].g = c_1[i1].b = a > 127 ? 0 : 1;
+                        c_1[i1].r = c_1[i1].g = c_1[i1].b = (byte)(a > 127 ? 0 : 255);
                         c_1[i1].a = c_0[i1].a;
                     }
-                    texture.SetPixels(c_1, i);
+                    texture.SetPixels32(c_1, i);
                 }
                 texture.Apply();
             }
             else
             {
                 texture = new Texture2D(sourceTexture.width, sourceTexture.height, TextureFormat.RGBA32, true);
-                texture.SetPixels(sourceTexture.GetPixels());
+                texture.SetPixels32(sourceTexture.GetPixels32());
                 texture.Apply();
             }
             return texture;
@@ -101,7 +101,7 @@ namespace Unity.Notifications
 
             var result = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
-            var destPixels = new Color[width * height];
+            var destPixels = new Color32[width * height];
             for (int y = 0; y < height; ++y)
             {
                 for (int x = 0; x < width; ++x)
@@ -109,7 +109,7 @@ namespace Unity.Notifications
                     destPixels[y * width + x] = sourceTexture.GetPixelBilinear((float)x / (float)width, (float)y / (float)height);
                 }
             }
-            result.SetPixels(destPixels);
+            result.SetPixels32(destPixels);
             result.Apply();
 
             return result;
