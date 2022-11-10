@@ -240,6 +240,19 @@ namespace Unity.Notifications.Android
         {
             return self.Call<AndroidJavaObject>(createNotificationBuilder, channelId);
         }
+
+        public void SetupBigPictureStyle(AndroidJavaObject builder, BigPictureStyle bigPicture)
+        {
+            self.Call("setupBigPictureStyle",
+                builder,
+                bigPicture.LargeIcon,
+                bigPicture.Picture,
+                bigPicture.ContentTitle,
+                bigPicture.ContentDescription,
+                bigPicture.SummaryText,
+                bigPicture.ShowWhenCollapsed
+            );
+        }
     }
 
     struct NotificationJni
@@ -978,13 +991,24 @@ namespace Unity.Notifications.Android
                 s_Jni.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
             if (notification.Number >= 0)
                 s_Jni.NotificationBuilder.SetNumber(notificationBuilder, notification.Number);
-            if (notification.Style == NotificationStyle.BigTextStyle)
+            switch (notification.Style)
             {
-                using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
-                {
-                    style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
-                    s_Jni.NotificationBuilder.SetStyle(notificationBuilder, style);
-                }
+                case NotificationStyle.None:
+                    break;
+                case NotificationStyle.BigPictureStyle:
+                    if (notification.BigPicture.HasValue)
+                    {
+                        var bigPicture = notification.BigPicture.Value;
+                        s_Jni.NotificationManager.SetupBigPictureStyle(notificationBuilder, bigPicture);
+                    }
+                    break;
+                case NotificationStyle.BigTextStyle:
+                    using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
+                    {
+                        style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
+                        s_Jni.NotificationBuilder.SetStyle(notificationBuilder, style);
+                    }
+                    break;
             }
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
             s_Jni.NotificationBuilder.SetWhen(notificationBuilder, timestampValue);

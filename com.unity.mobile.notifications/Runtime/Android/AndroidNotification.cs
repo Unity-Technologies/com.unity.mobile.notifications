@@ -13,11 +13,10 @@ namespace Unity.Notifications.Android
         /// </summary>
         None = 0,
 
-        //// todo currently disabled, bigpicture style requires additional logic that will be implemented in a future release
-        ///// <summary>
-        ///// generate a large-format notification.
-        ///// </summary>
-        //bigpicture = 1,
+        /// <summary>
+        /// Generate a large-format notification centered around an image.
+        /// </summary>
+        BigPictureStyle = 1,
 
         /// <summary>
         /// Generate a large-format notification that includes a lot of text.
@@ -46,6 +45,21 @@ namespace Unity.Notifications.Android
         /// Use this to mute this notification if this notification is a group child. This must be set on all children notifications you want to mute.
         /// </summary>
         GroupAlertChildren = 2,
+    }
+
+    /// <summary>
+    /// Data for setting up the big picture style notification.
+    /// Properties that are not available in devices API level are ignored. See Android documentation for availibility.
+    /// </summary>
+    /// <see cref="https://developer.android.com/reference/android/app/Notification.BigPictureStyle"/>
+    public struct BigPictureStyle
+    {
+        public string LargeIcon { get; set; }
+        public string Picture { get; set; }
+        public string ContentTitle { get; set; }
+        public string ContentDescription { get; set; }
+        public string SummaryText { get; set; }
+        public bool ShowWhenCollapsed { get; set; }
     }
 
     /// <summary>
@@ -186,6 +200,8 @@ namespace Unity.Notifications.Android
             set => m_SilentInForeground = !value;
         }
 
+        public BigPictureStyle? BigPicture;
+
         internal bool ShowCustomTimestamp { get; set; }
 
         private Color m_Color;
@@ -218,6 +234,7 @@ namespace Unity.Notifications.Android
             GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
             ShowTimestamp = false;
             ShowCustomTimestamp = false;
+            BigPicture = null;
 
             m_RepeatInterval = (-1L).ToTimeSpan();
             m_Color = new Color(0, 0, 0, 0);
