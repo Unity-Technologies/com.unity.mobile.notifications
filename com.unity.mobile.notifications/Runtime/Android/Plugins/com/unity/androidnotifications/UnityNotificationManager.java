@@ -746,11 +746,17 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     private void finalizeNotificationForDisplay(Notification.Builder notificationBuilder) {
         String icon = notificationBuilder.getExtras().getString(KEY_SMALL_ICON);
-        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
-        if (iconId == 0) {
-            iconId = mContext.getApplicationInfo().icon;
+        Object ico = getIconForUri(icon);
+        if (ico != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            notificationBuilder.setSmallIcon((Icon)ico);
+        } else {
+            int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
+            if (iconId == 0) {
+                iconId = mContext.getApplicationInfo().icon;
+            }
+            notificationBuilder.setSmallIcon(iconId);
         }
-        notificationBuilder.setSmallIcon(iconId);
+
         icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
         Bitmap largeIcon = getBitmap(icon);
         if (largeIcon != null) {
@@ -758,6 +764,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         setupBigPictureStyle(notificationBuilder);
+    }
+
+    private Object getIconForUri(String uri) {
+        if (uri == null || uri.length() == 0)
+            return null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && uri.indexOf("://") > 0) {
+            return Icon.createWithContentUri(uri);
+        }
+
+        return null;
     }
 
     private Bitmap getBitmap(String icon) {
