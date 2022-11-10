@@ -758,12 +758,29 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
-        Bitmap largeIcon = getBitmap(icon);
+        Object largeIcon = getIcon(icon);
         if (largeIcon != null) {
-            notificationBuilder.setLargeIcon(largeIcon);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && largeIcon instanceof Icon)
+                notificationBuilder.setLargeIcon((Icon)largeIcon);
+            else
+                notificationBuilder.setLargeIcon((Bitmap)largeIcon);
         }
 
         setupBigPictureStyle(notificationBuilder);
+    }
+
+    private Object getIcon(String icon) {
+        if (icon == null || icon.length() == 0)
+            return null;
+        if (icon.charAt(0) == '/') {
+            BitmapFactory.decodeFile(icon);
+        }
+
+        Object ico = getIconForUri(icon);
+        if (ico != null)
+            return ico;
+
+        return getBitmap(icon);
     }
 
     private Object getIconForUri(String uri) {
