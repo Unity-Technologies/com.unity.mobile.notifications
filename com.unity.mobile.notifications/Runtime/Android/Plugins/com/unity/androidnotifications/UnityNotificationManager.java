@@ -893,8 +893,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (picture.charAt(0) == '/') {
             style.bigPicture(BitmapFactory.decodeFile(picture));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && picture.indexOf("://") > 0) {
-            Icon icon = Icon.createWithContentUri(picture);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Icon icon = Icon.createWithContentUri(picture);
                 style.bigPicture(icon);
             } else {
                 Bitmap pic = loadBitmap(picture);
