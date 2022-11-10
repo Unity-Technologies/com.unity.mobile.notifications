@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -743,10 +744,19 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
         notificationBuilder.setSmallIcon(iconId);
         icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
-        iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
-        if (iconId != 0) {
-            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), iconId));
+        Bitmap largeIcon = getBitmap(icon);
+        if (largeIcon != null) {
+            notificationBuilder.setLargeIcon(largeIcon);
         }
+    }
+
+    private Bitmap getBitmap(String icon) {
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
+        if (iconId != 0) {
+            return BitmapFactory.decodeResource(mContext.getResources(), iconId);
+        }
+
+        return null;
     }
 
     @SuppressWarnings("deprecation")
