@@ -83,6 +83,7 @@ namespace Unity.Notifications.Android
         /// Notification small icon.
         /// It will be used to represent the notification in the status bar and content view (unless overridden there by a large icon)
         /// The icon PNG file has to be placed in the `/Assets/Plugins/Android/res/drawable` folder and it's name has to be specified without the extension.
+        /// Alternatively it can also be URI supported by the OS.
         /// </summary>
         public string SmallIcon { get; set; }
 
@@ -105,6 +106,7 @@ namespace Unity.Notifications.Android
         /// Notification large icon.
         /// Add a large icon to the notification content view. This image will be shown on the left of the notification view in place of the small icon (which will be placed in a small badge atop the large icon).
         /// The icon PNG file has to be placed in the `/Assets/Plugins/Android/res/drawable folder` and it's name has to be specified without the extension.
+        /// Alternatively it can be a file path or system supported URI.
         /// </summary>
         public string LargeIcon { get; set; }
 
