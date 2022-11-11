@@ -907,6 +907,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
                     style.bigPicture(pic);
                 }
             }
+        } else {
+            Object pic = getIconFromResources(picture);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && pic instanceof Icon)
+                style.bigPicture((Icon)pic);
+            else if (pic instanceof Bitmap)
+                style.bigPicture((Bitmap)pic);
         }
 
         style.setBigContentTitle(extras.getString(KEY_BIG_CONTENT_TITLE));
