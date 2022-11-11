@@ -780,7 +780,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (ico != null)
             return ico;
 
-        return getBitmap(icon);
+        return getIconFromResources(icon);
     }
 
     private Object getIconForUri(String uri) {
@@ -793,9 +793,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return null;
     }
 
-    private Bitmap getBitmap(String icon) {
-        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
+    private Object getIconFromResources(String name) {
+        int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, name);
         if (iconId != 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                return Icon.createWithResource(mContext, iconId);
             return BitmapFactory.decodeResource(mContext.getResources(), iconId);
         }
 
