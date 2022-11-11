@@ -54,11 +54,36 @@ namespace Unity.Notifications.Android
     /// <see cref="https://developer.android.com/reference/android/app/Notification.BigPictureStyle"/>
     public struct BigPictureStyle
     {
+        /// <summary>
+        /// The override for large icon (requirements are the same).
+        /// </summary>
+        /// <see cref="AndroidNotification.LargeIcon"/>
         public string LargeIcon { get; set; }
+
+        /// <summary>
+        /// The picture to be displayed.
+        /// Can be resource name (like icon), file path or an URI supported by Android.
+        /// </summary>
         public string Picture { get; set; }
+
+        /// <summary>
+        /// The content title to be displayed in the notification.
+        /// </summary>
         public string ContentTitle { get; set; }
+
+        /// <summary>
+        /// The content description to set.
+        /// </summary>
         public string ContentDescription { get; set; }
+
+        /// <summary>
+        /// The summary text to be shown.
+        /// </summary>
         public string SummaryText { get; set; }
+
+        /// <summary>
+        /// Whether to show big picture in place of large icon when collapsed.
+        /// </summary>
         public bool ShowWhenCollapsed { get; set; }
     }
 
