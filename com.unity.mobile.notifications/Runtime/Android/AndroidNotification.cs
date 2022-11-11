@@ -200,7 +200,22 @@ namespace Unity.Notifications.Android
             set => m_SilentInForeground = !value;
         }
 
-        public BigPictureStyle? BigPicture;
+        /// <summary>
+        /// The necessairy properties for big picture style notification.
+        /// For convenience, assigning this property will also set the Style property.
+        /// </summary>
+        public BigPictureStyle? BigPicture
+        {
+            get { return m_BigPictureStyle; }
+            set
+            {
+                m_BigPictureStyle = value;
+                if (m_BigPictureStyle.HasValue && Style == NotificationStyle.None)
+                    Style = NotificationStyle.BigPictureStyle;
+                else if (!m_BigPictureStyle.HasValue && Style == NotificationStyle.BigPictureStyle)
+                    Style = NotificationStyle.None;
+            }
+        }
 
         internal bool ShowCustomTimestamp { get; set; }
 
@@ -208,6 +223,7 @@ namespace Unity.Notifications.Android
         private TimeSpan m_RepeatInterval;
         private DateTime m_CustomTimestamp;
         private bool m_SilentInForeground;
+        private BigPictureStyle? m_BigPictureStyle;
 
         /// <summary>
         /// Create a notification struct with all optional fields set to default values.
@@ -234,7 +250,7 @@ namespace Unity.Notifications.Android
             GroupAlertBehaviour = GroupAlertBehaviours.GroupAlertAll;
             ShowTimestamp = false;
             ShowCustomTimestamp = false;
-            BigPicture = null;
+            m_BigPictureStyle = null;
 
             m_RepeatInterval = (-1L).ToTimeSpan();
             m_Color = new Color(0, 0, 0, 0);
