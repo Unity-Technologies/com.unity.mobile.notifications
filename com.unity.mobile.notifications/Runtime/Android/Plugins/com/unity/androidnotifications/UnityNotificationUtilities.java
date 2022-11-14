@@ -55,9 +55,9 @@ class UnityNotificationUtilities {
         try {
             Resources res = context.getResources();
             if (res != null) {
-                int id = res.getIdentifier(name, "mipmap", context.getPackageName());//, activity.getPackageName());
+                int id = res.getIdentifier(name, "mipmap", context.getPackageName());
                 if (id == 0)
-                    return res.getIdentifier(name, "drawable", context.getPackageName());//, activity.getPackageName());
+                    return res.getIdentifier(name, "drawable", context.getPackageName());
                 else
                     return id;
             }
