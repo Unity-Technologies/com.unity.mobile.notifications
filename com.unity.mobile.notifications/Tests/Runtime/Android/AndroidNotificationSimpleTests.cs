@@ -420,6 +420,37 @@ class AndroidNotificationSimpleTests
 
     [Test]
     [UnityPlatform(RuntimePlatform.Android)]
+    public void NotificationSerialization_BigPictureStyle()
+    {
+        const int notificationId = 816;
+
+        var original = new AndroidNotification("title", "content", DateTime.Now);
+        original.BigPicture = new BigPictureStyle()
+        {
+            LargeIcon = "icon_1",
+            Picture = "icon_0",
+            ContentTitle = "content_title",
+            ContentDescription = "content_description",
+            SummaryText = "summary",
+            ShowWhenCollapsed = true,
+        };
+
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var deserializedData = SerializeDeserializeNotification(builder);
+
+        Assert.AreEqual(NotificationStyle.BigPictureStyle, deserializedData.Notification.Style);
+        Assert.IsTrue(deserializedData.Notification.BigPicture.HasValue);
+        var bigPicture = deserializedData.Notification.BigPicture.Value;
+        Assert.AreEqual(original.BigPicture.Value.LargeIcon, bigPicture.LargeIcon);
+        Assert.AreEqual(original.BigPicture.Value.Picture, bigPicture.Picture);
+        Assert.AreEqual(original.BigPicture.Value.ContentTitle, bigPicture.ContentTitle);
+        Assert.AreEqual(original.BigPicture.Value.ContentDescription, bigPicture.ContentDescription);
+        Assert.AreEqual(original.BigPicture.Value.SummaryText, bigPicture.SummaryText);
+        Assert.AreEqual(original.BigPicture.Value.ShowWhenCollapsed, bigPicture.ShowWhenCollapsed);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
     public void OldTypeSerializedNotificationCanBedeserialized()
     {
         const int notificationId = 12345;
