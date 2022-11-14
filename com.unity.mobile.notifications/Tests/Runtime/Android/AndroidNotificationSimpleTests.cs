@@ -254,6 +254,11 @@ class AndroidNotificationSimpleTests
         return SerializeNotificationCustom_old("serializeNotificationCustom_v1", byteStream, javaNotif);
     }
 
+    static bool SerializeNotificationCustom_v2(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        return SerializeNotificationCustom_old("serializeNotificationCustom_v2", byteStream, javaNotif);
+    }
+
     static bool SerializeNotificationCustom_old(string method, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
     {
         using (var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream))
@@ -623,8 +628,27 @@ class AndroidNotificationSimpleTests
             var extras = builder.Call<AndroidJavaObject>("getExtras");
             extras.Call("putParcelable", "binder_item", bitmap);
 
-            // Serialize like we did in version 0
+            // Serialize like we did in version 1
             deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v1(u, s, j));
+        }
+
+        Assert.IsNotNull(deserialized);
+        CheckNotificationsMatch(original, deserialized.Notification);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CanDeserializeCustomSerializedNotification_v2()
+    {
+        const int notificationId = 255;
+
+        var original = CreateNotificationWithAllParameters();
+
+        AndroidNotificationIntentData deserialized;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            // Serialize like we did in version 2
+            deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v2(u, s, j));
         }
 
         Assert.IsNotNull(deserialized);

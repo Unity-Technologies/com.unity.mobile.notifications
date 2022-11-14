@@ -154,4 +154,47 @@ public class UnityNotificationTestUtils {
             Log.e(TAG_UNITY, "Failed to serialize notification", e);
         }
     }
+
+    // copy-paste of what serialization was in version 2 (except for hardcoded version number in here)
+    private static boolean serializeNotificationCustom_v2(Notification notification, DataOutputStream out) {
+        try {
+            out.write(UNITY_MAGIC_NUMBER);
+            out.writeInt(2); // NOTIFICATION_SERIALIZATION_VERSION
+
+            // serialize extras
+            boolean showWhen = notification.extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
+
+            out.writeInt(notification.extras.getInt(KEY_ID));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_TITLE));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_TEXT));
+            serializeString(out, notification.extras.getString(KEY_SMALL_ICON));
+            serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
+            out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
+            out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
+            serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+            out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
+            out.writeBoolean(showWhen);
+            serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
+            out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
+
+            serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
+            Integer color = UnityNotificationManager.getNotificationColor(notification);
+            out.writeBoolean(color != null);
+            if (color != null)
+                out.writeInt(color);
+            out.writeInt(notification.number);
+            out.writeBoolean(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
+            serializeString(out, notification.getGroup());
+            out.writeBoolean(0 != (notification.flags & Notification.FLAG_GROUP_SUMMARY));
+            out.writeInt(UnityNotificationManager.getNotificationGroupAlertBehavior(notification));
+            serializeString(out, notification.getSortKey());
+            if (showWhen)
+                out.writeLong(notification.when);
+
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to serialize notification", e);
+            return false;
+        }
+    }
 }
