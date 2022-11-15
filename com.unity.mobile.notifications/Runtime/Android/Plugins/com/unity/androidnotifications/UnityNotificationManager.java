@@ -55,6 +55,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private NotificationCallback mNotificationCallback;
     private int mExactSchedulingSetting = -1;
     private Method mCanScheduleExactAlarms;
+    private Method mBigIcon;
+    private Method mSetContentDescription;
+    private Method mShowBigPictureWhenCollapsed;
 
     static final String TAG_UNITY = "UnityNotifications";
 
@@ -898,9 +901,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (picture.charAt(0) == '/') {
             style.bigPicture(BitmapFactory.decodeFile(picture));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && picture.indexOf("://") > 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= 31) {
                 Icon icon = Icon.createWithContentUri(picture);
-                style.bigPicture(icon);
+                setBigPictureIcon(style, icon);
             } else {
                 Bitmap pic = loadBitmap(picture);
                 if (pic != null) {
@@ -909,20 +912,56 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         } else {
             Object pic = getIconFromResources(picture);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && pic instanceof Icon)
-                style.bigPicture((Icon)pic);
+            if (Build.VERSION.SDK_INT >= 31 && pic instanceof Icon)
+                setBigPictureIcon(style, pic);
             else if (pic instanceof Bitmap)
                 style.bigPicture((Bitmap)pic);
         }
 
         style.setBigContentTitle(extras.getString(KEY_BIG_CONTENT_TITLE));
         style.setSummaryText(extras.getString(KEY_BIG_SUMMARY_TEXT));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            style.setContentDescription(extras.getString(KEY_BIG_CONTENT_DESCRIPTION));
-            style.showBigPictureWhenCollapsed(extras.getBoolean(KEY_BIG_SHOW_WHEN_COLLAPSED, false));
+        if (Build.VERSION.SDK_INT >= 31) {
+            setBigPictureProps31(style, extras.getString(KEY_BIG_CONTENT_DESCRIPTION), extras.getBoolean(KEY_BIG_SHOW_WHEN_COLLAPSED, false));
         }
 
         builder.setStyle(style);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void setBigPictureIcon(Notification.BigPictureStyle style, Object icon) {
+        if (mBigIcon == null) {
+            try {
+                mBigIcon = Notification.BigPictureStyle.class.getMethod("bigPicture", Icon.class);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG_UNITY, "Failed to find method bigPicture", e);
+                return;
+            }
+        }
+
+        try {
+            mBigIcon.invoke(style, icon);
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to call method bigPicture", e);
+        }
+    }
+
+    private void setBigPictureProps31(Notification.BigPictureStyle style, String contentDesc, boolean showWhenCollapsed) {
+        if (mSetContentDescription == null || mShowBigPictureWhenCollapsed == null) {
+            try {
+                mSetContentDescription = Notification.BigPictureStyle.class.getMethod("setContentDescription", String.class);
+                mShowBigPictureWhenCollapsed = Notification.BigPictureStyle.class.getMethod("showBigPictureWhenCollapsed", boolean.class);
+            } catch (NoSuchMethodException e) {
+                Log.e(TAG_UNITY, "Failed to find method", e);
+                return;
+            }
+        }
+
+        try {
+            mSetContentDescription.invoke(style, contentDesc);
+            mShowBigPictureWhenCollapsed.invoke(style, showWhenCollapsed);
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to call method", e);
+        }
     }
 
     public static void setNotificationColor(Notification.Builder notificationBuilder, int color) {
