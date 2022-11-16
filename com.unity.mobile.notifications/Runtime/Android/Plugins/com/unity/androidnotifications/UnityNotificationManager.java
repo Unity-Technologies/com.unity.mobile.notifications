@@ -893,9 +893,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Object ico = getIcon(largeIcon);
         if (ico != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ico instanceof Icon)
-                builder.setLargeIcon((Icon)ico);
+                style.bigLargeIcon((Icon)ico);
             else
-                builder.setLargeIcon((Bitmap)ico);
+                style.bigLargeIcon((Bitmap)ico);
         }
 
         if (picture.charAt(0) == '/') {
