@@ -324,7 +324,7 @@ class UnityNotificationUtilities {
                 if (version >= 3) {
                     bigPicture = deserializeString(in);
                     if (bigPicture != null && bigPicture.length() > 0) {
-                        // the following only need to be put in if big text is there
+                        // the following only need to be put in if big picture is there
                         bigLargeIcon = deserializeString(in);
                         bigContentTitle = deserializeString(in);
                         bigContentDesc = deserializeString(in);
