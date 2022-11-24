@@ -65,6 +65,36 @@ AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 For details about other properties you can set, see [AndroidNotification](../api/Unity.Notifications.Android.AndroidNotification.html).
 
+### Send notification with big picture style
+
+BigPictureStyle is a predefined notification style centered around an image. Unity supports picture specified as resource ID, file path or URI. URI must be one of the type supported by Android. File path must be an absolute path on file system (note, that streaming assets on Android are inside .apk and accessed via URI, not path).
+
+Below is a simple example for downloading image from the internet and sending the notification with it.
+
+```c#
+IEnumerator DownloadAndShow(string url)
+{
+    var path = Path.Combine(Application.persistentDataPath, "image.jpg");
+    using (var uwr = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET))
+    {
+        uwr.downloadHandler = new DownloadHandlerFile(path);
+        yield return uwr.SendWebRequest();
+        if (uwr.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError(uwr.error);
+            yield break;
+        }
+    }
+
+    var notification = new AndroidNotification("Image", "Downloaded image", DateTime.Now);
+    notification.BigPicture = new BigPictureStyle()
+    {
+        Picture = path,
+    };
+    AndroidNotificationCenter.SendNotification(notification, ChannelId);
+}
+```
+
 ### Set icons
 
 You can set a custom icon as a small icon to display for each notification. If you don't specify any small icons, notifications will display the default application icon instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings; for more information, see [Notification Settings](Settings.html#custom-icons).
