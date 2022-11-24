@@ -948,7 +948,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private void setBigPictureProps31(Notification.BigPictureStyle style, String contentDesc, boolean showWhenCollapsed) {
         if (mSetContentDescription == null || mShowBigPictureWhenCollapsed == null) {
             try {
-                mSetContentDescription = Notification.BigPictureStyle.class.getMethod("setContentDescription", String.class);
+                mSetContentDescription = Notification.BigPictureStyle.class.getMethod("setContentDescription", CharSequence.class);
                 mShowBigPictureWhenCollapsed = Notification.BigPictureStyle.class.getMethod("showBigPictureWhenCollapsed", boolean.class);
             } catch (NoSuchMethodException e) {
                 Log.e(TAG_UNITY, "Failed to find method", e);
