@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.1.1] - UNRELEASED
+
+### Fixes:
+- [iOS] - Fix occasional crash when registering for push notifications.
+
 ## [2.1.0] - 2022-09-23
 
 ### Changes & Improvements:
