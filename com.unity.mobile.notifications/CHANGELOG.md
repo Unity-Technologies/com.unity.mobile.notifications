@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [UNRELEASED]
+## [Unreleased]
 
 ### Fixes:
 - [iOS] - Fix occasional crash when registering for push notifications.
