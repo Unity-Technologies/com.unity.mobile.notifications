@@ -52,13 +52,14 @@
 {
     struct iOSNotificationAuthorizationData authData;
     authData.granted = status == UNAuthorizationStatusAuthorized;
+    authData.error = NULL;
+    authData.deviceToken = NULL;
     NSString* deviceToken = nil;
     if (authData.granted)
     {
         deviceToken = [UnityNotificationManager deviceTokenFromNotification: notification];
         authData.deviceToken = [deviceToken UTF8String];
     }
-    authData.error = NULL;
 
     [_lock lock];
     _remoteNotificationsRegistered = status;
