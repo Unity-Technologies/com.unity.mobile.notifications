@@ -631,6 +631,9 @@ namespace Unity.Notifications.Android
                         permissionStatus = PermissionStatus.Denied;
                         SetPostPermissionSetting(permissionStatus);
                         break;
+                    case PermissionStatus.DeniedDontAskAgain:  // no longer used, revert to Denied
+                        permissionStatus = PermissionStatus.Denied;
+                        break;
                 }
 
                 return permissionStatus;
