@@ -23,7 +23,7 @@ namespace Unity.Notifications.Android
         Denied = 2,
 
         /// <summary>
-        /// User denied permission and expressed intent to not be prompted again.
+        /// No longer used. User denied permission and expressed intent to not be prompted again.
         /// </summary>
         DeniedDontAskAgain = 3,
 
@@ -53,7 +53,6 @@ namespace Unity.Notifications.Android
         /// Create a new request.
         /// Will show user a dialog asking for permission if that is required to post notifications and user hasn't permanently denied it already.
         /// </summary>
-        /// <see cref="PermissionStatus.DeniedDontAskAgain"/>
         public PermissionRequest()
         {
             Status = AndroidNotificationCenter.UserPermissionToPost;
@@ -61,6 +60,7 @@ namespace Unity.Notifications.Android
             {
                 case PermissionStatus.NotRequested:
                 case PermissionStatus.Denied:
+                case PermissionStatus.DeniedDontAskAgain:  // this one is no longer used, but might be found in settings
                     Status = PermissionStatus.RequestPending;
                     RequestPermission();
                     break;
@@ -72,7 +72,6 @@ namespace Unity.Notifications.Android
             var callbacks = new PermissionCallbacks();
             callbacks.PermissionGranted += (unused) => PermissionResponse(PermissionStatus.Allowed);
             callbacks.PermissionDenied += (unused) => PermissionResponse(PermissionStatus.Denied);
-            callbacks.PermissionDeniedAndDontAskAgain += (unused) => PermissionResponse(PermissionStatus.DeniedDontAskAgain);
             Permission.RequestUserPermission(AndroidNotificationCenter.PERMISSION_POST_NOTIFICATIONS, callbacks);
         }
 
