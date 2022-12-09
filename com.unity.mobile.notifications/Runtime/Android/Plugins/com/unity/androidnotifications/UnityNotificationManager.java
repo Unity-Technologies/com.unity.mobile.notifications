@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -145,6 +146,25 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     public int getTargetSdk() {
         return mContext.getApplicationInfo().targetSdkVersion;
+    }
+
+    public void registerNotificationChannelGroup(String id, String name, String description) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannelGroup group = new NotificationChannelGroup(id, name);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                group.setDescription(description);
+            }
+
+            getNotificationManager().createNotificationChannelGroup(group);
+        }
+    }
+
+    public void deleteNotificationChannelGroup(String id) {
+        if (id == null)
+            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getNotificationManager().deleteNotificationChannelGroup(id);
+        }
     }
 
     public void registerNotificationChannel(

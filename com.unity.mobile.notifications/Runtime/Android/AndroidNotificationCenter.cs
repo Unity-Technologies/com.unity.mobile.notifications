@@ -170,6 +170,11 @@ namespace Unity.Notifications.Android
             return klass.CallStatic<string>(getNotificationChannelId, notification);
         }
 
+        public void RegisterNotificationChannelGroup(AndroidNotificationChannelGroup group)
+        {
+            self.Call("registerNotificationChannelGroup", group.Id, group.Name, group.Description);
+        }
+
         public void RegisterNotificationChannel(AndroidNotificationChannel channel)
         {
             self.Call("registerNotificationChannel",
@@ -189,6 +194,11 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject[] GetNotificationChannels()
         {
             return self.Call<AndroidJavaObject[]>("getNotificationChannels");
+        }
+
+        public void DeleteNotificationChannelGroup(string id)
+        {
+            self.Call("deleteNotificationChannelGroup", id);
         }
 
         public void DeleteNotificationChannel(string channelId)
@@ -635,6 +645,32 @@ namespace Unity.Notifications.Android
 
                 return permissionStatus;
             }
+        }
+
+        /// <summary>
+        /// Register notification channel group.
+        /// </summary>
+        public static void RegisterNotificationChannelGroup(AndroidNotificationChannelGroup group)
+        {
+            if (!Initialize())
+                return;
+
+            if (string.IsNullOrEmpty(group.Id))
+                throw new Exception("Notification channel group ID is not specified.");
+            if (string.IsNullOrEmpty(group.Name))
+                throw new Exception("Notification channel group name is not specified.");
+
+            s_Jni.NotificationManager.RegisterNotificationChannelGroup(group);
+        }
+
+        /// <summary>
+        /// Delete notification channel group and all the channels in it.
+        /// </summary>
+        /// <param name="id">The ID of the group.</param>
+        public static void DeleteNotificationChannelGroup(string id)
+        {
+            if (Initialize())
+                s_Jni.NotificationManager.DeleteNotificationChannelGroup(id);
         }
 
         /// <summary>
