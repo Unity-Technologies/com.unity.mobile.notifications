@@ -76,6 +76,11 @@ namespace Unity.Notifications.Android
         public string Description { get; set; }
 
         /// <summary>
+        /// The ID of the registered channel group this channel belongs to.
+        /// </summary>
+        public string Group { get; set; }
+
+        /// <summary>
         /// Importance level which is applied to all notifications sent to the channel.
         /// This can be changed by users in the settings app. Android uses importance to determine how much the notification should interrupt the user (visually and audibly).
         /// The higher the importance of a notification, the more interruptive the notification will be.
@@ -141,6 +146,7 @@ namespace Unity.Notifications.Android
             Id = id;
             Name = name;
             Description = description;
+            Group = null;
             this.Importance = importance;
 
             CanBypassDnd = false;
