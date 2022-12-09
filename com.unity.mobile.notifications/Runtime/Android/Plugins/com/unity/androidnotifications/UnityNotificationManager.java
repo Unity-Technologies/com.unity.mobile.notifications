@@ -164,6 +164,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getNotificationManager().deleteNotificationChannelGroup(id);
+        } else {
+            for (NotificationChannelWrapper c : getNotificationChannels()) {
+                if (id.equals(c.group))
+                    deleteNotificationChannel(c.id);
+            }
         }
     }
 
