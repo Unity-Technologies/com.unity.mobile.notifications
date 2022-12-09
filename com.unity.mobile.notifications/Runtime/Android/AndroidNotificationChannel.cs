@@ -152,4 +152,26 @@ namespace Unity.Notifications.Android
             this.LockScreenVisibility = LockScreenVisibility.Public;
         }
     }
+
+    /// <summary>
+    /// Notification channel group description.
+    /// It is optional to put channels into groups, but looks nicer in Settings UI.
+    /// </summary>
+    public struct AndroidNotificationChannelGroup
+    {
+        /// <summary>
+        /// A unique ID for this group. Will rename the group if already exists.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// A user visible name for this group.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// A description for this group.
+        /// </summary>
+        public string Description { get; set; }
+    }
 }
