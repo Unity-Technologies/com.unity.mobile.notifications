@@ -187,7 +187,8 @@ namespace Unity.Notifications.Android
                 channel.CanBypassDnd,
                 channel.CanShowBadge,
                 channel.VibrationPattern,
-                (int)channel.LockScreenVisibility
+                (int)channel.LockScreenVisibility,
+                channel.Group
             );
         }
 
@@ -742,6 +743,7 @@ namespace Unity.Notifications.Android
                 ch.CanShowBadge = channel.Get<bool>("canShowBadge");
                 ch.VibrationPattern = channel.Get<long[]>("vibrationPattern");
                 ch.LockScreenVisibility = channel.Get<int>("lockscreenVisibility").ToLockScreenVisibility();
+                ch.Group = channel.Get<string>("group");
 
                 channels[i] = ch;
             }

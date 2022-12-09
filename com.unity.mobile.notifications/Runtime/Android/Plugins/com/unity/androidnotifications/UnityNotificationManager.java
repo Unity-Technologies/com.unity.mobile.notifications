@@ -177,7 +177,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             boolean canBypassDnd,
             boolean canShowBadge,
             long[] vibrationPattern,
-            int lockscreenVisibility) {
+            int lockscreenVisibility,
+            String group) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(id, name, importance);
             channel.setDescription(description);
@@ -187,6 +188,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             channel.setShowBadge(canShowBadge);
             channel.setVibrationPattern(vibrationPattern);
             channel.setLockscreenVisibility(lockscreenVisibility);
+            channel.setGroup(group);
 
             getNotificationManager().createNotificationChannel(channel);
         } else {
@@ -212,6 +214,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             editor.putBoolean("canShowBadge", canShowBadge);
             editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
             editor.putInt("lockscreenVisibility", lockscreenVisibility);
+            editor.putString("group", group);
 
             editor.apply();
         }
@@ -242,6 +245,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         channel.canBypassDnd = prefs.getBoolean("canBypassDnd", false);
         channel.canShowBadge = prefs.getBoolean("canShowBadge", false);
         channel.lockscreenVisibility = prefs.getInt("lockscreenVisibility", VISIBILITY_PUBLIC);
+        channel.group = prefs.getString("group", null);
         String[] vibrationPatternStr = prefs.getString("vibrationPattern", "[]").split(",");
 
         long[] vibrationPattern = new long[vibrationPatternStr.length];
@@ -276,6 +280,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         wrapper.canShowBadge = channel.canShowBadge();
         wrapper.vibrationPattern = channel.getVibrationPattern();
         wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
+        wrapper.group = channel.getGroup();
 
         return wrapper;
     }
@@ -948,6 +953,7 @@ class NotificationChannelWrapper {
     public boolean canShowBadge;
     public long[] vibrationPattern;
     public int lockscreenVisibility;
+    public String group;
 }
 
 // Implemented in C# to receive callback on notification show
