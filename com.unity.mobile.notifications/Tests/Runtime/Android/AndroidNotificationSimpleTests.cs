@@ -44,6 +44,12 @@ class AndroidNotificationSimpleTests
     public void BeforeAllTests()
     {
         var c = CreateNotificationChannelWithAllParameters();
+        var group = new AndroidNotificationChannelGroup()
+        {
+            Id = c.Group,
+            Name = "the group",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
         AndroidNotificationCenter.RegisterNotificationChannel(c);
     }
 
@@ -170,6 +176,31 @@ class AndroidNotificationSimpleTests
             foreach (var channel in channels)
                 AndroidNotificationCenter.RegisterNotificationChannel(channel);
         }
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void DeleteNotificationChannelGroup_GroupIsDeleted()
+    {
+        var group = new AndroidNotificationChannelGroup()
+        {
+            Id = "TestDelete",
+            Name = "Group for deletion",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
+        var channel = new AndroidNotificationChannel()
+        {
+            Id = "Temp",
+            Name = "Group testing",
+            Description = "Testing group",
+            Importance = Importance.Low,
+            Group = "TestDelete",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannel(channel);
+
+        AndroidNotificationCenter.DeleteNotificationChannelGroup("TestDelete");
+        var ch = AndroidNotificationCenter.GetNotificationChannel("Temp");
+        Assert.IsNull(ch.Id);
     }
 
     [Test]
