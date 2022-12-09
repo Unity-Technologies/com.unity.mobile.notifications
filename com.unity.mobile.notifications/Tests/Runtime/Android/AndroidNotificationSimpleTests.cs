@@ -54,6 +54,7 @@ class AndroidNotificationSimpleTests
         c.Name = "SerializeDeserializeNotification channel";
         c.Description = "SerializeDeserializeNotification channel";
         c.Importance = Importance.High;
+        c.Group = "Default";
         c.CanBypassDnd = true;
         c.CanShowBadge = true;
         c.EnableLights = true;
