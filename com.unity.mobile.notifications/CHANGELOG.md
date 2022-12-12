@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 
 ## [Unreleased]
 
+### Changes & Improvements:
+- [Android] - Added support for notification channel groups.
+
 ### Fixes:
 - [iOS] - Fix occasional crash when registering for push notifications.
 
