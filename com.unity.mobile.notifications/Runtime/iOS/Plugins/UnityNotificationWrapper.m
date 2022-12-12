@@ -191,12 +191,42 @@ const char* _GetLastRespondedNotificationUserText()
     return strdup(userText.UTF8String);
 }
 
-void* _CreateUNNotificationAction(const char* identifier, const char* title, int options)
+void* _CreateUNNotificationAction(const char* identifier, const char* title, int options, int iconType, const char* icon)
 {
+    enum IconType
+    {
+        kIconTypeNone = 0,
+        kIconTypeSystemImageName = 1,
+        kIconTypeTemplateImageName = 2,
+    };
+
     UNNotificationActionOptions opts = (UNNotificationActionOptions)options;
     NSString* idr = [NSString stringWithUTF8String: identifier];
     NSString* titl = [NSString stringWithUTF8String: title];
-    UNNotificationAction* action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts];
+    UNNotificationAction* action;
+
+    if (@available(iOS 15.0, *))
+    {
+        UNNotificationActionIcon *actionIcon = nil;
+        if (icon != NULL && iconType != kIconTypeNone)
+        {
+            NSString* iconName = [NSString stringWithUTF8String: icon];
+            switch (iconType)
+            {
+                case kIconTypeSystemImageName:
+                    actionIcon = [UNNotificationActionIcon iconWithSystemImageName: iconName];
+                    break;
+                case kIconTypeTemplateImageName:
+                    actionIcon = [UNNotificationActionIcon iconWithTemplateImageName: iconName];
+                    break;
+            }
+        }
+
+        action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts icon: actionIcon];
+    }
+    else
+        action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts];
+
     return (__bridge_retained void*)action;
 }
 

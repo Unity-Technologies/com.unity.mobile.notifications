@@ -16,6 +16,13 @@ namespace Unity.Notifications.iOS
         Foreground = (1 << 2),
     }
 
+    enum iOSNotificationActionIconType
+    {
+        None = 0,
+        SystemImageName = 1,
+        TemplateImageName = 2,
+    }
+
     /// <summary>
     /// Represents action for an actionable notification.
     /// Actions are supposed to be added to notification categories, which are then registered prior to sending notifications.
@@ -25,6 +32,9 @@ namespace Unity.Notifications.iOS
     /// <seealso cref="iOSNotificationCenter.GetLastRespondedNotificationAction"/>
     public class iOSNotificationAction
     {
+        iOSNotificationActionIconType _imageType;
+        string _image;
+
         /// <summary>
         /// An identifier for this action.
         /// Each action within an application unique must have unique ID.
@@ -71,7 +81,7 @@ namespace Unity.Notifications.iOS
         internal virtual IntPtr CreateUNNotificationAction()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            return iOSNotificationsWrapper._CreateUNNotificationAction(Id, Title, (int)Options);
+            return iOSNotificationsWrapper._CreateUNNotificationAction(Id, Title, (int)Options, (int)_imageType, _image);
 #else
             return IntPtr.Zero;
 #endif
