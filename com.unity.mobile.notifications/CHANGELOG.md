@@ -4,6 +4,9 @@ All notable changes to this package will be documented in this file.
 
 ## [Unreleased]
 
+### Changes & Improvements:
+- [iOS] - Added support for notification action icons (requires iOS 15).
+
 ### Fixes:
 - [iOS] - Fix occasional crash when registering for push notifications.
 
