@@ -56,6 +56,34 @@ namespace Unity.Notifications.iOS
         public iOSNotificationActionOptions Options { get; set; }
 
         /// <summary>
+        /// Set the icon for action using system symbol image name.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747241-iconwithsystemimagename?language=objc"/>
+        public string SystemImageName
+        {
+            get { return _imageType == iOSNotificationActionIconType.SystemImageName ? _image : null; }
+            set
+            {
+                _imageType = iOSNotificationActionIconType.SystemImageName;
+                _image = value;
+            }
+        }
+
+        /// <summary>
+        /// Set the icon for action using image from app's bundle.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747242-iconwithtemplateimagename?language=objc"/>
+        public string TemplateImageName
+        {
+            get { return _imageType == iOSNotificationActionIconType.TemplateImageName ? _image : null; }
+            set
+            {
+                _imageType = iOSNotificationActionIconType.TemplateImageName;
+                _image = value;
+            }
+        }
+
+        /// <summary>
         /// Creates new action.
         /// </summary>
         /// <param name="id">Unique identifier for this action</param>
