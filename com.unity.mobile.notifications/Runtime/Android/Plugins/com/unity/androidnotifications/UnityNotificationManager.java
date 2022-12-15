@@ -783,7 +783,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (ico != null)
             return ico;
 
-        return getIconFromResources(icon);
+        return getIconFromResources(icon, false);
     }
 
     private Object getIconForUri(String uri) {
@@ -796,10 +796,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return null;
     }
 
-    private Object getIconFromResources(String name) {
+    private Object getIconFromResources(String name, boolean forceBitmap) {
         int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, name);
         if (iconId != 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (!forceBitmap && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 return Icon.createWithResource(mContext, iconId);
             return BitmapFactory.decodeResource(mContext.getResources(), iconId);
         }
@@ -911,7 +911,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 }
             }
         } else {
-            Object pic = getIconFromResources(picture);
+            Object pic = getIconFromResources(picture, Build.VERSION.SDK_INT < 31);
             if (Build.VERSION.SDK_INT >= 31 && pic instanceof Icon)
                 setBigPictureIcon(style, pic);
             else if (pic instanceof Bitmap)
