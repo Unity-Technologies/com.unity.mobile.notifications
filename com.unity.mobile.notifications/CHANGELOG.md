@@ -5,6 +5,7 @@ All notable changes to this package will be documented in this file.
 ## [Unreleased]
 
 ### Fixes:
+- [Android] - No longer use DeniedAndDontAskAgain permission response, only Denied.
 - [iOS] - Fix occasional crash when registering for push notifications.
 
 ## [2.1.0] - 2022-09-23
