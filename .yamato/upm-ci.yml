@@ -83,7 +83,7 @@ test_Android_{{ editor.version }}:
        utr.bat --testproject=TestProjects\Main --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp  --architecture=arm64--artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
   after:
     - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-    - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d > upm-ci~/test-results/android/android_device_log.txt
+    - powershell %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -d; exit 0 > upm-ci~/test-results/android/android_device_log.txt
   artifacts:
     packages:
       paths:
