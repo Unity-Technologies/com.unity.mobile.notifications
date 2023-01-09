@@ -6,7 +6,8 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 - [Android] - No longer use DeniedAndDontAskAgain permission response, only Denied.
-- [iOS] - Fix occasional crash when registering for push notifications.
+- [iOS] - [issue 205](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/205) Fix occasional crash when registering for push notifications.
+- [iOS] - [issue 242](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/242) Fix exception when OriginalUtc key is missing in data (for example notification was scheduled using older package version).
 
 ## [2.1.0] - 2022-09-23
 
