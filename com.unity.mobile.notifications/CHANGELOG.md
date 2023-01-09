@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
+## [2.1.1] - 2023-01-04
 
 ### Fixes:
 - [Android] - No longer use DeniedAndDontAskAgain permission response, only Denied.
