@@ -228,7 +228,7 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// The necessairy properties for big picture style notification.
+        /// The necessary properties for big picture style notification.
         /// For convenience, assigning this property will also set the Style property.
         /// </summary>
         public BigPictureStyle? BigPicture
