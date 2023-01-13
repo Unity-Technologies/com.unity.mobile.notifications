@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+### Changes & Improvements:
+- [Android] - Added support for notification channel groups.
+
 ## [2.1.1] - 2023-01-04
 
 ### Fixes:

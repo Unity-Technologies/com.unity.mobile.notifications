@@ -43,12 +43,53 @@ class AndroidNotificationSimpleTests
     [OneTimeSetUp]
     public void BeforeAllTests()
     {
+        var c = CreateNotificationChannelWithAllParameters();
+        var group = new AndroidNotificationChannelGroup()
+        {
+            Id = c.Group,
+            Name = "the group",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
+        AndroidNotificationCenter.RegisterNotificationChannel(c);
+    }
+
+    AndroidNotificationChannel CreateNotificationChannelWithAllParameters()
+    {
         var c = new AndroidNotificationChannel();
         c.Id = kChannelId;
         c.Name = "SerializeDeserializeNotification channel";
         c.Description = "SerializeDeserializeNotification channel";
         c.Importance = Importance.High;
-        AndroidNotificationCenter.RegisterNotificationChannel(c);
+        c.Group = "Default";
+        c.CanBypassDnd = true;
+        c.CanShowBadge = true;
+        c.EnableLights = true;
+        c.EnableVibration = true;
+        c.VibrationPattern = new long[] { 5, 10 };
+        c.LockScreenVisibility = LockScreenVisibility.Public;
+        return c;
+    }
+
+    [Test]
+    public void AllAndroidNotificationChannelParametersAreTested()
+    {
+        var channel = CreateNotificationChannelWithAllParameters();
+        AndroidNotificationChannel defVals = default;
+
+        foreach (var field in typeof(AndroidNotificationChannel).GetFields())
+        {
+            var v1 = field.GetValue(channel);
+            var v2 = field.GetValue(defVals);
+            if (object.Equals(v1, v2))
+                Assert.Fail("Unassigned field " + field.Name);
+        }
+        foreach (var prop in typeof(AndroidNotificationChannel).GetProperties())
+        {
+            var v1 = prop.GetValue(channel);
+            var v2 = prop.GetValue(defVals);
+            if (object.Equals(v1, v2))
+                Assert.Fail("Unassigned property " + prop.Name);
+        }
     }
 
     [Test]
@@ -77,9 +118,34 @@ class AndroidNotificationSimpleTests
     {
         var channel = AndroidNotificationCenter.GetNotificationChannel(kChannelId);
         Assert.IsNotNull(channel);
-        Assert.AreEqual("SerializeDeserializeNotification channel", channel.Name);
-        Assert.AreEqual("SerializeDeserializeNotification channel", channel.Description);
-        Assert.AreEqual(Importance.High, channel.Importance);
+
+        var expected = CreateNotificationChannelWithAllParameters();
+
+        foreach (var field in typeof(AndroidNotificationChannel).GetFields())
+        {
+            var v1 = field.GetValue(channel);
+            var v2 = field.GetValue(expected);
+            if (!object.Equals(v1, v2))
+                Assert.Fail($"Unexpected value for field {field.Name}; expected {v2}, was {v1}");
+        }
+        foreach (var prop in typeof(AndroidNotificationChannel).GetProperties())
+        {
+            if (prop.Name == "CanBypassDnd") // this one returns the actual value, not the requested one (may differ)
+                continue;
+            if (prop.Name == "VibrationPattern")
+            {
+                Assert.IsNotNull(channel.VibrationPattern);
+                Assert.AreEqual(expected.VibrationPattern.Length, channel.VibrationPattern.Length);
+                for (int i = 0; i < expected.VibrationPattern.Length; ++i)
+                    Assert.AreEqual(expected.VibrationPattern[i], channel.VibrationPattern[i]);
+                continue;
+            }
+
+            var v1 = prop.GetValue(channel);
+            var v2 = prop.GetValue(expected);
+            if (!object.Equals(v1, v2))
+                Assert.Fail($"Unexpected value for property {prop.Name}; expected {v2}, was {v1}");
+        }
     }
 
     [Test]
@@ -110,6 +176,31 @@ class AndroidNotificationSimpleTests
             foreach (var channel in channels)
                 AndroidNotificationCenter.RegisterNotificationChannel(channel);
         }
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void DeleteNotificationChannelGroup_GroupIsDeleted()
+    {
+        var group = new AndroidNotificationChannelGroup()
+        {
+            Id = "TestDelete",
+            Name = "Group for deletion",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
+        var channel = new AndroidNotificationChannel()
+        {
+            Id = "Temp",
+            Name = "Group testing",
+            Description = "Testing group",
+            Importance = Importance.Low,
+            Group = "TestDelete",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannel(channel);
+
+        AndroidNotificationCenter.DeleteNotificationChannelGroup("TestDelete");
+        var ch = AndroidNotificationCenter.GetNotificationChannel("Temp");
+        Assert.IsNull(ch.Id);
     }
 
     [Test]
