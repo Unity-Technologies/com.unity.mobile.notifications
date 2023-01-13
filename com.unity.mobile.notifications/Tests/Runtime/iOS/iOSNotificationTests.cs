@@ -388,4 +388,26 @@ class iOSNotificationTests
         Assert.AreEqual(trigger2.Minute, retTrigger.Minute);
         Assert.AreEqual(trigger2.UtcTime, retTrigger.UtcTime);
     }
+
+    [Test]
+    public void iOSNotificationCalendarTrigger_HandlesMissingUtcField()
+    {
+        var original = new iOSNotificationCalendarTrigger()
+        {
+            Day = 5,
+        };
+
+        var notification = new iOSNotification()
+        {
+            Trigger = original,
+        };
+
+        // clear UserInfo, where UTC flag is stored
+        notification.UserInfo.Clear();
+
+        Assert.AreEqual(iOSNotificationTriggerType.Calendar, notification.Trigger.Type);
+        var result = (iOSNotificationCalendarTrigger)notification.Trigger;
+        Assert.AreEqual(5, result.Day);
+        Assert.IsFalse(result.UtcTime);
+    }
 }
