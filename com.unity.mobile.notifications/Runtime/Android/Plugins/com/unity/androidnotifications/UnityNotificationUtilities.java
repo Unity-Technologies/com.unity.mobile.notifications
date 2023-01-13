@@ -30,6 +30,12 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_NOTIFI
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT_INTERVAL;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SMALL_ICON;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_SHOW_IN_FOREGROUND;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_BIG_LARGE_ICON;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_BIG_PICTURE;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_BIG_CONTENT_TITLE;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_BIG_SUMMARY_TEXT;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_BIG_CONTENT_DESCRIPTION;
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_BIG_SHOW_WHEN_COLLAPSED;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 class UnityNotificationUtilities {
@@ -42,7 +48,7 @@ class UnityNotificationUtilities {
     // magic stands for "Unity Mobile Notifications Notification"
     static final byte[] UNITY_MAGIC_NUMBER = new byte[] { 'U', 'M', 'N', 'N'};
     private static final byte[] UNITY_MAGIC_NUMBER_PARCELLED = new byte[] { 'U', 'M', 'N', 'P'};
-    private static final int NOTIFICATION_SERIALIZATION_VERSION = 2;
+    private static final int NOTIFICATION_SERIALIZATION_VERSION = 3;
     private static final int INTENT_SERIALIZATION_VERSION = 0;
 
     static final String SAVED_NOTIFICATION_PRIMARY_KEY = "data";
@@ -55,9 +61,9 @@ class UnityNotificationUtilities {
         try {
             Resources res = context.getResources();
             if (res != null) {
-                int id = res.getIdentifier(name, "mipmap", context.getPackageName());//, activity.getPackageName());
+                int id = res.getIdentifier(name, "mipmap", context.getPackageName());
                 if (id == 0)
-                    return res.getIdentifier(name, "drawable", context.getPackageName());//, activity.getPackageName());
+                    return res.getIdentifier(name, "drawable", context.getPackageName());
                 else
                     return id;
             }
@@ -148,6 +154,17 @@ class UnityNotificationUtilities {
             out.writeBoolean(showWhen);
             serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
             out.writeBoolean(notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true));
+
+            String bigPicture = notification.extras.getString(KEY_BIG_PICTURE);
+            serializeString(out, bigPicture);
+            if (bigPicture != null && bigPicture.length() > 0) {
+                // the following only need to be put in if big picture is there
+                serializeString(out, notification.extras.getString(KEY_BIG_LARGE_ICON));
+                serializeString(out, notification.extras.getString(KEY_BIG_CONTENT_TITLE));
+                serializeString(out, notification.extras.getString(KEY_BIG_CONTENT_DESCRIPTION));
+                serializeString(out, notification.extras.getString(KEY_BIG_SUMMARY_TEXT));
+                out.writeBoolean(notification.extras.getBoolean(KEY_BIG_SHOW_WHEN_COLLAPSED, false));
+            }
 
             serializeString(out, Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? null : notification.getChannelId());
             Integer color = UnityNotificationManager.getNotificationColor(notification);
@@ -280,6 +297,8 @@ class UnityNotificationUtilities {
             long fireTime, repeatInterval;
             boolean usesStopWatch, showWhen, showInForeground = true;
             Bundle extras = null;
+            String bigPicture = null, bigLargeIcon = null, bigContentTitle = null, bigSummary = null, bigContentDesc = null;
+            boolean bigShowWhenCollapsed = false;
             if (version < 2) {
                 // no longer serialized since v2
                 extras = deserializeParcelable(in);
@@ -301,6 +320,18 @@ class UnityNotificationUtilities {
                 intentData = deserializeString(in);
                 if (version > 0)
                     showInForeground = in.readBoolean();
+
+                if (version >= 3) {
+                    bigPicture = deserializeString(in);
+                    if (bigPicture != null && bigPicture.length() > 0) {
+                        // the following only need to be put in if big picture is there
+                        bigLargeIcon = deserializeString(in);
+                        bigContentTitle = deserializeString(in);
+                        bigContentDesc = deserializeString(in);
+                        bigSummary = deserializeString(in);
+                        bigShowWhenCollapsed = in.readBoolean();
+                    }
+                }
             } else {
                 title = extras.getString(Notification.EXTRA_TITLE);
                 text = extras.getString(Notification.EXTRA_TEXT);
@@ -327,7 +358,8 @@ class UnityNotificationUtilities {
             String sortKey = deserializeString(in);
             long when = showWhen ? in.readLong() : 0;
 
-            Notification.Builder builder = UnityNotificationManager.getNotificationManagerImpl(context).createNotificationBuilder(channelId);
+            UnityNotificationManager manager = UnityNotificationManager.getNotificationManagerImpl(context);
+            Notification.Builder builder = manager.createNotificationBuilder(channelId);
             if (extras != null)
                 builder.setExtras(extras);
             else {
@@ -348,6 +380,8 @@ class UnityNotificationUtilities {
                 builder.setContentText(text);
             if (bigText != null)
                 builder.setStyle(new Notification.BigTextStyle().bigText(bigText));
+            else if (bigPicture != null)
+                manager.setupBigPictureStyle(builder, bigLargeIcon, bigPicture, bigContentTitle, bigContentDesc, bigSummary, bigShowWhenCollapsed);
             if (haveColor)
                 UnityNotificationManager.setNotificationColor(builder, color);
             if (number >= 0)

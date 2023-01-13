@@ -6,6 +6,8 @@ All notable changes to this package will be documented in this file.
 
 ### Changes & Improvements:
 - [Android] - Added support for notification channel groups.
+- [Android] - Added support for BigPicture style.
+- [Android] - Icons now support local files and URIs.
 
 ## [2.1.1] - 2023-01-04
 

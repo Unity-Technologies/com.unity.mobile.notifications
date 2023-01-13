@@ -345,6 +345,11 @@ class AndroidNotificationSimpleTests
         return SerializeNotificationCustom_old("serializeNotificationCustom_v1", byteStream, javaNotif);
     }
 
+    static bool SerializeNotificationCustom_v2(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        return SerializeNotificationCustom_old("serializeNotificationCustom_v2", byteStream, javaNotif);
+    }
+
     static bool SerializeNotificationCustom_old(string method, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
     {
         using (var dataStream = new AndroidJavaObject("java.io.DataOutputStream", byteStream))
@@ -502,6 +507,37 @@ class AndroidNotificationSimpleTests
         var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
         // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
         Assert.IsNull(bitmapAfterSerialization);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void NotificationSerialization_BigPictureStyle()
+    {
+        const int notificationId = 816;
+
+        var original = new AndroidNotification("title", "content", DateTime.Now);
+        original.BigPicture = new BigPictureStyle()
+        {
+            LargeIcon = "icon_1",
+            Picture = "icon_0",
+            ContentTitle = "content_title",
+            ContentDescription = "content_description",
+            SummaryText = "summary",
+            ShowWhenCollapsed = true,
+        };
+
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var deserializedData = SerializeDeserializeNotification(builder);
+
+        Assert.AreEqual(NotificationStyle.BigPictureStyle, deserializedData.Notification.Style);
+        Assert.IsTrue(deserializedData.Notification.BigPicture.HasValue);
+        var bigPicture = deserializedData.Notification.BigPicture.Value;
+        Assert.AreEqual(original.BigPicture.Value.LargeIcon, bigPicture.LargeIcon);
+        Assert.AreEqual(original.BigPicture.Value.Picture, bigPicture.Picture);
+        Assert.AreEqual(original.BigPicture.Value.ContentTitle, bigPicture.ContentTitle);
+        Assert.AreEqual(original.BigPicture.Value.ContentDescription, bigPicture.ContentDescription);
+        Assert.AreEqual(original.BigPicture.Value.SummaryText, bigPicture.SummaryText);
+        Assert.AreEqual(original.BigPicture.Value.ShowWhenCollapsed, bigPicture.ShowWhenCollapsed);
     }
 
     [Test]
@@ -714,8 +750,27 @@ class AndroidNotificationSimpleTests
             var extras = builder.Call<AndroidJavaObject>("getExtras");
             extras.Call("putParcelable", "binder_item", bitmap);
 
-            // Serialize like we did in version 0
+            // Serialize like we did in version 1
             deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v1(u, s, j));
+        }
+
+        Assert.IsNotNull(deserialized);
+        CheckNotificationsMatch(original, deserialized.Notification);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CanDeserializeCustomSerializedNotification_v2()
+    {
+        const int notificationId = 255;
+
+        var original = CreateNotificationWithAllParameters();
+
+        AndroidNotificationIntentData deserialized;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            // Serialize like we did in version 2
+            deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v2(u, s, j));
         }
 
         Assert.IsNotNull(deserialized);

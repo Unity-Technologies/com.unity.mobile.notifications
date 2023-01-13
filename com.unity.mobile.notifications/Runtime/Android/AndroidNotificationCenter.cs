@@ -53,6 +53,14 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject KEY_NOTIFICATION;
         public AndroidJavaObject KEY_SMALL_ICON;
         public AndroidJavaObject KEY_SHOW_IN_FOREGROUND;
+        public AndroidJavaObject KEY_BIG_PICTURE;
+
+        // these are lesser used, don't waste java global refs on them
+        public string KEY_BIG_LARGE_ICON;
+        public string KEY_BIG_CONTENT_TITLE;
+        public string KEY_BIG_SUMMARY_TEXT;
+        public string KEY_BIG_CONTENT_DESCRIPTION;
+        public string KEY_BIG_SHOW_WHEN_COLLAPSED;
 
         private JniMethodID getNotificationFromIntent;
         private JniMethodID setNotificationIcon;
@@ -91,6 +99,12 @@ namespace Unity.Notifications.Android
             KEY_NOTIFICATION = clazz.GetStatic<AndroidJavaObject>("KEY_NOTIFICATION");
             KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
             KEY_SHOW_IN_FOREGROUND = clazz.GetStatic<AndroidJavaObject>("KEY_SHOW_IN_FOREGROUND");
+            KEY_BIG_PICTURE = clazz.GetStatic<AndroidJavaObject>("KEY_BIG_PICTURE");
+            KEY_BIG_LARGE_ICON = clazz.GetStatic<string>("KEY_BIG_LARGE_ICON");
+            KEY_BIG_CONTENT_TITLE = clazz.GetStatic<string>("KEY_BIG_CONTENT_TITLE");
+            KEY_BIG_SUMMARY_TEXT = clazz.GetStatic<string>("KEY_BIG_SUMMARY_TEXT");
+            KEY_BIG_CONTENT_DESCRIPTION = clazz.GetStatic<string>("KEY_BIG_CONTENT_DESCRIPTION");
+            KEY_BIG_SHOW_WHEN_COLLAPSED = clazz.GetStatic<string>("KEY_BIG_SHOW_WHEN_COLLAPSED");
 
             CollectMethods(clazz);
 #else
@@ -102,6 +116,12 @@ namespace Unity.Notifications.Android
             KEY_NOTIFICATION = null;
             KEY_SMALL_ICON = null;
             KEY_SHOW_IN_FOREGROUND = null;
+            KEY_BIG_PICTURE = null;
+            KEY_BIG_LARGE_ICON = null;
+            KEY_BIG_CONTENT_TITLE = null;
+            KEY_BIG_SUMMARY_TEXT = null;
+            KEY_BIG_CONTENT_DESCRIPTION = null;
+            KEY_BIG_SHOW_WHEN_COLLAPSED = null;
 #endif
         }
 
@@ -250,6 +270,19 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject CreateNotificationBuilder(String channelId)
         {
             return self.Call<AndroidJavaObject>(createNotificationBuilder, channelId);
+        }
+
+        public void SetupBigPictureStyle(AndroidJavaObject builder, BigPictureStyle bigPicture)
+        {
+            self.Call("setupBigPictureStyle",
+                builder,
+                bigPicture.LargeIcon,
+                bigPicture.Picture,
+                bigPicture.ContentTitle,
+                bigPicture.ContentDescription,
+                bigPicture.SummaryText,
+                bigPicture.ShowWhenCollapsed
+            );
         }
     }
 
@@ -463,6 +496,11 @@ namespace Unity.Notifications.Android
             return bundle.Call<bool>(getBoolean, key, defaultValue);
         }
 
+        public bool GetBoolean(AndroidJavaObject bundle, string key, bool defaultValue)
+        {
+            return bundle.Call<bool>(getBoolean, key, defaultValue);
+        }
+
         public int GetInt(AndroidJavaObject bundle, AndroidJavaObject key, int defaultValue)
         {
             return bundle.Call<int>(getInt, key, defaultValue);
@@ -474,6 +512,11 @@ namespace Unity.Notifications.Android
         }
 
         public string GetString(AndroidJavaObject bundle, AndroidJavaObject key)
+        {
+            return bundle.Call<string>(getString, key);
+        }
+
+        public string GetString(AndroidJavaObject bundle, string key)
         {
             return bundle.Call<string>(getString, key);
         }
@@ -1019,13 +1062,24 @@ namespace Unity.Notifications.Android
                 s_Jni.NotificationBuilder.SetAutoCancel(notificationBuilder, notification.ShouldAutoCancel);
             if (notification.Number >= 0)
                 s_Jni.NotificationBuilder.SetNumber(notificationBuilder, notification.Number);
-            if (notification.Style == NotificationStyle.BigTextStyle)
+            switch (notification.Style)
             {
-                using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
-                {
-                    style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
-                    s_Jni.NotificationBuilder.SetStyle(notificationBuilder, style);
-                }
+                case NotificationStyle.None:
+                    break;
+                case NotificationStyle.BigPictureStyle:
+                    if (notification.BigPicture.HasValue)
+                    {
+                        var bigPicture = notification.BigPicture.Value;
+                        s_Jni.NotificationManager.SetupBigPictureStyle(notificationBuilder, bigPicture);
+                    }
+                    break;
+                case NotificationStyle.BigTextStyle:
+                    using (var style = new AndroidJavaObject("android.app.Notification$BigTextStyle"))
+                    {
+                        style.Call<AndroidJavaObject>("bigText", notification.Text).Dispose();
+                        s_Jni.NotificationBuilder.SetStyle(notificationBuilder, style);
+                    }
+                    break;
             }
             long timestampValue = notification.ShowCustomTimestamp ? notification.CustomTimestamp.ToLong() : fireTime;
             s_Jni.NotificationBuilder.SetWhen(notificationBuilder, timestampValue);
@@ -1077,8 +1131,22 @@ namespace Unity.Notifications.Android
 
                 if (s_Jni.Bundle.ContainsKey(extras, s_Jni.Notification.EXTRA_BIG_TEXT))
                     notification.Style = NotificationStyle.BigTextStyle;
+                else if (s_Jni.Bundle.ContainsKey(extras, s_Jni.NotificationManager.KEY_BIG_PICTURE))
+                    notification.Style = NotificationStyle.BigPictureStyle;
                 else
                     notification.Style = NotificationStyle.None;
+
+                if (notification.Style == NotificationStyle.BigPictureStyle)
+                {
+                    var bigPicture = new BigPictureStyle();
+                    bigPicture.Picture = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_BIG_PICTURE);
+                    bigPicture.LargeIcon = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_BIG_LARGE_ICON);
+                    bigPicture.ContentTitle = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_BIG_CONTENT_TITLE);
+                    bigPicture.ContentDescription = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_BIG_CONTENT_DESCRIPTION);
+                    bigPicture.SummaryText = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_BIG_SUMMARY_TEXT);
+                    bigPicture.ShowWhenCollapsed = s_Jni.Bundle.GetBoolean(extras, s_Jni.NotificationManager.KEY_BIG_SHOW_WHEN_COLLAPSED, false);
+                    notification.BigPicture = bigPicture;
+                }
 
                 notification.Color = s_Jni.NotificationManager.GetNotificationColor(notificationObj);
                 notification.Number = s_Jni.Notification.Number(notificationObj);
