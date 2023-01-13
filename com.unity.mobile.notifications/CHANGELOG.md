@@ -2,10 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
-## [2.1.1] - 2023-01-04
+## [Unreleased]
 
 ### Changes & Improvements:
 - [Android] - Added support for notification channel groups.
+
+## [2.1.1] - 2023-01-04
 
 ### Fixes:
 - [Android] - No longer use DeniedAndDontAskAgain permission response, only Denied.
