@@ -203,34 +203,44 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["Channels"]["List All Channels"] = new Action(() => { ListAllChannels(); });
             m_groups["Channels"]["Create Default Simple Channel"] = new Action(() => {
                 CreateChannel(
+                    new AndroidNotificationChannelGroup()
+                    {
+                        Id = "Main",
+                        Name = "Main"
+                    },
                     new AndroidNotificationChannel()
                     {
                         Id = "default_channel",
                         Name = "Default Channel",
                         Importance = Importance.Default,
-                        Description = "Default Notifications"
+                        Description = "Default Notifications",
+                        Group = "Main",
                     }
                 );
             });
             m_groups["Channels"]["Create Secondary Simple Channel"] = new Action(() => {
                 CreateChannel(
+                    SecondaryGroup(),
                     new AndroidNotificationChannel()
                     {
                         Id = "secondary_channel",
                         Name = "Secondary Channel",
                         Importance = Importance.Low,
-                        Description = "Secondary Notifications"
+                        Description = "Secondary Notifications",
+                        Group = "SecondaryGroup",
                     }
                 );
             });
             m_groups["Channels"]["Create Fancy Channel"] = new Action(() => {
                 CreateChannel(
+                    SecondaryGroup(),
                     new AndroidNotificationChannel()
                     {
                         Id = "fancy_channel",
                         Name = "Fancy Channel",
                         Importance = Importance.High,
                         Description = "Fancy Notifications",
+                        Group = "SecondaryGroup",
                         CanBypassDnd = true,
                         CanShowBadge = true,
                         EnableLights = true,
@@ -286,6 +296,16 @@ namespace Unity.Notifications.Tests.Sample
             ButtonCheckStatusExplicitID.interactable = false;
 
             m_gameObjectReferences.ButtonGroupTemplate.gameObject.SetActive(false);
+        }
+
+        AndroidNotificationChannelGroup SecondaryGroup()
+        {
+            return new AndroidNotificationChannelGroup()
+            {
+                Id = "SecondaryGroup",
+                Name = "Different channels",
+                Description = "Group for other channels",
+            };
         }
 
         void RequestNotificationPermission()
@@ -403,11 +423,12 @@ namespace Unity.Notifications.Tests.Sample
             }
         }
 
-        public void CreateChannel(AndroidNotificationChannel channel)
+        public void CreateChannel(AndroidNotificationChannelGroup group, AndroidNotificationChannel channel)
         {
             m_LOGGER
                 .Blue($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Call {MethodBase.GetCurrentMethod().Name}")
                 .Properties(channel, 1);
+            AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
             AndroidNotificationCenter.RegisterNotificationChannel(channel);
         }
 

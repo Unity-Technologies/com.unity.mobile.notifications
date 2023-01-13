@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -159,6 +160,30 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return mContext.getApplicationInfo().targetSdkVersion;
     }
 
+    public void registerNotificationChannelGroup(String id, String name, String description) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannelGroup group = new NotificationChannelGroup(id, name);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                group.setDescription(description);
+            }
+
+            getNotificationManager().createNotificationChannelGroup(group);
+        }
+    }
+
+    public void deleteNotificationChannelGroup(String id) {
+        if (id == null)
+            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getNotificationManager().deleteNotificationChannelGroup(id);
+        } else {
+            for (NotificationChannelWrapper c : getNotificationChannels()) {
+                if (id.equals(c.group))
+                    deleteNotificationChannel(c.id);
+            }
+        }
+    }
+
     public void registerNotificationChannel(
             String id,
             String name,
@@ -169,7 +194,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
             boolean canBypassDnd,
             boolean canShowBadge,
             long[] vibrationPattern,
-            int lockscreenVisibility) {
+            int lockscreenVisibility,
+            String group) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(id, name, importance);
             channel.setDescription(description);
@@ -179,6 +205,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             channel.setShowBadge(canShowBadge);
             channel.setVibrationPattern(vibrationPattern);
             channel.setLockscreenVisibility(lockscreenVisibility);
+            channel.setGroup(group);
 
             getNotificationManager().createNotificationChannel(channel);
         } else {
@@ -204,6 +231,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             editor.putBoolean("canShowBadge", canShowBadge);
             editor.putString("vibrationPattern", Arrays.toString(vibrationPattern));
             editor.putInt("lockscreenVisibility", lockscreenVisibility);
+            editor.putString("group", group);
 
             editor.apply();
         }
@@ -234,6 +262,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         channel.canBypassDnd = prefs.getBoolean("canBypassDnd", false);
         channel.canShowBadge = prefs.getBoolean("canShowBadge", false);
         channel.lockscreenVisibility = prefs.getInt("lockscreenVisibility", VISIBILITY_PUBLIC);
+        channel.group = prefs.getString("group", null);
         String[] vibrationPatternStr = prefs.getString("vibrationPattern", "[]").split(",");
 
         long[] vibrationPattern = new long[vibrationPatternStr.length];
@@ -268,6 +297,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         wrapper.canShowBadge = channel.canShowBadge();
         wrapper.vibrationPattern = channel.getVibrationPattern();
         wrapper.lockscreenVisibility = channel.getLockscreenVisibility();
+        wrapper.group = channel.getGroup();
 
         return wrapper;
     }
@@ -1090,6 +1120,7 @@ class NotificationChannelWrapper {
     public boolean canShowBadge;
     public long[] vibrationPattern;
     public int lockscreenVisibility;
+    public String group;
 }
 
 // Implemented in C# to receive callback on notification show
