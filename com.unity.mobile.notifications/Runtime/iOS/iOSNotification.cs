@@ -389,8 +389,19 @@ namespace Unity.Notifications.iOS
                                 UtcTime = true,
                                 Repeats = data.trigger.calendar.repeats != 0
                             };
-                            if (userInfo != null && userInfo["OriginalUtc"] == "0")
-                                trigger = trigger.ToLocal();
+                            if (userInfo != null)
+                            {
+                                string utc;
+                                if (userInfo.TryGetValue("OriginalUtc", out utc))
+                                {
+                                    if (utc == "0")
+                                        trigger = trigger.ToLocal();
+                                }
+                                else
+                                    trigger.UtcTime = false;
+                            }
+                            else
+                                trigger.UtcTime = false;
                             return trigger;
                         }
                     case iOSNotificationTriggerType.Location:
