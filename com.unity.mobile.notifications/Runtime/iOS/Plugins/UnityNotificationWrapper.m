@@ -240,14 +240,23 @@ void* _CreateUNNotificationAction(const char* identifier, const char* title, int
     return (__bridge_retained void*)action;
 }
 
-void* _CreateUNTextInputNotificationAction(const char* identifier, const char* title, int options, const char* buttonTitle, const char* placeholder)
+void* _CreateUNTextInputNotificationAction(const char* identifier, const char* title, int options, int iconType, const char* icon, const char* buttonTitle, const char* placeholder)
 {
     UNNotificationActionOptions opts = (UNNotificationActionOptions)options;
     NSString* idr = [NSString stringWithUTF8String: identifier];
     NSString* titl = [NSString stringWithUTF8String: title];
     NSString* btnTitle = [NSString stringWithUTF8String: buttonTitle];
     NSString* placeHolder = placeholder ? [NSString stringWithUTF8String: placeholder] : NULL;
-    UNTextInputNotificationAction* action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+    UNTextInputNotificationAction* action;
+
+    if (@available(iOS 15.0, *))
+    {
+        UNNotificationActionIcon* actionIcon = (UNNotificationActionIcon*)CreateNotificationActionIcon(iconType, icon);
+        action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts icon: actionIcon textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+    }
+    else
+        action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+
     return (__bridge_retained void*)action;
 }
 

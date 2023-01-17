@@ -32,8 +32,8 @@ namespace Unity.Notifications.iOS
     /// <seealso cref="iOSNotificationCenter.GetLastRespondedNotificationAction"/>
     public class iOSNotificationAction
     {
-        iOSNotificationActionIconType _imageType;
-        string _image;
+        internal iOSNotificationActionIconType _imageType;
+        internal string _image;
 
         /// <summary>
         /// An identifier for this action.
@@ -164,7 +164,7 @@ namespace Unity.Notifications.iOS
         internal override IntPtr CreateUNNotificationAction()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            return iOSNotificationsWrapper._CreateUNTextInputNotificationAction(Id, Title, (int)Options, TextInputButtonTitle, TextInputPlaceholder);
+            return iOSNotificationsWrapper._CreateUNTextInputNotificationAction(Id, Title, (int)Options, (int)_imageType, _image, TextInputButtonTitle, TextInputPlaceholder);
 #else
             return IntPtr.Zero;
 #endif
