@@ -160,7 +160,11 @@ namespace Unity.Notifications.Tests.Sample
             {
                 SystemImageName = "multiply.circle.fill",
             };
-            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Respond", iOSNotificationActionOptions.Foreground, "Respond");
+            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Respond", iOSNotificationActionOptions.Foreground, "Respond")
+            {
+                // drop image2.png from project dir to XCode for it to work
+                TemplateImageName = "image2",
+            };
             var twoActions = new iOSNotificationCategory("THREE_ACTIONS");
             twoActions.AddActions(new[] { actionConfirm, actionLater, actionReject });
             var withInput = new iOSNotificationCategory("WITH_INPUT");
