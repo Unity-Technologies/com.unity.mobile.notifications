@@ -98,10 +98,10 @@ namespace Unity.Notifications.iOS
         private static extern void _ReadAttachmentsNSArray(IntPtr handle, IntPtr nsArray, ReceiveUNNotificationAttachmentCallback callback);
 
         [DllImport("__Internal")]
-        internal static extern IntPtr _CreateUNNotificationAction(string id, string title, int options);
+        internal static extern IntPtr _CreateUNNotificationAction(string id, string title, int options, int iconType, string icon);
 
         [DllImport("__Internal")]
-        internal static extern IntPtr _CreateUNTextInputNotificationAction(string id, string title, int options, string buttonTitle, string placeholder);
+        internal static extern IntPtr _CreateUNTextInputNotificationAction(string id, string title, int options, int iconType, string icon, string buttonTitle, string placeholder);
 
         [DllImport("__Internal")]
         private static extern void _ReleaseNSObject(IntPtr obj);

@@ -191,23 +191,72 @@ const char* _GetLastRespondedNotificationUserText()
     return strdup(userText.UTF8String);
 }
 
-void* _CreateUNNotificationAction(const char* identifier, const char* title, int options)
+static NSObject* CreateNotificationActionIcon(int iconType, const char* icon)
+{
+    enum IconType
+    {
+        kIconTypeNone = 0,
+        kIconTypeSystemImageName = 1,
+        kIconTypeTemplateImageName = 2,
+    };
+
+    NSObject* actionIcon = nil;
+
+    if (@available(iOS 15.0, *))
+    {
+        if (icon != NULL && iconType != kIconTypeNone)
+        {
+            NSString* iconName = [NSString stringWithUTF8String: icon];
+            switch (iconType)
+            {
+                case kIconTypeSystemImageName:
+                    actionIcon = [UNNotificationActionIcon iconWithSystemImageName: iconName];
+                    break;
+                case kIconTypeTemplateImageName:
+                    actionIcon = [UNNotificationActionIcon iconWithTemplateImageName: iconName];
+                    break;
+            }
+        }
+    }
+
+    return actionIcon;
+}
+
+void* _CreateUNNotificationAction(const char* identifier, const char* title, int options, int iconType, const char* icon)
 {
     UNNotificationActionOptions opts = (UNNotificationActionOptions)options;
     NSString* idr = [NSString stringWithUTF8String: identifier];
     NSString* titl = [NSString stringWithUTF8String: title];
-    UNNotificationAction* action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts];
+    UNNotificationAction* action;
+
+    if (@available(iOS 15.0, *))
+    {
+        UNNotificationActionIcon* actionIcon = (UNNotificationActionIcon*)CreateNotificationActionIcon(iconType, icon);
+        action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts icon: actionIcon];
+    }
+    else
+        action = [UNNotificationAction actionWithIdentifier: idr title: titl options: opts];
+
     return (__bridge_retained void*)action;
 }
 
-void* _CreateUNTextInputNotificationAction(const char* identifier, const char* title, int options, const char* buttonTitle, const char* placeholder)
+void* _CreateUNTextInputNotificationAction(const char* identifier, const char* title, int options, int iconType, const char* icon, const char* buttonTitle, const char* placeholder)
 {
     UNNotificationActionOptions opts = (UNNotificationActionOptions)options;
     NSString* idr = [NSString stringWithUTF8String: identifier];
     NSString* titl = [NSString stringWithUTF8String: title];
     NSString* btnTitle = [NSString stringWithUTF8String: buttonTitle];
     NSString* placeHolder = placeholder ? [NSString stringWithUTF8String: placeholder] : NULL;
-    UNTextInputNotificationAction* action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+    UNTextInputNotificationAction* action;
+
+    if (@available(iOS 15.0, *))
+    {
+        UNNotificationActionIcon* actionIcon = (UNNotificationActionIcon*)CreateNotificationActionIcon(iconType, icon);
+        action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts icon: actionIcon textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+    }
+    else
+        action = [UNTextInputNotificationAction actionWithIdentifier: idr title: titl options: opts textInputButtonTitle: btnTitle textInputPlaceholder: placeHolder];
+
     return (__bridge_retained void*)action;
 }
 

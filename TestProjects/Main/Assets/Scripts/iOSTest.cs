@@ -151,9 +151,20 @@ namespace Unity.Notifications.Tests.Sample
         private void RegisterCategories()
         {
             var actionConfirm = new iOSNotificationAction("ACTION_CONFIRM", "Confirm", iOSNotificationActionOptions.Foreground|iOSNotificationActionOptions.Required);
-            var actionLater = new iOSNotificationAction("ACTION_LATER", "Later");
-            var actionReject = new iOSNotificationAction("ACTION_REJECT", "Reject", iOSNotificationActionOptions.Destructive);
-            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Respond", iOSNotificationActionOptions.Foreground, "Respond");
+            var actionLater = new iOSNotificationAction("ACTION_LATER", "Later")
+            {
+                // drop image2.png from project dir to XCode for it to work
+                TemplateImageName = "image2",
+            };
+            var actionReject = new iOSNotificationAction("ACTION_REJECT", "Reject", iOSNotificationActionOptions.Destructive)
+            {
+                SystemImageName = "multiply.circle.fill",
+            };
+            var actionInput = new iOSTextInputNotificationAction("ACTION_INPUT", "Respond", iOSNotificationActionOptions.Foreground, "Respond")
+            {
+                // drop image2.png from project dir to XCode for it to work
+                TemplateImageName = "image2",
+            };
             var twoActions = new iOSNotificationCategory("THREE_ACTIONS");
             twoActions.AddActions(new[] { actionConfirm, actionLater, actionReject });
             var withInput = new iOSNotificationCategory("WITH_INPUT");

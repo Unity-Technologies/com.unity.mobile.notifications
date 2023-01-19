@@ -16,6 +16,13 @@ namespace Unity.Notifications.iOS
         Foreground = (1 << 2),
     }
 
+    enum iOSNotificationActionIconType
+    {
+        None = 0,
+        SystemImageName = 1,
+        TemplateImageName = 2,
+    }
+
     /// <summary>
     /// Represents action for an actionable notification.
     /// Actions are supposed to be added to notification categories, which are then registered prior to sending notifications.
@@ -25,6 +32,9 @@ namespace Unity.Notifications.iOS
     /// <seealso cref="iOSNotificationCenter.GetLastRespondedNotificationAction"/>
     public class iOSNotificationAction
     {
+        internal iOSNotificationActionIconType _imageType;
+        internal string _image;
+
         /// <summary>
         /// An identifier for this action.
         /// Each action within an application unique must have unique ID.
@@ -44,6 +54,34 @@ namespace Unity.Notifications.iOS
         /// </summary>
         /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
         public iOSNotificationActionOptions Options { get; set; }
+
+        /// <summary>
+        /// Set the icon for action using system symbol image name.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747241-iconwithsystemimagename?language=objc"/>
+        public string SystemImageName
+        {
+            get { return _imageType == iOSNotificationActionIconType.SystemImageName ? _image : null; }
+            set
+            {
+                _imageType = iOSNotificationActionIconType.SystemImageName;
+                _image = value;
+            }
+        }
+
+        /// <summary>
+        /// Set the icon for action using image from app's bundle.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747242-iconwithtemplateimagename?language=objc"/>
+        public string TemplateImageName
+        {
+            get { return _imageType == iOSNotificationActionIconType.TemplateImageName ? _image : null; }
+            set
+            {
+                _imageType = iOSNotificationActionIconType.TemplateImageName;
+                _image = value;
+            }
+        }
 
         /// <summary>
         /// Creates new action.
@@ -71,7 +109,7 @@ namespace Unity.Notifications.iOS
         internal virtual IntPtr CreateUNNotificationAction()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            return iOSNotificationsWrapper._CreateUNNotificationAction(Id, Title, (int)Options);
+            return iOSNotificationsWrapper._CreateUNNotificationAction(Id, Title, (int)Options, (int)_imageType, _image);
 #else
             return IntPtr.Zero;
 #endif
@@ -126,7 +164,7 @@ namespace Unity.Notifications.iOS
         internal override IntPtr CreateUNNotificationAction()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            return iOSNotificationsWrapper._CreateUNTextInputNotificationAction(Id, Title, (int)Options, TextInputButtonTitle, TextInputPlaceholder);
+            return iOSNotificationsWrapper._CreateUNTextInputNotificationAction(Id, Title, (int)Options, (int)_imageType, _image, TextInputButtonTitle, TextInputPlaceholder);
 #else
             return IntPtr.Zero;
 #endif
