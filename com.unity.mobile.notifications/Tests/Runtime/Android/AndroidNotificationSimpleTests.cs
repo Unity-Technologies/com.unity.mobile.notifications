@@ -43,12 +43,53 @@ class AndroidNotificationSimpleTests
     [OneTimeSetUp]
     public void BeforeAllTests()
     {
+        var c = CreateNotificationChannelWithAllParameters();
+        var group = new AndroidNotificationChannelGroup()
+        {
+            Id = c.Group,
+            Name = "the group",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
+        AndroidNotificationCenter.RegisterNotificationChannel(c);
+    }
+
+    AndroidNotificationChannel CreateNotificationChannelWithAllParameters()
+    {
         var c = new AndroidNotificationChannel();
         c.Id = kChannelId;
         c.Name = "SerializeDeserializeNotification channel";
         c.Description = "SerializeDeserializeNotification channel";
         c.Importance = Importance.High;
-        AndroidNotificationCenter.RegisterNotificationChannel(c);
+        c.Group = "Default";
+        c.CanBypassDnd = true;
+        c.CanShowBadge = true;
+        c.EnableLights = true;
+        c.EnableVibration = true;
+        c.VibrationPattern = new long[] { 5, 10 };
+        c.LockScreenVisibility = LockScreenVisibility.Public;
+        return c;
+    }
+
+    [Test]
+    public void AllAndroidNotificationChannelParametersAreTested()
+    {
+        var channel = CreateNotificationChannelWithAllParameters();
+        AndroidNotificationChannel defVals = default;
+
+        foreach (var field in typeof(AndroidNotificationChannel).GetFields())
+        {
+            var v1 = field.GetValue(channel);
+            var v2 = field.GetValue(defVals);
+            if (object.Equals(v1, v2))
+                Assert.Fail("Unassigned field " + field.Name);
+        }
+        foreach (var prop in typeof(AndroidNotificationChannel).GetProperties())
+        {
+            var v1 = prop.GetValue(channel);
+            var v2 = prop.GetValue(defVals);
+            if (object.Equals(v1, v2))
+                Assert.Fail("Unassigned property " + prop.Name);
+        }
     }
 
     [Test]
@@ -77,9 +118,34 @@ class AndroidNotificationSimpleTests
     {
         var channel = AndroidNotificationCenter.GetNotificationChannel(kChannelId);
         Assert.IsNotNull(channel);
-        Assert.AreEqual("SerializeDeserializeNotification channel", channel.Name);
-        Assert.AreEqual("SerializeDeserializeNotification channel", channel.Description);
-        Assert.AreEqual(Importance.High, channel.Importance);
+
+        var expected = CreateNotificationChannelWithAllParameters();
+
+        foreach (var field in typeof(AndroidNotificationChannel).GetFields())
+        {
+            var v1 = field.GetValue(channel);
+            var v2 = field.GetValue(expected);
+            if (!object.Equals(v1, v2))
+                Assert.Fail($"Unexpected value for field {field.Name}; expected {v2}, was {v1}");
+        }
+        foreach (var prop in typeof(AndroidNotificationChannel).GetProperties())
+        {
+            if (prop.Name == "CanBypassDnd") // this one returns the actual value, not the requested one (may differ)
+                continue;
+            if (prop.Name == "VibrationPattern")
+            {
+                Assert.IsNotNull(channel.VibrationPattern);
+                Assert.AreEqual(expected.VibrationPattern.Length, channel.VibrationPattern.Length);
+                for (int i = 0; i < expected.VibrationPattern.Length; ++i)
+                    Assert.AreEqual(expected.VibrationPattern[i], channel.VibrationPattern[i]);
+                continue;
+            }
+
+            var v1 = prop.GetValue(channel);
+            var v2 = prop.GetValue(expected);
+            if (!object.Equals(v1, v2))
+                Assert.Fail($"Unexpected value for property {prop.Name}; expected {v2}, was {v1}");
+        }
     }
 
     [Test]
@@ -110,6 +176,31 @@ class AndroidNotificationSimpleTests
             foreach (var channel in channels)
                 AndroidNotificationCenter.RegisterNotificationChannel(channel);
         }
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void DeleteNotificationChannelGroup_GroupIsDeleted()
+    {
+        var group = new AndroidNotificationChannelGroup()
+        {
+            Id = "TestDelete",
+            Name = "Group for deletion",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
+        var channel = new AndroidNotificationChannel()
+        {
+            Id = "Temp",
+            Name = "Group testing",
+            Description = "Testing group",
+            Importance = Importance.Low,
+            Group = "TestDelete",
+        };
+        AndroidNotificationCenter.RegisterNotificationChannel(channel);
+
+        AndroidNotificationCenter.DeleteNotificationChannelGroup("TestDelete");
+        var ch = AndroidNotificationCenter.GetNotificationChannel("Temp");
+        Assert.IsNull(ch.Id);
     }
 
     [Test]
@@ -252,6 +343,11 @@ class AndroidNotificationSimpleTests
     static bool SerializeNotificationCustom_v1(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
     {
         return SerializeNotificationCustom_old("serializeNotificationCustom_v1", byteStream, javaNotif);
+    }
+
+    static bool SerializeNotificationCustom_v2(AndroidJavaClass utilsClass, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
+    {
+        return SerializeNotificationCustom_old("serializeNotificationCustom_v2", byteStream, javaNotif);
     }
 
     static bool SerializeNotificationCustom_old(string method, AndroidJavaObject byteStream, AndroidJavaObject javaNotif)
@@ -411,6 +507,37 @@ class AndroidNotificationSimpleTests
         var bitmapAfterSerialization = deserializedExtras.Call<AndroidJavaObject>("getParcelable", "binder_item");
         // bitmap is binder object and can't be parcelled, while our fallback custom serialization only preserves our stuff
         Assert.IsNull(bitmapAfterSerialization);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void NotificationSerialization_BigPictureStyle()
+    {
+        const int notificationId = 816;
+
+        var original = new AndroidNotification("title", "content", DateTime.Now);
+        original.BigPicture = new BigPictureStyle()
+        {
+            LargeIcon = "icon_1",
+            Picture = "icon_0",
+            ContentTitle = "content_title",
+            ContentDescription = "content_description",
+            SummaryText = "summary",
+            ShowWhenCollapsed = true,
+        };
+
+        var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId);
+        var deserializedData = SerializeDeserializeNotification(builder);
+
+        Assert.AreEqual(NotificationStyle.BigPictureStyle, deserializedData.Notification.Style);
+        Assert.IsTrue(deserializedData.Notification.BigPicture.HasValue);
+        var bigPicture = deserializedData.Notification.BigPicture.Value;
+        Assert.AreEqual(original.BigPicture.Value.LargeIcon, bigPicture.LargeIcon);
+        Assert.AreEqual(original.BigPicture.Value.Picture, bigPicture.Picture);
+        Assert.AreEqual(original.BigPicture.Value.ContentTitle, bigPicture.ContentTitle);
+        Assert.AreEqual(original.BigPicture.Value.ContentDescription, bigPicture.ContentDescription);
+        Assert.AreEqual(original.BigPicture.Value.SummaryText, bigPicture.SummaryText);
+        Assert.AreEqual(original.BigPicture.Value.ShowWhenCollapsed, bigPicture.ShowWhenCollapsed);
     }
 
     [Test]
@@ -623,8 +750,27 @@ class AndroidNotificationSimpleTests
             var extras = builder.Call<AndroidJavaObject>("getExtras");
             extras.Call("putParcelable", "binder_item", bitmap);
 
-            // Serialize like we did in version 0
+            // Serialize like we did in version 1
             deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v1(u, s, j));
+        }
+
+        Assert.IsNotNull(deserialized);
+        CheckNotificationsMatch(original, deserialized.Notification);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void CanDeserializeCustomSerializedNotification_v2()
+    {
+        const int notificationId = 255;
+
+        var original = CreateNotificationWithAllParameters();
+
+        AndroidNotificationIntentData deserialized;
+        using (var builder = AndroidNotificationCenter.CreateNotificationBuilder(notificationId, original, kChannelId))
+        {
+            // Serialize like we did in version 2
+            deserialized = SerializeDeserializeNotificationWithFunc(builder, (u, s, j) => SerializeNotificationCustom_v2(u, s, j));
         }
 
         Assert.IsNotNull(deserialized);

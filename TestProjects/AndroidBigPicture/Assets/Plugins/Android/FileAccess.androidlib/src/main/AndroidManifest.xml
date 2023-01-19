@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.unity.fileaccess" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <activity android:exported="false" android:name="com.unity.fileaccess.FileChooser" />
+        <provider
+            android:authorities="com.unity.fileaccess"
+            android:name="com.unity.fileaccess.ImageProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+    </application>
+</manifest>

@@ -4,13 +4,22 @@
 
 Starting in Android 8.0, all notifications must be assigned to a notification channel. The Unity Mobile Notifications package provides a set of APIs to manage notification channels. The example below shows how to create a notification channel.
 
+Notification channels can be grouped together. This is not required, but it may look better in the Settings UI.
+
 ```c#
+var group = new AndroidNotificationChannelGroup()
+{
+    Id = "Main",
+    Name = "Main notifications",
+};
+AndroidNotificationCenter.RegisterNotificationChannelGroup(group);
 var channel = new AndroidNotificationChannel()
 {
     Id = "channel_id",
     Name = "Default Channel",
     Importance = Importance.Default,
     Description = "Generic notifications",
+    Group = "Main",  // must be same as Id of previously registered group
 };
 AndroidNotificationCenter.RegisterNotificationChannel(channel);
 ```
@@ -64,6 +73,36 @@ notification.FireTime = System.DateTime.Now.AddMinutes(1);
 AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 For details about other properties you can set, see [AndroidNotification](../api/Unity.Notifications.Android.AndroidNotification.html).
+
+### Send notification with big picture style
+
+BigPictureStyle is a predefined notification style centered around an image. Unity supports picture specified as resource ID, file path or URI. URI must be one of the type supported by Android. File path must be an absolute path on file system (note, that streaming assets on Android are inside .apk and accessed via URI, not path).
+
+Below is a simple example for downloading image from the internet and sending the notification with it.
+
+```c#
+IEnumerator DownloadAndShow(string url)
+{
+    var path = Path.Combine(Application.persistentDataPath, "image.jpg");
+    using (var uwr = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET))
+    {
+        uwr.downloadHandler = new DownloadHandlerFile(path);
+        yield return uwr.SendWebRequest();
+        if (uwr.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError(uwr.error);
+            yield break;
+        }
+    }
+
+    var notification = new AndroidNotification("Image", "Downloaded image", DateTime.Now);
+    notification.BigPicture = new BigPictureStyle()
+    {
+        Picture = path,
+    };
+    AndroidNotificationCenter.SendNotification(notification, ChannelId);
+}
+```
 
 ### Set icons
 

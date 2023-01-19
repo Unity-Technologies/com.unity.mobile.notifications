@@ -1,0 +1,9 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    implementation 'androidx.core:core:1.9.0'
+}
+
+android {
+    compileSdkVersion 33
+}
