@@ -284,6 +284,11 @@ namespace Unity.Notifications.Android
                 bigPicture.ShowWhenCollapsed
             );
         }
+
+        public bool CanScheduleExactAlarms()
+        {
+            return self.Call<bool>("canScheduleExactAlarms");
+        }
     }
 
     struct NotificationJni
@@ -703,6 +708,30 @@ namespace Unity.Notifications.Android
                 // on lower target SDK OS asks permission automatically, can't ask manually
                 return s_TargetApiLevel >= API_POST_NOTIFICATIONS_PERMISSION_REQUIRED;
             }
+        }
+
+        public static bool UsingExactScheduling
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+                return s_Jni.NotificationManager.CanScheduleExactAlarms();
+            }
+        }
+
+        public static void RequestExactScheduling()
+        {
+            if (!Initialize())
+                return;
+            if (s_DeviceApiLevel < 31)
+                return;
+
+            var packageName = s_CurrentActivity.Call<string>("getPackageName");
+            using (var uriClass = new AndroidJavaClass("android.net.Uri"))
+                using (var uri = uriClass.CallStatic<AndroidJavaObject>("parse", $"package:{packageName}"))
+                    using (var intent = new AndroidJavaObject("android.content.Intent", "android.settings.REQUEST_SCHEDULE_EXACT_ALARM", uri))
+                        s_CurrentActivity.Call("startActivity", intent);
         }
 
         /// <summary>

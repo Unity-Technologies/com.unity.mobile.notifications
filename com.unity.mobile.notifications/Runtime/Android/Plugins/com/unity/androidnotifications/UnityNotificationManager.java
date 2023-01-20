@@ -592,6 +592,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
     }
 
+    public boolean canScheduleExactAlarms() {
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        return canScheduleExactAlarms(alarmManager);
+    }
+
     // Call AlarmManager to set the broadcast intent with fire time and interval.
     private void scheduleNotificationIntentAlarm(long repeatInterval, long fireTime, PendingIntent broadcast) {
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
