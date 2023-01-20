@@ -694,6 +694,17 @@ namespace Unity.Notifications.Android
             }
         }
 
+        internal static bool CanRequestPermissionToPost
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+                // on lower target SDK OS asks permission automatically, can't ask manually
+                return s_TargetApiLevel >= API_POST_NOTIFICATIONS_PERMISSION_REQUIRED;
+            }
+        }
+
         /// <summary>
         /// Register notification channel group.
         /// </summary>
