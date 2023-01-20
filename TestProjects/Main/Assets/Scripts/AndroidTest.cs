@@ -177,6 +177,7 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["General"]["Notification batch size: "+NotificationBatchSizes[_CurrentNotificationBatchSizeIndex]] = new Action(() => { ChangeNotificationBatchSize(NotificationBatchSizes); });
             m_groups["General"]["Reset notification counter"] = new Action(() => { NotificationCounter = 0; });
             m_groups["General"]["Request permission"] = new Action(() => { RequestNotificationPermission(); });
+            m_groups["General"]["Exact scheduling"] = new Action(() => { ExactScheduling(); });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -321,6 +322,13 @@ namespace Unity.Notifications.Tests.Sample
                     m_LOGGER.Red(request.Status.ToString());
                     break;
             }
+        }
+
+        void ExactScheduling()
+        {
+            var isExact = AndroidNotificationCenter.UsingExactScheduling;
+            m_LOGGER.Blue($"Scheduling at exact time: {isExact}");
+            AndroidNotificationCenter.RequestExactScheduling();
         }
 
 
