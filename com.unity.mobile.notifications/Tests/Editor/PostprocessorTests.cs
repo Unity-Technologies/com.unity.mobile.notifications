@@ -37,7 +37,10 @@ namespace Unity.Notifications.Tests
 </manifest>";
       const string kRescheduleOnRestartFalse = "<meta-data android:name=\"reschedule_notifications_on_restart\" android:value=\"false\" />";
       const string kRescheduleOnRestartTrue = "<meta-data android:name=\"reschedule_notifications_on_restart\" android:value=\"true\" />";
+      const string kExactSchedulingOn = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"1\" />";
+      const string kExactSchedulingOff = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"0\" />";
       const string kReceiveBookCompletedPermission = "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />";
+      const string kScheduleExactAlarmPermission = "<uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />";
 
       string GetSourceXml(string metaDataExtra, string permissionExtra)
       {
@@ -127,6 +130,41 @@ namespace Unity.Notifications.Tests
             AndroidNotificationPostProcessor.AppendAndroidPermissionField(null, xmlDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
 
             Assert.IsTrue(xmlDoc.InnerXml.Contains(kReceiveBookCompletedPermission));
+        }
+
+        [Test]
+        public void InjectAndroidManifest_AddsScheduleExactWhenEnabled()
+        {
+            string sourceXmlContent = GetSourceXml(null, null);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(sourceXmlContent);
+            var settings = new AndroidNotificationPostProcessor.ManifestSettings()
+            {
+                ExactAlarm = AndroidExactSchedulingOption.ExactWhenAvailable | AndroidExactSchedulingOption.AddScheduleExactPermission,
+            };
+
+            AndroidNotificationPostProcessor.InjectAndroidManifest("test", xmlDoc, settings);
+
+            Assert.IsTrue(xmlDoc.InnerXml.Contains(kExactSchedulingOn));
+            Assert.IsTrue(xmlDoc.InnerXml.Contains(kScheduleExactAlarmPermission));
+        }
+
+        [Test]
+        public void InjectAndroidManifest_DoesNotAddScheduleExactWhenExactNotEnabled()
+        {
+            string sourceXmlContent = GetSourceXml(null, null);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(sourceXmlContent);
+            var settings = new AndroidNotificationPostProcessor.ManifestSettings()
+            {
+                // AndroidExactSchedulingOption.ExactWhenAvailable absent, so this one is ignored
+                ExactAlarm = AndroidExactSchedulingOption.AddScheduleExactPermission,
+            };
+
+            AndroidNotificationPostProcessor.InjectAndroidManifest("test", xmlDoc, settings);
+
+            Assert.IsTrue(xmlDoc.InnerXml.Contains(kExactSchedulingOff));
+            Assert.IsFalse(xmlDoc.InnerXml.Contains("android.permission.SCHEDULE_EXACT_ALARM"));
         }
 
 #endif
