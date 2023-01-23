@@ -41,6 +41,7 @@ namespace Unity.Notifications.Tests
       const string kExactSchedulingOff = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"0\" />";
       const string kReceiveBookCompletedPermission = "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />";
       const string kScheduleExactAlarmPermission = "<uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />";
+      const string kUseExactAlarmPermission = "<uses-permission android:name=\"android.permission.USE_EXACT_ALARM\" />";
 
       string GetSourceXml(string metaDataExtra, string permissionExtra)
       {
@@ -135,22 +136,44 @@ namespace Unity.Notifications.Tests
         [Test]
         public void InjectAndroidManifest_AddsScheduleExactWhenEnabled()
         {
+            InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption.AddScheduleExactPermission, kScheduleExactAlarmPermission);
+        }
+
+        [Test]
+        public void InjectAndroidManifest_AddsUseExactWhenEnabled()
+        {
+            InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption.AddUseExactAlarmPermission, kUseExactAlarmPermission);
+        }
+
+        public void InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption flag, string permission)
+        {
             string sourceXmlContent = GetSourceXml(null, null);
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(sourceXmlContent);
             var settings = new AndroidNotificationPostProcessor.ManifestSettings()
             {
-                ExactAlarm = AndroidExactSchedulingOption.ExactWhenAvailable | AndroidExactSchedulingOption.AddScheduleExactPermission,
+                ExactAlarm = AndroidExactSchedulingOption.ExactWhenAvailable | flag,
             };
 
             AndroidNotificationPostProcessor.InjectAndroidManifest("test", xmlDoc, settings);
 
             Assert.IsTrue(xmlDoc.InnerXml.Contains(kExactSchedulingOn));
-            Assert.IsTrue(xmlDoc.InnerXml.Contains(kScheduleExactAlarmPermission));
+            Assert.IsTrue(xmlDoc.InnerXml.Contains(permission));
         }
 
         [Test]
         public void InjectAndroidManifest_DoesNotAddScheduleExactWhenExactNotEnabled()
+        {
+            InjectAndroidManifest_DoesNotAddPermissionWhenExactNotEnabled("android.permission.SCHEDULE_EXACT_ALARM");
+        }
+
+        [Test]
+        public void InjectAndroidManifest_DoesNotAddUseExactWhenExactNotEnabled()
+        {
+            InjectAndroidManifest_DoesNotAddPermissionWhenExactNotEnabled("android.permission.USE_EXACT_ALARM");
+        }
+
+        public void InjectAndroidManifest_DoesNotAddPermissionWhenExactNotEnabled(string permission)
         {
             string sourceXmlContent = GetSourceXml(null, null);
             XmlDocument xmlDoc = new XmlDocument();
@@ -164,7 +187,7 @@ namespace Unity.Notifications.Tests
             AndroidNotificationPostProcessor.InjectAndroidManifest("test", xmlDoc, settings);
 
             Assert.IsTrue(xmlDoc.InnerXml.Contains(kExactSchedulingOff));
-            Assert.IsFalse(xmlDoc.InnerXml.Contains("android.permission.SCHEDULE_EXACT_ALARM"));
+            Assert.IsFalse(xmlDoc.InnerXml.Contains(permission));
         }
 
 #endif
