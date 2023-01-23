@@ -42,6 +42,7 @@ namespace Unity.Notifications.Tests
       const string kReceiveBookCompletedPermission = "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />";
       const string kScheduleExactAlarmPermission = "<uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />";
       const string kUseExactAlarmPermission = "<uses-permission android:name=\"android.permission.USE_EXACT_ALARM\" />";
+      const string kRequestIgnoreBatteryOptimizationsPermission = "<uses-permission-sdk-23 android:name=\"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS\" />";
 
       string GetSourceXml(string metaDataExtra, string permissionExtra)
       {
@@ -145,6 +146,13 @@ namespace Unity.Notifications.Tests
             InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption.AddUseExactAlarmPermission, kUseExactAlarmPermission);
         }
 
+        [Test]
+        public void InjectAndroidManifest_AddsBatteryOptimizationsWhenEnabled()
+        {
+            InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption.AddRequestIgnoreBatteryOptimizationsPermission, kRequestIgnoreBatteryOptimizationsPermission);
+            //InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption.AddRequestIgnoreBatteryOptimizationsPermission, "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
+        }
+
         public void InjectAndroidManifest_AddsPermissionWhenEnabled(AndroidExactSchedulingOption flag, string permission)
         {
             string sourceXmlContent = GetSourceXml(null, null);
@@ -171,6 +179,12 @@ namespace Unity.Notifications.Tests
         public void InjectAndroidManifest_DoesNotAddUseExactWhenExactNotEnabled()
         {
             InjectAndroidManifest_DoesNotAddPermissionWhenExactNotEnabled("android.permission.USE_EXACT_ALARM");
+        }
+
+        [Test]
+        public void InjectAndroidManifest_DoesNotAddBatteryOptimizationsWhenExactNotEnabled()
+        {
+            InjectAndroidManifest_DoesNotAddPermissionWhenExactNotEnabled("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
         }
 
         public void InjectAndroidManifest_DoesNotAddPermissionWhenExactNotEnabled(string permission)
