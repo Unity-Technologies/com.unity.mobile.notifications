@@ -114,6 +114,10 @@ namespace Unity.Notifications
                     AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.SCHEDULE_EXACT_ALARM", useExact ? "32" : null);
                 if (useExact)
                     AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.USE_EXACT_ALARM");
+
+                // Battery optimizations must use "uses-permission-sdk-23", regular uses-permission does not work
+                if ((settings.ExactAlarm & AndroidExactSchedulingOption.AddRequestIgnoreBatteryOptimizationsPermission) != 0)
+                    AppendAndroidPermissionField(manifestPath, manifestDoc, "uses-permission-sdk-23", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", null);
             }
         }
 
@@ -186,6 +190,11 @@ namespace Unity.Notifications
 
         internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name, string maxSdk = null)
         {
+            AppendAndroidPermissionField(manifestPath, xmlDoc, "uses-permission", name, maxSdk);
+        }
+
+        internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string tagName, string name, string maxSdk)
+        {
             var manifestNode = xmlDoc.SelectSingleNode("manifest");
             if (manifestNode == null)
                 throw new ArgumentException(string.Format("Missing 'manifest' node in '{0}'.", manifestPath));
@@ -193,7 +202,7 @@ namespace Unity.Notifications
             XmlElement metaDataNode = null;
             foreach (XmlNode node in manifestNode.ChildNodes)
             {
-                if (!(node is XmlElement) || node.Name != "uses-permission")
+                if (!(node is XmlElement) || node.Name != tagName)
                     continue;
 
                 var element = (XmlElement)node;
@@ -211,7 +220,7 @@ namespace Unity.Notifications
 
             if (metaDataNode == null)
             {
-                metaDataNode = xmlDoc.CreateElement("uses-permission");
+                metaDataNode = xmlDoc.CreateElement(tagName);
                 metaDataNode.SetAttribute("name", kAndroidNamespaceURI, name);
             }
             if (maxSdk != null)

@@ -25,5 +25,7 @@ namespace Unity.Notifications
         /// Add USE_EXACT_ALARM permission to the manifest.
         /// </summary>
         AddUseExactAlarmPermission = 1 << 2,
+
+        AddRequestIgnoreBatteryOptimizationsPermission = 1 << 3,
     }
 }
