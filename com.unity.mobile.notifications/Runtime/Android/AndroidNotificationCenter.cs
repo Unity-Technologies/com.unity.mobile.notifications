@@ -739,6 +739,29 @@ namespace Unity.Notifications.Android
                         s_CurrentActivity.Call("startActivity", intent);
         }
 
+        public static bool IgnoringBatteryOptimizations
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+                if (s_DeviceApiLevel < 23)
+                    return false;
+                using (var pm = s_CurrentActivity.Call<AndroidJavaObject>("getSystemService", "power"))
+                    return pm.Call<bool>("isIgnoringBatteryOptimizations", s_CurrentActivity.Call<string>("getPackageName"));
+            }
+        }
+
+        public static void RequestIgnoreBatteryOptimizations()
+        {
+            if (!Initialize())
+                return;
+            if (s_DeviceApiLevel < 23)
+                return;
+
+            StartActionForThisPackage("android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
+        }
+
         /// <summary>
         /// Register notification channel group.
         /// </summary>
