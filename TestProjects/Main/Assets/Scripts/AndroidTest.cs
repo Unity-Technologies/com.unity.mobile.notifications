@@ -327,7 +327,9 @@ namespace Unity.Notifications.Tests.Sample
         void ExactScheduling()
         {
             var isExact = AndroidNotificationCenter.UsingExactScheduling;
+            var ignoringBattery = AndroidNotificationCenter.IgnoringBatteryOptimizations;
             m_LOGGER.Blue($"Scheduling at exact time: {isExact}");
+            m_LOGGER.Blue($"Ignoring battery optimizations: {ignoringBattery}");
         }
 
         void RequestExactScheduling()
