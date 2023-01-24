@@ -178,6 +178,8 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["General"]["Reset notification counter"] = new Action(() => { NotificationCounter = 0; });
             m_groups["General"]["Request permission"] = new Action(() => { RequestNotificationPermission(); });
             m_groups["General"]["Exact scheduling"] = new Action(() => { ExactScheduling(); });
+            m_groups["General"]["Request exact scheduling"] = new Action(() => { RequestExactScheduling(); });
+            m_groups["General"]["Ignore battery"] = new Action(() => { IgnoreBattery(); });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -335,6 +337,11 @@ namespace Unity.Notifications.Tests.Sample
         void RequestExactScheduling()
         {
             AndroidNotificationCenter.RequestExactScheduling();
+        }
+
+        void IgnoreBattery()
+        {
+            AndroidNotificationCenter.RequestIgnoreBatteryOptimizations();
         }
 
 
