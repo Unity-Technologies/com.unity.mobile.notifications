@@ -328,6 +328,10 @@ namespace Unity.Notifications.Tests.Sample
         {
             var isExact = AndroidNotificationCenter.UsingExactScheduling;
             m_LOGGER.Blue($"Scheduling at exact time: {isExact}");
+        }
+
+        void RequestExactScheduling()
+        {
             AndroidNotificationCenter.RequestExactScheduling();
         }
 
