@@ -710,6 +710,11 @@ namespace Unity.Notifications.Android
             }
         }
 
+        /// <summary>
+        /// Whether notifications are scheduled at exact times.
+        /// Combines notification settings and actual device settings (since Android 12 exact scheduling is user controllable).
+        /// </summary>
+        /// <seealso cref="AndroidExactSchedulingOption"/>
         public static bool UsingExactScheduling
         {
             get
@@ -720,6 +725,13 @@ namespace Unity.Notifications.Android
             }
         }
 
+        /// <summary>
+        /// Request user permission to schedule alarms at exact times.
+        /// Only works on Android 12 and later, older versions can schedule at exact times without requesting it.
+        /// This may cause your app to use more battery.
+        /// App must have SCHEDULE_EXACT_ALARM permission to be able to request this.
+        /// </summary>
+        /// <seealso cref="AndroidExactSchedulingOption"/>
         public static void RequestExactScheduling()
         {
             if (!Initialize())
@@ -739,6 +751,11 @@ namespace Unity.Notifications.Android
                         s_CurrentActivity.Call("startActivity", intent);
         }
 
+        /// <summary>
+        /// Whether app is ignoring device battery optimization settings.
+        /// When device is in power saving or similar restricted mode, scheduled notifications may not appear or be late.
+        /// </summary>
+        /// <seealso cref="RequestIgnoreBatteryOptimizations()"/>
         public static bool IgnoringBatteryOptimizations
         {
             get
@@ -752,6 +769,12 @@ namespace Unity.Notifications.Android
             }
         }
 
+        /// <summary>
+        /// Request user to allow unrestricted background work for app.
+        /// UI for it is provided by OS and is manufacturer specific. Recommended to explain user what to do before requesting.
+        /// App must have REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission to be able to request this.
+        /// </summary>
+        /// <seealso cref="AndroidExactSchedulingOption"/>
         public static void RequestIgnoreBatteryOptimizations()
         {
             if (!Initialize())
