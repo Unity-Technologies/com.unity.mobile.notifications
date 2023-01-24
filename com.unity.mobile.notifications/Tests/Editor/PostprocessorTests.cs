@@ -35,23 +35,23 @@ namespace Unity.Notifications.Tests
   <uses-feature android:name=""android.hardware.touchscreen.multitouch"" android:required=""false"" />
   <uses-feature android:name=""android.hardware.touchscreen.multitouch.distinct"" android:required=""false"" />
 </manifest>";
-      const string kRescheduleOnRestartFalse = "<meta-data android:name=\"reschedule_notifications_on_restart\" android:value=\"false\" />";
-      const string kRescheduleOnRestartTrue = "<meta-data android:name=\"reschedule_notifications_on_restart\" android:value=\"true\" />";
-      const string kExactSchedulingOn = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"1\" />";
-      const string kExactSchedulingOff = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"0\" />";
-      const string kReceiveBookCompletedPermission = "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />";
-      const string kScheduleExactAlarmPermission = "<uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />";
-      const string kUseExactAlarmPermission = "<uses-permission android:name=\"android.permission.USE_EXACT_ALARM\" />";
-      const string kRequestIgnoreBatteryOptimizationsPermission = "<uses-permission-sdk-23 android:name=\"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS\" />";
+        const string kRescheduleOnRestartFalse = "<meta-data android:name=\"reschedule_notifications_on_restart\" android:value=\"false\" />";
+        const string kRescheduleOnRestartTrue = "<meta-data android:name=\"reschedule_notifications_on_restart\" android:value=\"true\" />";
+        const string kExactSchedulingOn = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"1\" />";
+        const string kExactSchedulingOff = "<meta-data android:name=\"com.unity.androidnotifications.exact_scheduling\" android:value=\"0\" />";
+        const string kReceiveBookCompletedPermission = "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />";
+        const string kScheduleExactAlarmPermission = "<uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />";
+        const string kUseExactAlarmPermission = "<uses-permission android:name=\"android.permission.USE_EXACT_ALARM\" />";
+        const string kRequestIgnoreBatteryOptimizationsPermission = "<uses-permission-sdk-23 android:name=\"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS\" />";
 
-      string GetSourceXml(string metaDataExtra, string permissionExtra)
-      {
-          if (metaDataExtra == null)
-              metaDataExtra = "";
-          if (permissionExtra == null)
-              permissionExtra = "";
-          return string.Format(kManifestTemplate, metaDataExtra, permissionExtra);
-      }
+        string GetSourceXml(string metaDataExtra, string permissionExtra)
+        {
+            if (metaDataExtra == null)
+                metaDataExtra = "";
+            if (permissionExtra == null)
+                permissionExtra = "";
+            return string.Format(kManifestTemplate, metaDataExtra, permissionExtra);
+        }
 
 #if UNITY_ANDROID
         [Test]

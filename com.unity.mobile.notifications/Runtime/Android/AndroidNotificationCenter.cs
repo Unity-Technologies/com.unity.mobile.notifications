@@ -746,9 +746,9 @@ namespace Unity.Notifications.Android
         {
             var packageName = s_CurrentActivity.Call<string>("getPackageName");
             using (var uriClass = new AndroidJavaClass("android.net.Uri"))
-                using (var uri = uriClass.CallStatic<AndroidJavaObject>("parse", $"package:{packageName}"))
-                    using (var intent = new AndroidJavaObject("android.content.Intent", action, uri))
-                        s_CurrentActivity.Call("startActivity", intent);
+            using (var uri = uriClass.CallStatic<AndroidJavaObject>("parse", $"package:{packageName}"))
+            using (var intent = new AndroidJavaObject("android.content.Intent", action, uri))
+                s_CurrentActivity.Call("startActivity", intent);
         }
 
         /// <summary>
