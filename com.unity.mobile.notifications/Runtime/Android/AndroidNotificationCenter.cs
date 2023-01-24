@@ -727,10 +727,15 @@ namespace Unity.Notifications.Android
             if (s_DeviceApiLevel < 31)
                 return;
 
+            StartActionForThisPackage("android.settings.REQUEST_SCHEDULE_EXACT_ALARM");
+        }
+
+        private static void StartActionForThisPackage(string action)
+        {
             var packageName = s_CurrentActivity.Call<string>("getPackageName");
             using (var uriClass = new AndroidJavaClass("android.net.Uri"))
                 using (var uri = uriClass.CallStatic<AndroidJavaObject>("parse", $"package:{packageName}"))
-                    using (var intent = new AndroidJavaObject("android.content.Intent", "android.settings.REQUEST_SCHEDULE_EXACT_ALARM", uri))
+                    using (var intent = new AndroidJavaObject("android.content.Intent", action, uri))
                         s_CurrentActivity.Call("startActivity", intent);
         }
 
