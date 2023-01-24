@@ -5,13 +5,6 @@ test_editors:
   - version: 2021.3
   - version: 2020.3
 
-test_players:
-  - version: trunk
-  - version: 2022.2
-  - version: 2022.1
-  - version: 2021.3
-  - version: 2020.3
-
 test_platforms:
   - name: mac
     type: Unity::VM::osx
@@ -65,7 +58,7 @@ test_{{ platform.name }}_{{ editor.version }}:
 {% endfor %}
 {% endfor %}
 
-{% for editor in test_players %}
+{% for editor in test_editors %}
 test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
@@ -92,7 +85,7 @@ test_Android_{{ editor.version }}:
     - .yamato/upm-ci.yml#pack
 {% endfor %}
 
-{% for editor in test_players %}
+{% for editor in test_editors %}
 test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
@@ -142,7 +135,7 @@ test_trigger:
     - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
     {% endfor %}
     {% endfor %}
-    {% for editor in test_players %}
+    {% for editor in test_editors %}
     - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
     - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
     {% endfor %}
