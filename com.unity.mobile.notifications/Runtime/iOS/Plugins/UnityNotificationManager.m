@@ -301,6 +301,8 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     UNNotificationSound* sound = [self soundForNotification: data];
     if (sound != nil)
         content.sound = sound;
+    if (@available(iOS 15.0, *))
+        content.interruptionLevel = [self unityInterruptionLevelToIos: data->interruptionLevel];
 
     content.attachments = (__bridge_transfer NSArray<UNNotificationAttachment*>*)data->attachments;
     data->attachments = NULL;
@@ -404,6 +406,24 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
             if (soundName != nil)
                 return [UNNotificationSound soundNamed: soundName];
             return UNNotificationSound.defaultSound;
+    }
+}
+
+- (UNNotificationInterruptionLevel)unityInterruptionLevelToIos:(int)level
+API_AVAILABLE(ios(15.0))
+{
+    switch (level)
+    {
+        case kInterruptionLevelActive:
+            return UNNotificationInterruptionLevelActive;
+        case kInterruptionLevelCritical:
+            return UNNotificationInterruptionLevelCritical;
+        case kInterruptionLevelPassive:
+            return UNNotificationInterruptionLevelPassive;
+        case kInterruptionLevelTimeSensitive:
+            return UNNotificationInterruptionLevelTimeSensitive;
+        default:
+            return UNNotificationInterruptionLevelActive;
     }
 }
 
