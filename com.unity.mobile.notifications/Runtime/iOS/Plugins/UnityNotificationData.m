@@ -81,6 +81,7 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->soundType = kSoundTypeDefault;
     notificationData->soundVolume = -1.0f;
     notificationData->soundName = NULL;
+    notificationData->interruptionLevel = kInterruptionLevelActive;
     notificationData->triggerType = PUSH_TRIGGER;
     notificationData->userInfo = NULL;
 }

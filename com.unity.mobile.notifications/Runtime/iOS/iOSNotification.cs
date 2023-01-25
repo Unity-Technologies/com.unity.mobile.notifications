@@ -60,6 +60,14 @@ namespace Unity.Notifications.iOS
         None = 4,
     }
 
+    public enum NotificationInterruptionLevel
+    {
+        Active = 0,
+        Critical = 1,
+        Passive = 2,
+        TimeSensitive = 3,
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct TimeTriggerData
     {
@@ -114,6 +122,7 @@ namespace Unity.Notifications.iOS
         public Int32 soundType;
         public float soundVolume;
         public string soundName;
+        public Int32 interruptionLevel;
 
         public IntPtr userInfo;
         public IntPtr attachments;
@@ -270,6 +279,12 @@ namespace Unity.Notifications.iOS
         /// </summary>
         /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc"/>
         public float? SoundVolume { get; set; }
+
+        public NotificationInterruptionLevel InterruptionLevel
+        {
+            get { return (NotificationInterruptionLevel)data.interruptionLevel; }
+            set { data.interruptionLevel = (int)value; }
+        }
 
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
@@ -456,6 +471,7 @@ namespace Unity.Notifications.iOS
             Data = "";
             ShowInForeground = false;
             ForegroundPresentationOption = PresentationOption.Alert | PresentationOption.Sound;
+            InterruptionLevel = NotificationInterruptionLevel.Active;
         }
 
         internal iOSNotification(iOSNotificationWithUserInfo data)
