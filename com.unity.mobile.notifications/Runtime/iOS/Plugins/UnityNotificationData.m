@@ -86,6 +86,23 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->userInfo = NULL;
 }
 
+static enum UnityNotificationInterruptionLevel InterruptionLevelToUnity(UNNotificationInterruptionLevel level)
+API_AVAILABLE(ios(15.0))
+{
+    switch (level)
+    {
+        case UNNotificationInterruptionLevelActive:
+        default:
+            return kInterruptionLevelActive;
+        case UNNotificationInterruptionLevelCritical:
+            return kInterruptionLevelCritical;
+        case UNNotificationInterruptionLevelPassive:
+            return kInterruptionLevelPassive;
+        case UNNotificationInterruptionLevelTimeSensitive:
+            return kInterruptionLevelTimeSensitive;
+    }
+}
+
 static void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
 {
     NSDictionary* userInfo = request.content.userInfo;
@@ -133,6 +150,11 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
 
     if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
         notificationData.threadIdentifier = strdup([content.threadIdentifier UTF8String]);
+
+    if (@available(iOS 15.0, *))
+        notificationData.interruptionLevel = InterruptionLevelToUnity(content.interruptionLevel);
+    else
+        notificationData.interruptionLevel = kInterruptionLevelActive;
 
     if ([request.trigger isKindOfClass: [UNTimeIntervalNotificationTrigger class]])
     {
