@@ -46,6 +46,7 @@ typedef struct iOSNotificationData
     float soundVolume;
     char* soundName;
     int interruptionLevel;
+    double relevanceScore;
 
     void* userInfo;
     void* attachments;

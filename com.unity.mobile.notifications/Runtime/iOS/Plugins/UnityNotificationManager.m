@@ -302,7 +302,10 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     if (sound != nil)
         content.sound = sound;
     if (@available(iOS 15.0, *))
+    {
         content.interruptionLevel = [self unityInterruptionLevelToIos: data->interruptionLevel];
+        content.relevanceScore = data->relevanceScore;
+    }
 
     content.attachments = (__bridge_transfer NSArray<UNNotificationAttachment*>*)data->attachments;
     data->attachments = NULL;

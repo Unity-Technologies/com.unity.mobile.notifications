@@ -82,6 +82,7 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->soundVolume = -1.0f;
     notificationData->soundName = NULL;
     notificationData->interruptionLevel = kInterruptionLevelActive;
+    notificationData->relevanceScore = 0;
     notificationData->triggerType = PUSH_TRIGGER;
     notificationData->userInfo = NULL;
 }
@@ -152,9 +153,15 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
         notificationData.threadIdentifier = strdup([content.threadIdentifier UTF8String]);
 
     if (@available(iOS 15.0, *))
+    {
         notificationData.interruptionLevel = InterruptionLevelToUnity(content.interruptionLevel);
+        notificationData.relevanceScore = content.relevanceScore;
+    }
     else
+    {
         notificationData.interruptionLevel = kInterruptionLevelActive;
+        notificationData.relevanceScore = 0;
+    }
 
     if ([request.trigger isKindOfClass: [UNTimeIntervalNotificationTrigger class]])
     {

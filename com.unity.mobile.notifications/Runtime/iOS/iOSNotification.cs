@@ -123,6 +123,7 @@ namespace Unity.Notifications.iOS
         public float soundVolume;
         public string soundName;
         public Int32 interruptionLevel;
+        public double relevanceScore;
 
         public IntPtr userInfo;
         public IntPtr attachments;
@@ -284,6 +285,12 @@ namespace Unity.Notifications.iOS
         {
             get { return (NotificationInterruptionLevel)data.interruptionLevel; }
             set { data.interruptionLevel = (int)value; }
+        }
+
+        public double RelevanceScore
+        {
+            get { return data.relevanceScore; }
+            set { data.relevanceScore = value; }
         }
 
         /// <summary>
@@ -472,6 +479,7 @@ namespace Unity.Notifications.iOS
             ShowInForeground = false;
             ForegroundPresentationOption = PresentationOption.Alert | PresentationOption.Sound;
             InterruptionLevel = NotificationInterruptionLevel.Active;
+            RelevanceScore = 0;
         }
 
         internal iOSNotification(iOSNotificationWithUserInfo data)
