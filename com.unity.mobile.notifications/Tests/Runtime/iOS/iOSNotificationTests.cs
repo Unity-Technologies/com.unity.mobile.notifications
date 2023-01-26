@@ -227,6 +227,7 @@ class iOSNotificationTests
             Body = "body",
             Badge = 2,
             InterruptionLevel = NotificationInterruptionLevel.Critical,
+            RelevanceScore = 1.0,
             ShowInForeground = true,
             ForegroundPresentationOption = PresentationOption.Alert,
         };
