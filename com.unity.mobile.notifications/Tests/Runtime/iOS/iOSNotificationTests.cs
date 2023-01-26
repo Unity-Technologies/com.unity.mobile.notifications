@@ -267,7 +267,7 @@ class iOSNotificationTests
                     }
                     else
                     {
-                        int intVal = (int)v2;
+                        int intVal = ((IConvertible)v2).ToInt32(System.Globalization.CultureInfo.InvariantCulture);
                         if (intVal == 0)
                             Assert.Fail($"Expected property {prop.Name} to be non-zero");
                     }
