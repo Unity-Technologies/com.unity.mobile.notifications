@@ -60,11 +60,31 @@ namespace Unity.Notifications.iOS
         None = 4,
     }
 
+    /// <summary>
+    /// Importance and delivery timing of a notification.
+    /// See Apple documentation for details. Available since iOS 15, always Active on lower versions.
+    /// </summary>
+    /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel?language=objc"/>
     public enum NotificationInterruptionLevel
     {
+        /// <summary>
+        /// Default level. The system presents the notification immediately, lights up the screen, and can play a sound.
+        /// </summary>
         Active = 0,
+
+        /// <summary>
+        /// The system presents the notification immediately, lights up the screen, and bypasses the mute switch to play a sound.
+        /// </summary>
         Critical = 1,
+
+        /// <summary>
+        /// The system adds the notification to the notification list without lighting up the screen or playing a sound.
+        /// </summary>
         Passive = 2,
+
+        /// <summary>
+        /// The system presents the notification immediately, lights up the screen, and can play a sound, but won’t break through system notification controls.
+        /// </summary>
         TimeSensitive = 3,
     }
 
@@ -281,12 +301,19 @@ namespace Unity.Notifications.iOS
         /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc"/>
         public float? SoundVolume { get; set; }
 
+        /// <summary>
+        /// The notification’s importance and required delivery timing.
+        /// </summary>
         public NotificationInterruptionLevel InterruptionLevel
         {
             get { return (NotificationInterruptionLevel)data.interruptionLevel; }
             set { data.interruptionLevel = (int)value; }
         }
 
+        /// <summary>
+        /// The score the system uses to determine if the notification is the summary’s featured notification.
+        /// </summary>
+        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore?language=objc"/>
         public double RelevanceScore
         {
             get { return data.relevanceScore; }
