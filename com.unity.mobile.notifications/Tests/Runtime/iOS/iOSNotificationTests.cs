@@ -243,7 +243,7 @@ class iOSNotificationTests
     void CompareNotifications(iOSNotification expected, iOSNotification actual)
     {
         // these don't roundtrip or are tested separately
-        var ignoredProps = new []
+        var ignoredProps = new[]
         {
             "Attachments",
             "SoundName",
@@ -273,7 +273,7 @@ class iOSNotificationTests
                             Assert.Fail($"Expected property {prop.Name} to be non-zero");
                     }
                 }
-                else if(prop.PropertyType.IsEnum)
+                else if (prop.PropertyType.IsEnum)
                 {
                     int intVal = (int)v2;
                     if (intVal == 0)
