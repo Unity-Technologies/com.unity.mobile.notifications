@@ -504,14 +504,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private PendingIntent getActivityPendingIntent(int id, Intent intent, int flags) {
-        if (Build.VERSION.SDK_INT >= 23)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return PendingIntent.getActivity(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
         else
             return PendingIntent.getActivity(mContext, id, intent, flags);
     }
 
     private PendingIntent getBroadcastPendingIntent(int id, Intent intent, int flags) {
-        if (Build.VERSION.SDK_INT >= 23)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return PendingIntent.getBroadcast(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
         else
             return PendingIntent.getBroadcast(mContext, id, intent, flags);
@@ -931,7 +931,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (picture.charAt(0) == '/') {
             style.bigPicture(BitmapFactory.decodeFile(picture));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && picture.indexOf("://") > 0) {
-            if (Build.VERSION.SDK_INT >= 31) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Icon icon = Icon.createWithContentUri(picture);
                 setBigPictureIcon(style, icon);
             } else {
@@ -941,8 +941,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 }
             }
         } else {
-            Object pic = getIconFromResources(picture, Build.VERSION.SDK_INT < 31);
-            if (Build.VERSION.SDK_INT >= 31 && pic instanceof Icon)
+            Object pic = getIconFromResources(picture, Build.VERSION.SDK_INT < Build.VERSION_CODES.S);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && pic instanceof Icon)
                 setBigPictureIcon(style, pic);
             else if (pic instanceof Bitmap)
                 style.bigPicture((Bitmap)pic);
@@ -950,7 +950,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         style.setBigContentTitle(extras.getString(KEY_BIG_CONTENT_TITLE));
         style.setSummaryText(extras.getString(KEY_BIG_SUMMARY_TEXT));
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             setBigPictureProps31(style, extras.getString(KEY_BIG_CONTENT_DESCRIPTION), extras.getBoolean(KEY_BIG_SHOW_WHEN_COLLAPSED, false));
         }
 
