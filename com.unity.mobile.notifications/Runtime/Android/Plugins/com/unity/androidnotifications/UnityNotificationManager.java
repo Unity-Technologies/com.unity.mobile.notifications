@@ -55,7 +55,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
     private NotificationCallback mNotificationCallback;
     private int mExactSchedulingSetting = -1;
-    private Method mCanScheduleExactAlarms;
     private Method mBigIcon;
     private Method mSetContentDescription;
     private Method mShowBigPictureWhenCollapsed;
@@ -579,17 +578,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT < 31)
             return true;
 
-        try {
-            if (mCanScheduleExactAlarms == null)
-                mCanScheduleExactAlarms = AlarmManager.class.getMethod("canScheduleExactAlarms");
-            return (boolean)mCanScheduleExactAlarms.invoke(alarmManager);
-        } catch (NoSuchMethodException ex) {
-            Log.e(TAG_UNITY, "No AlarmManager.canScheduleExactAlarms() on Android 31+ device, should not happen", ex);
-            return false;
-        } catch (Exception ex) {
-            Log.e(TAG_UNITY, "AlarmManager.canScheduleExactAlarms() threw", ex);
-            return false;
-        }
+        return alarmManager.canScheduleExactAlarms();
     }
 
     // Call AlarmManager to set the broadcast intent with fire time and interval.
