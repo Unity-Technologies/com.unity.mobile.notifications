@@ -31,7 +31,6 @@ import static android.app.Notification.VISIBILITY_PUBLIC;
 
 import java.io.InputStream;
 import java.lang.Integer;
-import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.Set;
@@ -55,8 +54,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
     private NotificationCallback mNotificationCallback;
     private int mExactSchedulingSetting = -1;
-    private Method mSetContentDescription;
-    private Method mShowBigPictureWhenCollapsed;
 
     static final String TAG_UNITY = "UnityNotifications";
 
@@ -939,29 +936,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
         style.setBigContentTitle(extras.getString(KEY_BIG_CONTENT_TITLE));
         style.setSummaryText(extras.getString(KEY_BIG_SUMMARY_TEXT));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setBigPictureProps31(style, extras.getString(KEY_BIG_CONTENT_DESCRIPTION), extras.getBoolean(KEY_BIG_SHOW_WHEN_COLLAPSED, false));
+            style.setContentDescription(extras.getString(KEY_BIG_CONTENT_DESCRIPTION));
+            style.showBigPictureWhenCollapsed(extras.getBoolean(KEY_BIG_SHOW_WHEN_COLLAPSED, false));
         }
 
         builder.setStyle(style);
-    }
-
-    private void setBigPictureProps31(Notification.BigPictureStyle style, String contentDesc, boolean showWhenCollapsed) {
-        if (mSetContentDescription == null || mShowBigPictureWhenCollapsed == null) {
-            try {
-                mSetContentDescription = Notification.BigPictureStyle.class.getMethod("setContentDescription", CharSequence.class);
-                mShowBigPictureWhenCollapsed = Notification.BigPictureStyle.class.getMethod("showBigPictureWhenCollapsed", boolean.class);
-            } catch (NoSuchMethodException e) {
-                Log.e(TAG_UNITY, "Failed to find method", e);
-                return;
-            }
-        }
-
-        try {
-            mSetContentDescription.invoke(style, contentDesc);
-            mShowBigPictureWhenCollapsed.invoke(style, showWhenCollapsed);
-        } catch (Exception e) {
-            Log.e(TAG_UNITY, "Failed to call method", e);
-        }
     }
 
     public static void setNotificationColor(Notification.Builder notificationBuilder, int color) {
