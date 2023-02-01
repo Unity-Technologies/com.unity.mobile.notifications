@@ -55,7 +55,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
     private NotificationCallback mNotificationCallback;
     private int mExactSchedulingSetting = -1;
-    private Method mBigIcon;
     private Method mSetContentDescription;
     private Method mShowBigPictureWhenCollapsed;
 
@@ -922,7 +921,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && picture.indexOf("://") > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Icon icon = Icon.createWithContentUri(picture);
-                setBigPictureIcon(style, icon);
+                style.bigPicture(icon);
             } else {
                 Bitmap pic = loadBitmap(picture);
                 if (pic != null) {
@@ -932,7 +931,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         } else {
             Object pic = getIconFromResources(picture, Build.VERSION.SDK_INT < Build.VERSION_CODES.S);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && pic instanceof Icon)
-                setBigPictureIcon(style, pic);
+                style.bigPicture((Icon)pic);
             else if (pic instanceof Bitmap)
                 style.bigPicture((Bitmap)pic);
         }
@@ -944,24 +943,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         builder.setStyle(style);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private void setBigPictureIcon(Notification.BigPictureStyle style, Object icon) {
-        if (mBigIcon == null) {
-            try {
-                mBigIcon = Notification.BigPictureStyle.class.getMethod("bigPicture", Icon.class);
-            } catch (NoSuchMethodException e) {
-                Log.e(TAG_UNITY, "Failed to find method bigPicture", e);
-                return;
-            }
-        }
-
-        try {
-            mBigIcon.invoke(style, icon);
-        } catch (Exception e) {
-            Log.e(TAG_UNITY, "Failed to call method bigPicture", e);
-        }
     }
 
     private void setBigPictureProps31(Notification.BigPictureStyle style, String contentDesc, boolean showWhenCollapsed) {
