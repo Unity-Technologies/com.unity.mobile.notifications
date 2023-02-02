@@ -204,6 +204,30 @@ namespace Unity.Notifications.Tests
             Assert.IsFalse(xmlDoc.InnerXml.Contains(permission));
         }
 
+        static readonly string[] kProguardContents = new[]
+        {
+            "-keep class bitter.jnibridge.* { *; }",
+            "-keep class com.unity3d.player.* { *; }",
+            "-keep class org.fmod.* { *; }",
+        };
+
+        [Test]
+        public void InjectProguard_WhenMissing_AddsNotifications()
+        {
+            string[] result;
+            bool ret = AndroidNotificationPostProcessor.InjectProguard(kProguardContents, out result);
+
+            Assert.IsTrue(ret);
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result[result.Length - 1].Contains("com.unity.androidnotifications.UnityNotificationManager"));
+
+            // try again, now should not modify
+            string[] res2;
+            ret = AndroidNotificationPostProcessor.InjectProguard(result, out res2);
+            Assert.IsFalse(ret);
+            Assert.IsNull(res2);
+        }
+
 #endif
     }
 }
