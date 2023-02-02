@@ -57,23 +57,23 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     static final String TAG_UNITY = "UnityNotifications";
 
-    static final String KEY_FIRE_TIME = "fireTime";
-    static final String KEY_ID = "id";
-    static final String KEY_INTENT_DATA = "data";
-    static final String KEY_LARGE_ICON = "largeIcon";
-    static final String KEY_REPEAT_INTERVAL = "repeatInterval";
-    static final String KEY_NOTIFICATION = "unityNotification";
-    static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
-    static final String KEY_SMALL_ICON = "smallIcon";
-    static final String KEY_CHANNEL_ID = "channelID";
-    static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
-    static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
-    static final String KEY_BIG_LARGE_ICON = "com.unity.BigLargeIcon";
-    static final String KEY_BIG_PICTURE = "com.unity.BigPicture";
-    static final String KEY_BIG_CONTENT_TITLE = "com.unity.BigContentTytle";
-    static final String KEY_BIG_SUMMARY_TEXT = "com.unity.BigSummaryText";
-    static final String KEY_BIG_CONTENT_DESCRIPTION = "com.unity.BigContentDescription";
-    static final String KEY_BIG_SHOW_WHEN_COLLAPSED = "com.unity.BigShowWhenCollapsed";
+    public static final String KEY_FIRE_TIME = "fireTime";
+    public static final String KEY_ID = "id";
+    public static final String KEY_INTENT_DATA = "data";
+    public static final String KEY_LARGE_ICON = "largeIcon";
+    public static final String KEY_REPEAT_INTERVAL = "repeatInterval";
+    public static final String KEY_NOTIFICATION = "unityNotification";
+    public static final String KEY_NOTIFICATION_ID = "com.unity.NotificationID";
+    public static final String KEY_SMALL_ICON = "smallIcon";
+    public static final String KEY_CHANNEL_ID = "channelID";
+    public static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
+    public static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
+    public static final String KEY_BIG_LARGE_ICON = "com.unity.BigLargeIcon";
+    public static final String KEY_BIG_PICTURE = "com.unity.BigPicture";
+    public static final String KEY_BIG_CONTENT_TITLE = "com.unity.BigContentTytle";
+    public static final String KEY_BIG_SUMMARY_TEXT = "com.unity.BigSummaryText";
+    public static final String KEY_BIG_CONTENT_DESCRIPTION = "com.unity.BigContentDescription";
+    public static final String KEY_BIG_SHOW_WHEN_COLLAPSED = "com.unity.BigShowWhenCollapsed";
 
     static final String NOTIFICATION_CHANNELS_SHARED_PREFS = "UNITY_NOTIFICATIONS";
     static final String NOTIFICATION_CHANNELS_SHARED_PREFS_KEY = "ChannelIDs";
