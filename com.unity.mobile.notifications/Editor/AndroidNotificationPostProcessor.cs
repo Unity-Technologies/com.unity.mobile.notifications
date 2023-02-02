@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;
@@ -21,6 +22,7 @@ namespace Unity.Notifications
             CopyNotificationResources(projectPath);
 
             InjectAndroidManifest(projectPath);
+            InjectProguard(projectPath);
         }
 
         private void MinSdkCheck()
@@ -259,6 +261,34 @@ namespace Unity.Notifications
             metaDataNode.SetAttribute("value", kAndroidNamespaceURI, value);
 
             applicationNode.AppendChild(metaDataNode);
+        }
+
+        private static void InjectProguard(string projectPath)
+        {
+            var proguardFile = $"{projectPath}/proguard-unity.txt";
+            if (!File.Exists(proguardFile))
+            {
+                UnityEngine.Debug.LogWarning($"Proguard file {proguardFile} not found, mobile notifications package may not function");
+                return;
+            }
+
+            var lines = File.ReadAllLines(proguardFile);
+            string[] newLines;
+            if (InjectProguard(lines, out newLines))
+                File.WriteAllLines(proguardFile, newLines);
+        }
+
+        internal static bool InjectProguard(string[] original, out string[] result)
+        {
+            foreach (var s in original)
+                if (s.Contains("com.unity.androidnotifications.UnityNotificationManager"))
+                {
+                    result = null;
+                    return false;
+                }
+
+            result = original.Concat(new[] {"-keep class com.unity.androidnotifications.UnityNotificationManager { public *; }"}).ToArray();
+            return true;
         }
     }
 }
