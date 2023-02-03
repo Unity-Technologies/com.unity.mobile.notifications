@@ -119,6 +119,7 @@ namespace Unity.Notifications.Tests.Sample
                     m_LOGGER.Green("Permission granted to post notifications");
                     break;
                 default:
+                    m_LOGGER.Blue("Should show reason for notifications: " + AndroidNotificationCenter.ShouldShowPermissionToPostRationale);
                     m_LOGGER.Red("No permission to post notifications: " + permission);
                     break;
             }
