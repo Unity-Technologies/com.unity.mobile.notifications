@@ -711,6 +711,30 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
+        /// Returns true if app should show UI explaining why it need permission to post notifications.
+        /// The UI should be shown before requesting the permission.
+        /// </summary>
+        public static bool ShouldShowPermissionToPostRationale
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+
+                if (CanRequestPermissionToPost)
+                {
+#if UNITY_2023_1_OR_NEWER
+                    return Permission.ShouldShowRequestPermissionRationale(PERMISSION_POST_NOTIFICATIONS);
+#else
+                    return s_CurrentActivity.Call<bool>("shouldShowRequestPermissionRationale", PERMISSION_POST_NOTIFICATIONS);
+#endif
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Whether notifications are scheduled at exact times.
         /// Combines notification settings and actual device settings (since Android 12 exact scheduling is user controllable).
         /// </summary>
