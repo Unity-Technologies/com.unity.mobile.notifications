@@ -739,7 +739,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         }
 
         try {
-            mNotificationCallback.onSentNotification(notification);
+            if (mNotificationCallback != null)
+                mNotificationCallback.onSentNotification(notification);
         } catch (RuntimeException ex) {
             Log.w(TAG_UNITY, "Can not invoke OnNotificationReceived event when the app is not running!");
         }
