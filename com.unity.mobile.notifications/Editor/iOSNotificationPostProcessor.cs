@@ -37,6 +37,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
         var needLocationFramework = (bool)settings.Find(i => i.Key == NotificationSettings.iOSSettings.USE_LOCATION_TRIGGER).Value;
         var addPushNotificationCapability = (bool)settings.Find(i => i.Key == NotificationSettings.iOSSettings.ADD_PUSH_CAPABILITY).Value;
+        var addTimeSensitiveEntitlement = (bool)settings.Find(i => i.Key == NotificationSettings.iOSSettings.ADD_TIME_SENSITIVE_ENTITLEMENT).Value;
 
         var useReleaseAPSEnv = false;
         if (addPushNotificationCapability)
@@ -46,12 +47,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 useReleaseAPSEnv = (bool)useReleaseAPSEnvSetting.Value;
         }
 
-        PatchPBXProject(path, needLocationFramework, addPushNotificationCapability, useReleaseAPSEnv);
+        PatchPBXProject(path, needLocationFramework, addPushNotificationCapability, useReleaseAPSEnv, addTimeSensitiveEntitlement);
         PatchPlist(path, settings, addPushNotificationCapability);
         PatchPreprocessor(path, needLocationFramework, addPushNotificationCapability);
     }
 
-    private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv)
+    private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv, bool addTimeSensitiveEntitlement)
     {
         var pbxProjectPath = PBXProject.GetPBXProjectPath(path);
 
@@ -92,19 +93,38 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (needsToWriteChanges)
             File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
 
+        var entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
+        if (entitlementsFileName == null)
+        {
+            var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
+            entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+        }
+
         // Update the entitlements file.
         if (addPushNotificationCapability)
         {
-            var entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
-            if (entitlementsFileName == null)
-            {
-                var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
-                entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
-            }
-
             var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, "Unity-iPhone");
             capManager.AddPushNotifications(!useReleaseAPSEnv);
             capManager.WriteToFile();
+        }
+
+        if (addTimeSensitiveEntitlement)
+        {
+            var entitlementsFile = new PlistDocument();
+            var entitlementsFilePath = Path.Combine(path, entitlementsFileName);
+            if (File.Exists(entitlementsFilePath))
+                entitlementsFile.ReadFromFile(entitlementsFilePath);
+            var entitlement = entitlementsFile.root["com.apple.developer.usernotifications.time-sensitive"] as PlistElementBoolean;
+            if (entitlement == null || entitlement.AsBoolean() == false)
+            {
+                entitlementsFile.root["com.apple.developer.usernotifications.time-sensitive"] = new PlistElementBoolean(true);
+                entitlementsFile.WriteToFile(entitlementsFilePath);
+            }
+            if (pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS") == null)
+            {
+                pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
+                pbxProject.WriteToFile(pbxProjectPath);
+            }
         }
     }
 
