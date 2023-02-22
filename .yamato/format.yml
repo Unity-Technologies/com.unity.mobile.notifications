@@ -7,7 +7,7 @@ check_format:
   commands:
     - git clone --branch stable git@github.cds.internal.unity3d.com:unity/unity-meta.git --no-checkout
     - git -C unity-meta checkout 6f6dd71b42f7fd3294032a6c89b1402ef3e46099
-    - perl unity-meta/Tools/Format/format.pl --dry-run all
+    - perl unity-meta/Tools/Format/format.pl --dry-run .
   triggers:
     branches:
       only:
