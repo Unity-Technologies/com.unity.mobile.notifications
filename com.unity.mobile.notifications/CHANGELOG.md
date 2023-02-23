@@ -9,6 +9,8 @@ All notable changes to this package will be documented in this file.
 - [Android] - Added support for BigPicture style.
 - [Android] - Icons now support local files and URIs.
 - [iOS] - Added support for notification action icons (requires iOS 15).
+- [iOS] - Added property to set interruption level (requires iOS 15).
+- [iOS] - Added property to set relevance score (requires iOS 15).
 
 ## [2.1.1] - 2023-01-04
 

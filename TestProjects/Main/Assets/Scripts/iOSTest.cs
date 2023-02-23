@@ -238,6 +238,7 @@ namespace Unity.Notifications.Tests.Sample
                         Badge = template.Badge,
                         Data = template.Data,
                         SoundType = template.SoundType,
+                        InterruptionLevel = template.InterruptionLevel,
                         Trigger = new iOSNotificationTimeIntervalTrigger()
                         {
                             TimeInterval = TimeSpan.FromSeconds(template.TimeTriggerInterval),

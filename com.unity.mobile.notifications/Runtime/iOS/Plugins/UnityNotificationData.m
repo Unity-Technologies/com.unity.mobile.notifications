@@ -81,8 +81,27 @@ void initiOSNotificationData(iOSNotificationData* notificationData)
     notificationData->soundType = kSoundTypeDefault;
     notificationData->soundVolume = -1.0f;
     notificationData->soundName = NULL;
+    notificationData->interruptionLevel = kInterruptionLevelActive;
+    notificationData->relevanceScore = 0;
     notificationData->triggerType = PUSH_TRIGGER;
     notificationData->userInfo = NULL;
+}
+
+static enum UnityNotificationInterruptionLevel InterruptionLevelToUnity(UNNotificationInterruptionLevel level)
+API_AVAILABLE(ios(15.0))
+{
+    switch (level)
+    {
+        case UNNotificationInterruptionLevelActive:
+        default:
+            return kInterruptionLevelActive;
+        case UNNotificationInterruptionLevelCritical:
+            return kInterruptionLevelCritical;
+        case UNNotificationInterruptionLevelPassive:
+            return kInterruptionLevelPassive;
+        case UNNotificationInterruptionLevelTimeSensitive:
+            return kInterruptionLevelTimeSensitive;
+    }
 }
 
 static void parseCustomizedData(iOSNotificationData* notificationData, UNNotificationRequest* request)
@@ -132,6 +151,17 @@ iOSNotificationData UNNotificationRequestToiOSNotificationData(UNNotificationReq
 
     if (content.threadIdentifier != nil && content.threadIdentifier.length > 0)
         notificationData.threadIdentifier = strdup([content.threadIdentifier UTF8String]);
+
+    if (@available(iOS 15.0, *))
+    {
+        notificationData.interruptionLevel = InterruptionLevelToUnity(content.interruptionLevel);
+        notificationData.relevanceScore = content.relevanceScore;
+    }
+    else
+    {
+        notificationData.interruptionLevel = kInterruptionLevelActive;
+        notificationData.relevanceScore = 0;
+    }
 
     if ([request.trigger isKindOfClass: [UNTimeIntervalNotificationTrigger class]])
     {

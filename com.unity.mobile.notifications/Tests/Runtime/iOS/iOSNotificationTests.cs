@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
@@ -203,6 +204,93 @@ class iOSNotificationTests
     public IEnumerator SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived()
     {
         yield return SendNotificationUsingCalendarTrigger_NotificationIsReceived("SendNotificationUsingCalendarTriggerUtcTime_NotificationIsReceived", true);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator SendNotification_AllPropertiesRoundtrip()
+    {
+        var trigger = new iOSNotificationTimeIntervalTrigger()
+        {
+            TimeInterval = new TimeSpan(0, 0, 5),
+            Repeats = false,
+        };
+
+        var notification = new iOSNotification()
+        {
+            Trigger = trigger,
+            Identifier = "roundtrip",
+            CategoryIdentifier = "category",
+            ThreadIdentifier = "thread",
+            Title = "Title",
+            Subtitle = "subtitle",
+            Body = "body",
+            Badge = 2,
+            InterruptionLevel = NotificationInterruptionLevel.Critical,
+            RelevanceScore = 1.0,
+            ShowInForeground = true,
+            ForegroundPresentationOption = PresentationOption.Alert,
+        };
+
+        iOSNotificationCenter.ScheduleNotification(notification);
+
+        yield return WaitForNotification(10.0f);
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsNotNull(lastReceivedNotification);
+        CompareNotifications(notification, lastReceivedNotification);
+    }
+
+    void CompareNotifications(iOSNotification expected, iOSNotification actual)
+    {
+        // these don't roundtrip or are tested separately
+        var ignoredProps = new[]
+        {
+            "Attachments",
+            "SoundName",
+            "SoundType",
+            "SoundVolume",
+            "UserInfo",
+        };
+        foreach (var prop in typeof(iOSNotification).GetProperties())
+        {
+            if (ignoredProps.Contains(prop.Name))
+                continue;
+            var v1 = prop.GetValue(expected);
+            var v2 = prop.GetValue(actual);
+            if (prop.PropertyType.IsValueType)
+            {
+                if (prop.PropertyType.IsPrimitive)
+                {
+                    if (prop.PropertyType == typeof(bool))
+                    {
+                        if (!(bool)v2)
+                            Assert.Fail($"Expected property {prop.Name} to be true");
+                    }
+                    else
+                    {
+                        int intVal = ((IConvertible)v2).ToInt32(System.Globalization.CultureInfo.InvariantCulture);
+                        if (intVal == 0)
+                            Assert.Fail($"Expected property {prop.Name} to be non-zero");
+                    }
+                }
+                else if (prop.PropertyType.IsEnum)
+                {
+                    int intVal = (int)v2;
+                    if (intVal == 0)
+                        Assert.Fail($"Expected property {prop.Name} to be non-zero");
+                }
+                else
+                    Assert.Fail($"Property {prop.Name} not handled");
+            }
+            else
+            {
+                if (v2 == null)
+                    Assert.Fail($"Property {prop.Name} value is null");
+            }
+
+            if (!object.Equals(v1, v2))
+                Assert.Fail($"Value missmatch for property {prop.Name}: '{v1}' vs '{v2}'");
+        }
     }
 
     [Test]
