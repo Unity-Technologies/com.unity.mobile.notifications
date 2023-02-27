@@ -707,6 +707,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 Class openActivity;
                 if (mOpenActivity == null) {
                     openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, true);
+                    if (openActivity == null) {
+                        Log.e(TAG_UNITY, "Activity not found, cannot show notification");
+                        return;
+                    }
                 }
                 else {
                     openActivity = mOpenActivity;
