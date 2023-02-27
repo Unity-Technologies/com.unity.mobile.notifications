@@ -109,7 +109,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 PackageManager.DONT_KILL_APP);
         }
 
-        mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, false);
+        mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
         if (mOpenActivity == null)
             throw new RuntimeException("Failed to determine Activity to be opened when tapping notification");
         if (!mBackgroundThread.isAlive())
@@ -705,7 +705,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
                 Class openActivity;
                 if (mOpenActivity == null) {
-                    openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext, true);
+                    openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
                     if (openActivity == null) {
                         Log.e(TAG_UNITY, "Activity not found, cannot show notification");
                         return;

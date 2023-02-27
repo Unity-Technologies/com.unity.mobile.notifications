@@ -510,7 +510,7 @@ class UnityNotificationUtilities {
         return null;
     }
 
-    protected static Class<?> getOpenAppActivity(Context context, boolean fallbackToDefault) {
+    protected static Class<?> getOpenAppActivity(Context context) {
         ApplicationInfo ai = null;
         try {
             ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
@@ -532,7 +532,7 @@ class UnityNotificationUtilities {
             }
         }
 
-        if (activityClass == null && fallbackToDefault) {
+        if (activityClass == null) {
             Log.w(TAG_UNITY, "No custom_notification_android_activity found, attempting to find app activity class");
 
             String classToFind = "com.unity3d.player.UnityPlayerActivity";
