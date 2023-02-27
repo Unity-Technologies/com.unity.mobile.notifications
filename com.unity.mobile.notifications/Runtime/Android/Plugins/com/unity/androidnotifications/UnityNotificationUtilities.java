@@ -519,14 +519,11 @@ class UnityNotificationUtilities {
         }
         Bundle bundle = ai.metaData;
 
-        String customActivityClassName = null;
         Class activityClass = null;
 
         if (bundle.containsKey("custom_notification_android_activity")) {
-            customActivityClassName = bundle.getString("custom_notification_android_activity");
-
             try {
-                activityClass = Class.forName(customActivityClassName);
+                return Class.forName(bundle.getString("custom_notification_android_activity"));
             } catch (ClassNotFoundException ignored) {
                 ;
             }
