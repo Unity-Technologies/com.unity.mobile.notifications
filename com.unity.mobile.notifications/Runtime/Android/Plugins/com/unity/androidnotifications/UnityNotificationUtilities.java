@@ -11,6 +11,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -510,43 +511,72 @@ class UnityNotificationUtilities {
         return null;
     }
 
+    // Returns Activity class to be opened when notification is tapped
+    // Search is done in this order:
+    //   * class specified in meta-data key custom_notification_android_activity
+    //   * the only enabled activity with name ending in either .UnityPlayerActivity or .UnityPlayerGameActivity
+    //   * the only enabled activity in the package
     protected static Class<?> getOpenAppActivity(Context context) {
-        ApplicationInfo ai = null;
         try {
-            ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Bundle bundle = ai.metaData;
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
 
-        Class activityClass = null;
-
-        if (bundle.containsKey("custom_notification_android_activity")) {
-            try {
-                return Class.forName(bundle.getString("custom_notification_android_activity"));
-            } catch (ClassNotFoundException ignored) {
-                ;
-            }
-        }
-
-        if (activityClass == null) {
-            Log.w(TAG_UNITY, "No custom_notification_android_activity found, attempting to find app activity class");
-
-            String classToFind = "com.unity3d.player.UnityPlayerActivity";
-            try {
-                return Class.forName(classToFind);
-            } catch (ClassNotFoundException ignored) {
-                Log.w(TAG_UNITY, String.format("Attempting to find : %s, failed!", classToFind));
-                classToFind = String.format("%s.UnityPlayerActivity", context.getPackageName());
+            if (bundle.containsKey("custom_notification_android_activity")) {
                 try {
-                    return Class.forName(classToFind);
-                } catch (ClassNotFoundException ignored1) {
-                    Log.w(TAG_UNITY, String.format("Attempting to find class based on package name: %s, failed!", classToFind));
+                    return Class.forName(bundle.getString("custom_notification_android_activity"));
+                } catch (ClassNotFoundException e) {
+                    Log.e(TAG_UNITY, "Specified activity class for notifications not found: " + e.getMessage());
                 }
             }
+
+            Log.w(TAG_UNITY, "No custom_notification_android_activity found, attempting to find app activity class");
+
+            ActivityInfo[] aInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES).activities;
+            if (aInfo != null) {
+                String activityClassName = null;
+                String conflictingActivity = null;
+                boolean activityConflict = false;
+                for (ActivityInfo info : aInfo) {
+                    // activity alias not supported
+                    if (info.enabled && info.targetActivity == null) {
+                        if (activityClassName == null) {
+                            activityClassName = info.name;
+                        } else if (info.name.endsWith(".UnityPlayerActivity") || info.name.endsWith(".UnityPlayerGameActivity")) {
+                            if (activityClassName.endsWith(".UnityPlayerActivity") || activityClassName.endsWith(".UnityPlayerGameActivity")) {
+                                conflictingActivity = info.name;
+                                activityConflict = true;
+                                break;
+                            }
+
+                            activityClassName = info.name;
+                            activityConflict = false;
+                        } else {
+                            conflictingActivity = info.name;
+                            activityConflict = true;
+                        }
+                    }
+                }
+
+                if (activityConflict) {
+                    Log.e(TAG_UNITY, String.format("Multiple choices for activity for notifications: %s and %s", activityClassName, conflictingActivity));
+                    return null;
+                }
+
+                if (activityClassName == null) {
+                    Log.e(TAG_UNITY, "Activity class for notifications not found");
+                    return null;
+                }
+
+                return Class.forName(activityClassName);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            Log.e(TAG_UNITY, "Failed to find activity class: " + e.getMessage());
         }
 
-        return activityClass;
+        return null;
     }
 
     protected static Notification.Builder recoverBuilder(Context context, Notification notification) {
