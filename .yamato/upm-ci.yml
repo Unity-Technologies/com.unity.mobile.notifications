@@ -68,7 +68,7 @@ test_Android_{{ editor.version }}:
   commands:
     - curl -s {{ utr.url_win }} --output utr.bat
     - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade --use-pep517
-    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
+    - pipenv run unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
     - utr.bat --testproject=TestProjects\Main --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
