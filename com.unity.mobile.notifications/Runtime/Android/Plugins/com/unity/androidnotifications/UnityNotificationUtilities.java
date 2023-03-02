@@ -548,8 +548,8 @@ class UnityNotificationUtilities {
 
                 if (activityClassName == null) {
                     activityClassName = info.name;
-                } else if (info.name.endsWith(".UnityPlayerActivity") || info.name.endsWith(".UnityPlayerGameActivity")) {
-                    if (activityClassName.endsWith(".UnityPlayerActivity") || activityClassName.endsWith(".UnityPlayerGameActivity")) {
+                } else if (isUnityActivity(info.name)) {
+                    if (isUnityActivity(activityClassName)) {
                         conflictingActivity = info.name;
                         activityConflict = true;
                         break;
@@ -581,6 +581,10 @@ class UnityNotificationUtilities {
         }
 
         return null;
+    }
+
+    private static boolean isUnityActivity(String name) {
+        return name.endsWith(".UnityPlayerActivity") || name.endsWith(".UnityPlayerGameActivity");
     }
 
     protected static Notification.Builder recoverBuilder(Context context, Notification notification) {
