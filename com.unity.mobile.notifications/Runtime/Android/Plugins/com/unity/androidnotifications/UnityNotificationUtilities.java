@@ -543,22 +543,23 @@ class UnityNotificationUtilities {
             boolean activityConflict = false;
             for (ActivityInfo info : aInfo) {
                 // activity alias not supported
-                if (info.enabled && info.targetActivity == null) {
-                    if (activityClassName == null) {
-                        activityClassName = info.name;
-                    } else if (info.name.endsWith(".UnityPlayerActivity") || info.name.endsWith(".UnityPlayerGameActivity")) {
-                        if (activityClassName.endsWith(".UnityPlayerActivity") || activityClassName.endsWith(".UnityPlayerGameActivity")) {
-                            conflictingActivity = info.name;
-                            activityConflict = true;
-                            break;
-                        }
+                if (!info.enabled || info.targetActivity != null)
+                    continue;
 
-                        activityClassName = info.name;
-                        activityConflict = false;
-                    } else {
+                if (activityClassName == null) {
+                    activityClassName = info.name;
+                } else if (info.name.endsWith(".UnityPlayerActivity") || info.name.endsWith(".UnityPlayerGameActivity")) {
+                    if (activityClassName.endsWith(".UnityPlayerActivity") || activityClassName.endsWith(".UnityPlayerGameActivity")) {
                         conflictingActivity = info.name;
                         activityConflict = true;
+                        break;
                     }
+
+                    activityClassName = info.name;
+                    activityConflict = false;
+                } else {
+                    conflictingActivity = info.name;
+                    activityConflict = true;
                 }
             }
 
