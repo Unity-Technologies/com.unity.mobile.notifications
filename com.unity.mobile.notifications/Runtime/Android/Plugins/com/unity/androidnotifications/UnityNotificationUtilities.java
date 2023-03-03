@@ -539,7 +539,6 @@ class UnityNotificationUtilities {
             }
 
             String activityClassName = null;
-            String conflictingActivity = null;
             boolean activityConflict = false;
             for (ActivityInfo info : aInfo) {
                 // activity alias not supported
@@ -550,7 +549,6 @@ class UnityNotificationUtilities {
                     activityClassName = info.name;
                 } else if (isUnityActivity(info.name)) {
                     if (isUnityActivity(activityClassName)) {
-                        conflictingActivity = info.name;
                         activityConflict = true;
                         break;
                     }
@@ -558,13 +556,12 @@ class UnityNotificationUtilities {
                     activityClassName = info.name;
                     activityConflict = false;
                 } else {
-                    conflictingActivity = info.name;
                     activityConflict = true;
                 }
             }
 
             if (activityConflict) {
-                Log.e(TAG_UNITY, String.format("Multiple choices for activity for notifications: %s and %s", activityClassName, conflictingActivity));
+                Log.e(TAG_UNITY, "Multiple choices for activity for notifications, set activity explicitly in Notification Settings");
                 return null;
             }
 
