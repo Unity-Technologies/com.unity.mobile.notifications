@@ -67,8 +67,8 @@ test_Android_{{ editor.version }}:
     flavor: b1.medium
   commands:
     - curl -s {{ utr.url_win }} --output utr.bat
-    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade --use-pep517
-    - pipenv run unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
+    - gsudo choco install unity-downloader-cli -y -s https://artifactory.prd.it.unity3d.com/artifactory/api/nuget/unity-choco-local
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
     - utr.bat --testproject=TestProjects\Main --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
