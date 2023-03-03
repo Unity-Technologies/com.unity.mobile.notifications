@@ -25,6 +25,14 @@ enum UnitySoundType
     kSoundTypeNone = 4,
 };
 
+enum UnityNotificationInterruptionLevel
+{
+    kInterruptionLevelActive = 0,
+    kInterruptionLevelCritical = 1,
+    kInterruptionLevelPassive = 2,
+    kInterruptionLevelTimeSensitive = 3,
+};
+
 typedef struct iOSNotificationData
 {
     char* identifier;
@@ -37,6 +45,8 @@ typedef struct iOSNotificationData
     int soundType;
     float soundVolume;
     char* soundName;
+    int interruptionLevel;
+    double relevanceScore;
 
     void* userInfo;
     void* attachments;

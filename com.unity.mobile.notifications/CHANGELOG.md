@@ -11,6 +11,8 @@ All notable changes to this package will be documented in this file.
 - [Android] - Added API to check if UI with permission rationale for notifications should be shown before requesting permission.
 - [Android] - Added APIs to request exact scheduling and bupasssing battery optimizations.
 - [iOS] - Added support for notification action icons (requires iOS 15).
+- [iOS] - Added property to set interruption level (requires iOS 15).
+- [iOS] - Added property to set relevance score (requires iOS 15).
 
 ## [2.1.1] - 2023-01-04
 

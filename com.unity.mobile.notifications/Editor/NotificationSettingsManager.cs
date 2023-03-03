@@ -143,7 +143,12 @@ namespace Unity.Notifications
                     "Include CoreLocation Framework",
                     "Include the CoreLocation framework to use the iOSNotificationLocationTrigger in your project.",
                     settingsManager.GetOrAddNotificationSettingValue(NotificationSettings.iOSSettings.USE_LOCATION_TRIGGER, false, false),
-                    false)
+                    false),
+                new NotificationSetting(NotificationSettings.iOSSettings.ADD_TIME_SENSITIVE_ENTITLEMENT,
+                    "Enable time sensitive notifications",
+                    "Enable to add entitlement for notifications with time sensitive interruption level",
+                    settingsManager.GetOrAddNotificationSettingValue(NotificationSettings.iOSSettings.ADD_TIME_SENSITIVE_ENTITLEMENT, false, false),
+                    false),
             };
 
             // Create the settings for Android.

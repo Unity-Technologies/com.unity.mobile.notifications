@@ -63,11 +63,11 @@ test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
     type: Unity::mobile::shield
-    image: mobile/android-execution-base:v0.6.1
+    image: mobile/android-execution-base:v0.7.0
     flavor: b1.medium
   commands:
     - curl -s {{ utr.url_win }} --output utr.bat
-    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - gsudo choco install unity-downloader-cli -y -s https://artifactory.prd.it.unity3d.com/artifactory/api/nuget/unity-choco-local
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
     - utr.bat --testproject=TestProjects\Main --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
