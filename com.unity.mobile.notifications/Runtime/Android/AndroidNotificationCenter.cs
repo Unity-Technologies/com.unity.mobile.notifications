@@ -284,6 +284,11 @@ namespace Unity.Notifications.Android
                 bigPicture.ShowWhenCollapsed
             );
         }
+
+        public bool CanScheduleExactAlarms()
+        {
+            return self.Call<bool>("canScheduleExactAlarms");
+        }
     }
 
     struct NotificationJni
@@ -692,6 +697,116 @@ namespace Unity.Notifications.Android
 
                 return permissionStatus;
             }
+        }
+
+        internal static bool CanRequestPermissionToPost
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+                // on lower target SDK OS asks permission automatically, can't ask manually
+                return s_TargetApiLevel >= API_POST_NOTIFICATIONS_PERMISSION_REQUIRED;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if app should show UI explaining why it need permission to post notifications.
+        /// The UI should be shown before requesting the permission.
+        /// </summary>
+        public static bool ShouldShowPermissionToPostRationale
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+
+                if (CanRequestPermissionToPost)
+                {
+#if UNITY_2023_1_OR_NEWER
+                    return Permission.ShouldShowRequestPermissionRationale(PERMISSION_POST_NOTIFICATIONS);
+#else
+                    return s_CurrentActivity.Call<bool>("shouldShowRequestPermissionRationale", PERMISSION_POST_NOTIFICATIONS);
+#endif
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Whether notifications are scheduled at exact times.
+        /// Combines notification settings and actual device settings (since Android 12 exact scheduling is user controllable).
+        /// </summary>
+        /// <seealso cref="AndroidExactSchedulingOption"/>
+        public static bool UsingExactScheduling
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+                return s_Jni.NotificationManager.CanScheduleExactAlarms();
+            }
+        }
+
+        /// <summary>
+        /// Request user permission to schedule alarms at exact times.
+        /// Only works on Android 12 and later, older versions can schedule at exact times without requesting it.
+        /// This may cause your app to use more battery.
+        /// App must have SCHEDULE_EXACT_ALARM permission to be able to request this.
+        /// </summary>
+        /// <seealso cref="AndroidExactSchedulingOption"/>
+        public static void RequestExactScheduling()
+        {
+            if (!Initialize())
+                return;
+            if (s_DeviceApiLevel < 31)
+                return;
+
+            StartActionForThisPackage("android.settings.REQUEST_SCHEDULE_EXACT_ALARM");
+        }
+
+        private static void StartActionForThisPackage(string action)
+        {
+            var packageName = s_CurrentActivity.Call<string>("getPackageName");
+            using (var uriClass = new AndroidJavaClass("android.net.Uri"))
+            using (var uri = uriClass.CallStatic<AndroidJavaObject>("parse", $"package:{packageName}"))
+            using (var intent = new AndroidJavaObject("android.content.Intent", action, uri))
+                s_CurrentActivity.Call("startActivity", intent);
+        }
+
+        /// <summary>
+        /// Whether app is ignoring device battery optimization settings.
+        /// When device is in power saving or similar restricted mode, scheduled notifications may not appear or be late.
+        /// </summary>
+        /// <seealso cref="RequestIgnoreBatteryOptimizations()"/>
+        public static bool IgnoringBatteryOptimizations
+        {
+            get
+            {
+                if (!Initialize())
+                    return false;
+                if (s_DeviceApiLevel < 23)
+                    return false;
+                using (var pm = s_CurrentActivity.Call<AndroidJavaObject>("getSystemService", "power"))
+                    return pm.Call<bool>("isIgnoringBatteryOptimizations", s_CurrentActivity.Call<string>("getPackageName"));
+            }
+        }
+
+        /// <summary>
+        /// Request user to allow unrestricted background work for app.
+        /// UI for it is provided by OS and is manufacturer specific. Recommended to explain user what to do before requesting.
+        /// App must have REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission to be able to request this.
+        /// </summary>
+        /// <seealso cref="AndroidExactSchedulingOption"/>
+        public static void RequestIgnoreBatteryOptimizations()
+        {
+            if (!Initialize())
+                return;
+            if (s_DeviceApiLevel < 23)
+                return;
+
+            StartActionForThisPackage("android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
         }
 
         /// <summary>

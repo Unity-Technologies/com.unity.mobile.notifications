@@ -25,5 +25,11 @@ namespace Unity.Notifications
         /// Add USE_EXACT_ALARM permission to the manifest.
         /// </summary>
         AddUseExactAlarmPermission = 1 << 2,
+
+        /// <summary>
+        /// Add REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission to the manifest.
+        /// Required if you want to use <see cref="AndroidNotificationCenter.RequestIgnoreBatteryOptimizations()"/>.
+        /// </summary>
+        AddRequestIgnoreBatteryOptimizationsPermission = 1 << 3,
     }
 }

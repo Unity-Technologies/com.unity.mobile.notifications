@@ -119,6 +119,7 @@ namespace Unity.Notifications.Tests.Sample
                     m_LOGGER.Green("Permission granted to post notifications");
                     break;
                 default:
+                    m_LOGGER.Blue("Should show reason for notifications: " + AndroidNotificationCenter.ShouldShowPermissionToPostRationale);
                     m_LOGGER.Red("No permission to post notifications: " + permission);
                     break;
             }
@@ -177,6 +178,9 @@ namespace Unity.Notifications.Tests.Sample
             m_groups["General"]["Notification batch size: "+NotificationBatchSizes[_CurrentNotificationBatchSizeIndex]] = new Action(() => { ChangeNotificationBatchSize(NotificationBatchSizes); });
             m_groups["General"]["Reset notification counter"] = new Action(() => { NotificationCounter = 0; });
             m_groups["General"]["Request permission"] = new Action(() => { RequestNotificationPermission(); });
+            m_groups["General"]["Exact scheduling"] = new Action(() => { ExactScheduling(); });
+            m_groups["General"]["Request exact scheduling"] = new Action(() => { RequestExactScheduling(); });
+            m_groups["General"]["Ignore battery"] = new Action(() => { IgnoreBattery(); });
 
             m_groups["Modify"] = new OrderedDictionary();
             //m_groups["Modify"]["Create notification preset"] = new Action(() => {  });
@@ -321,6 +325,24 @@ namespace Unity.Notifications.Tests.Sample
                     m_LOGGER.Red(request.Status.ToString());
                     break;
             }
+        }
+
+        void ExactScheduling()
+        {
+            var isExact = AndroidNotificationCenter.UsingExactScheduling;
+            var ignoringBattery = AndroidNotificationCenter.IgnoringBatteryOptimizations;
+            m_LOGGER.Blue($"Scheduling at exact time: {isExact}");
+            m_LOGGER.Blue($"Ignoring battery optimizations: {ignoringBattery}");
+        }
+
+        void RequestExactScheduling()
+        {
+            AndroidNotificationCenter.RequestExactScheduling();
+        }
+
+        void IgnoreBattery()
+        {
+            AndroidNotificationCenter.RequestIgnoreBatteryOptimizations();
         }
 
 

@@ -61,18 +61,20 @@ namespace Unity.Notifications.Android
                 case PermissionStatus.NotRequested:
                 case PermissionStatus.Denied:
                 case PermissionStatus.DeniedDontAskAgain:  // this one is no longer used, but might be found in settings
-                    Status = PermissionStatus.RequestPending;
-                    RequestPermission();
+                    Status = RequestPermission();
                     break;
             }
         }
 
-        void RequestPermission()
+        PermissionStatus RequestPermission()
         {
+            if (!AndroidNotificationCenter.CanRequestPermissionToPost)
+                return PermissionStatus.Denied;
             var callbacks = new PermissionCallbacks();
             callbacks.PermissionGranted += (unused) => PermissionResponse(PermissionStatus.Allowed);
             callbacks.PermissionDenied += (unused) => PermissionResponse(PermissionStatus.Denied);
             Permission.RequestUserPermission(AndroidNotificationCenter.PERMISSION_POST_NOTIFICATIONS, callbacks);
+            return PermissionStatus.RequestPending;
         }
 
         void PermissionResponse(PermissionStatus status)

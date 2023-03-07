@@ -36,9 +36,11 @@ On devices that use Android versions prior to 8.0, this package emulates the sam
 
 Before Android 6.0 notifications can be scheduled only at approximate time.
 
-Since Android 12.0 (API level 31) android.permission.SCHEDULE_EXACT_ALARM permission has to be added to the manifest to enable exact scheduling, see [documentation](https://developer.android.com/reference/android/Manifest.permission#SCHEDULE_EXACT_ALARM).
+Since Android 12.0 (API level 31) android.permission.SCHEDULE_EXACT_ALARM permission has to be added to the manifest to enable exact scheduling, see [documentation](https://developer.android.com/reference/android/Manifest.permission#SCHEDULE_EXACT_ALARM). Note, that adding this permission does not guarantee you'll be able to use exact scheduling. You can check it by calling AndroidNotificationCenter.UsingExactScheduling. You may need to request user permission to schedule at exact times by calling AndroidNotificationCenter.RequestExactScheduling().
 
 Since Android 13.0 (API level 33) the android.permission.USE_EXACT_ALARM is and alternative permission to enable exact scheduling.
+
+On devices with Android version less than 12 and battery saving on, exact scheduling may not work. It can be improved by requesting user to bypass battery saving via AndroidNotificationCenter.RequestIgnoreBatteryOptimizations() (query it via AndroidNotificationCenter.IgnoringBatteryOptimizations). To be able to request it, you need the [permission](https://developer.android.com/reference/android/Manifest.permission#REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).
 
 Android recommends to not use exact scheduling due to higher power consumption it entails. Use notification settings in Unity to enable the automatic addition of the mentioned permissions or to always use inexact scheduling.
 
