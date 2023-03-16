@@ -273,21 +273,29 @@ namespace Unity.Notifications
             }
 
             var lines = File.ReadAllLines(proguardFile);
-            string[] newLines;
-            if (InjectProguard(lines, out newLines))
-                File.WriteAllLines(proguardFile, newLines);
+            if (InjectProguard(ref lines))
+                File.WriteAllLines(proguardFile, lines);
         }
 
-        internal static bool InjectProguard(string[] original, out string[] result)
+        internal static bool InjectProguard(ref string[] lines)
         {
-            foreach (var s in original)
-                if (s.Contains("com.unity.androidnotifications.UnityNotificationManager"))
-                {
-                    result = null;
-                    return false;
-                }
+            bool manager = InjectProguard(ref lines,
+                "com.unity.androidnotifications.UnityNotificationManager",
+                "-keep class com.unity.androidnotifications.UnityNotificationManager { public *; }");
+            bool callback = InjectProguard(ref lines,
+                "com.unity.androidnotifications.NotificationCallback",
+                "-keep class com.unity.androidnotifications.NotificationCallback { *; }");
 
-            result = original.Concat(new[] {"-keep class com.unity.androidnotifications.UnityNotificationManager { public *; }"}).ToArray();
+            return manager || callback;
+        }
+
+        static bool InjectProguard(ref string[] lines, string search, string inject)
+        {
+            foreach (var s in lines)
+                if (s.Contains(search))
+                    return false;
+
+            lines = lines.Concat(new[] { inject }).ToArray();
             return true;
         }
     }

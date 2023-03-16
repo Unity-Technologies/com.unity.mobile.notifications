@@ -214,18 +214,17 @@ namespace Unity.Notifications.Tests
         [Test]
         public void InjectProguard_WhenMissing_AddsNotifications()
         {
-            string[] result;
-            bool ret = AndroidNotificationPostProcessor.InjectProguard(kProguardContents, out result);
+            string[] result = kProguardContents;
+            bool ret = AndroidNotificationPostProcessor.InjectProguard(ref result);
 
             Assert.IsTrue(ret);
             Assert.IsNotNull(result);
-            Assert.IsTrue(result[result.Length - 1].Contains("com.unity.androidnotifications.UnityNotificationManager"));
+            Assert.IsTrue(result[result.Length - 2].Contains("com.unity.androidnotifications.UnityNotificationManager"));
+            Assert.IsTrue(result[result.Length - 1].Contains("com.unity.androidnotifications.NotificationCallback"));
 
             // try again, now should not modify
-            string[] res2;
-            ret = AndroidNotificationPostProcessor.InjectProguard(result, out res2);
+            ret = AndroidNotificationPostProcessor.InjectProguard(ref result);
             Assert.IsFalse(ret);
-            Assert.IsNull(res2);
         }
 
 #endif
