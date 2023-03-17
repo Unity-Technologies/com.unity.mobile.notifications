@@ -403,7 +403,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
         // fireTime not taken from notification, because we may have adjusted it
 
         // when rescheduling after boot notification may be absent
-        mScheduledNotifications.putIfAbsent(Integer.valueOf(id), notificationBuilder);
+        // also, we may be replacing an existing notification
+        mScheduledNotifications.put(Integer.valueOf(id), notificationBuilder);
         intent.putExtra(KEY_NOTIFICATION_ID, id);
 
         PendingIntent broadcast = getBroadcastPendingIntent(id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
