@@ -1,5 +1,6 @@
 package com.unity.androidnotifications;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -55,6 +56,8 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private NotificationCallback mNotificationCallback;
     private int mExactSchedulingSetting = -1;
 
+    private static final int PERMISSION_STATUS_ALLOWED = 1;
+    private static final int PERMISSION_STATUS_DENIED = 2;
     static final String TAG_UNITY = "UnityNotifications";
 
     public static final String KEY_FIRE_TIME = "fireTime";
@@ -152,6 +155,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     public int getTargetSdk() {
         return mContext.getApplicationInfo().targetSdkVersion;
+    }
+
+    public int areNotificationsEnabled() {
+        boolean permissionGranted = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            permissionGranted = mContext.checkCallingOrSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        if (!permissionGranted)
+            return PERMISSION_STATUS_DENIED;
+        return PERMISSION_STATUS_ALLOWED;
     }
 
     public void registerNotificationChannelGroup(String id, String name, String description) {

@@ -289,6 +289,11 @@ namespace Unity.Notifications.Android
         {
             return self.Call<bool>("canScheduleExactAlarms");
         }
+
+        public PermissionStatus AreNotificationsEnabled()
+        {
+            return (PermissionStatus)self.Call<int>("areNotificationsEnabled");
+        }
     }
 
     struct NotificationJni
@@ -674,8 +679,8 @@ namespace Unity.Notifications.Android
                     return PermissionStatus.Allowed;
 
                 var permissionStatus = (PermissionStatus)PlayerPrefs.GetInt(SETTING_POST_NOTIFICATIONS_PERMISSION, (int)PermissionStatus.NotRequested);
-                var allowed = Permission.HasUserAuthorizedPermission(PERMISSION_POST_NOTIFICATIONS);
-                if (allowed)
+                var enableStatus = s_Jni.NotificationManager.AreNotificationsEnabled();
+                if (enableStatus == PermissionStatus.Allowed)
                 {
                     if (permissionStatus != PermissionStatus.Allowed)
                         SetPostPermissionSetting(PermissionStatus.Allowed);
