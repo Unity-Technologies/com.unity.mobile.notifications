@@ -429,4 +429,22 @@ class AndroidNotificationSendingTests
         Assert.AreEqual("summary", bigPictureData.SummaryText);
         Assert.IsTrue(bigPictureData.ShowWhenCollapsed);
     }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator SendAndReplaceNotification()
+    {
+        var original = new AndroidNotification("NotificationToBeReplaced", "This should be replaced", DateTime.Now.AddSeconds(5));
+        int id = AndroidNotificationCenter.SendNotification(original, kDefaultTestChannel);
+        yield return new WaitForSeconds(1);
+
+        var replacement = new AndroidNotification("ReplacementNotification", "Replacement text", DateTime.Now.AddSeconds(3));
+        AndroidNotificationCenter.UpdateScheduledNotification(id, replacement, kDefaultTestChannel);
+        yield return WaitForNotification(8.0f);
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        var received = currentHandler.lastNotification.Notification;
+        Assert.AreEqual(replacement.Title, received.Title);
+        Assert.AreEqual(replacement.Text, received.Text);
+    }
 }

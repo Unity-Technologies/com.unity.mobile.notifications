@@ -995,7 +995,7 @@ namespace Unity.Notifications.Android
             {
                 using (var builder = CreateNotificationBuilder(id, notification, channelId))
                 {
-                    SendNotification(builder);
+                    ScheduleNotification(builder, false);
                 }
             }
         }
