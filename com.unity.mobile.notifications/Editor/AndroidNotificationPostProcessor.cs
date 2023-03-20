@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Android;
@@ -21,6 +22,7 @@ namespace Unity.Notifications
             CopyNotificationResources(projectPath);
 
             InjectAndroidManifest(projectPath);
+            InjectProguard(projectPath);
         }
 
         private void MinSdkCheck()
@@ -259,6 +261,42 @@ namespace Unity.Notifications
             metaDataNode.SetAttribute("value", kAndroidNamespaceURI, value);
 
             applicationNode.AppendChild(metaDataNode);
+        }
+
+        private static void InjectProguard(string projectPath)
+        {
+            var proguardFile = $"{projectPath}/proguard-unity.txt";
+            if (!File.Exists(proguardFile))
+            {
+                UnityEngine.Debug.LogWarning($"Proguard file {proguardFile} not found, mobile notifications package may not function");
+                return;
+            }
+
+            var lines = File.ReadAllLines(proguardFile);
+            if (InjectProguard(ref lines))
+                File.WriteAllLines(proguardFile, lines);
+        }
+
+        internal static bool InjectProguard(ref string[] lines)
+        {
+            bool manager = InjectProguard(ref lines,
+                "com.unity.androidnotifications.UnityNotificationManager",
+                "-keep class com.unity.androidnotifications.UnityNotificationManager { public *; }");
+            bool callback = InjectProguard(ref lines,
+                "com.unity.androidnotifications.NotificationCallback",
+                "-keep class com.unity.androidnotifications.NotificationCallback { *; }");
+
+            return manager || callback;
+        }
+
+        static bool InjectProguard(ref string[] lines, string search, string inject)
+        {
+            foreach (var s in lines)
+                if (s.Contains(search))
+                    return false;
+
+            lines = lines.Concat(new[] { inject }).ToArray();
+            return true;
         }
     }
 }
