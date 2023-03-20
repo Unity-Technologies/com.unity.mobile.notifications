@@ -22,6 +22,7 @@ Add custom icons your app can use for notifications. Whenever you schedule notif
 
 The following settings are available for iOS notifications.
 
+<a name="request-authorization"></a>
 ### Request Authorization on App Launch
 
 You can configure your app to request authorization in one of two ways:
@@ -29,6 +30,7 @@ You can configure your app to request authorization in one of two ways:
 - From script (see this [example](iOS.html#authorization-request) for details).
 - By enabling the **Request Authorization on App Launch** option, which makes the app automatically request the authorization when the user launches the app.
 
+<a name="enable-push-notifications"></a>
 ### Enable Push Notifications
 
 You can enable the **Enable Push Notifications** options to add the push notification capability to the Xcode project.

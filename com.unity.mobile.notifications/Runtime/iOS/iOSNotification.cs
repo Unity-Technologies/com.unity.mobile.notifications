@@ -217,7 +217,9 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The message displayed in the notification alert.
+        /// See Apple's documentation for details.
         /// </summary>
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649863-body"/>
         public string Body
         {
             get { return data.body; }
