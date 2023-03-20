@@ -14,6 +14,9 @@ All notable changes to this package will be documented in this file.
 - [iOS] - Added property to set interruption level (requires iOS 15).
 - [iOS] - Added property to set relevance score (requires iOS 15).
 
+### Fixes:
+- [Android] - Fix updating scheduled notification not updating if app is not killed.
+
 ## [2.1.1] - 2023-01-04
 
 ### Fixes:
