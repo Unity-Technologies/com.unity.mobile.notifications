@@ -2,7 +2,7 @@
 
 ## Authorization request
 
-You need to request permissions from the system to send local notifications and receive remote notifications. To do this, use [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can ask for permissions to only send certain types of notification. The example below shows how to request permissions to show UI Alert dialogs and add a badge on the app icon.
+You need to request permissions from the system to send local notifications and receive remote notifications. To do this, use [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can request for permissions to only send certain types of notification. The example below shows how to request permissions to display UI Alert dialogs and add a badge on the app icon.
 
 ```c#
 IEnumerator RequestAuthorization()
@@ -25,9 +25,9 @@ IEnumerator RequestAuthorization()
 }
 ```
 
-You can send the same request again to check the current authorization status. If the user has already granted or denied authorization, the permissions request dialogue doesn't display again.
+You can send the same request again to check the current authorization status. If the user has already granted or denied authorization, the permissions request dialog doesn't display again.
 
-You can also enable an automatic authorization request when the user launches the app. For more details, see [notification settings](settings.html#request-authorization-on-app-launch).
+You can also enable an automatic authorization request when the user launches the app. For more details, refer to [notification settings](Settings# request-authorization).
 
 Users might change the authorization status for each notification type at any time in the system settings. You can call [iOSNotificationCenter.GetNotificationSettings](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetNotificationSettings) to check the actual authorization status when necessary.
 
@@ -36,7 +36,7 @@ Users might change the authorization status for each notification type at any ti
 A device token is a piece of data that contains a unique identifier assigned by Apple to a specific app on a specific device. If you intend to send push notifications to the users after they confirm the authorization request, you need to retrieve the device token first.
 
 To retrieve the device token, you need to:
-- Enable the **Enable Push Notifications** option in the [notification settings](settings.html#enable-push-notifications).
+- Enable the **Enable Push Notifications** option in the [notification settings](Settings#enable-push-notifications).
 - Create the authorization request with `registerForRemoteNotifications` set to true.
 
 For more information on how to send push notifications to a device and how to add push notification support to your app, see Apple developer documentation on [handling remote notifications](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1).
@@ -44,7 +44,7 @@ For more information on how to send push notifications to a device and how to ad
 
 ## Manage notifications
 
-This package provides a set of APIs to manage notifications. These APIs enable actions such as sending, updating, and deleting notifications. For more notification-related APIs, see [iOSNotificationCenter](../api/Unity.Notifications.iOS.iOSNotificationCenter.html).
+This package provides a set of APIs to manage notifications. These APIs enable actions such as sending, updating, and deleting notifications. For more notification-related APIs, refer to [iOSNotificationCenter](../api/Unity.Notifications.iOS.iOSNotificationCenter.html).
 
 ### Send a simple notification
 
@@ -116,7 +116,7 @@ var calendarTrigger = new iOSNotificationCalendarTrigger()
 You can also create an [iOSNotificationLocationTrigger](../api/Unity.Notifications.iOS.iOSNotificationLocationTrigger.html) if you want to schedule the delivery of a notification when the device enters or leaves a specific geographic region.
 
 Before you schedule any notifications with this trigger, you need to enable the **Include CoreLocation Framework** option in the [notifications settings](settings.html#include-corelocation-framework). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization.
-For additional information, see the [Core Location](https://developer.apple.com/documentation/corelocation/clregion?language=objc) documentation on the Apple Developer website.
+For additional information, refer to the [Core Location](https://developer.apple.com/documentation/corelocation/clregion?language=objc) documentation on the Apple Developer website.
 
 In the example below, the center coordinate is defined using the WGS 84 system. The app triggers the notification when the user enters an area within a 250 meter radius around the Eiffel Tower in Paris.
 
@@ -139,7 +139,7 @@ You shouldn't need to create an [iOSNotificationPushTrigger](../api/Unity.Notifi
 
 #### [iOSNotificationCenter.OnNotificationReceived](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnNotificationReceived)
 
-By default, if your app triggers a local notification while it is in the foreground, the device won’t display an alert for that notification. If you want the notification to behave as though the device isn’t running the app, set the `ShowInForeground` property to true when you schedule the notification, as shown below.
+By default, if your app triggers a local notification while it's in the foreground, the device won’t display an alert for that notification. If you want the notification to behave as though the device isn’t running the app, set the `ShowInForeground` property to true when you schedule the notification, as shown below.
 
 ```c#
 notification.ShowInForeground = true;
@@ -229,6 +229,6 @@ You have to use the exact `data` as the key of your custom data, because this is
 
 #### Images, videos and sounds
 
-By default notifications use the default system sound. Sound can be disabled by changing the [iOSNotificationCenter.SoundType](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_SoundType). A custom sound can be used by using Default sound type and assigning sound file name to [iOSNotificationCenter.SoundName](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_SoundName). The sound file itself has to be manually added to XCode project. For more information regarding file placement and supported formats, see [Apple documentation](https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc).
+By default, mobile notifications use the default system sound. You can deactivate the sound by changing the [iOSNotificationCenter.SoundType](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_SoundType). A custom sound can be used by using Default sound type and assigning sound file name to [iOSNotificationCenter.SoundName](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_SoundName). The sound file itself has to be manually added to XCode project. For more information for file placement and supported formats, refer to [Apple documentation](https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc).
 
 Images or video can added to notifications by using [attachments](../api/Unity.Notifications.iOS.iOSNotificationAttachment.html).
