@@ -31,6 +31,12 @@ namespace Unity.Notifications.Android
         /// A request for permission was made and user hasn't responded yet.
         /// </summary>
         RequestPending = 4,
+
+        /// <summary>
+        /// Notifications are blocked for this app. Before API level 33 this means they were disabled in Settings.
+        /// <see cref="https://developer.android.com/reference/android/app/NotificationManager#areNotificationsEnabled()"/>
+        /// </summary>
+        NotificationsBlockedForApp = 5,
     }
 
     /// <summary>

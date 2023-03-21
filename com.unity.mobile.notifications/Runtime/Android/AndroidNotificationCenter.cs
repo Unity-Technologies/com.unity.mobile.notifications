@@ -600,6 +600,7 @@ namespace Unity.Notifications.Android
     /// </summary>
     public class AndroidNotificationCenter
     {
+        private static int API_NOTIFICATIONS_CAN_BE_BLOCKED = 24;
         private static int API_POST_NOTIFICATIONS_PERMISSION_REQUIRED = 33;
         internal static string PERMISSION_POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
 
@@ -667,7 +668,7 @@ namespace Unity.Notifications.Android
 
         /// <summary>
         /// Has user given permission to post notifications.
-        /// Before Android 13 (API 33) no permission is required.
+        /// Before Android 13 (API 33) no permission is required, but user can disable notifications in the Settings since Android 7 (API 24).
         /// </summary>
         public static PermissionStatus UserPermissionToPost
         {
@@ -675,17 +676,20 @@ namespace Unity.Notifications.Android
             {
                 if (!Initialize())
                     return PermissionStatus.Denied;
-                if (s_DeviceApiLevel < API_POST_NOTIFICATIONS_PERMISSION_REQUIRED)
+                if (s_DeviceApiLevel < API_NOTIFICATIONS_CAN_BE_BLOCKED)
                     return PermissionStatus.Allowed;
 
                 var permissionStatus = (PermissionStatus)PlayerPrefs.GetInt(SETTING_POST_NOTIFICATIONS_PERMISSION, (int)PermissionStatus.NotRequested);
                 var enableStatus = s_Jni.NotificationManager.AreNotificationsEnabled();
                 if (enableStatus == PermissionStatus.Allowed)
                 {
-                    if (permissionStatus != PermissionStatus.Allowed)
+                    // only save to settings on devices where runtime permission exists
+                    if (s_DeviceApiLevel >= API_POST_NOTIFICATIONS_PERMISSION_REQUIRED && permissionStatus != PermissionStatus.Allowed)
                         SetPostPermissionSetting(PermissionStatus.Allowed);
                     return PermissionStatus.Allowed;
                 }
+                else if (enableStatus == PermissionStatus.NotificationsBlockedForApp)
+                    return enableStatus;
 
                 switch (permissionStatus)
                 {
