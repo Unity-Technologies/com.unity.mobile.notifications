@@ -539,24 +539,32 @@ class UnityNotificationUtilities {
             }
 
             String activityClassName = null;
-            boolean activityConflict = false;
+            boolean activityIsUnity = false, activityConflict = false;
             for (ActivityInfo info : aInfo) {
                 // activity alias not supported
                 if (!info.enabled || info.targetActivity != null)
                     continue;
 
+                boolean candidateIsUnity = isUnityActivity(info.name);
                 if (activityClassName == null) {
                     activityClassName = info.name;
-                } else if (isUnityActivity(info.name)) {
-                    if (isUnityActivity(activityClassName)) {
-                        activityConflict = true;
-                        break;
-                    }
+                    activityIsUnity = candidateIsUnity;
+                    continue;
+                }
 
-                    activityClassName = info.name;
-                    activityConflict = false;
-                } else {
+                // two Unity activities is a hard conflict
+                // two non-Unity activities is a conflict unless we find a Unity activity later on
+                if (activityIsUnity == candidateIsUnity) {
                     activityConflict = true;
+                    if (activityIsUnity && candidateIsUnity)
+                        break;
+                    continue;
+                }
+
+                if (candidateIsUnity) {
+                    activityClassName = info.name;
+                    activityIsUnity = candidateIsUnity;
+                    activityConflict = false;
                 }
             }
 
