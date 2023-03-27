@@ -5,8 +5,8 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// Options for notification actions.
     /// These represent values from UNNotificationActionOptions.
+    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
     /// </summary>
-    /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
     [Flags]
     public enum iOSNotificationActionOptions
     {
@@ -51,14 +51,14 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Options for the action. Can be a combination of given flags.
         /// Refer to Apple documentation for UNNotificationActionOptions for exact meanings.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
         public iOSNotificationActionOptions Options { get; set; }
 
         /// <summary>
         /// Set the icon for action using system symbol image name.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747241-iconwithsystemimagename?language=objc"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747241-iconwithsystemimagename?language=objc"/>
         public string SystemImageName
         {
             get { return _imageType == iOSNotificationActionIconType.SystemImageName ? _image : null; }
@@ -71,8 +71,8 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Set the icon for action using image from app's bundle.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747242-iconwithtemplateimagename?language=objc"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747242-iconwithtemplateimagename?language=objc"/>
         public string TemplateImageName
         {
             get { return _imageType == iOSNotificationActionIconType.TemplateImageName ? _image : null; }

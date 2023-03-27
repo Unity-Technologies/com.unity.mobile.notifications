@@ -35,8 +35,8 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// The type of sound to use for the notification.
     /// See Apple documentation for details.
-    /// </summary>
     /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc"/>
+    /// </summary>
     public enum NotificationSoundType
     {
         /// <summary>
@@ -63,8 +63,8 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// Importance and delivery timing of a notification.
     /// See Apple documentation for details. Available since iOS 15, always Active on lower versions.
+    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel?language=objc"/>
     /// </summary>
-    /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel?language=objc"/>
     public enum NotificationInterruptionLevel
     {
         /// <summary>
@@ -218,8 +218,8 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The message displayed in the notification alert.
         /// See Apple's documentation for details.
-        /// </summary>
         /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649863-body"/>
+        /// </summary>
         public string Body
         {
             get { return data.body; }
@@ -299,8 +299,8 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The volume for the sound. Use null to use the default volume.
         /// See Apple documentation for supported values.
-        /// </summary>
         /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc"/>
+        /// </summary>
         public float? SoundVolume { get; set; }
 
         /// <summary>
@@ -314,8 +314,8 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The score the system uses to determine if the notification is the summary’s featured notification.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore?language=objc"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore?language=objc"/>
         public double RelevanceScore
         {
             get { return data.relevanceScore; }
@@ -348,8 +348,8 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// A list of notification attachments.
         /// Notification attachments can be images, audio or video files. Refer to Apple documentation on supported formats.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc"/>
         public List<iOSNotificationAttachment> Attachments { get; set; }
 
         /// <summary>

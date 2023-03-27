@@ -600,8 +600,8 @@ namespace Unity.Notifications.Android
 
         /// <summary>
         /// A PlayerPrefs key used to save users reply to POST_NOTIFICATIONS request (integer value of the PermissionStatus).
+        /// Value is one of <see cref="PermissionStatus"/>
         /// </summary>
-        /// <see cref="PermissionStatus"/>
         public static string SETTING_POST_NOTIFICATIONS_PERMISSION = "com.unity.androidnotifications.PostNotificationsPermission";
 
         /// <summary>

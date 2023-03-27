@@ -3,8 +3,8 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// Notification attachment.
     /// Refer to Apple documentation for details.
+    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationattachment?language=objc"/>
     /// </summary>
-    /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationattachment?language=objc"/>
     public struct iOSNotificationAttachment
     {
         /// <summary>
