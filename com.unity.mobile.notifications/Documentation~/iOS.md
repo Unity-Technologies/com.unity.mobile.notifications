@@ -232,3 +232,11 @@ You have to use the exact `data` as the key of your custom data, because this is
 By default, mobile notifications use the default system sound. You can deactivate the sound by changing the [iOSNotificationCenter.SoundType](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_SoundType). A custom sound can be used by using Default sound type and assigning sound file name to [iOSNotificationCenter.SoundName](../api/Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_SoundName). The sound file itself has to be manually added to XCode project. For more information for file placement and supported formats, refer to [Apple documentation](https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc).
 
 Images or video can added to notifications by using [attachments](../api/Unity.Notifications.iOS.iOSNotificationAttachment.html).
+
+#### Actionable notifications
+
+Notifications optionally can have actions. Possible actions are registered on notification [category](../api/Unity.Notifications.iOS.iOSNotificationCategory.html) during it's registration, then notifications with the same catogory identifier will have the registered actions on them.
+
+If user taps a particular actions, rather than notification itself, the [iOSNotificationCenter.GetLastRespondedNotificationAction](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetLastRespondedNotificationAction) will return the action identifier.
+
+A text [input action](../api/Unity.Notifications.iOS.iOSTextInputNotificationAction.html) can be used to request user to type some response text.
