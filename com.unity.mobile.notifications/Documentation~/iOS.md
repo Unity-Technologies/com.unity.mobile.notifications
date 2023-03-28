@@ -239,4 +239,4 @@ Occasionally, notifications have actions that are registered by notification [ca
 
 If you tap a particular action rather than the notification itself, the [iOSNotificationCenter.GetLastRespondedNotificationAction](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetLastRespondedNotificationAction) will return the action identifier.
 
-A text [input action](../api/Unity.Notifications.iOS.iOSTextInputNotificationAction.html) can be used to request user to type some response text.
+Use the text [input action](../api/Unity.Notifications.iOS.iOSTextInputNotificationAction.html) to prompt the user to type some response text.
