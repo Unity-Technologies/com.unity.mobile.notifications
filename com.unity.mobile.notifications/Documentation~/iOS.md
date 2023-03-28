@@ -235,7 +235,7 @@ Images or video can added to notifications by using [attachments](../api/Unity.N
 
 #### Actionable notifications
 
-Notifications optionally can have actions. Possible actions are registered on notification [category](../api/Unity.Notifications.iOS.iOSNotificationCategory.html) during it's registration, then notifications with the same catogory identifier will have the registered actions on them.
+Occasionally, notifications have actions that are registered by notification [category](../api/Unity.Notifications.iOS.iOSNotificationCategory.html) such that notifications with the same category identifier have the registered actions on them.
 
 If user taps a particular actions, rather than notification itself, the [iOSNotificationCenter.GetLastRespondedNotificationAction](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetLastRespondedNotificationAction) will return the action identifier.
 
