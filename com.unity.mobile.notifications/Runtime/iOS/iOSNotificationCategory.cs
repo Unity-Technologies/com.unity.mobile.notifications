@@ -6,8 +6,8 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// Options for notification category. Multiple options can be combined.
     /// These represent values from UNNotificationCategoryOptions.
+    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions"/>
     /// </summary>
-    /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions"/>
     [Flags]
     public enum iOSNotificationCategoryOptions
     {
@@ -23,7 +23,7 @@ namespace Unity.Notifications.iOS
     /// Notification categories need to be registered on application start to be useful.
     /// By adding actions to category, you make all notification sent with this category identifier actionable.
     /// </summary>
-    /// <see cref="iOSNotification.CategoryIdentifier"/>
+    /// <seealso cref="iOSNotification.CategoryIdentifier"/>
     /// <seealso cref="https://developer.apple.com/documentation/usernotifications/unnotificationcategory"/>
     public class iOSNotificationCategory
     {
@@ -37,26 +37,26 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Get actions set for this category.
+        /// For more info see <see cref="iOSNotificationAction"/>.
         /// </summary>
-        /// <see cref="iOSNotificationAction"/>
         public iOSNotificationAction[] Actions { get { return m_Actions.ToArray(); } }
 
         /// <summary>
         /// Intent identifiers set for this category.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/1649282-intentidentifiers"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/1649282-intentidentifiers"/>
         public string[] IntentIdentifiers { get { return m_IntentIdentifiers.ToArray(); } }
 
         /// <summary>
         /// The placeholder text to display when the system disables notification previews for the app.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/2873736-hiddenpreviewsbodyplaceholder"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/2873736-hiddenpreviewsbodyplaceholder"/>
         public string HiddenPreviewsBodyPlaceholder { get; set; }
 
         /// <summary>
         /// A format string for the summary description used when the system groups the category’s notifications.
+        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/2963112-categorysummaryformat"/>
         /// </summary>
-        /// <see cref="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/2963112-categorysummaryformat"/>
         public string SummaryFormat { get; set; }
 
         /// <summary>

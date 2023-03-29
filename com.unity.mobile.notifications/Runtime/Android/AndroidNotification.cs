@@ -50,8 +50,8 @@ namespace Unity.Notifications.Android
     /// <summary>
     /// Data for setting up the big picture style notification.
     /// Properties that are not available in devices API level are ignored. See Android documentation for availibility.
+    /// <see href="https://developer.android.com/reference/android/app/Notification.BigPictureStyle"/>
     /// </summary>
-    /// <see cref="https://developer.android.com/reference/android/app/Notification.BigPictureStyle"/>
     public struct BigPictureStyle
     {
         /// <summary>
