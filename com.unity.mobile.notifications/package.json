@@ -1,7 +1,7 @@
 {
   "name": "com.unity.mobile.notifications",
   "displayName": "Mobile Notifications",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "unity": "2020.3",
   "description": "Mobile Notifications package adds support for scheduling local repeatable or one-time notifications on iOS and Android.\n\nOn iOS receiving of push notifications is also supported.",
   "keywords": [
