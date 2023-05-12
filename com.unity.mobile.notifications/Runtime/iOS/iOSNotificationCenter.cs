@@ -133,6 +133,8 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Use this to retrieve the last local or remote notification received by the app.
+        /// Do not call this in Awake or Start of the first scene, wait for at least a frame.
+        /// On cold app start iOS reports this with small delay.
         /// </summary>
         /// <seealso cref="SetNotificationCategories(IEnumerable{iOSNotificationCategory})"/>
         /// <returns>
