@@ -163,7 +163,7 @@ namespace Unity.Notifications.Tests.Sample
                 IntentData = template.IntentData,
                 ShowTimestamp = template.ShowTimestamp,
                 RepeatInterval = TimeSpan.FromSeconds(template.RepeatInterval),
-                //ShowInForeground = template.ShowInForeground
+                ShowInForeground = template.ShowInForeground
             };
             return newNotification;
         }
