@@ -251,7 +251,10 @@ namespace Unity.Notifications
             if (!forceSave && File.Exists(k_SettingsPath))
                 return;
 
-            File.WriteAllText(k_SettingsPath, EditorJsonUtility.ToJson(this, true));
+            if (AssetDatabase.MakeEditable(k_SettingsPath))
+                File.WriteAllText(k_SettingsPath, EditorJsonUtility.ToJson(this, true));
+            else
+                Debug.LogError($"Failed to make file {k_SettingsPath} editable");
         }
 
         public void AddDrawableResource(string id, Texture2D image, NotificationIconType type)

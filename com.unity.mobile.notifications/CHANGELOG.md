@@ -8,6 +8,8 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 
+- Changing settings will make settings file editable if read-only by version control.
+
 ## [2.2.0] - 2023-04-06
 
 ### Changes & Improvements:
