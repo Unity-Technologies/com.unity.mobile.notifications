@@ -15,7 +15,7 @@ All notable changes to this package will be documented in this file.
 - [Android] - Added support for BigPicture style.
 - [Android] - Icons now support local files and URIs.
 - [Android] - Added API to check if UI with permission rationale for notifications should be shown before requesting permission.
-- [Android] - Added APIs to request exact scheduling and bupasssing battery optimizations.
+- [Android] - Added APIs to request exact scheduling and bypasssing battery optimizations.
 - [Android] - Minification seetings now managed automatically by package.
 - [Android] - AndroidNotificationCenter.UserPermissionToPost now will also report if notifications are blocked in Settings (Android 7+).
 - [iOS] - Added support for notification action icons (requires iOS 15).
