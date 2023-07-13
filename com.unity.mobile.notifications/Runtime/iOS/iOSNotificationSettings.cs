@@ -4,6 +4,7 @@ namespace Unity.Notifications.iOS
 {
     /// <summary>
     /// Enum indicating whether the app is allowed to schedule notifications.
+    /// You can capture these values in <see cref="iOSNotificationSettings.AuthorizationStatus"/> property using <see cref="iOSNotificationCenter.GetNotificationSettings"/>method.
     /// </summary>
     public enum AuthorizationStatus
     {

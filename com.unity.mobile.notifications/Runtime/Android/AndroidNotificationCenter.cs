@@ -612,6 +612,7 @@ namespace Unity.Notifications.Android
 
         /// <summary>
         /// The delegate type for the notification received callbacks.
+        /// It is used in <see cref="AndroidNotificationCenter.OnNotificationReceived"/> event.
         /// </summary>
         public delegate void NotificationReceivedCallback(AndroidNotificationIntentData data);
 
