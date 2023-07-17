@@ -2,13 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
-
-### Changes & Improvements:
+## [2.2.1] - 2023-07-17
 
 ### Fixes:
 
 - Changing settings will make settings file editable if read-only by version control.
+- Documentation updates.
 
 ## [2.2.0] - 2023-04-06
 
