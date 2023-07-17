@@ -44,6 +44,9 @@ On devices with Android version less than 12 and battery saving on, exact schedu
 
 Android recommends to not use exact scheduling due to higher power consumption it entails. Use notification settings in Unity to enable the automatic addition of the mentioned permissions or to always use inexact scheduling.
 
+> [!NOTE]
+> Google recommends applications that require exact scheduling as a key feature to declare **SCHEDULE_EXACT_ALARM** and **USE_EXACT_ALARM** permissions. Applications that do not require exact scheduling and still declare these permissions are prohibited to publish on Google Play. For more information, refer to Google's policy on restricted permission requirement for [**Exact Alarm API**](https://support.google.com/googleplay/android-developer/answer/13161072?sjid=4970395232627262797-EU).
+
 ## Request permission to post notifications
 
 Starting with Android 13.0 (API level 33) notifications can not be posted without users permission. They can still be scheduled, but will work silently with no UI shown to the user. You can request the permission by running this method in the coroutine:
