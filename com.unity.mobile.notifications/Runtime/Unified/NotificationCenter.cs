@@ -11,6 +11,9 @@ namespace Unity.Notifications
 {
     public struct NotificationCenterArgs
     {
+        public static NotificationCenterArgs Default => new NotificationCenterArgs()
+        { };
+
         public string AndroidChannel { get; set; }
     }
 
