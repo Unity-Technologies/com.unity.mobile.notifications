@@ -12,9 +12,15 @@ namespace Unity.Notifications
     public struct NotificationCenterArgs
     {
         public static NotificationCenterArgs Default => new NotificationCenterArgs()
-        { };
+        {
+#if UNITY_IOS
+        	iOSAuthorizationOptions = (int)(AuthorizationOption.Badge | AuthorizationOption.Sound | AuthorizationOption.Alert),
+#endif
+        };
 
         public string AndroidChannel { get; set; }
+        public int iOSAuthorizationOptions { get; set; }
+        public bool iOSRegisterForRemoteNotifications { get; set; }
     }
 
     public static class NotificationCenter
@@ -78,6 +84,11 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
             AndroidNotificationCenter.Initialize();
 #endif
+        }
+
+        public static NotificationsPermissionRequest RequestPermission()
+        {
+            return new NotificationsPermissionRequest(s_Args.iOSAuthorizationOptions, s_Args.iOSRegisterForRemoteNotifications);
         }
 
         static void CheckInitialized()
