@@ -124,9 +124,7 @@ namespace Unity.Notifications
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.AddDrawableResource(id, image, type);
-#if UNITY_2020_2_OR_NEWER
                 SettingsService.RepaintAllSettingsWindow();
-#endif
             }
 
             /// <summary>
@@ -137,9 +135,7 @@ namespace Unity.Notifications
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.RemoveDrawableResourceByIndex(index);
-#if UNITY_2020_2_OR_NEWER
                 SettingsService.RepaintAllSettingsWindow();
-#endif
             }
 
             /// <summary>
@@ -150,9 +146,7 @@ namespace Unity.Notifications
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.RemoveDrawableResourceById(id);
-#if UNITY_2020_2_OR_NEWER
                 SettingsService.RepaintAllSettingsWindow();
-#endif
             }
 
             /// <summary>
@@ -162,9 +156,7 @@ namespace Unity.Notifications
             {
                 var manager = NotificationSettingsManager.Initialize();
                 manager.ClearDrawableResources();
-#if UNITY_2020_2_OR_NEWER
                 SettingsService.RepaintAllSettingsWindow();
-#endif
             }
 
 
