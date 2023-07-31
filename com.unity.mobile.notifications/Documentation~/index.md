@@ -4,7 +4,7 @@ The Unity Mobile Notifications package adds support for scheduling local one-tim
 
 ### Requirements
 
-- Compatible with Unity 2020.3 or above.
+- Compatible with Unity 2021.3 or above.
 - Compatible with Android 5 (API 21) and iOS 10.0+.
 - Requires Android SDK with API level 33 or higher.
 - Requires Xcode with SDK for iOS 15.2 or newer.
