@@ -19,6 +19,8 @@ namespace Unity.Notifications
         };
 
         public string AndroidChannelId { get; set; }
+        public string AndroidChannelName { get; set; }
+        public string AndroidChannelDescription { get; set; }
         public int iOSAuthorizationOptions { get; set; }
         public bool iOSRegisterForRemoteNotifications { get; set; }
     }
@@ -83,6 +85,18 @@ namespace Unity.Notifications
 
 #if UNITY_ANDROID
             AndroidNotificationCenter.Initialize();
+            if (args.AndroidChannelName != null || args.AndroidChannelDescription != null)
+            {
+                AndroidNotificationCenter.RegisterNotificationChannel(new AndroidNotificationChannel()
+                {
+                    Id = args.AndroidChannelId,
+                    Name = args.AndroidChannelName,
+                    Description = args.AndroidChannelDescription,
+                    Importance = Importance.Default,
+                    CanShowBadge = true,
+                });
+            }
+
 #endif
         }
 
