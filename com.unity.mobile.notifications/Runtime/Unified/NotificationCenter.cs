@@ -9,19 +9,26 @@ using Unity.Notifications.iOS;
 
 namespace Unity.Notifications
 {
+    [Flags]
+    public enum NotificationPresentation
+    {
+        Alert = 1,
+        Badge = 1 << 1,
+        Sound = 1 << 2,
+        Vibrate = 1 << 3,
+    }
+
     public struct NotificationCenterArgs
     {
         public static NotificationCenterArgs Default => new NotificationCenterArgs()
         {
-#if UNITY_IOS
-            iOSAuthorizationOptions = (int)(AuthorizationOption.Badge | AuthorizationOption.Sound | AuthorizationOption.Alert),
-#endif
+            PresentationOptions = NotificationPresentation.Badge | NotificationPresentation.Sound,
         };
 
+        public NotificationPresentation PresentationOptions { get; set; }
         public string AndroidChannelId { get; set; }
         public string AndroidChannelName { get; set; }
         public string AndroidChannelDescription { get; set; }
-        public int iOSAuthorizationOptions { get; set; }
         public bool iOSRegisterForRemoteNotifications { get; set; }
     }
 
@@ -87,22 +94,37 @@ namespace Unity.Notifications
             AndroidNotificationCenter.Initialize();
             if (args.AndroidChannelName != null || args.AndroidChannelDescription != null)
             {
+                Importance importance = Importance.Low;
+                if (0 != (args.PresentationOptions & NotificationPresentation.Alert))
+                    importance = Importance.High;
+                else if (0 != (args.PresentationOptions & NotificationPresentation.Sound))
+                    importance = Importance.Default;
+
                 AndroidNotificationCenter.RegisterNotificationChannel(new AndroidNotificationChannel()
                 {
                     Id = args.AndroidChannelId,
                     Name = args.AndroidChannelName,
                     Description = args.AndroidChannelDescription,
-                    Importance = Importance.Default,
-                    CanShowBadge = true,
+                    Importance = importance,
+                    CanShowBadge = 0 != (args.PresentationOptions & NotificationPresentation.Badge),
+                    EnableVibration = 0 != (args.PresentationOptions & NotificationPresentation.Vibrate),
                 });
             }
-
 #endif
         }
 
         public static NotificationsPermissionRequest RequestPermission()
         {
-            return new NotificationsPermissionRequest(s_Args.iOSAuthorizationOptions, s_Args.iOSRegisterForRemoteNotifications);
+            int iOSAuthorizationOptions = 0;
+#if UNITY_IOS
+            if (0 != (s_Args.PresentationOptions & NotificationPresentation.Alert))
+                iOSAuthorizationOptions |= (int)AuthorizationOption.Alert;
+            if (0 != (s_Args.PresentationOptions & NotificationPresentation.Badge))
+                iOSAuthorizationOptions |= (int)AuthorizationOption.Badge;
+            if (0 != (s_Args.PresentationOptions & NotificationPresentation.Sound))
+                iOSAuthorizationOptions |= (int)AuthorizationOption.Sound;
+#endif
+            return new NotificationsPermissionRequest(iOSAuthorizationOptions, s_Args.iOSRegisterForRemoteNotifications);
         }
 
         static void CheckInitialized()
