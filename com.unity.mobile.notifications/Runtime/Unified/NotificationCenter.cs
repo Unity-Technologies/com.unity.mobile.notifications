@@ -14,7 +14,7 @@ namespace Unity.Notifications
         public static NotificationCenterArgs Default => new NotificationCenterArgs()
         {
 #if UNITY_IOS
-        	iOSAuthorizationOptions = (int)(AuthorizationOption.Badge | AuthorizationOption.Sound | AuthorizationOption.Alert),
+            iOSAuthorizationOptions = (int)(AuthorizationOption.Badge | AuthorizationOption.Sound | AuthorizationOption.Alert),
 #endif
         };
 
