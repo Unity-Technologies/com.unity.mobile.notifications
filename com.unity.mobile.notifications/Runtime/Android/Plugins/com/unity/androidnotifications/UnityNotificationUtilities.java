@@ -150,7 +150,7 @@ class UnityNotificationUtilities {
             serializeString(out, notification.extras.getString(KEY_LARGE_ICON));
             out.writeLong(notification.extras.getLong(KEY_FIRE_TIME, -1));
             out.writeLong(notification.extras.getLong(KEY_REPEAT_INTERVAL, -1));
-            serializeString(out,  Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : notification.extras.getString(Notification.EXTRA_BIG_TEXT));
+            serializeString(out, notification.extras.getString(Notification.EXTRA_BIG_TEXT));
             out.writeBoolean(notification.extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false));
             out.writeBoolean(showWhen);
             serializeString(out, notification.extras.getString(KEY_INTENT_DATA));
@@ -340,7 +340,7 @@ class UnityNotificationUtilities {
                 largeIcon = extras.getString(KEY_LARGE_ICON);
                 fireTime = extras.getLong(KEY_FIRE_TIME, -1);
                 repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, -1);
-                bigText = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? null : extras.getString(Notification.EXTRA_BIG_TEXT);
+                bigText = extras.getString(Notification.EXTRA_BIG_TEXT);
                 usesStopWatch = extras.getBoolean(Notification.EXTRA_SHOW_CHRONOMETER, false);
                 showWhen = extras.getBoolean(Notification.EXTRA_SHOW_WHEN, false);
                 intentData = extras.getString(KEY_INTENT_DATA);
@@ -621,11 +621,9 @@ class UnityNotificationUtilities {
         builder.setAutoCancel(0 != (notification.flags & Notification.FLAG_AUTO_CANCEL));
         if (notification.number >= 0)
             builder.setNumber(notification.number);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            String bigText = notification.extras.getString(Notification.EXTRA_BIG_TEXT);
-            if (bigText != null)
-                builder.setStyle(new Notification.BigTextStyle().bigText(bigText));
-        }
+        String bigText = notification.extras.getString(Notification.EXTRA_BIG_TEXT);
+        if (bigText != null)
+            builder.setStyle(new Notification.BigTextStyle().bigText(bigText));
 
         builder.setWhen(notification.when);
         String group = notification.getGroup();
