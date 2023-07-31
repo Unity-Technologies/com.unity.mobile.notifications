@@ -18,7 +18,7 @@ namespace Unity.Notifications
 #endif
         };
 
-        public string AndroidChannel { get; set; }
+        public string AndroidChannelId { get; set; }
         public int iOSAuthorizationOptions { get; set; }
         public bool iOSRegisterForRemoteNotifications { get; set; }
     }
@@ -75,7 +75,7 @@ namespace Unity.Notifications
         {
             if (s_Initialized)
                 return;
-            if (string.IsNullOrEmpty(args.AndroidChannel))
+            if (string.IsNullOrEmpty(args.AndroidChannelId))
                 throw new ArgumentException("AndroidChannel not provided");
 
             s_Args = args;
@@ -103,9 +103,9 @@ namespace Unity.Notifications
 
 #if UNITY_ANDROID
             if (notification.Identifier.HasValue)
-                AndroidNotificationCenter.SendNotificationWithExplicitID((AndroidNotification)notification, s_Args.AndroidChannel, notification.Identifier.Value);
+                AndroidNotificationCenter.SendNotificationWithExplicitID((AndroidNotification)notification, s_Args.AndroidChannelId, notification.Identifier.Value);
             else
-                AndroidNotificationCenter.SendNotification((AndroidNotification)notification, s_Args.AndroidChannel);
+                AndroidNotificationCenter.SendNotification((AndroidNotification)notification, s_Args.AndroidChannelId);
 #else
             var n = (iOSNotification)notification;
             if (n != null)
