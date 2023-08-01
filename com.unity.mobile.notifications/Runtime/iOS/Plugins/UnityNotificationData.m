@@ -58,15 +58,7 @@ NotificationSettingsData UNNotificationSettingsToNotificationSettingsData(UNNoti
     settingsData.notificationCenterSetting = (int)settings.notificationCenterSetting;
     settingsData.soundSetting = (int)settings.soundSetting;
     settingsData.alertStyle = (int)settings.alertStyle;
-
-    if (@available(iOS 11.0, *))
-    {
-        settingsData.showPreviewsSetting = (int)settings.showPreviewsSetting;
-    }
-    else
-    {
-        settingsData.showPreviewsSetting = 2;
-    }
+    settingsData.showPreviewsSetting = (int)settings.showPreviewsSetting;
     return settingsData;
 }
 
