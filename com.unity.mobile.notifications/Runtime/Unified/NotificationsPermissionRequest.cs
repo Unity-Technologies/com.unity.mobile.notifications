@@ -24,14 +24,14 @@ namespace Unity.Notifications
         AuthorizationRequest request;
 #endif
 
-        internal NotificationsPermissionRequest(int options, bool registerRemote)
+        internal NotificationsPermissionRequest(int options)
         {
 #if UNITY_ANDROID
             // do not create request if already allowed
             if (AndroidNotificationCenter.UserPermissionToPost != PermissionStatus.Allowed)
                 request = new PermissionRequest();
 #else
-            request = new AuthorizationRequest((AuthorizationOption)options, registerRemote);
+            request = new AuthorizationRequest((AuthorizationOption)options, false);
 #endif
         }
 

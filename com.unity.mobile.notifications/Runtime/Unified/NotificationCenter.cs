@@ -29,7 +29,6 @@ namespace Unity.Notifications
         public string AndroidChannelId { get; set; }
         public string AndroidChannelName { get; set; }
         public string AndroidChannelDescription { get; set; }
-        public bool iOSRegisterForRemoteNotifications { get; set; }
     }
 
     public static class NotificationCenter
@@ -124,7 +123,7 @@ namespace Unity.Notifications
             if (0 != (s_Args.PresentationOptions & NotificationPresentation.Sound))
                 iOSAuthorizationOptions |= (int)AuthorizationOption.Sound;
 #endif
-            return new NotificationsPermissionRequest(iOSAuthorizationOptions, s_Args.iOSRegisterForRemoteNotifications);
+            return new NotificationsPermissionRequest(iOSAuthorizationOptions);
         }
 
         static void CheckInitialized()
