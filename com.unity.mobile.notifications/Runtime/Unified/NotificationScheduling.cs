@@ -16,17 +16,17 @@ namespace Unity.Notifications
         /// <summary>
         /// Indicates, that notification does not repeat.
         /// </summary>
-        OneTime,
+        OneTime = 0,
 
         /// <summary>
         /// Indicates, that notification should repeat at one hour intervals.
         /// </summary>
-        Hourly,
+        Hourly = 1,
 
         /// <summary>
         /// Indicates, that notification should repeat daily.
         /// </summary>
-        Daily,
+        Daily = 2,
     }
 
     /// <summary>
