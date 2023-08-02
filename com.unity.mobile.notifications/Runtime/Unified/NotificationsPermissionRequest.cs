@@ -8,13 +8,33 @@ using Unity.Notifications.iOS;
 
 namespace Unity.Notifications
 {
+    /// <summary>
+    /// The status of notification permission request.
+    /// </summary>
+    /// <seealso cref="NotificationsPermissionRequest.Status"/>
     public enum NotificationsPermissionStatus
     {
+        /// <summary>
+        /// Indicates that request is ongoing. Usually mean that user is presented with UI to respond to.
+        /// </summary>
         RequestPending,
+
+        /// <summary>
+        /// Permission granted, you can post notifications.
+        /// </summary>
         Granted,
+
+        /// <summary>
+        /// Permission denied, sending notifications will not work.
+        /// </summary>
         Denied,
     }
 
+    /// <summary>
+    /// Track the status of notification permission request.
+    /// Can be returned from coroutine to suspend it until request is either granted or denied.
+    /// Permission can be granted or denied immediately, if this isn't the first request.
+    /// </summary>
     public class NotificationsPermissionRequest
         : CustomYieldInstruction
     {
@@ -35,6 +55,9 @@ namespace Unity.Notifications
 #endif
         }
 
+        /// <summary>
+        /// Overridden property of base class. Indicates if coroutine should be suspended.
+        /// </summary>
         public override bool keepWaiting => (request == null)
             ? false
 #if UNITY_ANDROID
@@ -43,6 +66,9 @@ namespace Unity.Notifications
             : !request.IsFinished;
 #endif
 
+        /// <summary>
+        /// Returns a status of this request.
+        /// </summary>
         public NotificationsPermissionStatus Status
         {
             get

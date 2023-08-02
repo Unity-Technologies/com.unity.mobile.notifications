@@ -29,17 +29,37 @@ namespace Unity.Notifications
         Daily,
     }
 
+    /// <summary>
+    /// Marker interface for different schedule types.
+    /// </summary>
     public interface NotificationSchedule
     {
         internal void Schedule(ref PlatformNotification notification);
     }
 
+    /// <summary>
+    /// Schedule notification to show up after a certain amount of time, optionally repeating at the same time interval.
+    /// </summary>
     public struct NotificationIntervalSchedule
         : NotificationSchedule
     {
+        /// <summary>
+        /// Time interval to show notification from current time.
+        /// Only full seconds are considered.
+        /// </summary>
         public TimeSpan Interval { get; set; }
+
+        /// <summary>
+        /// Whether notification should repeat.
+        /// If true, notification will repeat at the same interval as initial time from the current one.
+        /// </summary>
         public bool Repeats { get; set; }
 
+        /// <summary>
+        /// Convenience constructor.
+        /// </summary>
+        /// <param name="interval">Value for <see cref="Interval"/></param>
+        /// <param name="repeats">Value for <see cref="Repeats"/></param>
         public NotificationIntervalSchedule(TimeSpan interval, bool repeats = false)
         {
             Interval = interval;
@@ -62,12 +82,28 @@ namespace Unity.Notifications
         }
     }
 
+    /// <summary>
+    /// Schedule to show notification at particular date and time.
+    /// Optionally can repeat at predefined intervals.
+    /// </summary>
     public struct NotificationDateTimeSchedule
         : NotificationSchedule
     {
+        /// <summary>
+        /// Date and time when notification has to be shown for the first time.
+        /// </summary>
         public DateTime FireTime { get; set; }
+
+        /// <summary>
+        /// Interval, at which notification should repeat from the first delivery.
+        /// </summary>
         public NotificationRepeatInterval RepeatInterval { get; set; }
 
+        /// <summary>
+        /// Convenience constructor.
+        /// </summary>
+        /// <param name="fireTime">Value for <see cref="FireTime"/></param>
+        /// <param name="repeatInterval">Value for <see cref="RepeatInterval"/></param>
         public NotificationDateTimeSchedule(DateTime fireTime, NotificationRepeatInterval repeatInterval = NotificationRepeatInterval.OneTime)
         {
             FireTime = fireTime;

@@ -9,6 +9,14 @@ using PlatformNotification = Unity.Notifications.iOS.iOSNotification;
 
 namespace Unity.Notifications
 {
+    /// <summary>
+    /// Represents a notification to be sent or a received one.
+    /// Can be converted to platform specific notification via explicit cast.
+    /// <code>
+    /// var n1 = (AndroidNotification)notification; // convert to Android
+    /// var n1 = (iOSNotification)notification; // convert to iOS
+    /// </code>
+    /// </summary>
     public struct Notification
     {
         PlatformNotification notification;
@@ -46,8 +54,15 @@ namespace Unity.Notifications
 #endif
         }
 
+        /// <summary>
+        /// A unique identifier for this notification.
+        /// If null, a unique ID will be generated when scheduling.
+        /// </summary>
         public int? Identifier { get; set; }
 
+        /// <summary>
+        /// String that is shown on notification as title.
+        /// </summary>
         public string Title
         {
             get
@@ -68,6 +83,9 @@ namespace Unity.Notifications
             }
         }
 
+        /// <summary>
+        /// String that is shown on notification as it's main body.
+        /// </summary>
         public string Text
         {
             get
@@ -90,6 +108,10 @@ namespace Unity.Notifications
             }
         }
 
+        /// <summary>
+        /// Arbitrary data that is sent with notification.
+        /// Can be used to store some useful information in the notification to be later retrieved when notification arrives or is tapped by user.
+        /// </summary>
         public string Data
         {
             get
@@ -110,6 +132,10 @@ namespace Unity.Notifications
             }
         }
 
+        /// <summary>
+        /// Number, associated with the notification. Zero is ignored.
+        /// When supported, shows up as badge on application launcher.
+        /// </summary>
         public int Badge
         {
             get
@@ -131,6 +157,11 @@ namespace Unity.Notifications
         }
 
         // Default value differs on Android/iOS, so have separate here and unify uppon conversion
+        /// <summary>
+        /// Indicated, whether notification should be shown if it arrives while application is in foreground.
+        /// When notification arrives with app in foreground <see cref="NotificationCenter.OnNotificationReceived"/> even fires regardless of this.
+        /// Default is false, meaning notifications are silent when app is in foreground.
+        /// </summary>
         public bool ShowInForeground { get; set; }
     }
 }
