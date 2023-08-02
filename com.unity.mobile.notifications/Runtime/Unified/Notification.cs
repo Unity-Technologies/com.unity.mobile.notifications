@@ -9,13 +9,6 @@ using Unity.Notifications.iOS;
 
 namespace Unity.Notifications
 {
-    public enum NotificationRepeatInterval
-    {
-        OneTime,
-        Hourly,
-        Daily,
-    }
-
     public struct Notification
     {
 #if UNITY_ANDROID
@@ -146,62 +139,5 @@ namespace Unity.Notifications
 
         // Default value differs on Android/iOS, so have separate here and unify uppon conversion
         public bool ShowInForeground { get; set; }
-
-        public void FireAfter(TimeSpan interval, bool repeats = false)
-        {
-#if UNITY_ANDROID
-            notification.FireTime = DateTime.Now + interval;
-            if (repeats)
-                notification.RepeatInterval = interval;
-#else
-            if (notification == null)
-                notification = new iOSNotification();
-            notification.Trigger = new iOSNotificationTimeIntervalTrigger()
-            {
-                TimeInterval = interval,
-                Repeats = repeats,
-            };
-#endif
-        }
-
-        public void FireOn(DateTime fireTime, NotificationRepeatInterval repeat = NotificationRepeatInterval.OneTime)
-        {
-#if UNITY_ANDROID
-            notification.FireTime = fireTime; // TODO handle UTC
-            notification.RepeatInterval = repeat switch
-            {
-                NotificationRepeatInterval.OneTime => new TimeSpan(),
-                NotificationRepeatInterval.Hourly => TimeSpan.FromHours(1),
-                NotificationRepeatInterval.Daily => TimeSpan.FromDays(1),
-            };
-#else
-            var trigger = new iOSNotificationCalendarTrigger()
-            {
-                Year = fireTime.Year,
-                Month = fireTime.Month,
-                Day = fireTime.Day,
-                Hour = fireTime.Hour,
-                Minute = fireTime.Minute,
-                Second = fireTime.Second,
-                UtcTime = fireTime.Kind == DateTimeKind.Utc,
-            };
-
-            switch (repeat)
-            {
-                case NotificationRepeatInterval.OneTime:
-                    break;
-                case NotificationRepeatInterval.Hourly:
-                    trigger.Hour = null;
-                    trigger.Repeats = true;
-                    break;
-                case NotificationRepeatInterval.Daily:
-                    trigger.Day = null;
-                    trigger.Repeats = true;
-                    break;
-            }
-
-            notification.Trigger = trigger;
-#endif
-        }
     }
 }
