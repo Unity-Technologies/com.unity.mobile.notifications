@@ -132,19 +132,25 @@ namespace Unity.Notifications
                 throw new Exception("NotificationCenter not initialized");
         }
 
-        public static void ScheduleNotification(Notification notification)
+        public static void ScheduleNotification<T>(Notification notification, T schedule)
+            where T : NotificationSchedule
         {
             CheckInitialized();
 
 #if UNITY_ANDROID
+            var n = (AndroidNotification)notification;
+            schedule.Schedule(ref n);
             if (notification.Identifier.HasValue)
-                AndroidNotificationCenter.SendNotificationWithExplicitID((AndroidNotification)notification, s_Args.AndroidChannelId, notification.Identifier.Value);
+                AndroidNotificationCenter.SendNotificationWithExplicitID(n, s_Args.AndroidChannelId, notification.Identifier.Value);
             else
-                AndroidNotificationCenter.SendNotification((AndroidNotification)notification, s_Args.AndroidChannelId);
+                AndroidNotificationCenter.SendNotification(n, s_Args.AndroidChannelId);
 #else
             var n = (iOSNotification)notification;
             if (n != null)
+            {
+                schedule.Schedule(ref n);
                 iOSNotificationCenter.ScheduleNotification(n);
+            }
 #endif
         }
 
