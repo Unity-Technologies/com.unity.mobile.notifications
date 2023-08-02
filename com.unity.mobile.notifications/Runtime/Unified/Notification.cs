@@ -1,45 +1,38 @@
 using System;
 
 #if UNITY_ANDROID
-using Unity.Notifications.Android;
+using PlatformNotification = Unity.Notifications.Android.AndroidNotification;
 #else
 using System.Globalization;
-using Unity.Notifications.iOS;
+using PlatformNotification = Unity.Notifications.iOS.iOSNotification;
 #endif
 
 namespace Unity.Notifications
 {
     public struct Notification
     {
-#if UNITY_ANDROID
-        AndroidNotification notification;
-#else
-        iOSNotification notification;
-#endif
+        PlatformNotification notification;
 
-#if UNITY_ANDROID
-        public static explicit operator AndroidNotification(Notification n)
+        public static explicit operator PlatformNotification(Notification n)
         {
+#if UNITY_ANDROID
             n.notification.ShowInForeground = n.ShowInForeground;
             n.notification.ShouldAutoCancel = true; // iOS always auto-cancels
             return n.notification;
-        }
 #else
-        public static explicit operator iOSNotification(Notification n)
-        {
             var ret = n.notification;
             if (ret != null && n.Identifier.HasValue)
                 ret.Identifier = n.Identifier.Value.ToString(CultureInfo.InvariantCulture);
             ret.ShowInForeground = n.ShowInForeground;
             return ret;
+#endif
         }
-#endif
 
+        internal Notification(PlatformNotification notification
 #if UNITY_ANDROID
-        internal Notification(AndroidNotification notification, int id)
-#else
-        internal Notification(iOSNotification notification)
+            , int id
 #endif
+            )
         {
             this.notification = notification;
             Identifier = default;
@@ -69,7 +62,7 @@ namespace Unity.Notifications
             {
 #if UNITY_IOS
                 if (notification == null)
-                    notification = new iOSNotification();
+                    notification = new PlatformNotification();
 #endif
                 notification.Title = value;
             }
@@ -91,7 +84,7 @@ namespace Unity.Notifications
                 notification.Text = value;
 #else
                 if (notification == null)
-                    notification = new iOSNotification();
+                    notification = new PlatformNotification();
                 notification.Body = value;
 #endif
             }
