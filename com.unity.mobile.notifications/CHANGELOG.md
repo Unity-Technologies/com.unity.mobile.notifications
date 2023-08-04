@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+### Changes & Improvements:
+
+### Fixes:
+
 ## [2.2.1] - 2023-07-17
 
 ### Fixes:

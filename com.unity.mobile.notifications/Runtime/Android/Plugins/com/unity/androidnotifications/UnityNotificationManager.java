@@ -771,8 +771,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static Integer getNotificationColor(Notification notification) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-            return null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!notification.extras.containsKey(Notification.EXTRA_COLORIZED))
                 return null;
@@ -872,9 +870,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setVisibility((int) fakeNotificationChannel.lockscreenVisibility);
-            }
+            notificationBuilder.setVisibility((int) fakeNotificationChannel.lockscreenVisibility);
 
             // Need to convert Oreo channel importance to pre-Oreo priority.
             int priority;
@@ -969,19 +965,16 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static void setNotificationColor(Notification.Builder notificationBuilder, int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (color != 0) {
-                notificationBuilder.setColor(color);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notificationBuilder.setColorized(true);
-                }
+        if (color != 0) {
+            notificationBuilder.setColor(color);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationBuilder.setColorized(true);
             }
         }
     }
 
     public static void setNotificationUsesChronometer(Notification.Builder notificationBuilder, boolean usesChrono) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
-            notificationBuilder.setUsesChronometer(usesChrono);
+        notificationBuilder.setUsesChronometer(usesChrono);
     }
 
     public static void setNotificationGroupAlertBehavior(Notification.Builder notificationBuilder, int behavior) {

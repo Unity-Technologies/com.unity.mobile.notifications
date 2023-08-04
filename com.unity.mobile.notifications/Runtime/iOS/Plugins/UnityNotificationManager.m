@@ -245,11 +245,8 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     if (authorizationStatus == UNAuthorizationStatusAuthorized)
         return true;
 
-    if (@available(iOS 12.0, *))
-    {
-        if (authorizationStatus == UNAuthorizationStatusProvisional)
-            return true;
-    }
+    if (authorizationStatus == UNAuthorizationStatusProvisional)
+        return true;
 
     NSLog(@"Attempting to schedule a local notification without authorization, please call RequestAuthorization first.");
     return false;
@@ -268,19 +265,8 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
     // Convert from iOSNotificationData to UNMutableNotificationContent.
     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
 
-    // iOS 10 does not show notifications with an empty body or title fields.
-    // Since this works fine on iOS 11+ we'll add assign a string with a space to maintain consistent behaviour.
-    NSString *dataTitle, *dataBody;
-    if (@available(iOS 11.0, *))
-    {
-        dataTitle = data->title ? [NSString stringWithUTF8String: data->title] : [NSString string];
-        dataBody  = data->body  ? [NSString stringWithUTF8String: data->body]  : [NSString string];
-    }
-    else
-    {
-        dataTitle = data->title && data->title[0] ? [NSString stringWithUTF8String: data->title] : @" ";
-        dataBody  = data->body  && data->body[0]  ? [NSString stringWithUTF8String: data->body]  : @" ";
-    }
+    NSString* dataTitle = data->title ? [NSString stringWithUTF8String: data->title] : [NSString string];
+    NSString* dataBody  = data->body  ? [NSString stringWithUTF8String: data->body]  : [NSString string];
 
     content.title = [NSString localizedUserNotificationStringForKey: dataTitle arguments: nil];
     content.body  = [NSString localizedUserNotificationStringForKey: dataBody arguments: nil];
@@ -381,20 +367,15 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         case kSoundTypeNone:
             return nil;
         case kSoundTypeCritical:
-            if (@available(iOS 12.0, *))
+            if (soundName != nil)
             {
-                if (soundName != nil)
-                {
-                    if (data->soundVolume < 0)
-                        return [UNNotificationSound criticalSoundNamed: soundName];
-                    return [UNNotificationSound criticalSoundNamed: soundName withAudioVolume: data->soundVolume];
-                }
-                if (data->soundVolume >= 0)
-                    return [UNNotificationSound defaultCriticalSoundWithAudioVolume: data->soundVolume];
-                return UNNotificationSound.defaultCriticalSound;
+                if (data->soundVolume < 0)
+                    return [UNNotificationSound criticalSoundNamed: soundName];
+                return [UNNotificationSound criticalSoundNamed: soundName withAudioVolume: data->soundVolume];
             }
-            else
-                goto default_fallback;
+            if (data->soundVolume >= 0)
+                return [UNNotificationSound defaultCriticalSoundWithAudioVolume: data->soundVolume];
+            return UNNotificationSound.defaultCriticalSound;
         case kSoundTypeRingtone:
             if (@available(iOS 15.2, *))
             {
@@ -405,7 +386,6 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         // continue to default
         case kSoundTypeDefault:
         default:
-        default_fallback:
             if (soundName != nil)
                 return [UNNotificationSound soundNamed: soundName];
             return UNNotificationSound.defaultSound;
