@@ -57,6 +57,7 @@ class UnifiedNotificationsSendingTests
     {
         var notification = new Notification()
         {
+            Identifier = 15,
             Title = "Test",
             Text = "Testing",
             Data = "TestData",
@@ -70,6 +71,7 @@ class UnifiedNotificationsSendingTests
         Assert.AreEqual(1, receivedNotificationCount);
         Assert.IsTrue(lastNotification.HasValue);
         var n = lastNotification.Value;
+        Assert.AreEqual(15, n.Identifier);
         Assert.AreEqual("Test", n.Title);
         Assert.AreEqual("Testing", n.Text);
         Assert.AreEqual("TestData", n.Data);
@@ -95,5 +97,6 @@ class UnifiedNotificationsSendingTests
         var n = lastNotification.Value;
         Assert.AreEqual("AtTime", n.Title);
         Assert.AreEqual("AtSpecificTime", n.Text);
+        Assert.AreNotEqual(0, n.Identifier);  // ID should be auto-generated
     }
 }
