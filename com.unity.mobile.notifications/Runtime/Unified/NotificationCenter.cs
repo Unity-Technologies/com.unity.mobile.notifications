@@ -227,7 +227,8 @@ namespace Unity.Notifications
         /// <typeparam name="T">Type of the schedule, usually deduced from actually passed one.</typeparam>
         /// <param name="notification">Notification to send.</param>
         /// <param name="schedule">Schedule, specifying, when notification should be shown.</param>
-        public static void ScheduleNotification<T>(Notification notification, T schedule)
+        /// <returns>Notification identifier.</returns>
+        public static int ScheduleNotification<T>(Notification notification, T schedule)
             where T : NotificationSchedule
         {
             CheckInitialized();
@@ -236,16 +237,19 @@ namespace Unity.Notifications
             var n = (AndroidNotification)notification;
             schedule.Schedule(ref n);
             if (notification.Identifier.HasValue)
+            {
                 AndroidNotificationCenter.SendNotificationWithExplicitID(n, s_Args.AndroidChannelId, notification.Identifier.Value);
+                return notification.Identifier.Value;
+            }
             else
-                AndroidNotificationCenter.SendNotification(n, s_Args.AndroidChannelId);
+                return AndroidNotificationCenter.SendNotification(n, s_Args.AndroidChannelId);
 #else
             var n = (iOSNotification)notification;
-            if (n != null)
-            {
-                schedule.Schedule(ref n);
-                iOSNotificationCenter.ScheduleNotification(n);
-            }
+            if (n == null)
+                throw new ArgumentException("Passed notifiation is empty");
+            schedule.Schedule(ref n);
+            iOSNotificationCenter.ScheduleNotification(n);
+            return int.Parse(n.Identifier, NumberStyles.None, CultureInfo.InvariantCulture);
 #endif
         }
 
