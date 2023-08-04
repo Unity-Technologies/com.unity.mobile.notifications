@@ -1,8 +1,10 @@
 {
     "name": "Unity.Notifications.Tests.Sample",
+    "rootNamespace": "",
     "references": [
         "Unity.Notifications.Android",
-        "Unity.Notifications.iOS"
+        "Unity.Notifications.iOS",
+        "Unity.Notifications.Unified"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
