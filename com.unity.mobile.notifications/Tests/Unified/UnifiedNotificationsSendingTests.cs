@@ -99,4 +99,22 @@ class UnifiedNotificationsSendingTests
         Assert.AreEqual("AtSpecificTime", n.Text);
         Assert.AreNotEqual(0, n.Identifier);  // ID should be auto-generated
     }
+
+    [UnityTest]
+    [UnityPlatform(new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer })]
+    public IEnumerator ScheduleAndCancelNotification_DoesNotArrive()
+    {
+        var notification = new Notification()
+        {
+            Title = "Cancel",
+            Text = "To be cancelled",
+        };
+        int id = NotificationCenter.ScheduleNotification(notification, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(3)));
+
+        yield return new WaitForSeconds(0.5f);
+        NotificationCenter.CancelScheduledNotification(id);
+        yield return WaitForNotification(6.0f);
+
+        Assert.AreEqual(0, receivedNotificationCount);
+    }
 }
