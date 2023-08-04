@@ -18,9 +18,16 @@ class UnifiedNotificationsSendingTests
         NotificationCenter.OnNotificationReceived += OnNotificationReceived;
     }
 
+    [OneTimeTearDown]
+    public void AfterAllTests()
+    {
+        NotificationCenter.CancelAllScheduledNotifications();
+    }
+
     [SetUp]
     public void BeforeEachTest()
     {
+        NotificationCenter.CancelAllScheduledNotifications();
         receivedNotificationCount = 0;
         lastNotification = null;
     }
