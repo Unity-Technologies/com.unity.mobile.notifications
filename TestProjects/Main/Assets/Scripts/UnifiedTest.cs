@@ -24,9 +24,11 @@ public class UnifiedTest : MonoBehaviour
 
     void AddLog(params string[] lines)
     {
+        const int kLogLineCount = 30;
+
         logLines.AddRange(lines);
-        if (logLines.Count > 20)
-            logLines.RemoveRange(0, logLines.Count - 20);
+        if (logLines.Count > kLogLineCount)
+            logLines.RemoveRange(0, logLines.Count - kLogLineCount);
         log.text = string.Join("\n", logLines);
     }
 
