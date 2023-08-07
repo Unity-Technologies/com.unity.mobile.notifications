@@ -17,6 +17,8 @@ public class UnifiedTest : MonoBehaviour
     public InputField notificationText;
     public Slider notificationDelay;
     public Toggle notificationShowInForeground;
+    public Toggle notificationUseDateTime;
+    public Toggle notificationRepeat;
     #endregion
 
     List<string> logLines = new();
@@ -70,6 +72,7 @@ public class UnifiedTest : MonoBehaviour
     public void OnSendNotification()
     {
         Debug.Log("Sending notification");
+        AddLog($"Scheduled in {notificationDelay.value} seconds");
 
         var notification = new Notification()
         {
@@ -78,12 +81,23 @@ public class UnifiedTest : MonoBehaviour
             ShowInForeground = notificationShowInForeground.isOn,
         };
 
-        lastScheduledId = NotificationCenter.ScheduleNotification(notification, new NotificationIntervalSchedule()
+        NotificationSchedule schedule;
+        if (notificationUseDateTime.isOn)
         {
-            Interval = TimeSpan.FromSeconds(notificationDelay.value),
-        });
+            var repeat = notificationRepeat.isOn ? NotificationRepeatInterval.Hourly : NotificationRepeatInterval.OneTime;
+            schedule = new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(notificationDelay.value), repeat);
+            if (notificationRepeat.isOn)
+                AddLog($"Set to repeat: {repeat}");
+        }
+        else
+        {
+            schedule = new NotificationIntervalSchedule(TimeSpan.FromSeconds(notificationDelay.value), notificationRepeat.isOn);
+            if (notificationRepeat.isOn)
+                AddLog("Repeats around the same interval, if possible");
+        }
 
-        AddLog($"Scheduled {lastScheduledId} in {notificationDelay.value} seconds");
+        lastScheduledId = NotificationCenter.ScheduleNotification(notification, schedule);
+        AddLog($"ID of scheduled notification is {lastScheduledId}");
     }
 
     public void OnCancelLast()
@@ -115,5 +129,20 @@ public class UnifiedTest : MonoBehaviour
             PrintNotification("Last responded notification:", notification.Value);
         else
             AddLog("No responded notification");
+    }
+
+    public void OnShowHelp()
+    {
+        logLines.Clear();
+        AddLog(
+            "Send notification with properties set in fields",
+            "Cancel button cancels last scheduled notification if it hadn't arrived yet",
+            "Double press on Cancel cancels all scheduled notifications",
+            "Last responded button show info for last tapped notification",
+            "When show in foreground is not chcked, notifications arrive silently to foreground app",
+            "The DateTime toggle uses different scheduling method, both should work the same",
+            "Repeat causes to repeat at same interval or hourly depending on the method",
+            "NOTE: on Android inexact scheduling may be used, expect delays"
+        );
     }
 }
