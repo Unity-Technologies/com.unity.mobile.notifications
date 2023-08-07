@@ -21,6 +21,7 @@ public class UnifiedTest : MonoBehaviour
 
     List<string> logLines = new();
     int lastScheduledId;
+    bool cancelAll;
 
     void AddLog(params string[] lines)
     {
@@ -92,6 +93,18 @@ public class UnifiedTest : MonoBehaviour
             NotificationCenter.CancelScheduledNotification(lastScheduledId);
             AddLog($"Cancelled notification {lastScheduledId}");
             lastScheduledId = 0;
+            cancelAll = false;
+        }
+        else if (cancelAll)
+        {
+            NotificationCenter.CancelAllScheduledNotifications();
+            cancelAll = false;
+            AddLog("All scheduled notifications cancelled");
+        }
+        else
+        {
+            cancelAll = true;
+            AddLog("No last notification, press again to cancel ALL");
         }
     }
 
