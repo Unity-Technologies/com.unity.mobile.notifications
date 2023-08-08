@@ -19,14 +19,9 @@ namespace Unity.Notifications
         OneTime = 0,
 
         /// <summary>
-        /// Indicates, that notification should repeat at one hour intervals.
-        /// </summary>
-        Hourly = 1,
-
-        /// <summary>
         /// Indicates, that notification should repeat daily.
         /// </summary>
-        Daily = 2,
+        Daily = 1,
     }
 
     /// <summary>
@@ -117,16 +112,12 @@ namespace Unity.Notifications
             notification.RepeatInterval = RepeatInterval switch
             {
                 NotificationRepeatInterval.OneTime => new TimeSpan(),
-                NotificationRepeatInterval.Hourly => TimeSpan.FromHours(1),
                 NotificationRepeatInterval.Daily => TimeSpan.FromDays(1),
                 _ => new TimeSpan(),
             };
 #else
             var trigger = new iOSNotificationCalendarTrigger()
             {
-                Year = FireTime.Year,
-                Month = FireTime.Month,
-                Day = FireTime.Day,
                 Hour = FireTime.Hour,
                 Minute = FireTime.Minute,
                 Second = FireTime.Second,
@@ -136,15 +127,16 @@ namespace Unity.Notifications
             switch (RepeatInterval)
             {
                 case NotificationRepeatInterval.OneTime:
-                    break;
-                case NotificationRepeatInterval.Hourly:
-                    trigger.Hour = null;
-                    trigger.Repeats = true;
+                    trigger.Year = FireTime.Year;
+                    trigger.Month = FireTime.Month;
+                    trigger.Day = FireTime.Day;
                     break;
                 case NotificationRepeatInterval.Daily:
                     trigger.Day = null;
                     trigger.Repeats = true;
                     break;
+                default:
+                    throw new Exception($"Unsupported repeat interval {RepeatInterval}");
             }
 
             notification.Trigger = trigger;
