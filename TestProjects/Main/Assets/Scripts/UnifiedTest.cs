@@ -84,7 +84,7 @@ public class UnifiedTest : MonoBehaviour
         NotificationSchedule schedule;
         if (notificationUseDateTime.isOn)
         {
-            var repeat = notificationRepeat.isOn ? NotificationRepeatInterval.Hourly : NotificationRepeatInterval.OneTime;
+            var repeat = notificationRepeat.isOn ? NotificationRepeatInterval.Daily : NotificationRepeatInterval.OneTime;
             schedule = new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(notificationDelay.value), repeat);
             if (notificationRepeat.isOn)
                 AddLog($"Set to repeat: {repeat}");
