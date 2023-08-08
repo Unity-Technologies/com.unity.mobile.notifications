@@ -20,6 +20,7 @@ namespace Unity.Notifications
 
         /// <summary>
         /// Indicates, that notification should repeat daily.
+        /// When used in <see cref="NotificationDateTimeSchedule"/>, only time is used for scheduling.
         /// </summary>
         Daily = 1,
     }
@@ -85,7 +86,8 @@ namespace Unity.Notifications
         : NotificationSchedule
     {
         /// <summary>
-        /// Date and time when notification has to be shown for the first time.
+        /// Date and time when notification has to be shown if does not repeat.
+        /// If notification is set to repeat, the meaning of this value depends on <see cref="NotificationRepeatInterval"/>.
         /// </summary>
         public DateTime FireTime { get; set; }
 
@@ -108,13 +110,23 @@ namespace Unity.Notifications
         void NotificationSchedule.Schedule(ref PlatformNotification notification)
         {
 #if UNITY_ANDROID
-            notification.FireTime = FireTime; // TODO handle UTC
-            notification.RepeatInterval = RepeatInterval switch
+            // TODO handle UTC
+            switch (RepeatInterval)
             {
-                NotificationRepeatInterval.OneTime => new TimeSpan(),
-                NotificationRepeatInterval.Daily => TimeSpan.FromDays(1),
-                _ => new TimeSpan(),
-            };
+                case NotificationRepeatInterval.OneTime:
+                    notification.FireTime = FireTime;
+                    break;
+                case NotificationRepeatInterval.Daily:
+                    {
+                        var currentTime = DateTime.Now;
+                        var fireTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, FireTime.Hour, FireTime.Minute, FireTime.Second);
+                        if (fireTime < currentTime)
+                            fireTime = fireTime.AddDays(1);
+                        notification.FireTime = fireTime;
+                        notification.RepeatInterval = TimeSpan.FromDays(1);
+                        break;
+                    }
+            }
 #else
             var trigger = new iOSNotificationCalendarTrigger()
             {
