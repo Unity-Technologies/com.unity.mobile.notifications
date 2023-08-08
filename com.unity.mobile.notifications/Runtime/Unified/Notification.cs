@@ -170,5 +170,53 @@ namespace Unity.Notifications
         /// Default is false, meaning notifications are silent when app is in foreground.
         /// </summary>
         public bool ShowInForeground { get; set; }
+
+        /// <summary>
+        /// Identifier for the group this notification belong to.
+        /// If device supports it, notifications with same group identifier are stacked together.
+        /// On Android this is also called group, while on iOS it is called thread identidier.
+        /// </summary>
+        public string Group
+        {
+            get
+            {
+#if UNITY_ANDROID
+                return notification.Group;
+#else
+                return notification?.ThreadIdentifier;
+#endif
+            }
+            set
+            {
+#if UNITY_ANDROID
+                notification.Group = value;
+#else
+                GetNotification().ThreadIdentifier = value;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Marks this notification as group summary.
+        /// Only has effect if <see cref="Group"/> is also set.
+        /// Android only. On iOS will be just another notification in the group.
+        /// </summary>
+        public bool IsGroupSummary
+        {
+            get
+            {
+#if UNITY_ANDROID
+                return notification.GroupSummary;
+#else
+                return false;
+#endif
+            }
+            set
+            {
+#if UNITY_ANDROID
+                notification.GroupSummary = value;
+#endif
+            }
+        }
     }
 }
