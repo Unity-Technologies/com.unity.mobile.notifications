@@ -54,6 +54,15 @@ namespace Unity.Notifications
 #endif
         }
 
+#if UNITY_IOS
+        PlatformNotification GetNotification()
+        {
+            if (notification == null)
+                notification = new PlatformNotification();
+            return notification;
+        }
+#endif
+
         /// <summary>
         /// A unique identifier for this notification.
         /// If null, a unique ID will be generated when scheduling.
@@ -101,9 +110,7 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
                 notification.Text = value;
 #else
-                if (notification == null)
-                    notification = new PlatformNotification();
-                notification.Body = value;
+                GetNotification().Body = value;
 #endif
             }
         }
@@ -119,7 +126,7 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
                 return notification.IntentData;
 #else
-                return notification.Data;
+                return notification?.Data;
 #endif
             }
             set
@@ -127,7 +134,7 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
                 notification.IntentData = value;
 #else
-                notification.Data = value;
+                GetNotification().Data = value;
 #endif
             }
         }
@@ -143,7 +150,7 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
                 return notification.Number;
 #else
-                return notification.Badge;
+                return notification == null ? 0 : notification.Badge;
 #endif
             }
             set
@@ -151,7 +158,7 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
                 notification.Number = value;
 #else
-                notification.Badge = value;
+                GetNotification().Badge = value;
 #endif
             }
         }
