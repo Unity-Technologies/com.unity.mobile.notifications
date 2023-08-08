@@ -323,6 +323,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
         date.timeZone = [NSTimeZone timeZoneWithAbbreviation: @"UTC"];
 
         trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents: date repeats: data->trigger.calendar.repeats];
+        NSLog(@"Notification will show after %f s.", ((UNCalendarNotificationTrigger*)trigger).nextTriggerDate.timeIntervalSinceNow);
     }
     else if (data->triggerType == LOCATION_TRIGGER)
     {
