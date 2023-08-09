@@ -117,4 +117,96 @@ class UnifiedNotificationsSendingTests
 
         Assert.AreEqual(0, receivedNotificationCount);
     }
+
+    [UnityTest]
+    [UnityPlatform(new[] { RuntimePlatform.Android })]
+    public IEnumerator ScheduleNotification_WithExplicitCategory_UsesAndroidChannel()
+    {
+#if UNITY_ANDROID
+        const string category = "the_category";
+        Unity.Notifications.Android.AndroidNotificationCenter.RegisterNotificationChannel(
+            new Unity.Notifications.Android.AndroidNotificationChannel()
+            {
+                Id = category,
+                Name = "Category",
+                Description = "For category testing",
+                Importance = Unity.Notifications.Android.Importance.Default,
+            }
+        );
+        Unity.Notifications.Android.AndroidNotificationCenter.OnNotificationReceived += OnAndroidNotification;
+
+        yield return ScheduleNotification_WithExplicitCategory(category);
+
+        Unity.Notifications.Android.AndroidNotificationCenter.OnNotificationReceived -= OnAndroidNotification;
+
+        Assert.IsNotNull(lastAndroidNotification);
+        Assert.AreEqual(category, lastAndroidNotification.Channel);
+#else
+        yield break;
+#endif
+    }
+
+#if UNITY_ANDROID
+    Unity.Notifications.Android.AndroidNotificationIntentData lastAndroidNotification;
+    void OnAndroidNotification(Unity.Notifications.Android.AndroidNotificationIntentData intentData)
+    {
+        lastAndroidNotification = intentData;
+    }
+#endif
+
+    [UnityTest]
+    [UnityPlatform(new[] { RuntimePlatform.IPhonePlayer })]
+    public IEnumerator ScheduleNotification_WithExplicitCategory_UsesiOSCategory()
+    {
+#if UNITY_IOS
+        const string category = "the_category";
+        yield return ScheduleNotification_WithExplicitCategory(category);
+
+        var notification = (Unity.Notifications.iOS.iOSNotification)lastNotification.Value;
+        Assert.AreEqual(category, notification.CategoryIdentifier);
+#else
+        yield break;
+#endif
+    }
+
+    public IEnumerator ScheduleNotification_WithExplicitCategory(string category)
+    {
+        var notification = new Notification()
+        {
+            Title = "With category",
+            Text = "Sent to category",
+        };
+        NotificationCenter.ScheduleNotification(notification, category, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(3)));
+        yield return WaitForNotification(60.0f);
+
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsTrue(lastNotification.HasValue);
+        var n = lastNotification.Value;
+        Assert.AreEqual("With category", n.Title);
+        Assert.AreEqual("Sent to category", n.Text);
+    }
+
+    [UnityTest]
+    [UnityPlatform(new[] { RuntimePlatform.IPhonePlayer })]
+    public IEnumerator ScheduleNotification_WithoutCategory_UsesNoiOSCategory()
+    {
+        var notification = new Notification()
+        {
+            Title = "Without category",
+            Text = "Sent to no category",
+        };
+        NotificationCenter.ScheduleNotification(notification, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(3)));
+        yield return WaitForNotification(60.0f);
+
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsTrue(lastNotification.HasValue);
+        var n = lastNotification.Value;
+        Assert.AreEqual("Without category", n.Title);
+        Assert.AreEqual("Sent to no category", n.Text);
+
+#if UNITY_IOS
+        var iosNotification = (Unity.Notifications.iOS.iOSNotification)n;
+        Assert.IsNull(iosNotification.CategoryIdentifier);
+#endif
+    }
 }
