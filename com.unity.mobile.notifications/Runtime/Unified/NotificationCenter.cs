@@ -231,6 +231,26 @@ namespace Unity.Notifications
         public static int ScheduleNotification<T>(Notification notification, T schedule)
             where T : NotificationSchedule
         {
+            string category = null;
+#if UNITY_ANDROID
+            category = s_Args.AndroidChannelId;
+#endif
+            return ScheduleNotification(notification, category, schedule);
+        }
+
+        /// <summary>
+        /// Schedule notification to be shown in the future.
+        /// Allows to explicitly specify the category to send notification to. On Android it is notification channel.
+        /// Channel or category has to be created manually using AndroidNotificationCenter and iOSNotificationCenter respectively.
+        /// </summary>
+        /// <typeparam name="T">Type of the schedule, usually deduced from actually passed one.</typeparam>
+        /// <param name="notification">Notification to send.</param>
+        /// <param name="category">Identifier for iOS category or Android channel.</param>
+        /// <param name="schedule">Schedule, specifying, when notification should be shown.</param>
+        /// <returns>Notification identifier.</returns>
+        public static int ScheduleNotification<T>(Notification notification, string category, T schedule)
+            where T : NotificationSchedule
+        {
             CheckInitialized();
 
 #if UNITY_ANDROID
@@ -238,15 +258,16 @@ namespace Unity.Notifications
             schedule.Schedule(ref n);
             if (notification.Identifier.HasValue)
             {
-                AndroidNotificationCenter.SendNotificationWithExplicitID(n, s_Args.AndroidChannelId, notification.Identifier.Value);
+                AndroidNotificationCenter.SendNotificationWithExplicitID(n, category, notification.Identifier.Value);
                 return notification.Identifier.Value;
             }
             else
-                return AndroidNotificationCenter.SendNotification(n, s_Args.AndroidChannelId);
+                return AndroidNotificationCenter.SendNotification(n, category);
 #else
             var n = (iOSNotification)notification;
             if (n == null)
                 throw new ArgumentException("Passed notifiation is empty");
+            n.CategoryIdentifier = category;
             schedule.Schedule(ref n);
             iOSNotificationCenter.ScheduleNotification(n);
             return int.Parse(n.Identifier, NumberStyles.None, CultureInfo.InvariantCulture);
