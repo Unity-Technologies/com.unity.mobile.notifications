@@ -54,7 +54,7 @@ namespace Unity.Notifications
 #endif
         }
 
-#if UNITY_IOS
+#if !UNITY_ANDROID  // so code compiles when something other than Android/iOS is selected
         PlatformNotification GetNotification()
         {
             if (notification == null)
