@@ -131,6 +131,11 @@ public class UnifiedTest : MonoBehaviour
             AddLog("No responded notification");
     }
 
+    public void OnOpenSettings()
+    {
+        NotificationCenter.OpenNotificationSettings(NotificationSettingsSection.Category);
+    }
+
     public void OnShowHelp()
     {
         logLines.Clear();
