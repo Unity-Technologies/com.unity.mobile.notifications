@@ -366,7 +366,7 @@ namespace Unity.Notifications
             CheckInitialized();
 
 #if UNITY_IOS
-            Unity.Notifications.iOS.iOSNotificationCenter.ApplicationBadge = 0;
+            iOSNotificationCenter.ApplicationBadge = 0;
 #endif
         }
     }
