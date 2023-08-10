@@ -43,6 +43,23 @@ namespace Unity.Notifications
     }
 
     /// <summary>
+    /// The settings section to open, if possible.
+    /// </summary>
+    public enum NotificationSettingsSection
+    {
+        /// <summary>
+        /// Opens settings for application and tries to open the section for notifications.
+        /// </summary>
+        Application,
+
+        /// <summary>
+        /// Tries to navigate to section for a particular notification category.
+        /// Since Android 8.0 will open notification settings for the specific notification channel.
+        /// </summary>
+        Category,
+    }
+
+    /// <summary>
     /// Initialization arguments for <see cref="NotificationCenter"/>.
     /// Recommended to use <see cref="Default"/> to retrieve recommened default values and then alter it.
     /// It is required to manually set <see cref="AndroidChannelId"/>.
@@ -367,6 +384,31 @@ namespace Unity.Notifications
 
 #if UNITY_IOS
             iOSNotificationCenter.ApplicationBadge = 0;
+#endif
+        }
+
+        /// <summary>
+        /// Opens settings for the application.
+        /// If possible, will try to navigate as close to requested section as it can.
+        /// On iOS and Android prior to 8.0 will open settings for the application.
+        /// Since Android 8.0 will open notification settings for either application or the default channel.
+        /// </summary>
+        /// <param name="section">The section to navigate to.</param>
+        public static void OpenNotificationSettings(NotificationSettingsSection section = NotificationSettingsSection.Application)
+        {
+            CheckInitialized();
+
+#if UNITY_ANDROID
+            string channel = section switch
+            {
+                NotificationSettingsSection.Category => s_Args.AndroidChannelId,
+                NotificationSettingsSection.Application => null,
+                _ => null,
+            };
+
+            AndroidNotificationCenter.OpenNotificationSettings(channel);
+#else
+            iOSNotificationCenter.OpenNotificationSettings();
 #endif
         }
     }
