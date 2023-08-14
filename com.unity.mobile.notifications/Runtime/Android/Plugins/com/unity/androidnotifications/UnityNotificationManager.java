@@ -1018,23 +1018,31 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return builder.build();
     }
 
-    private Object getNotificationOrBuilderForIntent(Intent intent) {
-        Object notification = null;
-        boolean sendable = false;
+    private Object getNotificationOrIdForIntent(Intent intent) {
         if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
-            int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
-            Integer notificationId = Integer.valueOf(id);
+            return intent.getExtras().getInt(KEY_NOTIFICATION_ID);
+        } else if (intent.hasExtra(KEY_NOTIFICATION)) {
+            // old code path where Notification object is in intent
+            // in case the app was replaced and there still are pending alarms with notification
+            return intent.getParcelableExtra(KEY_NOTIFICATION);
+        }
+
+        return null;
+    }
+
+    private Object getNotificationOrBuilderForIntent(Intent intent) {
+        Object notification = getNotificationOrIdForIntent(intent);
+        boolean sendable = false;
+        if (notification instanceof Integer) {
+            Integer notificationId = (Integer)notification;
             if ((notification = mScheduledNotifications.get(notificationId)) != null) {
                 sendable = true;
             } else {
                 // in case we don't have cached notification, deserialize from storage
-                SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(String.valueOf(id)), Context.MODE_PRIVATE);
+                SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(notificationId.toString()), Context.MODE_PRIVATE);
                 notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
             }
-        } else if (intent.hasExtra(KEY_NOTIFICATION)) {
-            // old code path where Notification object is in intent
-            // in case the app was replaced and there still are pending alarms with notification
-            notification = intent.getParcelableExtra(KEY_NOTIFICATION);
+        } else if (notification != null) {
             sendable = true;
         }
 
