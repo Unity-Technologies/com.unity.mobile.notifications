@@ -719,36 +719,39 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         Notification notif = null;
         int id = -1;
-        boolean sendable = notification instanceof Notification;
-        if (sendable) {
+        if (notification instanceof Notification) {
             notif = (Notification) notification;
             id = notif.extras.getInt(KEY_ID, -1);
-        } else {
-            Notification.Builder builder = (Notification.Builder)notification;
-            // this is different instance and does not have mOpenActivity
-            if (builder == null) {
-                Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
-                return;
-            }
-
-            Class openActivity;
-            if (mOpenActivity == null) {
-                openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
-                if (openActivity == null) {
-                    Log.e(TAG_UNITY, "Activity not found, cannot show notification");
-                    return;
-                }
-            }
-            else {
-                openActivity = mOpenActivity;
-            }
-
-            id = builder.getExtras().getInt(KEY_ID, -1);
-            notif = buildNotificationForSending(openActivity, builder);
+            notify(id, notif);
+            return;
         }
 
-        if (notif != null) {
-            notify(id, notif);
+        Notification.Builder builder = (Notification.Builder)notification;
+        if (builder == null) {
+            Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
+            return;
+        }
+
+        notify(builder);
+    }
+
+    private void notify(Notification.Builder builder) {
+        Class openActivity;
+        if (mOpenActivity == null) {
+            openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
+            if (openActivity == null) {
+                Log.e(TAG_UNITY, "Activity not found, cannot show notification");
+                return;
+            }
+        }
+        else {
+            openActivity = mOpenActivity;
+        }
+
+        int id = builder.getExtras().getInt(KEY_ID, -1);
+        Notification notification = buildNotificationForSending(openActivity, builder);
+        if (notification != null) {
+            notify(id, notification);
         }
     }
 
