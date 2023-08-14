@@ -209,4 +209,55 @@ class UnifiedNotificationsSendingTests
         Assert.IsNull(iosNotification.CategoryIdentifier);
 #endif
     }
+
+    [UnityTest]
+    [UnityPlatform(new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer })]
+    public IEnumerator ScheduleWithSameID_ReplacesNotification()
+    {
+        var notification = new Notification()
+        {
+            Identifier = 123,
+            Title = "Replace",
+            Text = "To be replaced",
+        };
+        NotificationCenter.ScheduleNotification(notification, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(2)));
+        yield return null;
+
+        notification.Text = "Replacement text";
+        NotificationCenter.ScheduleNotification(notification, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(3)));
+
+        yield return WaitForNotification(60.0f);
+        yield return new WaitForSeconds(5);  // wait a bit more in case the second notification does arrive
+
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsTrue(lastNotification.HasValue);
+        var n = lastNotification.Value;
+        Assert.AreEqual(123, n.Identifier.Value);
+        Assert.AreEqual("Replace", n.Title);
+        Assert.AreEqual("Replacement text", n.Text);
+    }
+
+    [UnityTest]
+    [UnityPlatform(new[] { RuntimePlatform.Android, RuntimePlatform.IPhonePlayer })]
+    public IEnumerator ScheduleWithoutIDTwice_DeliversTwo()
+    {
+        var notification = new Notification()
+        {
+            Title = "No replace",
+            Text = "Not replaced",
+        };
+        var id1 = NotificationCenter.ScheduleNotification(notification, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(2)));
+        yield return null;
+
+        var id2 = NotificationCenter.ScheduleNotification(notification, new NotificationDateTimeSchedule(DateTime.Now.AddSeconds(3)));
+
+        Assert.AreNotEqual(id1, id2);
+
+        yield return WaitForNotification(60.0f);
+        // Both could be batched
+        if (receivedNotificationCount < 2)
+            yield return WaitForNotification(60.0f);
+
+        Assert.AreEqual(2, receivedNotificationCount);
+    }
 }
