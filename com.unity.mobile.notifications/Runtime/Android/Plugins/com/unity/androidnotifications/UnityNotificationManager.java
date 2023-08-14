@@ -712,7 +712,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private void showNotification(Intent intent) {
-        Object notification = getNotificationOrBuilderForIntent(intent);
+        Object notification = getNotificationOrIdForIntent(intent);
         if (notification == null) {
             return;
         }
@@ -726,7 +726,14 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return;
         }
 
-        Notification.Builder builder = (Notification.Builder)notification;
+        Integer notificationId = (Integer)notification;
+        Notification.Builder builder = mScheduledNotifications.get(notificationId);
+        if (builder != null) {
+            notify(builder);
+            return;
+        }
+
+        builder = deserializeNotificationBuilder(notificationId);
         if (builder == null) {
             Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
             return;
