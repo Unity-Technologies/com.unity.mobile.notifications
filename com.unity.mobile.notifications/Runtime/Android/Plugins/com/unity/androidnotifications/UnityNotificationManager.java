@@ -717,11 +717,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return;
         }
 
-        Notification notif = null;
-        int id = -1;
         if (notification instanceof Notification) {
-            notif = (Notification) notification;
-            id = notif.extras.getInt(KEY_ID, -1);
+            Notification notif = (Notification) notification;
+            int id = notif.extras.getInt(KEY_ID, -1);
             notify(id, notif);
             return;
         }
@@ -729,7 +727,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Integer notificationId = (Integer)notification;
         Notification.Builder builder = mScheduledNotifications.get(notificationId);
         if (builder != null) {
-            notify(builder);
+            notify(notificationId, builder);
             return;
         }
 
@@ -739,10 +737,10 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return;
         }
 
-        notify(builder);
+        notify(notificationId, builder);
     }
 
-    private void notify(Notification.Builder builder) {
+    private void notify(int id, Notification.Builder builder) {
         Class openActivity;
         if (mOpenActivity == null) {
             openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
@@ -755,7 +753,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
             openActivity = mOpenActivity;
         }
 
-        int id = builder.getExtras().getInt(KEY_ID, -1);
         Notification notification = buildNotificationForSending(openActivity, builder);
         if (notification != null) {
             notify(id, notification);
