@@ -708,41 +708,47 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 return;
             }
         }
+        showNotification(intent);
+    }
+
+    private void showNotification(Intent intent) {
         Object notification = getNotificationOrBuilderForIntent(intent);
-        if (notification != null) {
-            Notification notif = null;
-            int id = -1;
-            boolean sendable = notification instanceof Notification;
-            if (sendable) {
-                notif = (Notification) notification;
-                id = notif.extras.getInt(KEY_ID, -1);
-            } else {
-                Notification.Builder builder = (Notification.Builder)notification;
-                // this is different instance and does not have mOpenActivity
-                if (builder == null) {
-                    Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
+        if (notification == null) {
+            return;
+        }
+
+        Notification notif = null;
+        int id = -1;
+        boolean sendable = notification instanceof Notification;
+        if (sendable) {
+            notif = (Notification) notification;
+            id = notif.extras.getInt(KEY_ID, -1);
+        } else {
+            Notification.Builder builder = (Notification.Builder)notification;
+            // this is different instance and does not have mOpenActivity
+            if (builder == null) {
+                Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
+                return;
+            }
+
+            Class openActivity;
+            if (mOpenActivity == null) {
+                openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
+                if (openActivity == null) {
+                    Log.e(TAG_UNITY, "Activity not found, cannot show notification");
                     return;
                 }
-
-                Class openActivity;
-                if (mOpenActivity == null) {
-                    openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
-                    if (openActivity == null) {
-                        Log.e(TAG_UNITY, "Activity not found, cannot show notification");
-                        return;
-                    }
-                }
-                else {
-                    openActivity = mOpenActivity;
-                }
-
-                id = builder.getExtras().getInt(KEY_ID, -1);
-                notif = buildNotificationForSending(openActivity, builder);
+            }
+            else {
+                openActivity = mOpenActivity;
             }
 
-            if (notif != null) {
-                notify(id, notif);
-            }
+            id = builder.getExtras().getInt(KEY_ID, -1);
+            notif = buildNotificationForSending(openActivity, builder);
+        }
+
+        if (notif != null) {
+            notify(id, notif);
         }
     }
 
