@@ -287,7 +287,13 @@ namespace Unity.Notifications
             n.CategoryIdentifier = category;
             schedule.Schedule(ref n);
             iOSNotificationCenter.ScheduleNotification(n);
-            return int.Parse(n.Identifier, NumberStyles.None, CultureInfo.InvariantCulture);
+            if (notification.Identifier.HasValue)
+                return notification.Identifier.Value;
+            // iOSNotification is class and has auto-generated id set at this point
+            // for consistency with Android set it back to null, so same Notification can be sent again as new one
+            int id = int.Parse(n.Identifier, NumberStyles.None, CultureInfo.InvariantCulture);
+            n.Identifier = null;
+            return id;
 #endif
         }
 
