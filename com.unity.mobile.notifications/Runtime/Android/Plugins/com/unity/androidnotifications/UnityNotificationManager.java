@@ -1045,32 +1045,26 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     private Object getNotificationOrBuilderForIntent(Intent intent) {
         Object notification = getNotificationOrIdForIntent(intent);
-        boolean sendable = false;
         if (notification instanceof Integer) {
             Integer notificationId = (Integer)notification;
-            if ((notification = mScheduledNotifications.get(notificationId)) != null) {
-                sendable = true;
-            } else {
+            if ((notification = mScheduledNotifications.get(notificationId)) == null) {
                 // in case we don't have cached notification, deserialize from storage
                 SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(notificationId.toString()), Context.MODE_PRIVATE);
                 notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
+
+                Notification.Builder builder;
+                if (notification instanceof Notification) {
+                    builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
+                }
+                else {
+                    builder = (Notification.Builder)notification;
+                }
+
+                return builder;
             }
-        } else if (notification != null) {
-            sendable = true;
         }
 
-        if (notification == null || sendable)
-            return notification;
-
-        Notification.Builder builder;
-        if (notification instanceof Notification) {
-            builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
-        }
-        else {
-            builder = (Notification.Builder)notification;
-        }
-
-        return builder;
+        return notification;
     }
 
     public void showNotificationSettings(String channelId) {
