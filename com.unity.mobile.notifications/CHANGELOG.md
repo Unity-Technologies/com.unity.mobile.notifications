@@ -2,6 +2,14 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+### Changes & Improvements:
+- [Android] - Reschedule after reboot will send all notifications that expired less than 10 minutes ago.
+
+### Fixes:
+- [Android] - [issue 271](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/271) Fix possible ANR when sending/rescheduling after reboot.
+
 ## [2.2.1] - 2023-07-17
 
 ### Fixes:
