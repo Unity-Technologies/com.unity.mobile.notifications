@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -731,13 +732,15 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return;
         }
 
-        builder = deserializeNotificationBuilder(notificationId);
-        if (builder == null) {
-            Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
-            return;
-        }
+        AsyncTask.execute(() -> {
+            Notification.Builder nb = deserializeNotificationBuilder(notificationId);
+            if (nb == null) {
+                Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
+                return;
+            }
 
-        notify(notificationId, builder);
+            notify(notificationId, nb);
+        });
     }
 
     private void notify(int id, Notification.Builder builder) {
