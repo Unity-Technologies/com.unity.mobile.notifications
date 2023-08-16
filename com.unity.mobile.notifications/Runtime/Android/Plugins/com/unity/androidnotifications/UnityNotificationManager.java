@@ -743,7 +743,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         });
     }
 
-    private void notify(int id, Notification.Builder builder) {
+    void notify(int id, Notification.Builder builder) {
         Class openActivity;
         if (mOpenActivity == null) {
             openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
