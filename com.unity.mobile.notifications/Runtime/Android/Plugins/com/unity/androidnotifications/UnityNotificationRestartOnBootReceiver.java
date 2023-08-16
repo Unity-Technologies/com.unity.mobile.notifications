@@ -30,12 +30,12 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     private static void rescheduleSavedNotifications(Context context) {
         UnityNotificationManager manager = UnityNotificationManager.getNotificationManagerImpl(context);
         List<Notification.Builder> saved_notifications = manager.loadSavedNotifications();
+        Date currentDate = Calendar.getInstance().getTime();
 
         for (Notification.Builder notificationBuilder : saved_notifications) {
             Bundle extras = notificationBuilder.getExtras();
             long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, 0L);
             long fireTime = extras.getLong(KEY_FIRE_TIME, 0L);
-            Date currentDate = Calendar.getInstance().getTime();
             Date fireTimeDate = new Date(fireTime);
 
             boolean isRepeatable = repeatInterval > 0;
