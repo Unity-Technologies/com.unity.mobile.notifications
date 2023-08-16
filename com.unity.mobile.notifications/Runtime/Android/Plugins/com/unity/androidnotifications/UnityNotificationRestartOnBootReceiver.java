@@ -18,6 +18,7 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
+    private static final long EXPIRATION_TRESHOLD = 600000;  // 10 minutes
 
     @Override
     public void onReceive(Context context, Intent received_intent) {
@@ -42,6 +43,10 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
 
             if (fireTimeDate.after(currentDate) || isRepeatable) {
                 manager.scheduleAlarmWithNotification(notificationBuilder);
+            } else if (currentDate.getTime() - fireTime < EXPIRATION_TRESHOLD) {
+                // notification is in the past, but not by much, send now
+                int id = extras.getInt(KEY_ID);
+                manager.notify(id, notificationBuilder);
             } else {
                 Log.d(TAG_UNITY, "Notification expired, not rescheduling, ID: " + extras.getInt(KEY_ID, -1));
             }
