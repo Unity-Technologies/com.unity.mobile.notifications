@@ -34,6 +34,12 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
         Date currentDate = Calendar.getInstance().getTime();
 
         for (Notification.Builder notificationBuilder : saved_notifications) {
+            rescheduleNotification(manager, currentDate, notificationBuilder);
+        }
+    }
+
+    private static boolean rescheduleNotification(UnityNotificationManager manager, Date currentDate, Notification.Builder notificationBuilder) {
+        try {
             Bundle extras = notificationBuilder.getExtras();
             long repeatInterval = extras.getLong(KEY_REPEAT_INTERVAL, 0L);
             long fireTime = extras.getLong(KEY_FIRE_TIME, 0L);
@@ -43,13 +49,19 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
 
             if (fireTimeDate.after(currentDate) || isRepeatable) {
                 manager.scheduleAlarmWithNotification(notificationBuilder);
+                return true;
             } else if (currentDate.getTime() - fireTime < EXPIRATION_TRESHOLD) {
                 // notification is in the past, but not by much, send now
                 int id = extras.getInt(KEY_ID);
                 manager.notify(id, notificationBuilder);
+                return true;
             } else {
                 Log.d(TAG_UNITY, "Notification expired, not rescheduling, ID: " + extras.getInt(KEY_ID, -1));
+                return false;
             }
+        } catch (Exception e) {
+            Log.e(TAG_UNITY, "Failed to reschedule notification", e);
+            return false;
         }
     }
 }
