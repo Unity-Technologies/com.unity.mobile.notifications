@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -22,7 +23,7 @@ public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent received_intent) {
         Log.d(TAG_UNITY, "Rescheduling notifications after restart");
         if (Intent.ACTION_BOOT_COMPLETED.equals(received_intent.getAction())) {
-            rescheduleSavedNotifications(context);
+            AsyncTask.execute(() -> { rescheduleSavedNotifications(context); });
         }
     }
 
