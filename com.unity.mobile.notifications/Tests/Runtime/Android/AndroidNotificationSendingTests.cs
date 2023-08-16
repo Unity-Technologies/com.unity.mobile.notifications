@@ -378,8 +378,10 @@ class AndroidNotificationSendingTests
             manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
         var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver");
         using (var calendarClass = new AndroidJavaClass("java.util.Calendar"))
+        {
             using (var calendar = calendarClass.CallStatic<AndroidJavaObject>("getInstance"))
                 currentTime = calendar.Call<AndroidJavaObject>("getTime");
+        }
 
         using var builder = AndroidNotificationCenter.CreateNotificationBuilder(789, notification, kDefaultTestChannel);
         var result = rebootClass.CallStatic<bool>("rescheduleNotification", manager, currentTime, builder);
