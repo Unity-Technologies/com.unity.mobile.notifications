@@ -220,6 +220,8 @@ namespace Unity.Notifications
         /// <remarks>Before Android 13 no permission is required.</remarks>
         public static NotificationsPermissionRequest RequestPermission()
         {
+            CheckInitialized();
+
             int iOSAuthorizationOptions = 0;
 #if UNITY_IOS
             if (0 != (s_Args.PresentationOptions & NotificationPresentation.Alert))
