@@ -6,6 +6,8 @@ All notable changes to this package will be documented in this file.
 
 ### Changes & Improvements:
 
+- Added unified APIs for basic notifications that work on both platforms in the `Unity.Notifications` namespace.
+
 ### Fixes:
 
 ## [2.2.1] - 2023-07-17
