@@ -57,8 +57,6 @@
              BOOL registerRemoteOnLaunch = supportsPushNotification == YES ?
                  [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch"] boolValue] : NO;
 
-             NSInteger remoteForegroundPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityRemoteNotificationForegroundPresentationOptions"] integerValue];
-
              NSInteger defaultAuthorizationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityNotificationDefaultAuthorizationOptions"] integerValue];
 
              if (defaultAuthorizationOptions <= 0)
@@ -68,7 +66,6 @@
              {
                  UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
                  [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
-                 manager.remoteNotificationForegroundPresentationOptions = remoteForegroundPresentationOptions;
              }
          }];
 

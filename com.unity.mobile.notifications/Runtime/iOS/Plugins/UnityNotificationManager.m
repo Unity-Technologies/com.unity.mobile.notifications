@@ -15,6 +15,7 @@
 {
     NSLock* _lock;
     UNAuthorizationStatus _remoteNotificationsRegistered;
+    NSInteger _remoteNotificationForegroundPresentationOptions;
     NSString* _deviceToken;
     NSPointerArray* _pendingRemoteAuthRequests;
 }
@@ -39,6 +40,7 @@
     _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
     _deviceToken = nil;
     _pendingRemoteAuthRequests = nil;
+    _remoteNotificationForegroundPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityRemoteNotificationForegroundPresentationOptions"] integerValue];
     return self;
 }
 
