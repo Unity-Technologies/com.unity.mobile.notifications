@@ -27,8 +27,6 @@
 @property NSString* lastRespondedNotificationAction;
 @property NSString* lastRespondedNotificationUserText;
 
-@property UNNotificationPresentationOptions remoteNotificationForegroundPresentationOptions;
-
 + (instancetype)sharedInstance;
 
 - (id)init;
