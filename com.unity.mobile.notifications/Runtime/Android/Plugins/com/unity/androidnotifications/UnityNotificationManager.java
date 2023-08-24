@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -708,41 +709,56 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 return;
             }
         }
-        Object notification = getNotificationOrBuilderForIntent(intent);
+        showNotification(intent);
+    }
+
+    private void showNotification(Intent intent) {
+        Object notification = getNotificationOrIdForIntent(intent);
+        if (notification == null) {
+            return;
+        }
+
+        if (notification instanceof Notification) {
+            Notification notif = (Notification) notification;
+            int id = notif.extras.getInt(KEY_ID, -1);
+            notify(id, notif);
+            return;
+        }
+
+        Integer notificationId = (Integer)notification;
+        Notification.Builder builder = mScheduledNotifications.get(notificationId);
+        if (builder != null) {
+            notify(notificationId, builder);
+            return;
+        }
+
+        AsyncTask.execute(() -> {
+            Notification.Builder nb = deserializeNotificationBuilder(notificationId);
+            if (nb == null) {
+                Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
+                return;
+            }
+
+            notify(notificationId, nb);
+        });
+    }
+
+    void notify(int id, Notification.Builder builder) {
+        Class openActivity;
+        if (mOpenActivity == null) {
+            openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
+            if (openActivity == null) {
+                Log.e(TAG_UNITY, "Activity not found, cannot show notification");
+                return;
+            }
+        }
+        else {
+            openActivity = mOpenActivity;
+        }
+
+        Notification notification = buildNotificationForSending(openActivity, builder);
         if (notification != null) {
-            Notification notif = null;
-            int id = -1;
-            boolean sendable = notification instanceof Notification;
-            if (sendable) {
-                notif = (Notification) notification;
-                id = notif.extras.getInt(KEY_ID, -1);
-            } else {
-                Notification.Builder builder = (Notification.Builder)notification;
-                // this is different instance and does not have mOpenActivity
-                if (builder == null) {
-                    Log.e(TAG_UNITY, "Failed to recover builder, can't send notification");
-                    return;
-                }
-
-                Class openActivity;
-                if (mOpenActivity == null) {
-                    openActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
-                    if (openActivity == null) {
-                        Log.e(TAG_UNITY, "Activity not found, cannot show notification");
-                        return;
-                    }
-                }
-                else {
-                    openActivity = mOpenActivity;
-                }
-
-                id = builder.getExtras().getInt(KEY_ID, -1);
-                notif = buildNotificationForSending(openActivity, builder);
-            }
-
-            if (notif != null) {
-                notify(id, notif);
-            }
+            notify(id, notification);
         }
     }
 
@@ -1018,38 +1034,43 @@ public class UnityNotificationManager extends BroadcastReceiver {
         return builder.build();
     }
 
-    private Object getNotificationOrBuilderForIntent(Intent intent) {
-        Object notification = null;
-        boolean sendable = false;
+    private Object getNotificationOrIdForIntent(Intent intent) {
         if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
-            int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
-            Integer notificationId = Integer.valueOf(id);
-            if ((notification = mScheduledNotifications.get(notificationId)) != null) {
-                sendable = true;
-            } else {
-                // in case we don't have cached notification, deserialize from storage
-                SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(String.valueOf(id)), Context.MODE_PRIVATE);
-                notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
-            }
+            return intent.getExtras().getInt(KEY_NOTIFICATION_ID);
         } else if (intent.hasExtra(KEY_NOTIFICATION)) {
             // old code path where Notification object is in intent
             // in case the app was replaced and there still are pending alarms with notification
-            notification = intent.getParcelableExtra(KEY_NOTIFICATION);
-            sendable = true;
+            return intent.getParcelableExtra(KEY_NOTIFICATION);
         }
 
-        if (notification == null || sendable)
-            return notification;
+        return null;
+    }
 
-        Notification.Builder builder;
+    private Object getNotificationOrBuilderForIntent(Intent intent) {
+        Object notification = getNotificationOrIdForIntent(intent);
+        if (notification instanceof Integer) {
+            Integer notificationId = (Integer)notification;
+            if ((notification = mScheduledNotifications.get(notificationId)) == null) {
+                // in case we don't have cached notification, deserialize from storage
+                return deserializeNotificationBuilder(notificationId);
+            }
+        }
+
+        return notification;
+    }
+
+    private Notification.Builder deserializeNotificationBuilder(Integer notificationId) {
+        SharedPreferences prefs = mContext.getSharedPreferences(getSharedPrefsNameByNotificationId(notificationId.toString()), Context.MODE_PRIVATE);
+        Object notification = UnityNotificationUtilities.deserializeNotification(mContext, prefs);
+        if (notification == null) {
+            return null;
+        }
+
         if (notification instanceof Notification) {
-            builder = UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
-        }
-        else {
-            builder = (Notification.Builder)notification;
+            return UnityNotificationUtilities.recoverBuilder(mContext, (Notification)notification);
         }
 
-        return builder;
+        return (Notification.Builder)notification;
     }
 
     public void showNotificationSettings(String channelId) {
