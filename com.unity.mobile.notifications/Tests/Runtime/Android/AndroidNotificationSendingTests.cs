@@ -371,6 +371,57 @@ class AndroidNotificationSendingTests
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
     }
 
+    bool RescheduleNotification(AndroidNotification notification)
+    {
+        AndroidJavaObject manager, currentTime;
+        using (var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager"))
+            manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
+        var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver");
+        using (var calendarClass = new AndroidJavaClass("java.util.Calendar"))
+        {
+            using (var calendar = calendarClass.CallStatic<AndroidJavaObject>("getInstance"))
+                currentTime = calendar.Call<AndroidJavaObject>("getTime");
+        }
+
+        using var builder = AndroidNotificationCenter.CreateNotificationBuilder(789, notification, kDefaultTestChannel);
+        var result = rebootClass.CallStatic<bool>("rescheduleNotification", manager, currentTime, builder);
+        manager.Dispose();
+        currentTime.Dispose();
+        return result;
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator RescheduleNotification_ExpiredMomentAgo_SendsNotification()
+    {
+        var n = new AndroidNotification();
+        n.Title = "JustExpired";
+        n.Text = "Should be sent";
+        n.FireTime = System.DateTime.Now.AddMinutes(-1);
+
+        var result = RescheduleNotification(n);
+        Assert.IsTrue(result);
+
+        yield return WaitForNotification(5.0f);
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        var received = currentHandler.lastNotification.Notification;
+        Assert.AreEqual("JustExpired", received.Title);
+    }
+
+    [Test]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public void RescheduleNotification_ExpiredNotification_DoesNotReschedule()
+    {
+        var n = new AndroidNotification();
+        n.Title = "LongExpired";
+        n.Text = "Should NOT be sent";
+        n.FireTime = System.DateTime.Now.AddHours(-1);
+
+        var result = RescheduleNotification(n);
+        Assert.IsFalse(result);
+    }
+
     [UnityTest]
     [UnityPlatform(RuntimePlatform.Android)]
     public IEnumerator SendNotificationNotShownInForeground_IsDeliveredButNotShown()

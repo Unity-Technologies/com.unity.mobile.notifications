@@ -2,6 +2,17 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+### Changes & Improvements:
+- [Android] - Reschedule after reboot will send all notifications that expired less than 10 minutes ago.
+- [iOS] - Remote notifications now support showInForeground key (allows to show notification while app is the foreground).
+
+### Fixes:
+- [Android] - [issue 271](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/271) Fix possible ANR when sending/rescheduling after reboot.
+- [iOS] - Remote notification presentation options work regardless of when authorization is performed.
+- [iOS] - Remote notifications have presentation independent of whether callback is registered or not.
+
 ## [2.2.1] - 2023-07-17
 
 ### Fixes:
