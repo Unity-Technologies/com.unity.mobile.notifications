@@ -6,10 +6,6 @@ android {
     namespace 'com.unity.androidnotifications'
     compileSdk 33
 
-    defaultConfig {
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -17,10 +13,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
+    api files('../libs/unity-classes.jar')
 }
