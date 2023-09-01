@@ -6,6 +6,10 @@ android {
     namespace 'com.unity.androidnotifications'
     compileSdk 33
 
+    defaultConfig {
+        consumerProguardFiles "proguard-rules.pro"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
