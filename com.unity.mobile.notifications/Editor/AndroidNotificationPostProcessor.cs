@@ -85,8 +85,6 @@ namespace Unity.Notifications
                 AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
 
-            AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.POST_NOTIFICATIONS");
-
             bool enableExact = (settings.ExactAlarm & AndroidExactSchedulingOption.ExactWhenAvailable) != 0;
             AppendAndroidMetadataField(manifestPath, manifestDoc, "com.unity.androidnotifications.exact_scheduling", enableExact ? "1" : "0");
             if (enableExact)
