@@ -24,12 +24,6 @@ namespace Unity.Notifications
 
         private void CopyNotificationResources(string projectPath)
         {
-            // The projectPath points to the the parent folder instead of the actual project path.
-            if (!Directory.Exists(Path.Combine(projectPath, "src")))
-            {
-                projectPath = Path.Combine(projectPath, PlayerSettings.productName);
-            }
-
             // Get the icons set in the UnityNotificationEditorManager and write them to the res folder, then we can use the icons as res.
             var icons = NotificationSettingsManager.Initialize().GenerateDrawableResourcesForExport();
             foreach (var icon in icons)
