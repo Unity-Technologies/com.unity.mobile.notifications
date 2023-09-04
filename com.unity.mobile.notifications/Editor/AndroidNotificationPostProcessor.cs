@@ -17,6 +17,10 @@ namespace Unity.Notifications
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
+            projectPath = Path.Combine(projectPath, "mobilenotifications.androidlib");
+            if (!Directory.Exists(projectPath))
+                throw new Exception("mobilenotifications module not found in gradle project");
+
             CopyNotificationResources(projectPath);
 
             InjectAndroidManifest(projectPath);
