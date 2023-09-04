@@ -76,8 +76,6 @@ namespace Unity.Notifications
 
         internal static void InjectAndroidManifest(string manifestPath, XmlDocument manifestDoc, ManifestSettings settings)
         {
-            InjectReceivers(manifestPath, manifestDoc);
-
             if (settings.UseCustomActivity)
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "custom_notification_android_activity", settings.CustomActivity);
 
@@ -111,68 +109,6 @@ namespace Unity.Notifications
         private static T GetSetting<T>(List<NotificationSetting> settings, string key)
         {
             return (T)settings.Find(i => i.Key == key).Value;
-        }
-
-        internal static void InjectReceivers(string manifestPath, XmlDocument manifestXmlDoc)
-        {
-            const string kNotificationManagerName = "com.unity.androidnotifications.UnityNotificationManager";
-            const string kNotificationRestartOnBootName = "com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver";
-
-            var applicationXmlNode = manifestXmlDoc.SelectSingleNode("manifest/application");
-            if (applicationXmlNode == null)
-                throw new ArgumentException(string.Format("Missing 'application' node in '{0}'.", manifestPath));
-
-            XmlElement notificationManagerReceiver = null;
-            XmlElement notificationRestartOnBootReceiver = null;
-
-            var receiverNodes = manifestXmlDoc.SelectNodes("manifest/application/receiver");
-            if (receiverNodes != null)
-            {
-                // Check existing receivers.
-                foreach (XmlNode node in receiverNodes)
-                {
-                    var element = node as XmlElement;
-                    if (element == null)
-                        continue;
-
-                    var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
-                    if (elementName == kNotificationManagerName)
-                        notificationManagerReceiver = element;
-                    else if (elementName == kNotificationRestartOnBootName)
-                        notificationRestartOnBootReceiver = element;
-
-                    if (notificationManagerReceiver != null && notificationRestartOnBootReceiver != null)
-                        break;
-                }
-            }
-
-            // Create notification manager receiver if necessary.
-            if (notificationManagerReceiver == null)
-            {
-                notificationManagerReceiver = manifestXmlDoc.CreateElement("receiver");
-                notificationManagerReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationManagerName);
-
-                applicationXmlNode.AppendChild(notificationManagerReceiver);
-            }
-            notificationManagerReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
-
-            // Create notification restart-on-boot receiver if necessary.
-            if (notificationRestartOnBootReceiver == null)
-            {
-                notificationRestartOnBootReceiver = manifestXmlDoc.CreateElement("receiver");
-                notificationRestartOnBootReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationRestartOnBootName);
-
-                var intentFilterNode = manifestXmlDoc.CreateElement("intent-filter");
-
-                var actionNode = manifestXmlDoc.CreateElement("action");
-                actionNode.SetAttribute("name", kAndroidNamespaceURI, "android.intent.action.BOOT_COMPLETED");
-
-                intentFilterNode.AppendChild(actionNode);
-                notificationRestartOnBootReceiver.AppendChild(intentFilterNode);
-                applicationXmlNode.AppendChild(notificationRestartOnBootReceiver);
-            }
-            notificationRestartOnBootReceiver.SetAttribute("enabled", kAndroidNamespaceURI, "false");
-            notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
         }
 
         internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name, string maxSdk = null)
