@@ -3,8 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.unity.androidnotifications'
-    compileSdk 33
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 22
