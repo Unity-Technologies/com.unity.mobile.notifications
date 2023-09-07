@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [2.2.2] - 2023-09-01
+## [2.2.2] - 2023-09-07
 
 ### Changes & Improvements:
 - [Android] - Reschedule after reboot will send all notifications that expired less than 10 minutes ago.
