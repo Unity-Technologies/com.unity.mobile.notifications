@@ -1,6 +1,6 @@
 # Mobile Notifications package
 
-The Unity Mobile Notifications package adds support for scheduling local one-time or repeatable notifications on Android and iOS. 
+The Unity Mobile Notifications package adds support for scheduling local one-time or repeatable notifications on Android and iOS.
 
 Notification functionality works differently on Android and iOS platforms. The mobile notifications package provides features in three sets of APIs for your convenience.
 

@@ -33,7 +33,7 @@ NotificationCenter.Initialize(args);
 
 After initializing `NotificationCenter`, you can request the user’s permission to send notifications.
 
-The following code example runs a coroutine until the permission is granted or denied. The status of the request indicates if the permission has been already granted, permanently denied, or is not required at all. 
+The following code example runs a coroutine until the permission is granted or denied. The status of the request indicates if the permission has been already granted, permanently denied, or is not required at all.
 
 ```c#
 IEnumerator Start()
@@ -98,9 +98,9 @@ NotificationCenter.CancelAllScheduledNotifications();
 NotificationCenter.CancelAllDeliveredNotifications();
 ```
 
-You can also cancel individual notifications. The recommended practice is to give each distinct notification a unique integer ID and assign it to the `Identifier` property when creating that notification. Otherwise a unique ID is generated and returned when you call `NotificationCenter.ScheduleNotification`. In this case, you must save the ID, as your application may get terminated before the notification is displayed. 
+You can also cancel individual notifications. The recommended practice is to give each distinct notification a unique integer ID and assign it to the `Identifier` property when creating that notification. Otherwise a unique ID is generated and returned when you call `NotificationCenter.ScheduleNotification`. In this case, you must save the ID, as your application may get terminated before the notification is displayed.
 
-The following code example demonstrates how to cancel individual notification using the ID: 
+The following code example demonstrates how to cancel individual notification using the ID:
 
 ```c#
 NotificationCenter.CancelScheduledNotification(id);
@@ -167,7 +167,7 @@ You can choose the required features by setting `NotificationCenterArgs.Presenta
 
 **Note**: On some devices, certain features may not be available or are disabled by default. For example, some Android devices disable alerts by default. On such devices, users can enable alerts in the notification settings.
 
-Badges are visuals on app launchers. It can be a simple dot or a circle with a number. Some devices may not support badges or users can disable badges in settings. When a badge is enabled, it is usually displayed when the application delivers notifications or displays a number of notifications. The application can override the number using `Notification` struct `Badge` property. 
+Badges are visuals on app launchers. It can be a simple dot or a circle with a number. Some devices may not support badges or users can disable badges in settings. When a badge is enabled, it is usually displayed when the application delivers notifications or displays a number of notifications. The application can override the number using `Notification` struct `Badge` property.
 
 **Note**: If you set the badge manually, you must also remove it by calling `NotificationCenter.ClearBadge()` (Unlike iOS, the badge is removed automatically on Android when notifications are canceled).
 
