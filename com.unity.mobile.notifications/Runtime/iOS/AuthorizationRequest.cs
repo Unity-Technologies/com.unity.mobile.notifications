@@ -169,6 +169,16 @@ namespace Unity.Notifications.iOS
             }
         }
 
+        public static bool RegisteredForRemoteNotifications
+        {
+            get => iOSNotificationsWrapper.RegisteredForRemoteNotifications();
+        }
+
+        public static void UnregisterForRemoteNotifications()
+        {
+            iOSNotificationsWrapper.UnregisterForRemoteNotifications();
+        }
+
         /// <summary>
         /// Dispose to unregister the OnAuthorizationRequestCompleted callback.
         /// </summary>

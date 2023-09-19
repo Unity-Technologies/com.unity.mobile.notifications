@@ -32,6 +32,12 @@ namespace Unity.Notifications.iOS
         private static extern void _RequestAuthorization(IntPtr request, Int32 options, bool registerForRemote);
 
         [DllImport("__Internal")]
+        private static extern int _RegisteredForRemoteNotifications();
+
+        [DllImport("__Internal")]
+        private static extern void _UnregisterForRemoteNotifications();
+
+        [DllImport("__Internal")]
         private static extern void _ScheduleLocalNotification(iOSNotificationData data);
 
         [DllImport("__Internal")]
@@ -232,6 +238,22 @@ namespace Unity.Notifications.iOS
         {
 #if UNITY_IOS && !UNITY_EDITOR
             _RequestAuthorization(request, options, registerRemote);
+#endif
+        }
+
+        public static bool RegisteredForRemoteNotifications()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return _RegisteredForRemoteNotifications() != 0;
+#else
+            return false;
+#endif
+        }
+
+        public static void UnregisterForRemoteNotifications()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            _UnregisterForRemoteNotifications();
 #endif
         }
 

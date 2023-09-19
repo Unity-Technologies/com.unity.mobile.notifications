@@ -34,6 +34,7 @@
 - (void)updateDeliveredNotificationList;
 - (void)updateNotificationSettings;
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request;
+- (void)unregisterForRemoteNotifications;
 - (void)scheduleLocalNotification:(iOSNotificationData*)data;
 
 @end

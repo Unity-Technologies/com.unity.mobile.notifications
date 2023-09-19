@@ -123,6 +123,12 @@
     }];
 }
 
+- (void)unregisterForRemoteNotifications
+{
+    [[UIApplication sharedApplication] unregisterForRemoteNotifications];
+    _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
+}
+
 + (NSString*)deviceTokenFromNotification:(NSNotification*)notification
 {
     NSData* deviceTokenData;
