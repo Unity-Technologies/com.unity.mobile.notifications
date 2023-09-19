@@ -10,8 +10,6 @@
 #import <UserNotifications/UserNotifications.h>
 #import "UnityNotificationData.h"
 
-#define SYSTEM_VERSION_10_OR_ABOVE  ([[[UIDevice currentDevice] systemVersion] compare:@"10.0" options:NSNumericSearch] != NSOrderedAscending)
-
 @interface UnityNotificationManager : NSObject<UNUserNotificationCenterDelegate>
 
 @property UNNotificationSettings* cachedNotificationSettings;

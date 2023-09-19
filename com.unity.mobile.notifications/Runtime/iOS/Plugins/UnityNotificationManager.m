@@ -81,9 +81,6 @@
 
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request
 {
-    if (!SYSTEM_VERSION_10_OR_ABOVE)
-        return;
-
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
 
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
