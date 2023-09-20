@@ -169,11 +169,20 @@ namespace Unity.Notifications.iOS
             }
         }
 
+        /// <summary>
+        /// Whether the app is currently registered for remote notifications.
+        /// </summary>
+        /// <seealso cref="https://developer.apple.com/documentation/uikit/uiapplication/1623069-registeredforremotenotifications?language=objc"/>
         public static bool RegisteredForRemoteNotifications
         {
             get => iOSNotificationsWrapper.RegisteredForRemoteNotifications();
         }
 
+        /// <summary>
+        /// Unregister for remote notifications.
+        /// This is rarely needed, typically when user logs out. The app can always re-register.
+        /// </summary>
+        /// <seealso cref="https://developer.apple.com/documentation/uikit/uiapplication/1623093-unregisterforremotenotifications?language=objc"/>
         public static void UnregisterForRemoteNotifications()
         {
             iOSNotificationsWrapper.UnregisterForRemoteNotifications();
