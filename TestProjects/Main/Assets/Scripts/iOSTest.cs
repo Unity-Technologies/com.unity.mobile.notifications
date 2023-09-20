@@ -195,6 +195,11 @@ namespace Unity.Notifications.Tests.Sample
             {
                 StartCoroutine(GetCurrentLocation());
             });
+            m_groups["General"]["Check push registration"] = new Action(() =>
+            {
+                RegisteredForRemoteNotifications();
+            });
+            m_groups["General"]["Unregister push notifications"] = new Action(UnregisterForRemoteNotifications);
             m_groups["General"]["Request Authorization Sound + Badge + Alert"] = new Action(() =>
             {
                 StartCoroutine(RequestAuthorization(AuthorizationOption.Alert | AuthorizationOption.Badge | AuthorizationOption.Sound));
@@ -426,6 +431,20 @@ namespace Unity.Notifications.Tests.Sample
                 // Access granted and location value could be retrieved
                 m_LOGGER.Green("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
             }
+        }
+
+        void RegisteredForRemoteNotifications()
+        {
+            if (AuthorizationRequest.RegisteredForRemoteNotifications)
+                m_LOGGER.Green("App is registered with push notifications");
+            else
+                m_LOGGER.Red("App is not registered with push notifications");
+        }
+
+        void UnregisterForRemoteNotifications()
+        {
+            AuthorizationRequest.UnregisterForRemoteNotifications();
+            m_LOGGER.Gray("Unregisterred for push notifications");
         }
 
         //Request authorization if it is not enabled in Editor UI
