@@ -1,4 +1,5 @@
 system: jira
 server: jira.unity3d.com
 project: MNB
+package: Mobile Notifications
 issuetype: Bug
