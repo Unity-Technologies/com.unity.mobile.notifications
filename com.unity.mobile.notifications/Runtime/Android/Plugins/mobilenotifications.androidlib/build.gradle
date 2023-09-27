@@ -2,8 +2,19 @@ plugins {
     id 'com.android.library'
 }
 
+def getCompileSdk(unityLib) {
+    def unityCompileSdk = unityLib.compileSdkVersion
+    def version = unityCompileSdk.find('\\d+').toInteger()
+    if (version < 33) {
+        return 33
+    }
+    return version
+}
+
 android {
-    compileSdkVersion 33
+    def unityLib = project(':unityLibrary').extensions.getByName('android')
+    compileSdkVersion getCompileSdk(unityLib)
+    buildToolsVersion unityLib.buildToolsVersion
 
     defaultConfig {
         minSdkVersion 22
