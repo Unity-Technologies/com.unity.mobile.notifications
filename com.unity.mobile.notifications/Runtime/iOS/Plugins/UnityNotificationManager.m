@@ -81,9 +81,6 @@
 
 - (void)requestAuthorization:(NSInteger)authorizationOptions withRegisterRemote:(BOOL)registerRemote forRequest:(void*)request
 {
-    if (!SYSTEM_VERSION_10_OR_ABOVE)
-        return;
-
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
 
     BOOL supportsPushNotification = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
@@ -124,6 +121,12 @@
             [self finishAuthorization: &authData forRequest: request];
         [self updateNotificationSettings];
     }];
+}
+
+- (void)unregisterForRemoteNotifications
+{
+    [[UIApplication sharedApplication] unregisterForRemoteNotifications];
+    _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
 }
 
 + (NSString*)deviceTokenFromNotification:(NSNotification*)notification
