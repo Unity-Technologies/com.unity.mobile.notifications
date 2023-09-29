@@ -830,7 +830,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (icon == null || icon.length() == 0)
             return null;
         if (icon.charAt(0) == '/') {
-            BitmapFactory.decodeFile(icon);
+            return BitmapFactory.decodeFile(icon);
         }
 
         Object ico = getIconForUri(icon);
