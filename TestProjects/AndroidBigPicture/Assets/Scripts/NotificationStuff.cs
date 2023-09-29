@@ -39,6 +39,8 @@ public class NotificationStuff : MonoBehaviour
             SmallIconUri();
         if (GUI.Button(new Rect(400, 300, 300, 200), "Large icon URI"))
             LargeIconUri();
+        if (GUI.Button(new Rect(400, 550, 300, 200), "Large Icon file"))
+            LargeIconFile();
 
         GUI.Label(new Rect(50, Screen.height - 50, 100, 50), "Delay (0-50s):");
         notificationDelay = GUI.HorizontalSlider(new Rect(150, Screen.height - 50, Screen.width - 200, 50), notificationDelay, 0, 50);
@@ -112,6 +114,14 @@ public class NotificationStuff : MonoBehaviour
         var uri = GetSmallIconUri();
         var notification = new AndroidNotification("Large icon", uri, GetNotificationDelay());
         notification.LargeIcon = uri;
+        AndroidNotificationCenter.SendNotification(notification, channel);
+    }
+
+    void LargeIconFile()
+    {
+        var path = Path.Combine(sharedImages, "small_icon.png");
+        var notification = new AndroidNotification("Large icon", path, GetNotificationDelay());
+        notification.LargeIcon = path;
         AndroidNotificationCenter.SendNotification(notification, channel);
     }
 
