@@ -6,4 +6,5 @@ dependencies {
 
 android {
     compileSdkVersion 33
+    buildToolsVersion project(':unityLibrary').extensions.getByName('android').buildToolsVersion
 }
