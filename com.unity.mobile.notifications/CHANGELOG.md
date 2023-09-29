@@ -9,6 +9,9 @@ All notable changes to this package will be documented in this file.
 - Added unified APIs for basic notifications that work on both platforms in the `Unity.Notifications` namespace.
 - [iOS] - Added APIs for checking and unregistering for push notifications.
 
+### Fixes:
+- [Android] - [issue 290](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/290) Fix large icon not displayed when privided as file path.
+
 ## [2.2.2] - 2023-09-07
 
 ### Changes & Improvements:
