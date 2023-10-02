@@ -7,6 +7,7 @@ All notable changes to this package will be documented in this file.
 ### Changes & Improvements:
 
 - Added unified APIs for basic notifications that work on both platforms in the `Unity.Notifications` namespace.
+- [Android] - FireTime will be local or UTC uppon receiving, depending on what it was when sending.
 - [iOS] - Added APIs for checking and unregistering for push notifications.
 
 ## [2.2.2] - 2023-09-07
