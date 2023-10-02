@@ -54,6 +54,7 @@ namespace Unity.Notifications.Android
         public AndroidJavaObject KEY_SMALL_ICON;
         public AndroidJavaObject KEY_SHOW_IN_FOREGROUND;
         public AndroidJavaObject KEY_BIG_PICTURE;
+        public AndroidJavaObject KEY_USE_UTC_TIME;
 
         // these are lesser used, don't waste java global refs on them
         public string KEY_BIG_LARGE_ICON;
@@ -100,6 +101,7 @@ namespace Unity.Notifications.Android
             KEY_SMALL_ICON = clazz.GetStatic<AndroidJavaObject>("KEY_SMALL_ICON");
             KEY_SHOW_IN_FOREGROUND = clazz.GetStatic<AndroidJavaObject>("KEY_SHOW_IN_FOREGROUND");
             KEY_BIG_PICTURE = clazz.GetStatic<AndroidJavaObject>("KEY_BIG_PICTURE");
+            KEY_USE_UTC_TIME = new AndroidJavaObject("java.lang.String", "con.unity.UseUtcTime");
             KEY_BIG_LARGE_ICON = clazz.GetStatic<string>("KEY_BIG_LARGE_ICON");
             KEY_BIG_CONTENT_TITLE = clazz.GetStatic<string>("KEY_BIG_CONTENT_TITLE");
             KEY_BIG_SUMMARY_TEXT = clazz.GetStatic<string>("KEY_BIG_SUMMARY_TEXT");
@@ -117,6 +119,7 @@ namespace Unity.Notifications.Android
             KEY_SMALL_ICON = null;
             KEY_SHOW_IN_FOREGROUND = null;
             KEY_BIG_PICTURE = null;
+            KEY_USE_UTC_TIME = null;
             KEY_BIG_LARGE_ICON = null;
             KEY_BIG_CONTENT_TITLE = null;
             KEY_BIG_SUMMARY_TEXT = null;
@@ -1227,6 +1230,8 @@ namespace Unity.Notifications.Android
             extras = s_Jni.NotificationBuilder.GetExtras(notificationBuilder);
             s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, notification.RepeatInterval.ToLong());
             s_Jni.Bundle.PutLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, fireTime);
+            if (notification.FireTime.Kind == DateTimeKind.Utc)
+                s_Jni.Bundle.PutBoolean(extras, s_Jni.NotificationManager.KEY_USE_UTC_TIME, true);
             s_Jni.Bundle.PutBoolean(extras, s_Jni.NotificationManager.KEY_SHOW_IN_FOREGROUND, notification.ShowInForeground);
             if (!string.IsNullOrEmpty(notification.IntentData))
                 s_Jni.Bundle.PutString(extras, s_Jni.NotificationManager.KEY_INTENT_DATA, notification.IntentData);
@@ -1250,7 +1255,11 @@ namespace Unity.Notifications.Android
                 notification.LargeIcon = s_Jni.Bundle.GetString(extras, s_Jni.NotificationManager.KEY_LARGE_ICON);
                 notification.ShouldAutoCancel = 0 != (flags & s_Jni.Notification.FLAG_AUTO_CANCEL);
                 notification.UsesStopwatch = s_Jni.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_CHRONOMETER, false);
-                notification.FireTime = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L).ToDatetime();
+                var fireTime = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_FIRE_TIME, -1L);
+                if (s_Jni.Bundle.GetBoolean(extras, s_Jni.NotificationManager.KEY_USE_UTC_TIME, false))
+                    notification.FireTime = fireTime.ToUtcDatetime();
+                else
+                    notification.FireTime = fireTime.ToLocalDatetime();
                 notification.RepeatInterval = s_Jni.Bundle.GetLong(extras, s_Jni.NotificationManager.KEY_REPEAT_INTERVAL, -1L).ToTimeSpan();
                 notification.ShowInForeground = s_Jni.Bundle.GetBoolean(extras, s_Jni.NotificationManager.KEY_SHOW_IN_FOREGROUND, true);
 
@@ -1283,7 +1292,7 @@ namespace Unity.Notifications.Android
                 var showTimestamp = s_Jni.Bundle.GetBoolean(extras, s_Jni.Notification.EXTRA_SHOW_WHEN, false);
                 notification.ShowTimestamp = showTimestamp;
                 if (showTimestamp)
-                    notification.CustomTimestamp = s_Jni.Notification.When(notificationObj).ToDatetime();
+                    notification.CustomTimestamp = s_Jni.Notification.When(notificationObj).ToLocalDatetime();
 
                 var data = new AndroidNotificationIntentData(id, channelId, notification);
                 data.NativeNotification = notificationObj;

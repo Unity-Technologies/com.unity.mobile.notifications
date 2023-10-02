@@ -64,10 +64,15 @@ namespace Unity.Notifications.Android
             return (long)Math.Floor(diff.TotalMilliseconds);
         }
 
-        public static DateTime ToDatetime(this long dateTime)
+        public static DateTime ToUtcDatetime(this long dateTime)
         {
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            return origin.AddMilliseconds(dateTime).ToLocalTime();
+            return origin.AddMilliseconds(dateTime);
+        }
+
+        public static DateTime ToLocalDatetime(this long dateTime)
+        {
+            return ToUtcDatetime(dateTime).ToLocalTime();
         }
 
         public static long ToLong(this TimeSpan? timeSpan)

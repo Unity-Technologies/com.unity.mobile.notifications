@@ -283,7 +283,7 @@ namespace Unity.Notifications.Android
 
             m_RepeatInterval = (-1L).ToTimeSpan();
             m_Color = new Color(0, 0, 0, 0);
-            m_CustomTimestamp = (-1L).ToDatetime();
+            m_CustomTimestamp = (-1L).ToLocalDatetime();
             m_SilentInForeground = false;
         }
 
