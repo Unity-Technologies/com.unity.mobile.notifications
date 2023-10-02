@@ -110,7 +110,6 @@ namespace Unity.Notifications
         void NotificationSchedule.Schedule(ref PlatformNotification notification)
         {
 #if UNITY_ANDROID
-            // TODO handle UTC
             switch (RepeatInterval)
             {
                 case NotificationRepeatInterval.OneTime:
