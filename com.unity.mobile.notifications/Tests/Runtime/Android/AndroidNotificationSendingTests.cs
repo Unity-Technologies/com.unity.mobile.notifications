@@ -500,4 +500,18 @@ class AndroidNotificationSendingTests
         Assert.AreEqual(replacement.Title, received.Title);
         Assert.AreEqual(replacement.Text, received.Text);
     }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.Android)]
+    public IEnumerator ScheduleUsingUtc()
+    {
+        var original = new AndroidNotification("UTC time", "Using UTC", DateTime.UtcNow.AddSeconds(2));
+        int id = AndroidNotificationCenter.SendNotification(original, kDefaultTestChannel);
+
+        yield return WaitForNotification(8.0f);
+
+        Assert.AreEqual(1, currentHandler.receivedNotificationCount);
+        var received = currentHandler.lastNotification.Notification;
+        Assert.AreEqual(DateTimeKind.Utc, received.FireTime.Kind);
+    }
 }
