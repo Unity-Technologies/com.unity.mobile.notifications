@@ -98,6 +98,8 @@ class AndroidNotificationSendingTests
         Assert.AreEqual(1, currentHandler.receivedNotificationCount);
         Assert.AreEqual(originalId, currentHandler.lastNotification.Id);
         Assert.AreEqual(n.Group, currentHandler.lastNotification.Notification.Group);
+        // scheduled using local time, should receive in local too
+        Assert.AreEqual(DateTimeKind.Local, currentHandler.lastNotification.Notification.FireTime.Kind);
     }
 
     [UnityTest]
