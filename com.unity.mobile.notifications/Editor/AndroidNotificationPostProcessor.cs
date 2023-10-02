@@ -17,20 +17,17 @@ namespace Unity.Notifications
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
         {
+            projectPath = Path.Combine(projectPath, "mobilenotifications.androidlib");
+            if (!Directory.Exists(projectPath))
+                throw new Exception("mobilenotifications module not found in gradle project");
+
             CopyNotificationResources(projectPath);
 
             InjectAndroidManifest(projectPath);
-            InjectProguard(projectPath);
         }
 
         private void CopyNotificationResources(string projectPath)
         {
-            // The projectPath points to the the parent folder instead of the actual project path.
-            if (!Directory.Exists(Path.Combine(projectPath, "src")))
-            {
-                projectPath = Path.Combine(projectPath, PlayerSettings.productName);
-            }
-
             // Get the icons set in the UnityNotificationEditorManager and write them to the res folder, then we can use the icons as res.
             var icons = NotificationSettingsManager.Initialize().GenerateDrawableResourcesForExport();
             foreach (var icon in icons)
@@ -77,8 +74,6 @@ namespace Unity.Notifications
 
         internal static void InjectAndroidManifest(string manifestPath, XmlDocument manifestDoc, ManifestSettings settings)
         {
-            InjectReceivers(manifestPath, manifestDoc);
-
             if (settings.UseCustomActivity)
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "custom_notification_android_activity", settings.CustomActivity);
 
@@ -87,8 +82,6 @@ namespace Unity.Notifications
                 AppendAndroidMetadataField(manifestPath, manifestDoc, "reschedule_notifications_on_restart", "true");
                 AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
-
-            AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.POST_NOTIFICATIONS");
 
             bool enableExact = (settings.ExactAlarm & AndroidExactSchedulingOption.ExactWhenAvailable) != 0;
             AppendAndroidMetadataField(manifestPath, manifestDoc, "com.unity.androidnotifications.exact_scheduling", enableExact ? "1" : "0");
@@ -112,68 +105,6 @@ namespace Unity.Notifications
         private static T GetSetting<T>(List<NotificationSetting> settings, string key)
         {
             return (T)settings.Find(i => i.Key == key).Value;
-        }
-
-        internal static void InjectReceivers(string manifestPath, XmlDocument manifestXmlDoc)
-        {
-            const string kNotificationManagerName = "com.unity.androidnotifications.UnityNotificationManager";
-            const string kNotificationRestartOnBootName = "com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver";
-
-            var applicationXmlNode = manifestXmlDoc.SelectSingleNode("manifest/application");
-            if (applicationXmlNode == null)
-                throw new ArgumentException(string.Format("Missing 'application' node in '{0}'.", manifestPath));
-
-            XmlElement notificationManagerReceiver = null;
-            XmlElement notificationRestartOnBootReceiver = null;
-
-            var receiverNodes = manifestXmlDoc.SelectNodes("manifest/application/receiver");
-            if (receiverNodes != null)
-            {
-                // Check existing receivers.
-                foreach (XmlNode node in receiverNodes)
-                {
-                    var element = node as XmlElement;
-                    if (element == null)
-                        continue;
-
-                    var elementName = element.GetAttribute("name", kAndroidNamespaceURI);
-                    if (elementName == kNotificationManagerName)
-                        notificationManagerReceiver = element;
-                    else if (elementName == kNotificationRestartOnBootName)
-                        notificationRestartOnBootReceiver = element;
-
-                    if (notificationManagerReceiver != null && notificationRestartOnBootReceiver != null)
-                        break;
-                }
-            }
-
-            // Create notification manager receiver if necessary.
-            if (notificationManagerReceiver == null)
-            {
-                notificationManagerReceiver = manifestXmlDoc.CreateElement("receiver");
-                notificationManagerReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationManagerName);
-
-                applicationXmlNode.AppendChild(notificationManagerReceiver);
-            }
-            notificationManagerReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
-
-            // Create notification restart-on-boot receiver if necessary.
-            if (notificationRestartOnBootReceiver == null)
-            {
-                notificationRestartOnBootReceiver = manifestXmlDoc.CreateElement("receiver");
-                notificationRestartOnBootReceiver.SetAttribute("name", kAndroidNamespaceURI, kNotificationRestartOnBootName);
-
-                var intentFilterNode = manifestXmlDoc.CreateElement("intent-filter");
-
-                var actionNode = manifestXmlDoc.CreateElement("action");
-                actionNode.SetAttribute("name", kAndroidNamespaceURI, "android.intent.action.BOOT_COMPLETED");
-
-                intentFilterNode.AppendChild(actionNode);
-                notificationRestartOnBootReceiver.AppendChild(intentFilterNode);
-                applicationXmlNode.AppendChild(notificationRestartOnBootReceiver);
-            }
-            notificationRestartOnBootReceiver.SetAttribute("enabled", kAndroidNamespaceURI, "false");
-            notificationRestartOnBootReceiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
         }
 
         internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name, string maxSdk = null)
@@ -247,42 +178,6 @@ namespace Unity.Notifications
             metaDataNode.SetAttribute("value", kAndroidNamespaceURI, value);
 
             applicationNode.AppendChild(metaDataNode);
-        }
-
-        private static void InjectProguard(string projectPath)
-        {
-            var proguardFile = $"{projectPath}/proguard-unity.txt";
-            if (!File.Exists(proguardFile))
-            {
-                UnityEngine.Debug.LogWarning($"Proguard file {proguardFile} not found, mobile notifications package may not function");
-                return;
-            }
-
-            var lines = File.ReadAllLines(proguardFile);
-            if (InjectProguard(ref lines))
-                File.WriteAllLines(proguardFile, lines);
-        }
-
-        internal static bool InjectProguard(ref string[] lines)
-        {
-            bool manager = InjectProguard(ref lines,
-                "com.unity.androidnotifications.UnityNotificationManager",
-                "-keep class com.unity.androidnotifications.UnityNotificationManager { public *; }");
-            bool callback = InjectProguard(ref lines,
-                "com.unity.androidnotifications.NotificationCallback",
-                "-keep class com.unity.androidnotifications.NotificationCallback { *; }");
-
-            return manager || callback;
-        }
-
-        static bool InjectProguard(ref string[] lines, string search, string inject)
-        {
-            foreach (var s in lines)
-                if (s.Contains(search))
-                    return false;
-
-            lines = lines.Concat(new[] { inject }).ToArray();
-            return true;
         }
     }
 }

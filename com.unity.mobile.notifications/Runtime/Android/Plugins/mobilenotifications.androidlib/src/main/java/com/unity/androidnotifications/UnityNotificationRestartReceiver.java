@@ -17,7 +17,7 @@ import static com.unity.androidnotifications.UnityNotificationManager.KEY_ID;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_REPEAT_INTERVAL;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
-public class UnityNotificationRestartOnBootReceiver extends BroadcastReceiver {
+public class UnityNotificationRestartReceiver extends BroadcastReceiver {
     private static final long EXPIRATION_TRESHOLD = 600000;  // 10 minutes
 
     @Override

@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.unity.androidnotifications">
+  <application>
+    <receiver android:name="com.unity.androidnotifications.UnityNotificationManager" android:exported="false" />
+    <receiver android:name="com.unity.androidnotifications.UnityNotificationRestartReceiver" android:enabled="false" android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+      </intent-filter>
+    </receiver>
+    <meta-data android:name="reschedule_notifications_on_restart" android:value="true" />
+    <meta-data android:name="com.unity.androidnotifications.exact_scheduling" android:value="1" />
+  </application>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+</manifest>

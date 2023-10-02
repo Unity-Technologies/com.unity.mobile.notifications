@@ -1,0 +1,38 @@
+plugins {
+    id 'com.android.library'
+}
+
+def getCompileSdk(unityLib) {
+    def unityCompileSdk = unityLib.compileSdkVersion
+    def version = unityCompileSdk.find('\\d+').toInteger()
+    if (version < 33) {
+        return 33
+    }
+    return version
+}
+
+android {
+    def unityLib = project(':unityLibrary').extensions.getByName('android')
+    compileSdkVersion getCompileSdk(unityLib)
+    buildToolsVersion unityLib.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion 22
+        consumerProguardFiles "proguard-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    api files('../libs/unity-classes.jar')
+}

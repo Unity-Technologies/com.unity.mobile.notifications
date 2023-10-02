@@ -106,7 +106,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             rescheduleOnRestart = metaData.getBoolean("reschedule_notifications_on_restart", false);
 
         if (rescheduleOnRestart) {
-            ComponentName receiver = new ComponentName(mContext, UnityNotificationRestartOnBootReceiver.class);
+            ComponentName receiver = new ComponentName(mContext, UnityNotificationRestartReceiver.class);
             PackageManager pm = mContext.getPackageManager();
 
             pm.setComponentEnabledSetting(receiver,

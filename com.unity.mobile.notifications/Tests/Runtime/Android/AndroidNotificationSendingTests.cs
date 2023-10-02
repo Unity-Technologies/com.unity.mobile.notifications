@@ -328,7 +328,7 @@ class AndroidNotificationSendingTests
     public IEnumerator SendNotification_CanReschedule()
     {
         var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
-        var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver");
+        var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartReceiver");
         AndroidJavaObject context;
         using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
         {
@@ -376,7 +376,7 @@ class AndroidNotificationSendingTests
         AndroidJavaObject manager, currentTime;
         using (var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager"))
             manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
-        var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartOnBootReceiver");
+        var rebootClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationRestartReceiver");
         using (var calendarClass = new AndroidJavaClass("java.util.Calendar"))
         {
             using (var calendar = calendarClass.CallStatic<AndroidJavaObject>("getInstance"))
