@@ -221,7 +221,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         } else {
             SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
             Set<String> channelIds = new HashSet<String>(prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<String>()));
-            channelIds.add(id); // TODO: what if users create the channel again with the same id?
+            channelIds.add(id);
 
             // Add to notification channel ids SharedPreferences.
             SharedPreferences.Editor editor = prefs.edit().clear();
