@@ -8,6 +8,7 @@ All notable changes to this package will be documented in this file.
 
 - Added unified APIs for basic notifications that work on both platforms in the `Unity.Notifications` namespace.
 - [iOS] - Added APIs for checking and unregistering for push notifications.
+- [iOS] - Added new presentation options, supported since iOS 14 (list and banner).
 
 ## [2.2.2] - 2023-09-07
 
