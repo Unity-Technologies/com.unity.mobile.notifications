@@ -16,13 +16,16 @@ MonoBehaviour:
   Identifier: 
   CategoryIdentifier: 
   ThreadIdentifier: 
-  Title:
+  Title: 
   Subtitle: 
   Body: And this is the body of this notification
   ShowInForeground: 1
-  PresentationOptions: 6
+  PresentationOptions: 18
   Badge: -1
   Data: 
   TimeTriggerInterval: 1
   Repeats: 0
   SoundType: 4
+  InterruptionLevel: 0
+  UserInfo: []
+  Attachments: []

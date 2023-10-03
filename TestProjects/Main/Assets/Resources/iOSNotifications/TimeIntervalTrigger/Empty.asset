@@ -16,12 +16,16 @@ MonoBehaviour:
   Identifier: 
   CategoryIdentifier: 
   ThreadIdentifier: 
-  Title:
+  Title: 
   Subtitle: 
   Body: 
   ShowInForeground: 1
-  PresentationOptions: 6
+  PresentationOptions: 22
   Badge: -1
   Data: 
   TimeTriggerInterval: 1
   Repeats: 0
+  SoundType: 0
+  InterruptionLevel: 0
+  UserInfo: []
+  Attachments: []
