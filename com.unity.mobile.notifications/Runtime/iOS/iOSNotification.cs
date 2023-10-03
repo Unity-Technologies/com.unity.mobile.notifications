@@ -7,6 +7,7 @@ namespace Unity.Notifications.iOS
 {
     /// <summary>
     /// Constants indicating how to present a notification in a foreground app
+    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions?language=objc"/>
     /// </summary>
     [Flags]
     public enum PresentationOption
@@ -30,6 +31,16 @@ namespace Unity.Notifications.iOS
         /// Display the alert using the content provided by the notification.
         /// </summary>
         Alert = 1 << 2,
+
+        /// <summary>
+        /// Show the notification in Notification Center.
+        /// </summary>
+        List = 1 << 3,
+
+        /// <summary>
+        /// Present the notification as a banner.
+        /// </summary>
+        Banner = 1 << 4,
     }
 
     /// <summary>
