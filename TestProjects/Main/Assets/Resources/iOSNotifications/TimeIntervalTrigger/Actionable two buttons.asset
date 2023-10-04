@@ -20,9 +20,12 @@ MonoBehaviour:
   Subtitle: 
   Body: Drag down to show actions
   ShowInForeground: 1
-  PresentationOptions: 6
+  PresentationOptions: 18
   Badge: -1
   Data: 
   TimeTriggerInterval: 5
   Repeats: 0
+  SoundType: 0
+  InterruptionLevel: 0
   UserInfo: []
+  Attachments: []

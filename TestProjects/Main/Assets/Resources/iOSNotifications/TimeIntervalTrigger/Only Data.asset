@@ -12,16 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc6c74f6df364b36b9afcbfd8cfbca3, type: 3}
   m_Name: Only Data
   m_EditorClassIdentifier: 
-  ButtonName: Empty notification + title
+  ButtonName: Empty notification + title (list)
   Identifier: 
   CategoryIdentifier: 
   ThreadIdentifier: 
-  Title:
+  Title: 
   Subtitle: 
   Body: 
   ShowInForeground: 1
-  PresentationOptions: 6
+  PresentationOptions: 26
   Badge: -1
   Data: This notification only includes data
   TimeTriggerInterval: 1
   Repeats: 0
+  SoundType: 0
+  InterruptionLevel: 0
+  UserInfo: []
+  Attachments: []
