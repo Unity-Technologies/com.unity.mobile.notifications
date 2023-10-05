@@ -10,6 +10,9 @@ All notable changes to this package will be documented in this file.
 - [iOS] - Added APIs for checking and unregistering for push notifications.
 - [iOS] - Added new presentation options, supported since iOS 14 (list and banner).
 
+### Fixes:
+- [Android] - [issue 290](https://github.com/Unity-Technologies/com.unity.mobile.notifications/issues/290) Fix large icon not displayed when privided as file path.
+
 ## [2.2.2] - 2023-09-07
 
 ### Changes & Improvements:
