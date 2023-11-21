@@ -7,7 +7,7 @@ test_editors:
 test_platforms:
   - name: mac
     type: Unity::VM::osx
-    image: package-ci/mac:stable
+    image: package-ci/macos-13:v4
     flavor: m1.mac
 
 artifactory:
