@@ -1,14 +1,13 @@
 test_editors:
   - version: trunk
   - version: 2023.2
-  - version: 2023.1
   - version: 2022.3
   - version: 2021.3
 
 test_platforms:
   - name: mac
     type: Unity::VM::osx
-    image: package-ci/mac:stable
+    image: package-ci/macos-13:v4
     flavor: m1.mac
 
 artifactory:
