@@ -2,7 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
 ## [2.3.0] - 2023-10-09
+
+### Fixes:
+- [iOS] - Do not copy Android plugins to Xcode project.
 
 ### Changes & Improvements:
 
