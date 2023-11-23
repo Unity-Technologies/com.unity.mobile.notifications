@@ -27,7 +27,7 @@ IEnumerator RequestAuthorization()
 
 You can send the same request again to check the current authorization status. If the user has already granted or denied authorization, the permissions request dialog doesn't display again.
 
-You can also enable an automatic authorization request when the user launches the app. For more details, refer to [notification settings](Settings.html#request-authorization).
+You can also enable an automatic authorization request when the user launches the app. For more details, refer to [notification settings](Settings.md#request-authorization).
 
 Users might change the authorization status for each notification type at any time in the system settings. You can call [iOSNotificationCenter.GetNotificationSettings](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetNotificationSettings) to check the actual authorization status when necessary.
 
@@ -36,7 +36,7 @@ Users might change the authorization status for each notification type at any ti
 A device token is a piece of data that contains a unique identifier assigned by Apple to a specific app on a specific device. If you intend to send push notifications to the users after they confirm the authorization request, you need to retrieve the device token first.
 
 To retrieve the device token, you need to:
-- Enable the **Enable Push Notifications** option in the [notification settings](Settings.html#enable-push-notifications).
+- Enable the **Enable Push Notifications** option in the [notification settings](Settings.md#enable-push-notifications).
 - Create the authorization request with `registerForRemoteNotifications` set to true.
 
 For more information on how to send push notifications to a device and how to add push notification support to your app, see Apple developer documentation on [handling remote notifications](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1).
@@ -115,7 +115,7 @@ var calendarTrigger = new iOSNotificationCalendarTrigger()
 
 You can also create an [iOSNotificationLocationTrigger](../api/Unity.Notifications.iOS.iOSNotificationLocationTrigger.html) if you want to schedule the delivery of a notification when the device enters or leaves a specific geographic region.
 
-Before you schedule any notifications with this trigger, you need to enable the **Include CoreLocation Framework** option in the [notifications settings](Settings.html#include-corelocation-framework). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization.
+Before you schedule any notifications with this trigger, you need to enable the **Include CoreLocation Framework** option in the [notifications settings](Settings.md#include-corelocation-framework). Your app must have authorization to use Core Location and must have when-in-use permissions. You can use the Unity LocationService API to request this authorization.
 For additional information, refer to the [Core Location](https://developer.apple.com/documentation/corelocation/clregion?language=objc) documentation on the Apple Developer website.
 
 In the example below, the center coordinate is defined using the WGS 84 system. The app triggers the notification when the user enters an area within a 250 meter radius around the Eiffel Tower in Paris.

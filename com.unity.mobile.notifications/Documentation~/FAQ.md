@@ -15,5 +15,5 @@ This means that scheduled notifications will not be delivered if the app is clos
 
 #### What can I do if notifications with a location trigger don’t work?
 
-Make sure you've added the `CoreLocation` framework to your Project. For information on how to do this, see documentation on [notification settings](Settings.html#include-corelocation-framework).
+Make sure you've added the `CoreLocation` framework to your Project. For information on how to do this, see documentation on [notification settings](Settings.md#include-corelocation-framework).
 Alternatively, you can add the `CoreLocation` framework manually to the Xcode project, or use the Unity Xcode API. You also need to use the [Location Service API](https://docs.unity3d.com/ScriptReference/LocationService.html) to request permission for your app to access location data.

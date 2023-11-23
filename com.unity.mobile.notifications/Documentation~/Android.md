@@ -111,7 +111,7 @@ IEnumerator DownloadAndShow(string url)
 
 ### Set icons
 
-You can set a custom icon as a small icon to display for each notification. If you don't specify any small icons, notifications will display the default application icon instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings; for more information, see [Notification Settings](Settings.html#custom-icons).
+You can set a custom icon as a small icon to display for each notification. If you don't specify any small icons, notifications will display the default application icon instead. You can optionally set a large icon which also displays in the notification drawer. You can configure icons in the notification settings; for more information, see [Notification Settings](Settings.md#custom-icons).
 
 The example below shows how to set the small and large icons with the icon ids you set in the notification settings.
 

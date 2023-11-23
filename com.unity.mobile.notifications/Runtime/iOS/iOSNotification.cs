@@ -335,8 +335,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
-        /// Push notification is sent to the device as 
-        /// <see href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification?language=objc">JSON</see>. 
+        /// Push notification is sent to the device as JSON. 
         /// The value for `data` key is set to the `Data` property on notification.
         /// </summary>
         public string Data
