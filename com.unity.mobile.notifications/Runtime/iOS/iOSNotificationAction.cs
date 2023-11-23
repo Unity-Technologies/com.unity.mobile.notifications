@@ -5,8 +5,7 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// Options for notification actions.
     /// These represent values from UNNotificationActionOptions.
-    /// For more information, refer to
-    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
+    /// For more information, refer to <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
     /// </summary>
     [Flags]
     public enum iOSNotificationActionOptions
