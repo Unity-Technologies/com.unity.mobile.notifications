@@ -5,14 +5,26 @@ namespace Unity.Notifications.iOS
     /// <summary>
     /// Options for notification actions.
     /// These represent values from UNNotificationActionOptions.
-    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions"/>
+    /// For more information, refer to <see href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions">Apple documentation</see>.
     /// </summary>
     [Flags]
     public enum iOSNotificationActionOptions
     {
+        /// <summary>
+        /// No specific action is performed.
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// An action that requires the user to unlock their device.
+        /// </summary>
         Required = (1 << 0),
+        /// <summary>
+        /// An irreversible action such as deleting data.
+        /// </summary>
         Destructive = (1 << 1),
+        /// <summary>
+        /// An action that opens the application.
+        /// </summary>
         Foreground = (1 << 2),
     }
 
