@@ -10,7 +10,6 @@ namespace Unity.Notifications.iOS
     [Flags]
     public enum iOSNotificationActionOptions
     {
-        
         None = 0,
         Required = (1 << 0),
         Destructive = (1 << 1),
