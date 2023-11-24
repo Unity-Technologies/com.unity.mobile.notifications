@@ -32,5 +32,8 @@ The runtime notification APIs are split into two parts for both Android and iOS.
     *   Add attachments to notifications.
     *   Support for notification actions.
 
-### Installing
-To install the Mobile Notification package, please follow the instructions in the [Package Manager documentation](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html).
+### Install the package
+
+To add the Mobile Notifications package to your project, use the [Unity Package Manager](https://docs.unity3d.com/Manual/upm-ui.html). For information on how to add the package, refer to [Adding and removing packages](https://docs.unity3d.com/Manual/upm-ui-actions.html).
+
+The package name is `com.unity.mobile.notifications` and the display name is **Mobile Notifications**.
