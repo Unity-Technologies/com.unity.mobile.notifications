@@ -8,6 +8,7 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 - [iOS] - Do not copy Android plugins to Xcode project.
+- [iOS] - Calendar trigger will use local or UTC time depending on which one is set on trigger.
 
 ### Changes & Improvements:
 
