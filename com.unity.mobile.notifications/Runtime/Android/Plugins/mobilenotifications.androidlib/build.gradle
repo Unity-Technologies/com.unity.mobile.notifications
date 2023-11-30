@@ -12,6 +12,12 @@ def getCompileSdk(unityLib) {
 }
 
 android {
+    // Checking if namespace exists is needed for 2021.3 (AGP 4.0.1)
+    // When 2021.3 is dropped, remove this check and package="com.unity.androidnotifications" from AndroidManifest
+    if (project.android.hasProperty("namespace")) {
+        namespace "com.unity.androidnotifications"
+    }
+
     def unityLib = project(':unityLibrary').extensions.getByName('android')
     compileSdkVersion getCompileSdk(unityLib)
     buildToolsVersion unityLib.buildToolsVersion
