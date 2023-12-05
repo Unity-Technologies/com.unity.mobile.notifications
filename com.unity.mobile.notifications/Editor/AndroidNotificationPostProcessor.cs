@@ -25,7 +25,7 @@ namespace Unity.Notifications
         }
 
         [Serializable]
-        private struct ManifestSettings
+        private class ManifestSettings
         {
             public bool UseCustomActivity;
             public string CustomActivity;
