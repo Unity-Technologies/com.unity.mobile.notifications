@@ -127,7 +127,7 @@ namespace Unity.Notifications.Android
         public LockScreenVisibility LockScreenVisibility { get; set; }
 
         /// <summary>
-        /// Whether channel is enabled in the Settings app. User can block notifications for entire app or for individual channels. Blocked channel will have it's Importance set to None.
+        /// Indicates whether a channel is enabled in the Settings app. User can block notifications for the entire app or for individual channels. The Importance of a blocked channel is set to None.
         /// </summary>
         public bool Enabled
         {
