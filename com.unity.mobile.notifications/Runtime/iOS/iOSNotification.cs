@@ -399,8 +399,6 @@ namespace Unity.Notifications.iOS
                             if (userInfo == null)
                                 userInfo = new Dictionary<string, string>();
                             userInfo["OriginalUtc"] = trigger.UtcTime ? "1" : "0";
-                            if (!trigger.UtcTime)
-                                trigger = trigger.ToUtc();
                             data.trigger.calendar.year = trigger.Year != null ? trigger.Year.Value : -1;
                             data.trigger.calendar.month = trigger.Month != null ? trigger.Month.Value : -1;
                             data.trigger.calendar.day = trigger.Day != null ? trigger.Day.Value : -1;
@@ -450,7 +448,7 @@ namespace Unity.Notifications.iOS
                                 Hour = (data.trigger.calendar.hour >= 0) ? (int?)data.trigger.calendar.hour : null,
                                 Minute = (data.trigger.calendar.minute >= 0) ? (int?)data.trigger.calendar.minute : null,
                                 Second = (data.trigger.calendar.second >= 0) ? (int?)data.trigger.calendar.second : null,
-                                UtcTime = true,
+                                UtcTime = false,
                                 Repeats = data.trigger.calendar.repeats != 0
                             };
                             if (userInfo != null)
@@ -458,14 +456,10 @@ namespace Unity.Notifications.iOS
                                 string utc;
                                 if (userInfo.TryGetValue("OriginalUtc", out utc))
                                 {
-                                    if (utc == "0")
-                                        trigger = trigger.ToLocal();
+                                    if (utc == "1")
+                                        trigger.UtcTime = true;
                                 }
-                                else
-                                    trigger.UtcTime = false;
                             }
-                            else
-                                trigger.UtcTime = false;
                             return trigger;
                         }
                     case iOSNotificationTriggerType.Location:

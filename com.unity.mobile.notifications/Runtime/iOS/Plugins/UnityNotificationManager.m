@@ -322,9 +322,10 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
             date.minute = data->trigger.calendar.minute;
         if (data->trigger.calendar.second >= 0)
             date.second = data->trigger.calendar.second;
-        // From C# we get UTC time
+
         date.calendar = [NSCalendar calendarWithIdentifier: NSCalendarIdentifierGregorian];
-        date.timeZone = [NSTimeZone timeZoneWithAbbreviation: @"UTC"];
+        if ([@"1" isEqualToString: [userInfo objectForKey: @"OriginalUtc"]])
+            date.timeZone = [NSTimeZone timeZoneWithAbbreviation: @"UTC"];
 
         trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents: date repeats: data->trigger.calendar.repeats];
         NSLog(@"Notification will show after %f s.", ((UNCalendarNotificationTrigger*)trigger).nextTriggerDate.timeIntervalSinceNow);
