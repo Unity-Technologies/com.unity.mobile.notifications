@@ -2,13 +2,14 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
-
-## [2.3.0] - 2023-10-09
+## [2.3.1] - 2023-12-11
 
 ### Fixes:
-- [iOS] - Do not copy Android plugins to Xcode project.
+- [Android] - Mark Android library to be compatible only with Android.
 - [iOS] - Calendar trigger will use local or UTC time depending on which one is set on trigger.
+- Various documentation fixes.
+
+## [2.3.0] - 2023-10-09
 
 ### Changes & Improvements:
 
