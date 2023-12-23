@@ -298,7 +298,7 @@ void _ReadNSDictionary(void* csDict, void* nsDict, void (*callback)(void* csDcit
 
 void _ReadAttachmentsNSArray(void* csList, void* nsArray, void (*callback)(void*, const char*, const char*))
 {
-    NSArray<UNNotificationAttachment*>* attachments = (__bridge_transfer NSArray<UNNotificationAttachment*>*)nsArray;
+    NSArray<UNNotificationAttachment*>* attachments = (__bridge NSArray<UNNotificationAttachment*>*)nsArray;
     [attachments enumerateObjectsUsingBlock:^(UNNotificationAttachment * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSString* idr = obj.identifier;
         NSString* url = obj.URL.absoluteString;
