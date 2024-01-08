@@ -6,6 +6,7 @@
         <action android:name="android.intent.action.BOOT_COMPLETED" />
       </intent-filter>
     </receiver>
+    <meta-data android:name="com.unity.androidnotifications.exact_scheduling" android:value="0" />
   </application>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>
