@@ -235,6 +235,12 @@ void freeiOSNotificationData(iOSNotificationData* notificationData)
         NSDictionary* userInfo = (__bridge_transfer NSDictionary*)notificationData->userInfo;
         userInfo = nil;
     }
+
+    if (notificationData->attachments != NULL)
+    {
+        NSArray* attachments = (__bridge_transfer NSArray*)notificationData->attachments;
+        attachments = nil;
+    }
 }
 
 void* _AddItemToNSDictionary(void* dict, const char* key, const char* value)
