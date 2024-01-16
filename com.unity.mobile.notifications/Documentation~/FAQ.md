@@ -8,9 +8,9 @@ Another way to provide icons is to place them in the `\Assets\Plugins\Android\re
 
 The notification color can be modified by [AndroidNotification.Color](../api/Unity.Notifications.Android.AndroidNotification.html#Unity_Notifications_Android_AndroidNotification_Color) property.
 
-#### Why are notifications not delivered on certain Huawei and Xiaomi phones when my app is closed and not running in the background?
+#### Why are notifications not delivered on certain phones when my app is closed and not running in the background?
 
-It seems that Huawei (including Honor) and Xiaomi utilize [aggressive battery saver techniques](https://stackoverflow.com/questions/47145722/how-to-deal-with-huaweis-and-xiaomis-battery-optimizations) which restrict app background activities, unless the app has been whitelisted by the user in device settings.
+It seems that some devices utilize [aggressive battery saver techniques](https://stackoverflow.com/questions/47145722/how-to-deal-with-huaweis-and-xiaomis-battery-optimizations) which restrict app background activities, unless the app has been whitelisted by the user in device settings. Some known manufacturers having this issue on some of their phones are Asus, Huawei (including Honor) and Xiaomi. More devices might be affected when changing battery settings to lower power consumption.
 This means that scheduled notifications will not be delivered if the app is closed or not running in the background. Currently, there's no available workaround besides encouraging the user to whitelist your app.
 
 #### What can I do if notifications with a location trigger don’t work?
