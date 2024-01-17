@@ -5,7 +5,7 @@ All notable changes to this package will be documented in this file.
 ## [Unreleased]
 
 ### Fixes:
-- [Android] - Remove excessive things from default manifest.
+- [Android] - Remove excessive permissions and metadata from default manifest (auto-add them based on settings).
 - [iOS] - Fix possible crash when sending push notification with attachment (like image).
 
 ## [2.3.1] - 2023-12-11
