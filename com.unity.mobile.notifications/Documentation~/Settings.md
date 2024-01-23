@@ -12,7 +12,7 @@ By default, scheduled notifications are removed after the device restarts. To pr
 
 ### Custom Activity
 
-You can enable the **Use Custom Activity** option to override the activity that opens when the user taps the notification. By default, your app will use `UnityPlayerActivity`.
+You can enable the **Use Custom Activity** option to override the activity that opens when the user taps the notification. By default, your app will use the only active activity in your app, if there is more than one activity, then it will use either `UnityPlayerActivity` or `UnityPlayerGameActivity` (since Unity 2023.1), depending on which one is available.
 
 ### Custom Icons
 
