@@ -13,9 +13,9 @@ The notification color can be modified by [AndroidNotification.Color](../api/Uni
 Some devices utilize [aggressive battery saver techniques](https://stackoverflow.com/questions/47145722/how-to-deal-with-huaweis-and-xiaomis-battery-optimizations) which restrict app background activities, unless the app has been whitelisted by the user in device settings. This behavior is observed on devices of certain manufacturers such as Asus, Huawei (including Honor), and Xiaomi. Adjusting battery settings to reduce power consumption might affect more devices.
 This means that scheduled notifications will not be delivered if the app is closed or not running in the background. Currently, there's no available workaround besides encouraging the user to whitelist your app.
 
-#### Why is exception thrown on Android when trying to use notifications and notifications don't work?
+#### Why is an exception thrown on Android causing notifications to not work as expected?
 
-On Android notifications are setup to open activity when tapped. During initialization Unity determines the activity the same way as it does when notification arrives. If activity could not be determined (usually due to multiple choices), Unity throws exception in inform, that activity has to be explicitly configured in [notification settings](Settings.md#custom-activity).
+On Android, the notifications are set up to open an activity when tapped. During initialization, Unity determines the activity in the same way as it does when the notification is received. If Unity can not determine an activity (usually due to multiple choices), it throws an exception to indicate that the activity must be explicitly configured in the [notification settings](Settings.md#custom-activity).
 
 #### What can I do if notifications with a location trigger don’t work?
 
