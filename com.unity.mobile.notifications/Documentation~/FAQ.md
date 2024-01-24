@@ -15,7 +15,7 @@ This means that scheduled notifications will not be delivered if the app is clos
 
 #### Why is an exception thrown on Android causing notifications to not work as expected?
 
-On Android, the notifications are set up to open an activity when tapped. During initialization, Unity determines the activity in the same way as it does when the notification is received. If Unity can not determine an activity (usually due to multiple choices), it throws an exception to indicate that the activity must be explicitly configured in the [notification settings](Settings.md#custom-activity).
+On Android, the notifications are set up to open an activity when tapped. During initialization, Unity determines the activity in the same way as it does when the notification is received. If Unity can not determine an activity (when more than one activity is active), it throws an exception to indicate that the activity must be explicitly configured in the [notification settings](Settings.md#custom-activity).
 
 #### What can I do if notifications with a location trigger don’t work?
 
