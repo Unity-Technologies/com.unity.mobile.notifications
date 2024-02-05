@@ -1,11 +1,14 @@
 package com.unity.androidnotifications;
 
+import static com.unity.androidnotifications.UnityNotificationManager.KEY_FIRE_TIME;
 import static com.unity.androidnotifications.UnityNotificationManager.KEY_ID;
 import static com.unity.androidnotifications.UnityNotificationManager.TAG_UNITY;
 
 import android.app.Notification;
+import android.os.Bundle;
 import android.util.Log;
 
+import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.Enumeration;
@@ -179,9 +182,22 @@ public class UnityNotificationBackgroundThread extends Thread {
 
     private void loadNotifications() {
         List<Notification.Builder> notifications = mManager.loadSavedNotifications();
+        if (notifications == null || notifications.size() == 0)
+            return;
+        final long currentTime = Calendar.getInstance().getTime().getTime();
+        boolean needHousekeeping = false;
         for (Notification.Builder builder : notifications) {
-            int id = builder.getExtras().getInt(KEY_ID, -1);
-            mScheduledNotifications.put(id, builder);
+            Bundle extras = builder.getExtras();
+            int id = extras.getInt(KEY_ID, -1);
+            long fireTime = extras.getLong(KEY_FIRE_TIME, -1);
+            boolean inFuture = fireTime - currentTime > 0;
+            if (inFuture)
+                mScheduledNotifications.put(id, builder);
+            else
+                needHousekeeping = true;
         }
+
+        if (needHousekeeping)
+            enqueueHousekeeping();
     }
 }
