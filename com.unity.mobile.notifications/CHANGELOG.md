@@ -6,6 +6,7 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 - [Android] - Remove excessive permissions and metadata from default manifest (auto-add them based on settings).
+- [Android] - Fixed notification status reporting after dismissing notification and re-launching the app.
 - [iOS] - Fixed a possible crash when sending push notifications with attachment (like image).
 
 ## [2.3.1] - 2023-12-11

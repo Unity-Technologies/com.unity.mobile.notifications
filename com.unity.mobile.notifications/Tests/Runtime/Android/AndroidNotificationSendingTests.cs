@@ -225,6 +225,17 @@ class AndroidNotificationSendingTests
         yield return new WaitForSeconds(2.0f); // cancel is async
         var status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
         Assert.AreEqual(NotificationStatus.Unknown, status);
+
+        // now simulate app kill and restart, where notifications are loaded from persistent storage
+        using var managerClass = new AndroidJavaClass("com.unity.androidnotifications.UnityNotificationManager");
+        using var manager = managerClass.GetStatic<AndroidJavaObject>("mUnityNotificationManager");
+        using var backgroundThread = manager.Get<AndroidJavaObject>("mBackgroundThread");
+        using var scheduledNotifications = manager.Get<AndroidJavaObject>("mScheduledNotifications");
+        scheduledNotifications.Call("clear");
+        backgroundThread.Call("loadNotifications");
+
+        status = AndroidNotificationCenter.CheckScheduledNotificationStatus(originalId);
+        Assert.AreEqual(NotificationStatus.Unknown, status);
     }
 
     [Test]
