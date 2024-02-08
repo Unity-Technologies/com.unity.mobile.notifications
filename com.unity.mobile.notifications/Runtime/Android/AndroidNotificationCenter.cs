@@ -35,7 +35,7 @@ namespace Unity.Notifications.Android
         Scheduled = 1,
 
         /// <summary>
-        /// A notification with a specified id was already delivered.
+        /// A notification with a specified id was already delivered (showing in status bar).
         /// </summary>
         Delivered = 2,
     }
