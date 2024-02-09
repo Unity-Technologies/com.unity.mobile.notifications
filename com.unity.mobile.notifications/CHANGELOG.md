@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
+## [2.3.2] - 2024-02-09
 
 ### Fixes:
 - [Android] - Remove excessive permissions and metadata from default manifest (auto-add them based on settings).
