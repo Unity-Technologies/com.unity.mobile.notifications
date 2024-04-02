@@ -66,7 +66,7 @@ test_Android_{{ editor.version }}:
     flavor: b1.medium
   commands:
     - curl -s {{ utr.url_win }} --output utr.bat
-    - gsudo choco install unity-downloader-cli -y -s https://artifactory.prd.it.unity3d.com/artifactory/api/nuget/unity-choco-local
+    - gsudo choco install unity-downloader-cli -y -s https://artifactory-slo.bf.unity3d.com/artifactory/api/nuget/choco
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
     - utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
