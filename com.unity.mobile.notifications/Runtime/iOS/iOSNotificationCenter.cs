@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Unity.Notifications.iOS
 {
@@ -169,6 +171,11 @@ namespace Unity.Notifications.iOS
             return iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
         }
 
+        public static QueryLastRespondedNotificationOp QueryLastRespondedNotification()
+        {
+            return new QueryLastRespondedNotificationOp();
+        }
+
         /// <summary>
         /// Unschedules the specified notification.
         /// </summary>
@@ -250,6 +257,90 @@ namespace Unity.Notifications.iOS
 #if !UNITY_EDITOR
             iOSNotificationsWrapper._OpenNotificationSettings();
 #endif
+        }
+    }
+
+    public enum QueryLastRespondedNotificationState
+    {
+        Pending,
+        NoRespondedNotification,
+        HaveRespondedNotification,
+    }
+
+    public class QueryLastRespondedNotificationOp
+        : CustomYieldInstruction
+    {
+        QueryLastRespondedNotificationState state;
+        iOSNotification notification;
+        string actionId;
+        string userText;
+
+        public override bool keepWaiting{
+            get
+            {
+                UpdateState();
+                return state == QueryLastRespondedNotificationState.Pending;
+            }
+        }
+
+        public iOSNotification Notification
+        {
+            get
+            {
+                CheckHaveNotification();
+                return notification;
+            }
+        }
+
+        public string ActionId
+        {
+            get
+            {
+                CheckHaveNotification();
+                return actionId;
+            }
+        }
+
+        public string UserText
+        {
+            get
+            {
+                CheckHaveNotification();
+                return userText;
+            }
+        }
+
+        internal QueryLastRespondedNotificationOp()
+        {
+            state = QueryLastRespondedNotificationState.Pending;
+            UpdateState();
+        }
+
+        void UpdateState()
+        {
+            if (state != QueryLastRespondedNotificationState.Pending || notification != null)
+                return;
+            if (iOSNotificationsWrapper.GetAppOpenedUsingNotification())
+            {
+                var data = iOSNotificationsWrapper.GetLastNotificationData();
+                if (data != null)
+                {
+                    notification = new iOSNotification(data.Value);
+                    actionId = iOSNotificationsWrapper.GetLastRespondedNotificationAction();
+                    userText = iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
+                    state = QueryLastRespondedNotificationState.HaveRespondedNotification;
+                    return;
+                }
+            }
+
+            state = QueryLastRespondedNotificationState.NoRespondedNotification;
+        }
+
+        void CheckHaveNotification()
+        {
+            UpdateState();
+            if (state == QueryLastRespondedNotificationState.Pending)
+                throw new InvalidOperationException("Operation has not completed yet");
         }
     }
 }
