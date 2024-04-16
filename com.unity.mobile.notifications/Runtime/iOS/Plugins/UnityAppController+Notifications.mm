@@ -43,7 +43,9 @@
          object: nil
          queue: [NSOperationQueue mainQueue]
          usingBlock:^(NSNotification *notification) {
-             [UnityNotificationManager sharedInstance].lastReceivedNotification = NULL;
+             UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
+             manager.launchedWithNotification = NO;
+             manager.lastReceivedNotification = NULL;
          }];
 
         [nc addObserverForName: kUnityWillFinishLaunchingWithOptions
@@ -62,6 +64,14 @@
 
              if (defaultAuthorizationOptions <= 0)
                  defaultAuthorizationOptions = (UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge);
+
+            if (notification != nil && notification.userInfo != nil)
+                for (NSString* key in notification.userInfo)
+                    if ([key isEqual: @"UIApplicationLaunchOptionsLocalNotificationKey"])
+                    {
+                        manager.launchedWithNotification = YES;
+                        break;
+                    }
 
              if (authorizeOnLaunch)
                  [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
