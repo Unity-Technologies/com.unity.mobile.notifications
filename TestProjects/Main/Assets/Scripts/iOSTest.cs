@@ -91,13 +91,12 @@ namespace Unity.Notifications.Tests.Sample
         IEnumerator StartRoutine()
         {
             // on app launch (not resume) notifications don't arrive immediately
-            // so in Start of the fisrt scene GetLastRespondedNotification may return null, wait a couple of frames
-            yield return null;
-            yield return null;
             // in case a killed app was launched by clicking a notification
-            iOSNotification notification = iOSNotificationCenter.GetLastRespondedNotification();
-            string lastAction = iOSNotificationCenter.GetLastRespondedNotificationAction();
-            string lastTextInput = iOSNotificationCenter.GetLastRespondedNotificationUserText();
+            var op = iOSNotificationCenter.QueryLastRespondedNotification();
+            yield return op;
+            iOSNotification notification = op.Notification;
+            string lastAction = op.ActionId;
+            string lastTextInput = op.UserText;
             RegisterCategories();
             ClearBadge();
             RemoveAllNotifications();
