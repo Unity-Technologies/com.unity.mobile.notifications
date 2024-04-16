@@ -74,7 +74,7 @@ namespace Unity.Notifications.iOS
         private static extern Int32 _GetApplicationBadge();
 
         [DllImport("__Internal")]
-        private static extern bool _GetAppOpenedUsingNotification();
+        private static extern Int32 _GetAppOpenedUsingNotification();
 
         [DllImport("__Internal")]
         internal static extern void _RemoveAllDeliveredNotifications();
@@ -426,7 +426,7 @@ namespace Unity.Notifications.iOS
         public static bool GetAppOpenedUsingNotification()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            return _GetAppOpenedUsingNotification();
+            return _GetAppOpenedUsingNotification() != 0;
 #else
             return false;
 #endif
@@ -435,7 +435,7 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationWithUserInfo? GetLastNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            if (_GetAppOpenedUsingNotification())
+            if (GetAppOpenedUsingNotification())
             {
                 IntPtr ptr = _GetLastNotificationData();
 

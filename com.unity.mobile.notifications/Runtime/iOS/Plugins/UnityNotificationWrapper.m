@@ -164,10 +164,10 @@ long _GetApplicationBadge()
     return [UIApplication sharedApplication].applicationIconBadgeNumber;
 }
 
-bool _GetAppOpenedUsingNotification()
+int _GetAppOpenedUsingNotification()
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
-    return manager.lastReceivedNotification != NULL;
+    return manager.launchedWithNotification;
 }
 
 iOSNotificationData* _GetLastNotificationData()
