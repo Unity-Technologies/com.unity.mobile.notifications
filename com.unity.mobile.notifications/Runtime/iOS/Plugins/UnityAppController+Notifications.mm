@@ -67,7 +67,8 @@
 
             if (notification != nil && notification.userInfo != nil)
                 for (NSString* key in notification.userInfo)
-                    if ([key isEqual: @"UIApplicationLaunchOptionsLocalNotificationKey"])
+                    if ([key isEqual: @"UIApplicationLaunchOptionsLocalNotificationKey"]
+                         || [key isEqual: @"UIApplicationLaunchOptionsRemoteNotificationKey"])
                     {
                         manager.launchedWithNotification = YES;
                         break;
