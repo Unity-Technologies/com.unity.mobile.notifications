@@ -435,21 +435,18 @@ namespace Unity.Notifications.iOS
         public static iOSNotificationWithUserInfo? GetLastNotificationData()
         {
 #if UNITY_IOS && !UNITY_EDITOR
-            if (GetAppOpenedUsingNotification())
-            {
-                IntPtr ptr = _GetLastNotificationData();
+            IntPtr ptr = _GetLastNotificationData();
 
-                if (ptr != IntPtr.Zero)
-                {
-                    iOSNotificationWithUserInfo data;
-                    data.data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
-                    data.userInfo = NSDictionaryToCs(data.data.userInfo);
-                    data.data.userInfo = IntPtr.Zero;
-                    data.attachments = AttachmentsNSArrayToCs(data.data.attachments);
-                    data.data.attachments = IntPtr.Zero;
-                    _FreeUnmanagediOSNotificationDataArray(ptr, 1);
-                    return data;
-                }
+            if (ptr != IntPtr.Zero)
+            {
+                iOSNotificationWithUserInfo data;
+                data.data = (iOSNotificationData)Marshal.PtrToStructure(ptr, typeof(iOSNotificationData));
+                data.userInfo = NSDictionaryToCs(data.data.userInfo);
+                data.data.userInfo = IntPtr.Zero;
+                data.attachments = AttachmentsNSArrayToCs(data.data.attachments);
+                data.data.attachments = IntPtr.Zero;
+                _FreeUnmanagediOSNotificationDataArray(ptr, 1);
+                return data;
             }
 #endif
             return null;
