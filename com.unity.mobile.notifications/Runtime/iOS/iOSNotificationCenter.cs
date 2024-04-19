@@ -320,19 +320,19 @@ namespace Unity.Notifications.iOS
         {
             if (state != QueryLastRespondedNotificationState.Pending || notification != null)
                 return;
-            if (iOSNotificationsWrapper.GetAppOpenedUsingNotification())
+
+            var data = iOSNotificationsWrapper.GetLastNotificationData();
+            if (data != null)
             {
-                var data = iOSNotificationsWrapper.GetLastNotificationData();
-                if (data != null)
-                {
-                    notification = new iOSNotification(data.Value);
-                    actionId = iOSNotificationsWrapper.GetLastRespondedNotificationAction();
-                    userText = iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
-                    state = QueryLastRespondedNotificationState.HaveRespondedNotification;
-                    return;
-                }
+                notification = new iOSNotification(data.Value);
+                actionId = iOSNotificationsWrapper.GetLastRespondedNotificationAction();
+                userText = iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
+                state = QueryLastRespondedNotificationState.HaveRespondedNotification;
+                return;
             }
 
+            if (iOSNotificationsWrapper.GetAppOpenedUsingNotification())
+                return;
             state = QueryLastRespondedNotificationState.NoRespondedNotification;
         }
 
