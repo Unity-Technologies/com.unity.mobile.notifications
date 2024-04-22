@@ -27,6 +27,11 @@ namespace Unity.Notifications
         HaveRespondedNotification,
     }
 
+    /// <summary>
+    /// An operation for retrieving notification used to open the app.
+    /// When app is not running, app launches first and then notification is delivered. There may be a delay until notification is delivered.
+    /// This operation may finish immediately or it may require a few frames to pass. You can return it from coroutine to wait until completion.
+    /// </summary>
     public class QueryLastRespondedNotificationOp
         : CustomYieldInstruction
     {
@@ -39,6 +44,9 @@ namespace Unity.Notifications
 #endif
         ;
 
+        /// <summary>
+        /// The state of the operation.
+        /// </summary>
         public QueryLastRespondedNotificationState State
         {
             get
@@ -56,6 +64,9 @@ namespace Unity.Notifications
             }
         }
 
+        /// <summary>
+        /// Returns a notification the was used to open the app or null if app was launched normally.
+        /// </summary>
         public Notification? Notification
         {
             get
