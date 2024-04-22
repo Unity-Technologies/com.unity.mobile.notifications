@@ -274,6 +274,7 @@ namespace Unity.Notifications.iOS
         iOSNotification notification;
         string actionId;
         string userText;
+        int frameStarted;
 
         public override bool keepWaiting{
             get
@@ -332,7 +333,14 @@ namespace Unity.Notifications.iOS
             }
 
             if (iOSNotificationsWrapper.GetAppOpenedUsingNotification())
-                return;
+            {
+                var frameNum = Time.frameCount;
+                if (frameStarted == 0)
+                    frameStarted = frameNum;
+                // there may be delay in delivery, but if waiting for n frames - something is not quite right
+                if (frameNum - frameStarted < 10)
+                    return;
+            }
             state = QueryLastRespondedNotificationState.NoRespondedNotification;
         }
 
