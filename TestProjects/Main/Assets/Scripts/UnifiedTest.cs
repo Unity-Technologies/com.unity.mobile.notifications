@@ -124,7 +124,14 @@ public class UnifiedTest : MonoBehaviour
 
     public void OnLastNotification()
     {
-        var notification = NotificationCenter.LastRespondedNotification;
+        StartCoroutine(QueryLastNotification());
+    }
+
+    IEnumerator QueryLastNotification()
+    {
+        var op = NotificationCenter.QueryLastRespondedNotification();
+        yield return op;
+        var notification = op.Notification;
         if (notification.HasValue)
             PrintNotification("Last responded notification:", notification.Value);
         else
