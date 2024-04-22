@@ -128,7 +128,8 @@ namespace Unity.Notifications.Tests.Sample
                 .Gray($"isPaused = {isPaused}", 1);
             if (isPaused == false)
             {
-                iOSNotification notification = iOSNotificationCenter.GetLastRespondedNotification();
+                var op = iOSNotificationCenter.QueryLastRespondedNotification();
+                iOSNotification notification = op.Notification;
                 if (notification != null)
                 {
                     m_LOGGER.Green($"Notification found:", 1);
@@ -138,8 +139,8 @@ namespace Unity.Notifications.Tests.Sample
                             .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
                             .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
                             .Properties(notification, 1);
-                        string lastAction = iOSNotificationCenter.GetLastRespondedNotificationAction();
-                        string lastTextInput = iOSNotificationCenter.GetLastRespondedNotificationUserText();
+                        string lastAction = op.ActionId;
+                        string lastTextInput = op.UserText;
                         if (lastAction != null)
                         {
                             string output = lastTextInput != null ? $"Used action {lastAction} with input '{lastTextInput}'" : $"Used action {lastAction}";
