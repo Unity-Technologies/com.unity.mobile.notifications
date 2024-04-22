@@ -69,6 +69,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The ID of the action that the user responded to or null if notification had no actions or no notification was responded to.
         /// </summary>
+        /// <seealso cref="SetNotificationCategories(IEnumerable{iOSNotificationCategory})"/>
         public string ActionId
         {
             get
@@ -81,6 +82,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The text entered by user when responding to notification using a text input action.
         /// </summary>
+        /// <seealso cref="SetNotificationCategories(IEnumerable{iOSNotificationCategory})"/>
         public string UserText
         {
             get
