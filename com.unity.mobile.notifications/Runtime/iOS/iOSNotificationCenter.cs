@@ -171,6 +171,10 @@ namespace Unity.Notifications.iOS
             return iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
         }
 
+        /// <summary>
+        /// Queries for the last notification used to open the app.
+        /// </summary>
+        /// <returns>An asynchronous operation that can be used in a coroutine to retrieve the notification.</returns>
         public static QueryLastRespondedNotificationOp QueryLastRespondedNotification()
         {
             return new QueryLastRespondedNotificationOp();
@@ -260,13 +264,33 @@ namespace Unity.Notifications.iOS
         }
     }
 
+    /// <summary>
+    /// The state of the query for last responded notification.
+    /// Returned by <see cref="QueryLastRespondedNotificationOp.State"/>
+    /// </summary>
     public enum QueryLastRespondedNotificationState
     {
+        /// <summary>
+        /// Operation is ongoing, wait for next frame and check again.
+        /// </summary>
         Pending,
+
+        /// <summary>
+        /// Operation is complete, app was launched normally, no notification was tapped.
+        /// </summary>
         NoRespondedNotification,
+
+        /// <summary>
+        /// Operation is complete, app was launched by tapping the notification, that can be retrieved via <see cref="QueryLastRespondedNotificationOp.Notification"/> property.
+        /// </summary>
         HaveRespondedNotification,
     }
 
+    /// <summary>
+    /// An operation for retrieving notification used to open the app.
+    /// When app is not running, app launches first and then notification is delivered. There may be a delay until notification is delivered.
+    /// This operation may finish immediately or it may require a few frames to pass. You can return it from coroutine to wait until completion.
+    /// </summary>
     public class QueryLastRespondedNotificationOp
         : CustomYieldInstruction
     {
@@ -276,6 +300,7 @@ namespace Unity.Notifications.iOS
         string userText;
         int frameStarted;
 
+        /// <inheritdoc/>
         public override bool keepWaiting{
             get
             {
@@ -284,6 +309,14 @@ namespace Unity.Notifications.iOS
             }
         }
 
+        /// <summary>
+        /// The state of the operation.
+        /// </summary>
+        public QueryLastRespondedNotificationState State => state;
+
+        /// <summary>
+        /// Returns a notification the was used to open the app or null if app was launched normally.
+        /// </summary>
         public iOSNotification Notification
         {
             get
@@ -293,6 +326,9 @@ namespace Unity.Notifications.iOS
             }
         }
 
+        /// <summary>
+        /// The ID of the action that the user responded to or null if notification had no actions or no notification was responded to.
+        /// </summary>
         public string ActionId
         {
             get
@@ -302,6 +338,9 @@ namespace Unity.Notifications.iOS
             }
         }
 
+        /// <summary>
+        /// The text entered by user when responding to notification using a text input action.
+        /// </summary>
         public string UserText
         {
             get
