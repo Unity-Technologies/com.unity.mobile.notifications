@@ -192,22 +192,27 @@ iOSNotificationCenter.ScheduleNotification(notification);
 The following code example shows how to retrieve the last notification the app received.
 
 ```c#
-var notification = iOSNotificationCenter.GetLastRespondedNotification();
-if (notification != null)
+IEnumerator Start()
 {
-    var msg = "Last Received Notification: " + notification.Identifier;
-    msg += "\n - Notification received: ";
-    msg += "\n - .Title: " + notification.Title;
-    msg += "\n - .Badge: " + notification.Badge;
-    msg += "\n - .Body: " + notification.Body;
-    msg += "\n - .CategoryIdentifier: " + notification.CategoryIdentifier;
-    msg += "\n - .Subtitle: " + notification.Subtitle;
-    msg += "\n - .Data: " + notification.Data;
-    Debug.Log(msg);
+    var query = iOSNotificationCenter.QueryLastRespondedNotification();
+    yield return query;
+    var notification = query.Notification;
+    if (notification != null)
+    {
+        var msg = "Last Received Notification: " + notification.Identifier;
+        msg += "\n - Notification received: ";
+        msg += "\n - .Title: " + notification.Title;
+        msg += "\n - .Badge: " + notification.Badge;
+        msg += "\n - .Body: " + notification.Body;
+        msg += "\n - .CategoryIdentifier: " + notification.CategoryIdentifier;
+        msg += "\n - .Subtitle: " + notification.Subtitle;
+        msg += "\n - .Data: " + notification.Data;
+        Debug.Log(msg);
+    }
 }
 ```
 
-If the user opens the app from a notification, [iOSNotificationCenter.GetLastRespondedNotification](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetLastRespondedNotification) also returns that notification. Otherwise, it returns null.
+If the user opens the app from a notification, the delivery of notification may not be instantaneous, that's why [iOSNotificationCenter.QueryLastRespondedNotification](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_QueryLastRespondedNotification) returns operation that can be waited in a coroutine. The returned operation may also complete right away, you can check it's state or you cna always use coroutine, which in such case will complete on next iteration.
 
 #### Set custom data for remote notifications
 
@@ -237,6 +242,4 @@ Images or video can added to notifications by using [attachments](../api/Unity.N
 
 Occasionally, notifications have actions that are registered by notification [category](../api/Unity.Notifications.iOS.iOSNotificationCategory.html) such that notifications with the same category identifier have the registered actions on them.
 
-If you tap a particular action rather than the notification itself, the [iOSNotificationCenter.GetLastRespondedNotificationAction](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_GetLastRespondedNotificationAction) will return the action identifier.
-
-Use the text [input action](../api/Unity.Notifications.iOS.iOSTextInputNotificationAction.html) to prompt the user to type some response text.
+If you tap a particular action rather than the notification itself, the [QueryLastRespondedNotificationOp](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_QueryLastRespondedNotificationOp) will contain not only notification, but also action identifier and, in case of text input action, the text entered by the user. Use the text [input action](../api/Unity.Notifications.iOS.iOSTextInputNotificationAction.html) to prompt the user to type some response text.
