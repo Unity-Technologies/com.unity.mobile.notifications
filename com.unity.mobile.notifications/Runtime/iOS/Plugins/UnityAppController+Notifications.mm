@@ -65,14 +65,14 @@
              if (defaultAuthorizationOptions <= 0)
                  defaultAuthorizationOptions = (UNAuthorizationOptionSound + UNAuthorizationOptionAlert + UNAuthorizationOptionBadge);
 
-            if (notification != nil && notification.userInfo != nil)
-                for (NSString* key in notification.userInfo)
-                    if ([key isEqual: @"UIApplicationLaunchOptionsLocalNotificationKey"]
+             if (notification != nil && notification.userInfo != nil)
+                 for (NSString* key in notification.userInfo)
+                     if ([key isEqual: @"UIApplicationLaunchOptionsLocalNotificationKey"]
                          || [key isEqual: @"UIApplicationLaunchOptionsRemoteNotificationKey"])
-                    {
-                        manager.launchedWithNotification = YES;
-                        break;
-                    }
+                     {
+                         manager.launchedWithNotification = YES;
+                         break;
+                     }
 
              if (authorizeOnLaunch)
                  [manager requestAuthorization: defaultAuthorizationOptions withRegisterRemote: registerRemoteOnLaunch forRequest: NULL];
