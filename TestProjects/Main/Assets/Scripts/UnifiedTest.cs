@@ -45,6 +45,7 @@ public class UnifiedTest : MonoBehaviour
         NotificationCenter.Initialize(args);
         NotificationCenter.OnNotificationReceived += OnNotificationReceived;
         StartCoroutine(PermissionRequest());
+        CheckIfOpenedUsingNotification();
     }
 
     IEnumerator PermissionRequest()
@@ -52,6 +53,29 @@ public class UnifiedTest : MonoBehaviour
         var request = NotificationCenter.RequestPermission();
         yield return request;
         AddLog($"Permission: {request.Status}");
+    }
+
+    void CheckIfOpenedUsingNotification()
+    {
+        var check = NotificationCenter.QueryLastRespondedNotification();
+        if (check.State == QueryLastRespondedNotificationState.Pending)
+            StartCoroutine(CheckIfOpenedUsingNotification(check));
+        else
+            FinishCheckIfOpenedUsingNotification(check);
+    }
+
+    IEnumerator CheckIfOpenedUsingNotification(QueryLastRespondedNotificationOp check)
+    {
+        yield return check;
+        FinishCheckIfOpenedUsingNotification(check);
+    }
+
+    void FinishCheckIfOpenedUsingNotification(QueryLastRespondedNotificationOp check)
+    {
+        if (check.State == QueryLastRespondedNotificationState.HaveRespondedNotification)
+            PrintNotification("Opened using notification", check.Notification.Value);
+        else
+            Debug.Log("App launched normally, not via notification");
     }
 
     void OnNotificationReceived(Notification notification)
