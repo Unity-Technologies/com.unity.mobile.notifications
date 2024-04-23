@@ -73,7 +73,7 @@ public class UnifiedTest : MonoBehaviour
     void FinishCheckIfOpenedUsingNotification(QueryLastRespondedNotificationOp check)
     {
         if (check.State == QueryLastRespondedNotificationState.HaveRespondedNotification)
-            PrintNotification("Opened using notification", check.Notification.Value);
+            PrintNotification("Opened using notification", check.Notification);
         else
             Debug.Log("App launched normally, not via notification");
     }
@@ -155,9 +155,8 @@ public class UnifiedTest : MonoBehaviour
     {
         var op = NotificationCenter.QueryLastRespondedNotification();
         yield return op;
-        var notification = op.Notification;
-        if (notification.HasValue)
-            PrintNotification("Last responded notification:", notification.Value);
+        if (op.State == QueryLastRespondedNotificationState.HaveRespondedNotification)
+            PrintNotification("Last responded notification:", op.Notification);
         else
             AddLog("No responded notification");
     }
