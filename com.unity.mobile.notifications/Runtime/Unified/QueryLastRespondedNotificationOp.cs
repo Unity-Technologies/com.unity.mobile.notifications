@@ -67,24 +67,22 @@ namespace Unity.Notifications
 
         /// <summary>
         /// Returns a notification the was used to open the app or null if app was launched normally.
+        /// An exception will be thrown if operation has not been completed yet or no notification is available.
         /// </summary>
-        public Notification? Notification
+        public Notification Notification
         {
             get
             {
                 if (notification.HasValue)
-                    return notification;
+                    return notification.Value;
 #if UNITY_IOS
                 if (State == QueryLastRespondedNotificationState.HaveRespondedNotification)
                 {
-                    var n = platformOperation.Notification;
-                    if (n == null)
-                        return null;
-                    notification = new Notification(n);
-                    return notification;
+                    notification = new Notification(platformOperation.Notification);
+                    return notification.Value;
                 }
 #endif
-                return null;
+                throw new System.InvalidOperationException("Operation does not have a valid notification");
             }
         }
 
