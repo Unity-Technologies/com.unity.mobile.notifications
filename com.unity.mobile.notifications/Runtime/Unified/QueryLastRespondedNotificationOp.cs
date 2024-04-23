@@ -52,6 +52,7 @@ namespace Unity.Notifications
             get
             {
 #if UNITY_ANDROID
+                return state;
 #else
                 return platformOperation.State switch
                 {
@@ -96,8 +97,12 @@ namespace Unity.Notifications
         {
             var intent = AndroidNotificationCenter.GetLastNotificationIntent();
             if (intent == null)
-                return null;
-            return new Notification(intent.Notification, intent.Id);
+                state = QueryLastRespondedNotificationState.NoRespondedNotification;
+            else
+            {
+                notification = new Notification(intent.Notification, intent.Id);
+                state = QueryLastRespondedNotificationState.HaveRespondedNotification;
+            }
         }
 #else
         internal QueryLastRespondedNotificationOp(Unity.Notifications.iOS.QueryLastRespondedNotificationOp op)
