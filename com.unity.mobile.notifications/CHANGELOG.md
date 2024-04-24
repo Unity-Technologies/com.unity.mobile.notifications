@@ -2,6 +2,10 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+- [iOS] New, more reliable APIs (QueryLastRespondedNotification) for querying if app was opened by tapping notification.
+
 ## [2.3.2] - 2024-02-09
 
 ### Fixes:
