@@ -77,7 +77,7 @@ namespace Unity.Notifications.iOS
     ///     result += "\n granted :  " + req.Granted;
     ///     result += "\n error:  " + req.Error;
     ///     result += "\n deviceToken:  " + req.DeviceToken;
-    ///     Debug.Log(res);
+    ///     Debug.Log(result);
     /// }
     /// </code>
     /// </example>
