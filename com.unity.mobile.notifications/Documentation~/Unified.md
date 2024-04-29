@@ -126,7 +126,7 @@ IEnumerator Start()
 }
 ```
 
-This also works if you send notification to the background and tap the notification to bring it back to foreground. You can query the properties of returned notification. The operation can be completed right away, but it is not guaranteed. Operation can be returned from coroutine to wait until it is complete, in case it was complete right away, it will continue execution on next iteration.
+This also works if you send notification to the background and tap the notification to bring it back to foreground. You can query the properties of returned notification. The operation might complete immediately but it is not guaranteed. You can use a coroutine to wait until it is complete. In case the operation completes immediately, the coroutine continues execution on the next iteration.
 
 If you want to receive notifications that are displayed while your application is in the foreground (by default such notifications aren't presented to the user), you must subscribe to an event, as demonstrated in the following code example:
 
