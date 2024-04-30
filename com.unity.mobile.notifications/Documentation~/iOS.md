@@ -212,7 +212,7 @@ IEnumerator Start()
 }
 ```
 
-If the user opens the app from a notification, the delivery of notification might not be instantaneous. [iOSNotificationCenter.QueryLastRespondedNotification](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_QueryLastRespondedNotification) returns an operation that you can use within a coroutine to wait until Unity determines if the application is launched from the notification. The returned operation might complete immediately. You can check its state or use a coroutine. In case of completed operation, the coroutine completes on the next iteration. 
+If the user opens the app from a notification, the delivery of notification might not be instantaneous. [iOSNotificationCenter.QueryLastRespondedNotification](../api/Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_QueryLastRespondedNotification) returns an operation that you can use within a coroutine to wait until Unity determines if the application is launched from the notification. The returned operation might complete immediately. You can check its state or use a coroutine. In case of completed operation, the coroutine completes on the next iteration.
 
 #### Set custom data for remote notifications
 

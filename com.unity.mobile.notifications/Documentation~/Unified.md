@@ -126,7 +126,7 @@ IEnumerator Start()
 }
 ```
 
-This also works if you send notification to the background and tap the notification to bring it back to foreground. You can query the properties of returned notification. The operation might complete immediately but it is not guaranteed. You can use a coroutine to wait until it is complete. In case the operation completes immediately, the coroutine continues execution on the next iteration.
+This also works if you send the application to the background and tap the notification to bring it back to the foreground. You can query the properties of returned notification. Using QueryLastRespondedNotification API, you can track your query’s status and the notification details within the operation that the API returns as an object. You might receive the notification details immediately in the operation but it is not guaranteed. You can use the operation in a coroutine to wait until the query is complete. In case it completes immediately, the coroutine continues its execution on the next iteration.
 
 If you want to receive notifications that are displayed while your application is in the foreground (by default such notifications aren't presented to the user), you must subscribe to an event, as demonstrated in the following code example:
 
