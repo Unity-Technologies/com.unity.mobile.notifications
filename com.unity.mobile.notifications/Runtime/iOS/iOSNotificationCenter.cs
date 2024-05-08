@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Unity.Notifications.iOS
@@ -140,6 +141,7 @@ namespace Unity.Notifications.iOS
         /// <returns>
         /// Returns the last local or remote notification used to open the app or clicked on by the user. If no notification is available it returns null.
         /// </returns>
+        [Obsolete("Use QueryLastRespondedNotification instead.")]
         public static iOSNotification GetLastRespondedNotification()
         {
             var data = iOSNotificationsWrapper.GetLastNotificationData();
@@ -155,6 +157,7 @@ namespace Unity.Notifications.iOS
         /// </summary>
         /// <seealso cref="SetNotificationCategories(IEnumerable{iOSNotificationCategory})"/>
         /// <returns>Action identifier</returns>
+        [Obsolete("Use QueryLastRespondedNotification instead.")]
         public static string GetLastRespondedNotificationAction()
         {
             return iOSNotificationsWrapper.GetLastRespondedNotificationAction();
@@ -164,9 +167,19 @@ namespace Unity.Notifications.iOS
         /// Get users text input for the last actionable notification with input support, null if no input.
         /// </summary>
         /// <returns>Text user extered in the input field from notification</returns>
+        [Obsolete("Use QueryLastRespondedNotification instead.")]
         public static string GetLastRespondedNotificationUserText()
         {
             return iOSNotificationsWrapper.GetLastRespondedNotificationUserText();
+        }
+
+        /// <summary>
+        /// Queries for the last notification used to open the app.
+        /// </summary>
+        /// <returns>An asynchronous operation that can be used in a coroutine to retrieve the notification.</returns>
+        public static QueryLastRespondedNotificationOp QueryLastRespondedNotification()
+        {
+            return new QueryLastRespondedNotificationOp();
         }
 
         /// <summary>

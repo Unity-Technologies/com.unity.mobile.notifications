@@ -21,7 +21,8 @@
 @property NSArray<UNNotificationRequest *> * cachedPendingNotificationRequests;
 @property NSArray<UNNotification *> * cachedDeliveredNotifications;
 
-@property (nonatomic) UNNotification* lastReceivedNotification;
+@property BOOL launchedWithNotification;
+@property UNNotification* lastReceivedNotification;
 @property NSString* lastRespondedNotificationAction;
 @property NSString* lastRespondedNotificationUserText;
 

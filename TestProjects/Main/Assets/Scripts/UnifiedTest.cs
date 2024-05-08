@@ -45,6 +45,7 @@ public class UnifiedTest : MonoBehaviour
         NotificationCenter.Initialize(args);
         NotificationCenter.OnNotificationReceived += OnNotificationReceived;
         StartCoroutine(PermissionRequest());
+        CheckIfOpenedUsingNotification();
     }
 
     IEnumerator PermissionRequest()
@@ -52,6 +53,29 @@ public class UnifiedTest : MonoBehaviour
         var request = NotificationCenter.RequestPermission();
         yield return request;
         AddLog($"Permission: {request.Status}");
+    }
+
+    void CheckIfOpenedUsingNotification()
+    {
+        var check = NotificationCenter.QueryLastRespondedNotification();
+        if (check.State == QueryLastRespondedNotificationState.Pending)
+            StartCoroutine(CheckIfOpenedUsingNotification(check));
+        else
+            FinishCheckIfOpenedUsingNotification(check);
+    }
+
+    IEnumerator CheckIfOpenedUsingNotification(QueryLastRespondedNotificationOp check)
+    {
+        yield return check;
+        FinishCheckIfOpenedUsingNotification(check);
+    }
+
+    void FinishCheckIfOpenedUsingNotification(QueryLastRespondedNotificationOp check)
+    {
+        if (check.State == QueryLastRespondedNotificationState.HaveRespondedNotification)
+            PrintNotification("Opened using notification", check.Notification);
+        else
+            Debug.Log("App launched normally, not via notification");
     }
 
     void OnNotificationReceived(Notification notification)
@@ -124,9 +148,15 @@ public class UnifiedTest : MonoBehaviour
 
     public void OnLastNotification()
     {
-        var notification = NotificationCenter.LastRespondedNotification;
-        if (notification.HasValue)
-            PrintNotification("Last responded notification:", notification.Value);
+        StartCoroutine(QueryLastNotification());
+    }
+
+    IEnumerator QueryLastNotification()
+    {
+        var op = NotificationCenter.QueryLastRespondedNotification();
+        yield return op;
+        if (op.State == QueryLastRespondedNotificationState.HaveRespondedNotification)
+            PrintNotification("Last responded notification:", op.Notification);
         else
             AddLog("No responded notification");
     }

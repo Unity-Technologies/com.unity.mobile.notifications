@@ -302,6 +302,7 @@ namespace Unity.Notifications
         /// <summary>
         /// Returns last notification tapped by user, or null.
         /// </summary>
+        [Obsolete("Use QueryLastRespondedNotification instead.")]
         public static Notification? LastRespondedNotification
         {
             get
@@ -320,6 +321,21 @@ namespace Unity.Notifications
                 return new Notification(notification);
 #endif
             }
+        }
+
+        // <summary>
+        /// Queries for the last notification used to open the app.
+        /// </summary>
+        /// <returns>An asynchronous operation that can be used in a coroutine to retrieve the notification.</returns>
+        public static QueryLastRespondedNotificationOp QueryLastRespondedNotification()
+        {
+            CheckInitialized();
+
+#if UNITY_ANDROID
+            return new QueryLastRespondedNotificationOp();
+#else
+            return new QueryLastRespondedNotificationOp(iOSNotificationCenter.QueryLastRespondedNotification());
+#endif
         }
 
         /// <summary>
