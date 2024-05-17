@@ -49,7 +49,7 @@ Android recommends to not use exact scheduling due to higher power consumption i
 
 ## Request permission to post notifications
 
-Starting with Android 13.0 (API level 33) notifications can not be posted without users permission. They can still be scheduled, but will work silently with no UI shown to the user. You can request the permission by running this method in the coroutine:
+Starting with Android 13.0 (API level 33) notifications can not be posted without users permission. They can still be scheduled, but will work silently with no UI shown to the user. You can request the permission by running this method in the [coroutine](https://docs.unity3d.com/6000.0/Documentation/Manual/Coroutines.html):
 
 ```c#
 IEnumerator RequestNotificationPermission()

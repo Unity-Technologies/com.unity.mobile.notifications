@@ -2,7 +2,7 @@
 
 ## Authorization request
 
-You need to request permissions from the system to send local notifications and receive remote notifications. To do this, use [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can request for permissions to only send certain types of notification. The example below shows how to request permissions to display UI Alert dialogs and add a badge on the app icon.
+You need to request permissions from the system to send local notifications and receive remote notifications. To do this, use [AuthorizationRequest](../api/Unity.Notifications.iOS.AuthorizationRequest.html). You can request for permissions to only send certain types of notification. The example below shows how to request permissions to display UI Alert dialogs and add a badge on the app icon. Run this method in a [coroutine](https://docs.unity3d.com/6000.0/Documentation/Manual/Coroutines.html).
 
 ```c#
 IEnumerator RequestAuthorization()
