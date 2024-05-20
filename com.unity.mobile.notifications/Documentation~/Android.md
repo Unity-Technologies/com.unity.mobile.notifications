@@ -61,7 +61,7 @@ IEnumerator RequestNotificationPermission()
 }
 ```
 
-The coroutine allows you to asynchronously wait until the user responds to the permission request. You can use `request.Status` to check whether the user has granted or denied the permission and proceed with posting notifications accordingly. 
+The coroutine allows you to asynchronously wait until the user responds to the permission request. You can use `request.Status` to check whether the user has granted or denied the permission and proceed with posting notifications accordingly.
 
 ## Manage notifications
 
