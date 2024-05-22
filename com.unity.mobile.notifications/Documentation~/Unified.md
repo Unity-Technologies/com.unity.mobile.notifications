@@ -33,7 +33,7 @@ NotificationCenter.Initialize(args);
 
 After initializing `NotificationCenter`, you can request the user’s permission to send notifications.
 
-The following code example runs a coroutine until the permission is granted or denied. The status of the request indicates if the permission has been already granted, permanently denied, or is not required at all.
+The following code example runs a [coroutine](https://docs.unity3d.com/6000.0/Documentation/Manual/Coroutines.html) until the permission is granted or denied. The status of the request indicates if the permission has been already granted, permanently denied, or is not required at all.
 
 ```c#
 IEnumerator Start()
