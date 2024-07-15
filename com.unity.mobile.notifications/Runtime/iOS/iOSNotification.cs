@@ -6,8 +6,8 @@ using UnityEngine;
 namespace Unity.Notifications.iOS
 {
     /// <summary>
-    /// Constants indicating how to present a notification in a foreground app
-    /// For more information see <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions?language=objc"/>Apple documentation</a>
+    /// Constants indicating how to present a notification in a foreground app.
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions"/>Apple documentation</a> for more information.
     /// </summary>
     [Flags]
     public enum PresentationOption
@@ -45,7 +45,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// The type of sound to use for the notification.
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc">Apple documentation</a> for details.
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound">Apple documentation</a> for details.
     /// </summary>
     public enum NotificationSoundType
     {
@@ -72,7 +72,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// Importance and delivery timing of a notification.
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel?language=objc">Apple documentation</a> for details. Available since iOS 15, always Active on lower versions.
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel">Apple documentation</a> for details. Available since iOS 15, always Active on lower versions.
     /// </summary>
     public enum NotificationInterruptionLevel
     {
@@ -164,7 +164,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// The iOSNotification class is used schedule local notifications. It includes the content of the notification and the trigger conditions for delivery.
-    /// An instance of this class is also returned when receiving remote notifications..
+    /// An instance of this class is also returned when receiving remote notifications.
     /// </summary>
     /// <remarks>
     /// Create an instance of this class when you want to schedule the delivery of a local notification. It contains the entire notification  payload to be delivered

@@ -13,6 +13,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The delegate type for the notification received callbacks.
         /// </summary>
+        /// <param name="notification">The notification sthat has been received.</param>
         public delegate void NotificationReceivedCallback(iOSNotification notification);
 
         /// <summary>
@@ -176,7 +177,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Queries for the last notification used to open the app.
         /// </summary>
-        /// <returns>An asynchronous operation that can be used in a coroutine to retrieve the notification.</returns>
+        /// <returns>An asynchronous operation that can be used in a coroutine to retrieve the notification</returns>
         public static QueryLastRespondedNotificationOp QueryLastRespondedNotification()
         {
             return new QueryLastRespondedNotificationOp();
