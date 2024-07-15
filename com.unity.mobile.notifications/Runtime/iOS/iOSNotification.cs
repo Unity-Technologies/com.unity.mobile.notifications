@@ -9,7 +9,7 @@ namespace Unity.Notifications.iOS
     /// Constants indicating how to present a notification in a foreground app.
     /// </summary>
     /// <remarks>
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions"/>Apple documentation</a> for more information.
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions">Apple documentation</a> for more information.
     /// </remarks>
     [Flags]
     public enum PresentationOption
@@ -171,7 +171,7 @@ namespace Unity.Notifications.iOS
     /// <remarks>
     /// Create an instance of this class when you want to schedule the delivery of a local notification. It contains the entire notification  payload to be delivered
     /// (which corresponds to UNNotificationContent) and  also the NotificationTrigger object with the conditions that trigger the delivery of the notification.
-    /// To schedule the delivery of your notification, pass an instance of this class to the <a href="Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_ScheduleNotification_Unity_Notifications_iOS_iOSNotification_"/>iOSNotificationCenter.ScheduleNotification</a> method.
+    /// To schedule the delivery of your notification, pass an instance of this class to the <a href="Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_ScheduleNotification_Unity_Notifications_iOS_iOSNotification_">iOSNotificationCenter.ScheduleNotification</a> method.
     /// </remarks>
     public class iOSNotification
     {
@@ -309,7 +309,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The volume for the sound. Use null to use the default volume.
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc">Apple documentation</a> for supported values.
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol">Apple documentation</a> for supported values.
         /// </summary>
         public float? SoundVolume { get; set; }
 
@@ -324,7 +324,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The score the system uses to determine if the notification is the summary’s featured notification.
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore?language=objc">Apple documentation</a> for more details.
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore">Apple documentation</a> for more details.
         /// </summary>
         public double RelevanceScore
         {
@@ -334,7 +334,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
-        /// Push notification is sent to the device as <a href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification?language=objc">JSON</see>.
+        /// Push notification is sent to the device as <a href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification">JSON</a>.
         /// The value for data key is set to the Data property on notification.
         /// </summary>
         public string Data
