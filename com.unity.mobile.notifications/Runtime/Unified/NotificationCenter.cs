@@ -326,7 +326,9 @@ namespace Unity.Notifications
         // <summary>
         /// Queries for the last notification used to open the app.
         /// </summary>
-        /// <returns>An asynchronous operation that can be used in a coroutine to retrieve the notification</returns>
+        /// <returns>
+        /// An asynchronous operation that can be used in a coroutine to retrieve the notification.
+        /// </returns>
         public static QueryLastRespondedNotificationOp QueryLastRespondedNotification()
         {
             CheckInitialized();
