@@ -7,7 +7,7 @@ namespace Unity.Notifications.iOS
 {
     /// <summary>
     /// Constants indicating how to present a notification in a foreground app
-    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions?language=objc"/>
+    /// For more information see <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions?language=objc"/>Apple documentation</a>
     /// </summary>
     [Flags]
     public enum PresentationOption
@@ -45,8 +45,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// The type of sound to use for the notification.
-    /// See Apple documentation for details.
-    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc"/>
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound?language=objc">Apple documentation</a> for details.
     /// </summary>
     public enum NotificationSoundType
     {
@@ -73,8 +72,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// Importance and delivery timing of a notification.
-    /// See Apple documentation for details. Available since iOS 15, always Active on lower versions.
-    /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel?language=objc"/>
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel?language=objc">Apple documentation</a> for details. Available since iOS 15, always Active on lower versions.
     /// </summary>
     public enum NotificationInterruptionLevel
     {
@@ -171,7 +169,7 @@ namespace Unity.Notifications.iOS
     /// <remarks>
     /// Create an instance of this class when you want to schedule the delivery of a local notification. It contains the entire notification  payload to be delivered
     /// (which corresponds to UNNotificationContent) and  also the NotificationTrigger object with the conditions that trigger the delivery of the notification.
-    /// To schedule the delivery of your notification, pass an instance of this class to the <see cref="iOSNotificationCenter.ScheduleNotification"/>  method.
+    /// To schedule the delivery of your notification, pass an instance of this class to the <a href="Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_ScheduleNotification_Unity_Notifications_iOS_iOSNotification_"/>iOSNotificationCenter.ScheduleNotification</a> method.
     /// </remarks>
     public class iOSNotification
     {
@@ -228,8 +226,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The message displayed in the notification alert.
-        /// See Apple's documentation for details.
-        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649863-body"/>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649863-body">Apple documentation</a> for details.
         /// </summary>
         public string Body
         {
@@ -241,7 +238,7 @@ namespace Unity.Notifications.iOS
         /// Indicates whether the notification alert should be shown when the app is open.
         /// </summary>
         /// <remarks>
-        /// Subscribe to the <see cref="iOSNotificationCenter.OnNotificationReceived"/> event to receive a callback when the notification is triggered.
+        /// Subscribe to the <a href="Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnNotificationReceived">iOSNotificationCenter.OnNotificationReceived</a> event to receive a callback when the notification is triggered.
         /// </remarks>
         public bool ShowInForeground
         {
@@ -257,7 +254,8 @@ namespace Unity.Notifications.iOS
 
 
         /// <summary>
-        /// Presentation options for displaying the local of notification when the app is running. Only works if  <see cref="iOSNotification.ShowInForeground"/> is enabled and user has allowed enabled the requested options for your app.
+        /// Presentation options for displaying the local of notification when the app is running.
+        /// Only works if  <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_ShowInForeground">iOSNotification.ShowInForeground</a> is enabled and user has allowed enabled the requested options for your app.
         /// </summary>
         public PresentationOption ForegroundPresentationOption
         {
@@ -309,8 +307,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The volume for the sound. Use null to use the default volume.
-        /// See Apple documentation for supported values.
-        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc"/>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol?language=objc">Apple documentation</a> for supported values.
         /// </summary>
         public float? SoundVolume { get; set; }
 
@@ -325,7 +322,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The score the system uses to determine if the notification is the summary’s featured notification.
-        /// <see href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore?language=objc"/>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore?language=objc">Apple documentation</a> for more details.
         /// </summary>
         public double RelevanceScore
         {
@@ -335,7 +332,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Arbitrary string data which can be retrieved when the notification is used to open the app or is received while the app is running.
-        /// Push notification is sent to the device as <see href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification?language=objc">JSON</see>.
+        /// Push notification is sent to the device as <a href="https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification?language=objc">JSON</see>.
         /// The value for data key is set to the Data property on notification.
         /// </summary>
         public string Data
@@ -360,16 +357,15 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// A list of notification attachments.
-        /// Notification attachments can be images, audio or video files. Refer to Apple documentation on supported formats.
-        /// <see href="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc"/>
+        /// Notification attachments can be images, audio or video files. Refer to <a href="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc">Apple documentation</a> on supported formats.
         /// </summary>
         public List<iOSNotificationAttachment> Attachments { get; set; }
 
         /// <summary>
         /// The conditions that trigger the delivery of the notification.
-        /// For notification that were already delivered and whose instance was returned by <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/> or <see cref="iOSNotificationCenter.OnRemoteNotificationReceived"/>
-        /// use this property to determine what caused the delivery to occur. You can do this by comparing <see cref="iOSNotification.Trigger"/>  to any of the notification trigger types that implement it, such as
-        /// <see cref="iOSNotificationLocationTrigger"/>, <see cref="iOSNotificationPushTrigger"/>, <see cref="iOSNotificationTimeIntervalTrigger"/>, <see cref="iOSNotificationCalendarTrigger"/>.
+        /// For notification that were already delivered and whose instance was returned by <a href="Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnNotificationReceived">iOSNotificationCenter.OnNotificationReceived</a> or <a href="Unity.Notifications.iOS.iOSNotificationCenter.html#Unity_Notifications_iOS_iOSNotificationCenter_OnRemoteNotificationReceived">iOSNotificationCenter.OnRemoteNotificationReceived</a>
+        /// use this property to determine what caused the delivery to occur. You can do this by comparing <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Trigger">iOSNotification.Trigger</a>  to any of the notification trigger types that implement it, such as
+        /// <a href="Unity.Notifications.iOS.iOSNotificationLocationTrigger.html">iOSNotificationLocationTrigger</a>, <a href="Unity.Notifications.iOS.iOSNotificationPushTrigger.html">iOSNotificationPushTrigger</a>, <a href="Unity.Notifications.iOS.iOSNotificationTimeIntervalTrigger.html">iOSNotificationTimeIntervalTrigger</a>, <a href="Unity.Notifications.iOS.iOSNotificationCalendarTrigger.html">iOSNotificationCalendarTrigger</a>.
         /// </summary>
         /// <example>
         /// <code>
@@ -486,14 +482,14 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Create a new instance of <see cref="iOSNotification"/> and automatically generate an unique string for <see cref="iOSNotification.Identifier"/>  with all optional fields set to default values.
+        /// Create a new instance of <a href="Unity.Notifications.iOS.iOSNotification.html">iOSNotification</a> and automatically generate an unique string for <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Identifier">iOSNotification.Identifier</a>  with all optional fields set to default values.
         /// </summary>
         public iOSNotification() : this(GenerateUniqueID())
         {
         }
 
         /// <summary>
-        /// Specify a <see cref="iOSNotification.Identifier"/> and create a notification object with all optional fields set to default values.
+        /// Specify a <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Identifier">iOSNotification.Identifier</a> and create a notification object with all optional fields set to default values.
         /// </summary>
         /// <param name="identifier">  Unique identifier for the local notification tha can later be used to track or change it's status.</param>
         public iOSNotification(string identifier)
