@@ -7,8 +7,10 @@ namespace Unity.Notifications.iOS
 {
     /// <summary>
     /// Constants indicating how to present a notification in a foreground app.
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions"/>Apple documentation</a> for more information.
     /// </summary>
+    /// <remarks>
+    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions"/>Apple documentation</a> for more information.
+    /// </remarks>
     [Flags]
     public enum PresentationOption
     {
