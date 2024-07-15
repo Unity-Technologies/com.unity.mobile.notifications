@@ -21,6 +21,10 @@ namespace Unity.Notifications
     {
         PlatformNotification notification;
 
+        /// <summary>
+        /// Notification can be converted to it's platform specific counterpart using explicit cast.
+        /// </summary>
+        /// <param name="n">Notification to convert</param>
         public static explicit operator PlatformNotification(Notification n)
         {
 #if UNITY_ANDROID
