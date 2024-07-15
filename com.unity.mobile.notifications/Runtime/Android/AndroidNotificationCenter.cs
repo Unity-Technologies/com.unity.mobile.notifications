@@ -614,6 +614,7 @@ namespace Unity.Notifications.Android
         /// The delegate type for the notification received callbacks.
         /// It is used in <see cref="AndroidNotificationCenter.OnNotificationReceived"/> event.
         /// </summary>
+        /// <param name="data">The data from notification intent.</param>
         public delegate void NotificationReceivedCallback(AndroidNotificationIntentData data);
 
         /// <summary>
@@ -822,6 +823,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Register notification channel group.
         /// </summary>
+        /// <param name="group">The channel group to register.</param>
         public static void RegisterNotificationChannelGroup(AndroidNotificationChannelGroup group)
         {
             if (!Initialize())
@@ -966,6 +968,7 @@ namespace Unity.Notifications.Android
         /// Schedule a notification created using the provided Notification.Builder object.
         /// Notification builder should be created by calling CreateNotificationBuilder.
         /// </summary>
+        /// <param name="notificationBuilder">Notification builder from which to construct the notification.</param>
         public static void SendNotification(AndroidJavaObject notificationBuilder)
         {
             if (Initialize())
@@ -977,6 +980,8 @@ namespace Unity.Notifications.Android
         /// Notification builder should be created by calling CreateNotificationBuilder.
         /// Stores the notification id to the second argument
         /// </summary>
+        /// <param name="notificationBuilder">Notification builder from which to construct the notification.</param>
+        /// <param name="id">Receives the generated notification ID.</param>
         public static void SendNotification(AndroidJavaObject notificationBuilder, out int id)
         {
             id = -1;
@@ -1131,6 +1136,9 @@ namespace Unity.Notifications.Android
         /// Will automatically generate the ID for notification.
         /// <see cref="CreateNotificationBuilder(int, AndroidNotification, string)"/>
         /// </summary>
+        /// <param name="notification">Notification from which to create the builder.</param>
+        /// <param name="channelId">Notification channel to which notification should be sent to.</param>
+        /// <returns>A proxy object for created Notification.Builder</returns>
         public static AndroidJavaObject CreateNotificationBuilder(AndroidNotification notification, string channelId)
         {
             AndroidJavaObject builder, extras;
