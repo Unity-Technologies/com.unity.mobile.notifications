@@ -55,7 +55,7 @@ namespace Unity.Notifications.Android
     {
         /// <summary>
         /// The override for large icon (requirements are the same).
-        /// For more information see <a href="Unity.Notifications.Android.AndroidNotification.html#Unity_Notifications_Android_AndroidNotification_LargeIcon"/>.
+        /// For more information see <a href="Unity.Notifications.Android.AndroidNotification.html#Unity_Notifications_Android_AndroidNotification_LargeIcon">AndroidNotification.LargeIcon</a>.
         /// </summary>
         public string LargeIcon { get; set; }
 
