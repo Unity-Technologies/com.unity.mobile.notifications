@@ -323,7 +323,7 @@ namespace Unity.Notifications
             }
         }
 
-        // <summary>
+        /// <summary>
         /// Queries for the last notification used to open the app.
         /// </summary>
         /// <returns>
