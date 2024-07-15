@@ -14,13 +14,13 @@ namespace Unity.Notifications
     /// </summary>
     /// <remarks>
     /// Can be converted to platform specific notification via explicit cast.
-    /// <para>
+    /// </remarks>
+    /// <example>
     /// <code>
     /// var n1 = (AndroidNotification)notification; // convert to Android
     /// var n1 = (iOSNotification)notification; // convert to iOS
     /// </code>
-    /// </para>
-    /// </remarks>
+    /// </example>
     public struct Notification
     {
         PlatformNotification notification;
