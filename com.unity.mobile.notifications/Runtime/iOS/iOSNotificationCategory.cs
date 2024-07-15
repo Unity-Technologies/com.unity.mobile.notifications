@@ -10,10 +10,29 @@ namespace Unity.Notifications.iOS
     [Flags]
     public enum iOSNotificationCategoryOptions
     {
+        /// <summary>
+        /// No options specified.
+        /// </summary>
         None = 0,
+
+        /// <summary>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/customdismissaction?language=objc">UNNotificationCategoryOptionCustomDismissAction</a>.
+        /// </summary>
         CustomDismissAction = (1 << 0),
+
+        /// <summary>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/allowincarplay?language=objc">UNNotificationCategoryOptionAllowInCarPlay</a>.
+        /// </summary>
         AllowInCarPlay = (1 << 1),
+
+        /// <summary>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/hiddenpreviewsshowtitle?language=objc">UNNotificationCategoryOptionHiddenPreviewsShowTitle</a>.
+        /// </summary>
         HiddenPreviewsShowTitle = (1 << 2),
+
+        /// <summary>
+        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/hiddenpreviewsshowsubtitle?language=objc">UNNotificationCategoryOptionHiddenPreviewsShowSubtitle</a>.
+        /// </summary>
         HiddenPreviewsShowSubtitle = (1 << 3),
     }
 
