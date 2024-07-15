@@ -106,7 +106,7 @@ namespace Unity.Notifications.Android
         /// <summary>
         /// Sets whether notifications posted to this channel should display notification lights, on devices that support that feature.
         /// This can be changed by users in the settings app.
-        /// </summary>/
+        /// </summary>
         public bool EnableLights { get; set; }
 
         /// <summary>
