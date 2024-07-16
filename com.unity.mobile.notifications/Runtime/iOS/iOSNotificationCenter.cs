@@ -13,7 +13,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The delegate type for the notification received callbacks.
         /// </summary>
-        /// <param name="notification">The notification sthat has been received.</param>
+        /// <param name="notification">The notification that has been received.</param>
         public delegate void NotificationReceivedCallback(iOSNotification notification);
 
         /// <summary>

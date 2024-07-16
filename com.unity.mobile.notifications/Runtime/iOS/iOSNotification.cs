@@ -9,7 +9,7 @@ namespace Unity.Notifications.iOS
     /// Constants indicating how to present a notification in a foreground app.
     /// </summary>
     /// <remarks>
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions">Apple documentation</a> for more information.
+    /// For more information, refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions">Apple documentation</a>.
     /// </remarks>
     [Flags]
     public enum PresentationOption
@@ -47,7 +47,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// The type of sound to use for the notification.
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound">Apple documentation</a> for details.
+    /// For more information, refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound">Apple documentation</a>.
     /// </summary>
     public enum NotificationSoundType
     {
@@ -74,7 +74,7 @@ namespace Unity.Notifications.iOS
 
     /// <summary>
     /// Importance and delivery timing of a notification.
-    /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel">Apple documentation</a> for details. Available since iOS 15, always Active on lower versions.
+    /// For more information, refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationinterruptionlevel">Apple documentation</a>. UNNotificationInterruptionLevel is available since iOS version 15. On versions earlier than iOS 15, the interruption level is always active.
     /// </summary>
     public enum NotificationInterruptionLevel
     {
@@ -165,7 +165,7 @@ namespace Unity.Notifications.iOS
     }
 
     /// <summary>
-    /// The iOSNotification class is used schedule local notifications. It includes the content of the notification and the trigger conditions for delivery.
+    /// The iOSNotification class is used to schedule local notifications. It includes the content of the notification and the trigger conditions for delivery.
     /// An instance of this class is also returned when receiving remote notifications.
     /// </summary>
     /// <remarks>
@@ -228,7 +228,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The message displayed in the notification alert.
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649863-body">Apple documentation</a> for details.
+        /// For more information, refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/1649863-body">Apple documentation</a>.
         /// </summary>
         public string Body
         {
@@ -256,8 +256,8 @@ namespace Unity.Notifications.iOS
 
 
         /// <summary>
-        /// Presentation options for displaying the local of notification when the app is running.
-        /// Only works if  <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_ShowInForeground">iOSNotification.ShowInForeground</a> is enabled and user has allowed enabled the requested options for your app.
+        /// Presentation options for displaying the local notification when the app is running.
+        /// Only works if  <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_ShowInForeground">iOSNotification.ShowInForeground</a> is enabled and the user has allowed the requested permissions for your app.
         /// </summary>
         public PresentationOption ForegroundPresentationOption
         {
@@ -309,7 +309,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The volume for the sound. Use null to use the default volume.
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol">Apple documentation</a> for supported values.
+        /// For information on the supported values, refer to  <a href="https://developer.apple.com/documentation/usernotifications/unnotificationsound/2963118-defaultcriticalsoundwithaudiovol">Apple documentation</a>.
         /// </summary>
         public float? SoundVolume { get; set; }
 
@@ -324,7 +324,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// The score the system uses to determine if the notification is the summary’s featured notification.
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore">Apple documentation</a> for more details.
+        /// For more information, refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3821031-relevancescore">Apple documentation</a>.
         /// </summary>
         public double RelevanceScore
         {
@@ -359,7 +359,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// A list of notification attachments.
-        /// Notification attachments can be images, audio or video files. Refer to <a href="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc">Apple documentation</a> on supported formats.
+        /// Notification attachments can be images, audio, or video files. Refer to <a href="https://developer.apple.com/documentation/usernotifications/unmutablenotificationcontent/1649857-attachments?language=objc">Apple documentation</a> on supported formats.
         /// </summary>
         public List<iOSNotificationAttachment> Attachments { get; set; }
 
@@ -484,7 +484,7 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Create a new instance of <a href="Unity.Notifications.iOS.iOSNotification.html">iOSNotification</a> and automatically generate an unique string for <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Identifier">iOSNotification.Identifier</a>  with all optional fields set to default values.
+        /// Create a new instance of <a href="Unity.Notifications.iOS.iOSNotification.html">iOSNotification</a> and automatically generate a unique string for <a href="Unity.Notifications.iOS.iOSNotification.html#Unity_Notifications_iOS_iOSNotification_Identifier">iOSNotification.Identifier</a>  with all optional fields set to default values.
         /// </summary>
         public iOSNotification() : this(GenerateUniqueID())
         {

@@ -65,7 +65,7 @@ namespace Unity.Notifications.iOS
         /// Options for the action. Can be a combination of given flags.
         /// </summary>
         /// <remarks>
-        /// Refer to Apple documentation for <a href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions">UNNotificationActionOptions</a> for exact meanings.
+        /// For information on the options, refer to Apple documentation <a href="https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions">UNNotificationActionOptions</a>.
         /// </remarks>
         public iOSNotificationActionOptions Options { get; set; }
 
@@ -73,7 +73,7 @@ namespace Unity.Notifications.iOS
         /// Set the icon for action using system symbol image name.
         /// </summary>
         /// <remarks>
-        /// <a href="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747241-iconwithsystemimagename">Apple documentation</a>
+        /// Refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747241-iconwithsystemimagename">Apple documentation</a>
         /// </remarks>
         public string SystemImageName
         {
@@ -89,7 +89,7 @@ namespace Unity.Notifications.iOS
         /// Set the icon for action using image from app's bundle.
         /// </summary>
         /// <remarks>
-        /// <a href="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747242-iconwithtemplateimagename">Apple documentation</a>
+        /// Refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationactionicon/3747242-iconwithtemplateimagename">Apple documentation</a>
         /// </remarks>
         public string TemplateImageName
         {

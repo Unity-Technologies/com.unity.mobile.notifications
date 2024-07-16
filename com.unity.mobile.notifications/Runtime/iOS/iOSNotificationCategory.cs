@@ -16,22 +16,22 @@ namespace Unity.Notifications.iOS
         None = 0,
 
         /// <summary>
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/customdismissaction?language=objc">UNNotificationCategoryOptionCustomDismissAction</a>.
+        /// Refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/customdismissaction?language=objc">UNNotificationCategoryOptionCustomDismissAction</a>.
         /// </summary>
         CustomDismissAction = (1 << 0),
 
         /// <summary>
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/allowincarplay?language=objc">UNNotificationCategoryOptionAllowInCarPlay</a>.
+        /// Refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/allowincarplay?language=objc">UNNotificationCategoryOptionAllowInCarPlay</a>.
         /// </summary>
         AllowInCarPlay = (1 << 1),
 
         /// <summary>
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/hiddenpreviewsshowtitle?language=objc">UNNotificationCategoryOptionHiddenPreviewsShowTitle</a>.
+        /// Refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/hiddenpreviewsshowtitle?language=objc">UNNotificationCategoryOptionHiddenPreviewsShowTitle</a>.
         /// </summary>
         HiddenPreviewsShowTitle = (1 << 2),
 
         /// <summary>
-        /// See <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/hiddenpreviewsshowsubtitle?language=objc">UNNotificationCategoryOptionHiddenPreviewsShowSubtitle</a>.
+        /// Refer to <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategoryoptions/hiddenpreviewsshowsubtitle?language=objc">UNNotificationCategoryOptionHiddenPreviewsShowSubtitle</a>.
         /// </summary>
         HiddenPreviewsShowSubtitle = (1 << 3),
     }
@@ -55,7 +55,7 @@ namespace Unity.Notifications.iOS
 
         /// <summary>
         /// Get actions set for this category.
-        /// For more info see <a href="Unity.Notifications.iOS.iOSNotificationAction.html">iOSNotificationAction</a>.
+        /// For more information, refer to <a href="Unity.Notifications.iOS.iOSNotificationAction.html">iOSNotificationAction</a>.
         /// </summary>
         public iOSNotificationAction[] Actions { get { return m_Actions.ToArray(); } }
 
@@ -70,7 +70,7 @@ namespace Unity.Notifications.iOS
         public string HiddenPreviewsBodyPlaceholder { get; set; }
 
         /// <summary>
-        /// A <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/2963112-categorysummaryformat">format</a> string for the summary description used when the system groups the category’s notifications.
+        /// A <a href="https://developer.apple.com/documentation/usernotifications/unnotificationcategory/2963112-categorysummaryformat">format</a> string used for the summary description when the system groups the notifications based on their category.
         /// </summary>
         public string SummaryFormat { get; set; }
 
