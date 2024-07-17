@@ -11,16 +11,25 @@ namespace Unity.Notifications
 {
     /// <summary>
     /// Represents a notification to be sent or a received one.
+    /// </summary>
+    /// <remarks>
     /// Can be converted to platform specific notification via explicit cast.
+    /// </remarks>
+    /// <example>
     /// <code>
     /// var n1 = (AndroidNotification)notification; // convert to Android
     /// var n1 = (iOSNotification)notification; // convert to iOS
     /// </code>
-    /// </summary>
+    /// </example>
     public struct Notification
     {
         PlatformNotification notification;
 
+        /// <summary>
+        /// Notification can be converted to its platform-specific counterpart using explicit cast.
+        /// </summary>
+        /// <param name="n">Notification to convert</param>
+        /// <returns>Resulting platform-specific notification</returns>
         public static explicit operator PlatformNotification(Notification n)
         {
 #if UNITY_ANDROID

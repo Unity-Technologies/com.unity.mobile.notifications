@@ -49,15 +49,14 @@ namespace Unity.Notifications.Android
 
     /// <summary>
     /// Data for setting up the big picture style notification.
-    /// Properties that are not available in devices API level are ignored. See Android documentation for availibility.
-    /// <see href="https://developer.android.com/reference/android/app/Notification.BigPictureStyle"/>
+    /// Properties that aren't available in the device's API level are ignored. Refer to <a href="https://developer.android.com/reference/android/app/Notification.BigPictureStyle">Android documentation</a> to check availability of properties based on each API level.
     /// </summary>
     public struct BigPictureStyle
     {
         /// <summary>
         /// The override for large icon (requirements are the same).
+        /// For more information, refer to <a href="Unity.Notifications.Android.AndroidNotification.html#Unity_Notifications_Android_AndroidNotification_LargeIcon">AndroidNotification.LargeIcon</a>.
         /// </summary>
-        /// <see cref="AndroidNotification.LargeIcon"/>
         public string LargeIcon { get; set; }
 
         /// <summary>

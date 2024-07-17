@@ -4,7 +4,7 @@ using Unity.Notifications.iOS;
 
 namespace Unity.Notifications.Tests
 {
-    public class ApiTestsiOS
+    internal class ApiTestsiOS
     {
         [Test]
         public void TimeIntervalTrigger_MeasuredInSeconds()
