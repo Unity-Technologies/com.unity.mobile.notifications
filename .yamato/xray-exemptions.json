@@ -1,0 +1,13 @@
+{
+  "per_package": {
+    "com.unity.mobile.notifications@2": {
+      "exempts": {
+        "PVP-41-1": {
+          "errors": [
+            "CHANGELOG.md: line 5: Unreleased section is not allowed for public release"
+          ]
+        }
+      }
+    }
+  }
+}
