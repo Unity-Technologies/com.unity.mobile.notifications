@@ -54,6 +54,9 @@ namespace Unity.Notifications.Tests
         }
 
 #if UNITY_ANDROID
+#if UNITY_2023_1_OR_NEWER
+// Use AndroidProjectFilesModifier instead
+#else
         [Test]
         public void AppendMetadataToManifest_WhenSameValue_Works()
         {
@@ -204,6 +207,7 @@ namespace Unity.Notifications.Tests
             Assert.IsFalse(xmlDoc.InnerXml.Contains(permission));
         }
 
+#endif
 #endif
     }
 }

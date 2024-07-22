@@ -1,4 +1,7 @@
 #if UNITY_ANDROID
+#if UNITY_2023_1_OR_NEWER
+// Use AndroidProjectFilesModifier instead
+#else
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -181,4 +184,5 @@ namespace Unity.Notifications
         }
     }
 }
+#endif
 #endif
