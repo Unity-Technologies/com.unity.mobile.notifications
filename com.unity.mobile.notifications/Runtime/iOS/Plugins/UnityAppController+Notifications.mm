@@ -8,7 +8,11 @@
 #import <objc/runtime.h>
 
 #import "UnityNotificationManager.h"
-#import "UnityAppController+Notifications.h"
+#import "Classes/PluginBase/AppDelegateListener.h"
+
+@interface UnityNotificationLifeCycleManager : NSObject
+
+@end
 
 @implementation UnityNotificationLifeCycleManager
 
