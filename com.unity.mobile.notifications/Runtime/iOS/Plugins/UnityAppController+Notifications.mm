@@ -20,17 +20,6 @@
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [UnityNotificationLifeCycleManager sharedInstance];
-    });
-}
-
-+ (instancetype)sharedInstance;
-{
-    static UnityNotificationLifeCycleManager *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[UnityNotificationLifeCycleManager alloc] init];
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 
         [nc addObserverForName: UIApplicationDidBecomeActiveNotification
@@ -100,7 +89,6 @@
              [manager finishRemoteNotificationRegistration: UNAuthorizationStatusDenied notification: notification];
          }];
     });
-    return sharedInstance;
 }
 @end
 #endif
