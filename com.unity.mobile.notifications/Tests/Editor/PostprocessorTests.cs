@@ -161,7 +161,7 @@ namespace Unity.Notifications.Tests
             string sourceXmlContent = GetSourceXml(null, null);
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(sourceXmlContent);
-            var settings = new AndroidNotificationPostProcessor.ManifestSettings()
+            var settings = new ManifestSettings()
             {
                 ExactAlarm = AndroidExactSchedulingOption.ExactWhenAvailable | flag,
             };
@@ -195,7 +195,7 @@ namespace Unity.Notifications.Tests
             string sourceXmlContent = GetSourceXml(null, null);
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(sourceXmlContent);
-            var settings = new AndroidNotificationPostProcessor.ManifestSettings()
+            var settings = new ManifestSettings()
             {
                 // AndroidExactSchedulingOption.ExactWhenAvailable absent, so this one is ignored
                 ExactAlarm = AndroidExactSchedulingOption.AddScheduleExactPermission,
