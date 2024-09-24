@@ -182,6 +182,21 @@ namespace Unity.Notifications
     {
         const string kAndroidNamespaceURI = "http://schemas.android.com/apk/res/android";
 
+        const string kNotificationsDefaultManifest = @"
+<manifest xmlns:android=""http://schemas.android.com/apk/res/android"" package=""com.unity.androidnotifications"">
+  <application>
+    <receiver android:name=""com.unity.androidnotifications.UnityNotificationManager"" android:exported=""false"" />
+    <receiver android:name=""com.unity.androidnotifications.UnityNotificationRestartReceiver"" android:enabled=""false"" android:exported=""false"">
+      <intent-filter>
+        <action android:name=""android.intent.action.BOOT_COMPLETED"" />
+      </intent-filter>
+    </receiver>
+    <meta-data android:name=""com.unity.androidnotifications.exact_scheduling"" android:value=""0"" />
+  </application>
+  <uses-permission android:name=""android.permission.POST_NOTIFICATIONS"" />
+</manifest>
+";
+
         public int callbackOrder { get { return 0; } }
 
         public void OnPostGenerateGradleAndroidProject(string projectPath)
@@ -213,11 +228,11 @@ namespace Unity.Notifications
         private void InjectAndroidManifest(string projectPath)
         {
             var manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
-            if (!File.Exists(manifestPath))
-                throw new FileNotFoundException(string.Format("'{0}' doesn't exist.", manifestPath));
-
             XmlDocument manifestDoc = new XmlDocument();
-            manifestDoc.Load(manifestPath);
+            if (File.Exists(manifestPath))
+                 manifestDoc.Load(manifestPath);
+            else
+                manifestDoc.LoadXml(kNotificationsDefaultManifest);
 
             var manifestSettings = AndroidNotificationPostProcessorUtils.GetManifestSettings();
 
