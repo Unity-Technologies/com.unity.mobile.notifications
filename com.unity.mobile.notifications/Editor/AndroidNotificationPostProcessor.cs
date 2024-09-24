@@ -29,12 +29,32 @@ namespace Unity.Notifications
     }
 
     [Serializable]
-    struct ManifestSettings
+    internal struct ManifestSettings
     {
         public bool UseCustomActivity;
         public string CustomActivity;
         public bool RescheduleOnRestart;
         public AndroidExactSchedulingOption ExactAlarm;
+    }
+
+    internal static class AndroidNotificationPostProcessorUtils
+    {
+        internal static ManifestSettings GetManifestSettings()
+        {
+            var settings = NotificationSettingsManager.Initialize().AndroidNotificationSettingsFlat;
+            return new ManifestSettings()
+            {
+                UseCustomActivity = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY),
+                CustomActivity = GetSetting<string>(settings, NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS),
+                RescheduleOnRestart = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART),
+                ExactAlarm = GetSetting<AndroidExactSchedulingOption>(settings, NotificationSettings.AndroidSettings.EXACT_ALARM),
+            };
+        }
+
+        private static T GetSetting<T>(List<NotificationSetting> settings, string key)
+        {
+            return (T)settings.Find(i => i.Key == key).Value;
+        }
     }
 
 #if UNITY_2023_1_OR_NEWER
@@ -50,14 +70,7 @@ namespace Unity.Notifications
             var ctx = new AndroidProjectFilesModifierContext();
             PrepareResources(ctx);
 
-            var settings = NotificationSettingsManager.Initialize().AndroidNotificationSettingsFlat;
-            ctx.SetData(nameof(ManifestSettings), new ManifestSettings()
-            {
-                UseCustomActivity = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY),
-                CustomActivity = GetSetting<string>(settings, NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS),
-                RescheduleOnRestart = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART),
-                ExactAlarm = GetSetting<AndroidExactSchedulingOption>(settings, NotificationSettings.AndroidSettings.EXACT_ALARM),
-            });
+            ctx.SetData(nameof(ManifestSettings), AndroidNotificationPostProcessorUtils.GetManifestSettings());
 
             ctx.Outputs.AddManifestFile("unityLibrary/mobilenotifications.androidlib/src/main/AndroidManifest.xml");
 
@@ -95,11 +108,6 @@ namespace Unity.Notifications
                 context.Outputs.AddFileWithContents(ToIconPath(icon.Key));
             };
             context.SetData(nameof(NotificationResources), resources);
-        }
-
-        private static T GetSetting<T>(List<NotificationSetting> settings, string key)
-        {
-            return (T)settings.Find(i => i.Key == key).Value;
         }
 
         private static void InjectReceivers(Manifest manifest)
@@ -211,14 +219,7 @@ namespace Unity.Notifications
             XmlDocument manifestDoc = new XmlDocument();
             manifestDoc.Load(manifestPath);
 
-            var settings = NotificationSettingsManager.Initialize().AndroidNotificationSettingsFlat;
-            var manifestSettings = new ManifestSettings()
-            {
-                UseCustomActivity = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.USE_CUSTOM_ACTIVITY),
-                CustomActivity = GetSetting<string>(settings, NotificationSettings.AndroidSettings.CUSTOM_ACTIVITY_CLASS),
-                RescheduleOnRestart = GetSetting<bool>(settings, NotificationSettings.AndroidSettings.RESCHEDULE_ON_RESTART),
-                ExactAlarm = GetSetting<AndroidExactSchedulingOption>(settings, NotificationSettings.AndroidSettings.EXACT_ALARM),
-            };
+            var manifestSettings = AndroidNotificationPostProcessorUtils.GetManifestSettings();
 
             InjectAndroidManifest(manifestPath, manifestDoc, manifestSettings);
 
@@ -253,11 +254,6 @@ namespace Unity.Notifications
                 if ((settings.ExactAlarm & AndroidExactSchedulingOption.AddRequestIgnoreBatteryOptimizationsPermission) != 0)
                     AppendAndroidPermissionField(manifestPath, manifestDoc, "uses-permission-sdk-23", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", null);
             }
-        }
-
-        private static T GetSetting<T>(List<NotificationSetting> settings, string key)
-        {
-            return (T)settings.Find(i => i.Key == key).Value;
         }
 
         internal static void AppendAndroidPermissionField(string manifestPath, XmlDocument xmlDoc, string name, string maxSdk = null)
