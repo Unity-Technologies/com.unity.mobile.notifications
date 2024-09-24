@@ -11,20 +11,20 @@ namespace Unity.Notifications
     public class AndroidNotificationPostProcessor : AndroidProjectFilesModifier
     {
         [Serializable]
-        private class NotificationIcon
+        private struct NotificationIcon
         {
             public string Name;
             public byte[] Data;
         }
 
         [Serializable]
-        private class NotificationResources
+        private struct NotificationResources
         {
             public NotificationIcon[] Icons;
         }
 
         [Serializable]
-        private class ManifestSettings
+        private struct ManifestSettings
         {
             public bool UseCustomActivity;
             public string CustomActivity;
