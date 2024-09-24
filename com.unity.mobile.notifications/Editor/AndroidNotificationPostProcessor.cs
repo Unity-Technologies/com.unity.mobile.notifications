@@ -1,13 +1,22 @@
 #if UNITY_ANDROID
-#if UNITY_2023_1_OR_NEWER
+
 using System;
 using System.Collections.Generic;
-using UnityEditor.Android;
-using Unity.Android.Gradle.Manifest;
 using System.IO;
+using UnityEditor.Android;
+
+#if UNITY_2023_1_OR_NEWER
+using Unity.Android.Gradle.Manifest;
+#else
+using System.Linq;
+using System.Xml;
+using UnityEditor;
+#endif
 
 namespace Unity.Notifications
 {
+
+#if UNITY_2023_1_OR_NEWER
     public class AndroidNotificationPostProcessor : AndroidProjectFilesModifier
     {
         [Serializable]
@@ -160,18 +169,8 @@ namespace Unity.Notifications
             }
         }
     }
-}
-#else
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml;
-using UnityEditor;
-using UnityEditor.Android;
 
-namespace Unity.Notifications
-{
+#else
     public class AndroidNotificationPostProcessor : IPostGenerateGradleAndroidProject
     {
         const string kAndroidNamespaceURI = "http://schemas.android.com/apk/res/android";
@@ -343,6 +342,6 @@ namespace Unity.Notifications
             applicationNode.AppendChild(metaDataNode);
         }
     }
-}
 #endif
+}
 #endif
