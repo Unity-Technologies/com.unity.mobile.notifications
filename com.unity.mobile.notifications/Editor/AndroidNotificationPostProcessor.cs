@@ -15,32 +15,31 @@ using UnityEditor;
 
 namespace Unity.Notifications
 {
+    [Serializable]
+    struct NotificationIcon
+    {
+        public string Name;
+        public byte[] Data;
+    }
+
+    [Serializable]
+    struct NotificationResources
+    {
+        public NotificationIcon[] Icons;
+    }
+
+    [Serializable]
+    struct ManifestSettings
+    {
+        public bool UseCustomActivity;
+        public string CustomActivity;
+        public bool RescheduleOnRestart;
+        public AndroidExactSchedulingOption ExactAlarm;
+    }
 
 #if UNITY_2023_1_OR_NEWER
     public class AndroidNotificationPostProcessor : AndroidProjectFilesModifier
     {
-        [Serializable]
-        private struct NotificationIcon
-        {
-            public string Name;
-            public byte[] Data;
-        }
-
-        [Serializable]
-        private struct NotificationResources
-        {
-            public NotificationIcon[] Icons;
-        }
-
-        [Serializable]
-        private struct ManifestSettings
-        {
-            public bool UseCustomActivity;
-            public string CustomActivity;
-            public bool RescheduleOnRestart;
-            public AndroidExactSchedulingOption ExactAlarm;
-        }
-
         private string ToIconPath(string name)
         {
             return $"unityLibrary/src/main/res/{name}";
@@ -201,14 +200,6 @@ namespace Unity.Notifications
                     File.WriteAllBytes(fileInfo.FullName, icon.Value);
                 }
             }
-        }
-
-        internal struct ManifestSettings
-        {
-            public bool UseCustomActivity;
-            public string CustomActivity;
-            public bool RescheduleOnRestart;
-            public AndroidExactSchedulingOption ExactAlarm;
         }
 
         private void InjectAndroidManifest(string projectPath)
