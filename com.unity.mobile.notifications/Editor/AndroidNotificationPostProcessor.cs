@@ -58,7 +58,7 @@ namespace Unity.Notifications
     }
 
 #if UNITY_2023_1_OR_NEWER
-    public class AndroidNotificationPostProcessor : AndroidProjectFilesModifier
+    class AndroidNotificationPostProcessor : AndroidProjectFilesModifier
     {
         private string ToIconPath(string name)
         {
@@ -178,7 +178,7 @@ namespace Unity.Notifications
     }
 
 #else
-    public class AndroidNotificationPostProcessor : IPostGenerateGradleAndroidProject
+    class AndroidNotificationPostProcessor : IPostGenerateGradleAndroidProject
     {
         const string kAndroidNamespaceURI = "http://schemas.android.com/apk/res/android";
 
