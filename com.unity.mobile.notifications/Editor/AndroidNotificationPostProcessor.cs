@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor.Android;
 
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
 using Unity.Android.Gradle.Manifest;
 #else
 using System.Linq;
@@ -57,7 +57,7 @@ namespace Unity.Notifications
         }
     }
 
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
     class AndroidNotificationPostProcessor : AndroidProjectFilesModifier
     {
         private string ToIconPath(string name)
@@ -117,8 +117,7 @@ namespace Unity.Notifications
             receiverkNotificationManager.Attributes.Exported.Set(false);
             manifest.Application.ReceiverList.AddElement(receiverkNotificationManager);
 
-            var receiverNotificationRestartOnBoot = new Receiver();
-            receiverNotificationRestartOnBoot.Attributes.Name.Set("com.unity.androidnotifications.UnityNotificationRestartReceiver");
+            var receiverNotificationRestartOnBoot = manifest.Application.AddReceiver("com.unity.androidnotifications.UnityNotificationRestartReceiver");
             receiverNotificationRestartOnBoot.Attributes.Exported.Set(false);
             receiverNotificationRestartOnBoot.Attributes.Enabled.Set(false);
 
@@ -128,8 +127,6 @@ namespace Unity.Notifications
             receiverNotificationRestartOnBootIntentFilter.ActionList.AddElement(receiverNotificationRestartOnBootAction);
 
             receiverNotificationRestartOnBoot.IntentFilterList.AddElement(receiverNotificationRestartOnBootIntentFilter);
-
-            manifest.Application.ReceiverList.AddElement(receiverNotificationRestartOnBoot);
         }
 
         private static void InjectAndroidManifest(Manifest manifest, ManifestSettings settings)
@@ -168,11 +165,7 @@ namespace Unity.Notifications
 
                 // Battery optimizations must use "uses-permission-sdk-23", regular uses-permission does not work
                 if ((settings.ExactAlarm & AndroidExactSchedulingOption.AddRequestIgnoreBatteryOptimizationsPermission) != 0)
-                {
-                    // TODO: Missing AddUsesPermissionSdk23 function
-                    var batterOptimizations = manifest.AddUsesPermission("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
-                    batterOptimizations.Attributes.Name.Set("uses-permission-sdk-23");
-                }
+                    manifest.AddUsesPermissionSdk23("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
             }
         }
     }
