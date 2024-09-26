@@ -54,7 +54,7 @@ namespace Unity.Notifications.Tests
         }
 
 #if UNITY_ANDROID
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
 // Use AndroidProjectFilesModifier instead
 #else
         [Test]
