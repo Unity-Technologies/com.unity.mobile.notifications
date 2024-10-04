@@ -222,10 +222,7 @@ namespace Unity.Notifications
         {
             var manifestPath = string.Format("{0}/src/main/AndroidManifest.xml", projectPath);
             XmlDocument manifestDoc = new XmlDocument();
-            if (File.Exists(manifestPath))
-                 manifestDoc.Load(manifestPath);
-            else
-                manifestDoc.LoadXml(kNotificationsDefaultManifest);
+            manifestDoc.LoadXml(kNotificationsDefaultManifest);
 
             var manifestSettings = AndroidNotificationPostProcessorUtils.GetManifestSettings();
 
