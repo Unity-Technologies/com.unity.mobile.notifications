@@ -54,6 +54,9 @@ namespace Unity.Notifications.Tests
         }
 
 #if UNITY_ANDROID
+#if UNITY_6000_0_OR_NEWER
+// Use AndroidProjectFilesModifier instead
+#else
         [Test]
         public void AppendMetadataToManifest_WhenSameValue_Works()
         {
@@ -158,7 +161,7 @@ namespace Unity.Notifications.Tests
             string sourceXmlContent = GetSourceXml(null, null);
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(sourceXmlContent);
-            var settings = new AndroidNotificationPostProcessor.ManifestSettings()
+            var settings = new ManifestSettings()
             {
                 ExactAlarm = AndroidExactSchedulingOption.ExactWhenAvailable | flag,
             };
@@ -192,7 +195,7 @@ namespace Unity.Notifications.Tests
             string sourceXmlContent = GetSourceXml(null, null);
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(sourceXmlContent);
-            var settings = new AndroidNotificationPostProcessor.ManifestSettings()
+            var settings = new ManifestSettings()
             {
                 // AndroidExactSchedulingOption.ExactWhenAvailable absent, so this one is ignored
                 ExactAlarm = AndroidExactSchedulingOption.AddScheduleExactPermission,
@@ -204,6 +207,7 @@ namespace Unity.Notifications.Tests
             Assert.IsFalse(xmlDoc.InnerXml.Contains(permission));
         }
 
+#endif
 #endif
     }
 }
