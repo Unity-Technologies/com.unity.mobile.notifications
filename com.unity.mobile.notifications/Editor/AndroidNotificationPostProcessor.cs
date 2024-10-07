@@ -110,39 +110,37 @@ namespace Unity.Notifications
             context.SetData(nameof(NotificationResources), resources);
         }
 
-        private static void InjectReceivers(Manifest manifest)
+        private static void InjectReceivers(Manifest manifest, ManifestSettings settings)
         {
             var receiverkNotificationManager = new Receiver();
             receiverkNotificationManager.Attributes.Name.Set("com.unity.androidnotifications.UnityNotificationManager");
             receiverkNotificationManager.Attributes.Exported.Set(false);
             manifest.Application.ReceiverList.AddElement(receiverkNotificationManager);
 
-            var receiverNotificationRestartOnBoot = manifest.Application.AddReceiver("com.unity.androidnotifications.UnityNotificationRestartReceiver");
-            receiverNotificationRestartOnBoot.Attributes.Exported.Set(false);
-            receiverNotificationRestartOnBoot.Attributes.Enabled.Set(false);
+            if (settings.RescheduleOnRestart)
+            {
+                manifest.AddUsesPermission("android.permission.RECEIVE_BOOT_COMPLETED");
 
-            var receiverNotificationRestartOnBootIntentFilter = new IntentFilter();
-            var receiverNotificationRestartOnBootAction = new Unity.Android.Gradle.Manifest.Action();
-            receiverNotificationRestartOnBootAction.Attributes.Name.Set("android.intent.action.BOOT_COMPLETED");
-            receiverNotificationRestartOnBootIntentFilter.ActionList.AddElement(receiverNotificationRestartOnBootAction);
+                var receiverNotificationRestartOnBoot = manifest.Application.AddReceiver("com.unity.androidnotifications.UnityNotificationRestartReceiver");
+                receiverNotificationRestartOnBoot.Attributes.Exported.Set(false);
 
-            receiverNotificationRestartOnBoot.IntentFilterList.AddElement(receiverNotificationRestartOnBootIntentFilter);
+                var receiverNotificationRestartOnBootIntentFilter = new IntentFilter();
+                var receiverNotificationRestartOnBootAction = new Unity.Android.Gradle.Manifest.Action();
+                receiverNotificationRestartOnBootAction.Attributes.Name.Set("android.intent.action.BOOT_COMPLETED");
+                receiverNotificationRestartOnBootIntentFilter.ActionList.AddElement(receiverNotificationRestartOnBootAction);
+
+                receiverNotificationRestartOnBoot.IntentFilterList.AddElement(receiverNotificationRestartOnBootIntentFilter);
+            }
         }
 
         private static void InjectAndroidManifest(Manifest manifest, ManifestSettings settings)
         {
             manifest.SetCustomAttribute("xmlns:android", "http://schemas.android.com/apk/res/android");
 
-            InjectReceivers(manifest);
+            InjectReceivers(manifest, settings);
 
             if (settings.UseCustomActivity)
                 manifest.Application.AddMetaDataValue("custom_notification_android_activity", settings.CustomActivity);
-
-            if (settings.RescheduleOnRestart)
-            {
-                manifest.Application.AddMetaDataValue("reschedule_notifications_on_restart", "true");
-                manifest.AddUsesPermission("android.permission.RECEIVE_BOOT_COMPLETED");
-            }
 
             manifest.AddUsesPermission("android.permission.POST_NOTIFICATIONS");
 
