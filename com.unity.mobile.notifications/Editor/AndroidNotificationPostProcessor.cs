@@ -177,11 +177,6 @@ namespace Unity.Notifications
 <manifest xmlns:android=""http://schemas.android.com/apk/res/android"" package=""com.unity.androidnotifications"">
   <application>
     <receiver android:name=""com.unity.androidnotifications.UnityNotificationManager"" android:exported=""false"" />
-    <receiver android:name=""com.unity.androidnotifications.UnityNotificationRestartReceiver"" android:enabled=""false"" android:exported=""false"">
-      <intent-filter>
-        <action android:name=""android.intent.action.BOOT_COMPLETED"" />
-      </intent-filter>
-    </receiver>
     <meta-data android:name=""com.unity.androidnotifications.exact_scheduling"" android:value=""0"" />
   </application>
   <uses-permission android:name=""android.permission.POST_NOTIFICATIONS"" />
@@ -236,7 +231,18 @@ namespace Unity.Notifications
 
             if (settings.RescheduleOnRestart)
             {
-                AppendAndroidMetadataField(manifestPath, manifestDoc, "reschedule_notifications_on_restart", "true");
+                var manifestNode = manifestDoc.SelectSingleNode("manifest");
+                var applicationNode = manifestNode.SelectSingleNode("application");
+                var receiver = manifestDoc.CreateElement("receiver");
+                receiver.SetAttribute("name", kAndroidNamespaceURI, "com.unity.androidnotifications.UnityNotificationRestartReceiver");
+                receiver.SetAttribute("exported", kAndroidNamespaceURI, "false");
+                applicationNode.AppendChild(receiver);
+                var filterNode = manifestDoc.CreateElement("intent-filter");
+                receiver.AppendChild(filterNode);
+                var actionNode = manifestDoc.CreateElement("action");
+                actionNode.SetAttribute("name", kAndroidNamespaceURI, "android.intent.action.BOOT_COMPLETED");
+                filterNode.AppendChild(actionNode);
+
                 AppendAndroidPermissionField(manifestPath, manifestDoc, "android.permission.RECEIVE_BOOT_COMPLETED");
             }
 
