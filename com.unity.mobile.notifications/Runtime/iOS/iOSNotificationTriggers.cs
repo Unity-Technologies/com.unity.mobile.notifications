@@ -145,6 +145,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Time interval after which the notification should be delivered (only total of full seconds is considered).
         /// </summary>
+        /// <value>Time interval until delivery</value>
         public TimeSpan TimeInterval
         {
             get { return TimeSpan.FromSeconds(timeInterval); }
@@ -159,6 +160,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Whether the notification should repeat.
         /// </summary>
+        /// <value>True if notification should repeat with the same interval</value>
         public bool Repeats { get; set; }
     }
 
