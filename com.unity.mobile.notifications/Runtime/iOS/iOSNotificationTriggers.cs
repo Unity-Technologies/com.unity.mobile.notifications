@@ -177,43 +177,51 @@ namespace Unity.Notifications.iOS
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Calendar; } }
 
         /// <summary>
-        /// Year
+        /// Year to schedule notification on or null for any year.
         /// </summary>
+        /// <value>Number indicating year or null to ignore year</value>
         public int? Year { get; set; }
 
         /// <summary>
-        /// Month
+        /// Month to schedule notification on or null for any month.
         /// </summary>
+        /// <value>Number indicating month or null to ignore month</value>
         public int? Month { get; set; }
 
         /// <summary>
-        /// Day
+        /// Day to schedule notification on or null for any day.
         /// </summary>
+        /// <value>Number indicating day or null to ignore day</value>
         public int? Day { get; set; }
 
         /// <summary>
-        /// Hour
+        /// Hour to schedule notification on or null for any hour.
         /// </summary>
+        /// <value>Number indicating hour or null to ignore hour</value>
         public int? Hour { get; set; }
 
         /// <summary>
-        /// Minute
+        /// Minute to schedule notification on or null for any minute.
         /// </summary>
+        /// <value>Number indicating minute or null to ignore minute</value>
         public int? Minute { get; set; }
 
         /// <summary>
-        /// Second
+        /// Second to schedule notification on or null for any second.
         /// </summary>
+        /// <value>Number indicating second or null to ignore second</value>
         public int? Second { get; set; }
 
         /// <summary>
         /// Are Date and Time field in UTC time. When false, use local time.
         /// </summary>
+        /// <value>True to use UTC time</value>
         public bool UtcTime { get; set; }
 
         /// <summary>
         /// Indicate whether the notification is repeated every defined time period. For instance if hour and minute fields are set the notification will be triggered every day at the specified hour and minute.
         /// </summary>
+        /// <value>True to repeat notification for each matching date and time, False to only show it on first match</value>
         public bool Repeats { get; set; }
 
         /// <summary>
