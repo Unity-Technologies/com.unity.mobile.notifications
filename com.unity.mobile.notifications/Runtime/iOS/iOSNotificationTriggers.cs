@@ -125,9 +125,7 @@ namespace Unity.Notifications.iOS
 
     public struct iOSNotificationPushTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Push; } }
     }
 
