@@ -78,31 +78,37 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The latitude of the center point of the geographic area.
         /// </summary>
+        /// <value>Latitude in degrees</value>
         public double Latitude { get; set; }
 
         /// <summary>
         /// The longitude of the center point of the geographic area.
         /// </summary>
+        /// <value>Longitude in degrees</value>
         public double Longitude { get; set; }
 
         /// <summary>
         /// The radius (measured in meters) that defines the geographic area’s outer boundary.
         /// </summary>
+        /// <value>Radius in meters</value>
         public float Radius { get; set; }
 
         /// <summary>
         /// When this property is enabled, a device crossing from outside the region to inside the region triggers the delivery of a notification
         /// </summary>
+        /// <value>True to notify on entering the region</value>
         public bool NotifyOnEntry { get; set; }
 
         /// <summary>
         /// When this property is enabled, a device crossing from inside the region to outside the region triggers the delivery of a notification
         /// </summary>
+        /// <value>True to notify on leaving the region</value>
         public bool NotifyOnExit { get; set; }
 
         /// <summary>
         /// Whether the notification should repeat.
         /// </summary>
+        /// <value>True is notification should repeat</value>
         public bool Repeats { get; set; }
     }
 
