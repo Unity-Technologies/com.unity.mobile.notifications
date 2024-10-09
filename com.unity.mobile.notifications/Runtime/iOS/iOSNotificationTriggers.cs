@@ -36,8 +36,9 @@ namespace Unity.Notifications.iOS
     public interface iOSNotificationTrigger
     {
         /// <summary>
-        /// Returns the trigger type for this trigger.
+        /// The type of notification trigger. For internal use.
         /// </summary>
+        /// <value>The type of the trigger</value>
         iOSNotificationTriggerType Type { get; }
     }
 
@@ -54,9 +55,7 @@ namespace Unity.Notifications.iOS
     ///</remarks>
     public struct iOSNotificationLocationTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Location; } }
 
         /// <summary>
@@ -134,9 +133,7 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationTimeIntervalTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.TimeInterval; } }
 
         internal int timeInterval;
@@ -170,9 +167,7 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationCalendarTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Calendar; } }
 
         /// <summary>
