@@ -96,19 +96,19 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// When this property is enabled, a device crossing from outside the region to inside the region triggers the delivery of a notification
         /// </summary>
-        /// <value>True to notify on entering the region</value>
+        /// <value>If true, a notification triggers when entering the region.</value>
         public bool NotifyOnEntry { get; set; }
 
         /// <summary>
         /// When this property is enabled, a device crossing from inside the region to outside the region triggers the delivery of a notification
         /// </summary>
-        /// <value>True to notify on leaving the region</value>
+        /// <value>If true, a notification triggers when leaving the region.</value>
         public bool NotifyOnExit { get; set; }
 
         /// <summary>
         /// Whether the notification should repeat.
         /// </summary>
-        /// <value>True is notification should repeat</value>
+        /// <value>If true, the notification repeats.</value>
         public bool Repeats { get; set; }
     }
 
@@ -160,7 +160,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Whether the notification should repeat.
         /// </summary>
-        /// <value>True if notification should repeat with the same interval</value>
+        /// <value>If true, the notification repeats with the same interval.</value>
         public bool Repeats { get; set; }
     }
 
@@ -177,7 +177,7 @@ namespace Unity.Notifications.iOS
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Calendar; } }
 
         /// <summary>
-        /// Year to schedule notification on or null for any year.
+        /// Specify the year to schedule the notification for or set to null to indicate any year.
         /// </summary>
         /// <value>Number indicating year or null to ignore year</value>
         public int? Year { get; set; }
@@ -215,13 +215,13 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Are Date and Time field in UTC time. When false, use local time.
         /// </summary>
-        /// <value>True to use UTC time</value>
+        /// <value>If true, use UTC time.</value>
         public bool UtcTime { get; set; }
 
         /// <summary>
         /// Indicate whether the notification is repeated every defined time period. For instance if hour and minute fields are set the notification will be triggered every day at the specified hour and minute.
         /// </summary>
-        /// <value>True to repeat notification for each matching date and time, False to only show it on first match</value>
+        /// <value>If true, the notification repeats for each matching date and time. If false, the notification triggers only on the first match.</value>
         public bool Repeats { get; set; }
 
         /// <summary>
