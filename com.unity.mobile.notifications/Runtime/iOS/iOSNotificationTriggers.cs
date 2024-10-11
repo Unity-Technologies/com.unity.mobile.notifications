@@ -183,31 +183,31 @@ namespace Unity.Notifications.iOS
         public int? Year { get; set; }
 
         /// <summary>
-        /// Month to schedule notification on or null for any month.
+        /// Specify the month to schedule the notification for or set to null to indicate any month.
         /// </summary>
         /// <value>Number indicating month or null to ignore month</value>
         public int? Month { get; set; }
 
         /// <summary>
-        /// Day to schedule notification on or null for any day.
+        /// Specify the day to schedule the notification for or set to null to indicate any day.
         /// </summary>
         /// <value>Number indicating day or null to ignore day</value>
         public int? Day { get; set; }
 
         /// <summary>
-        /// Hour to schedule notification on or null for any hour.
+        /// Specify the hour to schedule the notification for or set to null to indicate any hour.
         /// </summary>
         /// <value>Number indicating hour or null to ignore hour</value>
         public int? Hour { get; set; }
 
         /// <summary>
-        /// Minute to schedule notification on or null for any minute.
+        /// Specify the minute to schedule the notification for or set to null to indicate any minute.
         /// </summary>
         /// <value>Number indicating minute or null to ignore minute</value>
         public int? Minute { get; set; }
 
         /// <summary>
-        /// Second to schedule notification on or null for any second.
+        /// Specify the second to schedule the notification for or set to null to indicate any second.
         /// </summary>
         /// <value>Number indicating second or null to ignore second</value>
         public int? Second { get; set; }
