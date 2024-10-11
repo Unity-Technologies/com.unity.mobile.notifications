@@ -36,8 +36,9 @@ namespace Unity.Notifications.iOS
     public interface iOSNotificationTrigger
     {
         /// <summary>
-        /// Returns the trigger type for this trigger.
+        /// The type of notification trigger. For internal use.
         /// </summary>
+        /// <value>The type of the trigger</value>
         iOSNotificationTriggerType Type { get; }
     }
 
@@ -54,9 +55,7 @@ namespace Unity.Notifications.iOS
     ///</remarks>
     public struct iOSNotificationLocationTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Location; } }
 
         /// <summary>
@@ -79,31 +78,37 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// The latitude of the center point of the geographic area.
         /// </summary>
+        /// <value>Latitude in degrees</value>
         public double Latitude { get; set; }
 
         /// <summary>
         /// The longitude of the center point of the geographic area.
         /// </summary>
+        /// <value>Longitude in degrees</value>
         public double Longitude { get; set; }
 
         /// <summary>
         /// The radius (measured in meters) that defines the geographic area’s outer boundary.
         /// </summary>
+        /// <value>Radius in meters</value>
         public float Radius { get; set; }
 
         /// <summary>
         /// When this property is enabled, a device crossing from outside the region to inside the region triggers the delivery of a notification
         /// </summary>
+        /// <value>If true, a notification triggers when entering the region.</value>
         public bool NotifyOnEntry { get; set; }
 
         /// <summary>
         /// When this property is enabled, a device crossing from inside the region to outside the region triggers the delivery of a notification
         /// </summary>
+        /// <value>If true, a notification triggers when leaving the region.</value>
         public bool NotifyOnExit { get; set; }
 
         /// <summary>
         /// Whether the notification should repeat.
         /// </summary>
+        /// <value>If true, the notification repeats.</value>
         public bool Repeats { get; set; }
     }
 
@@ -120,9 +125,7 @@ namespace Unity.Notifications.iOS
 
     public struct iOSNotificationPushTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Push; } }
     }
 
@@ -134,9 +137,7 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationTimeIntervalTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.TimeInterval; } }
 
         internal int timeInterval;
@@ -144,6 +145,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Time interval after which the notification should be delivered (only total of full seconds is considered).
         /// </summary>
+        /// <value>Time interval until delivery</value>
         public TimeSpan TimeInterval
         {
             get { return TimeSpan.FromSeconds(timeInterval); }
@@ -158,6 +160,7 @@ namespace Unity.Notifications.iOS
         /// <summary>
         /// Whether the notification should repeat.
         /// </summary>
+        /// <value>If true, the notification repeats with the same interval.</value>
         public bool Repeats { get; set; }
     }
 
@@ -170,49 +173,55 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public struct iOSNotificationCalendarTrigger : iOSNotificationTrigger
     {
-        /// <summary>
-        /// The type of notification trigger.
-        /// </summary>
+        /// <inheritdoc/>
         public iOSNotificationTriggerType Type { get { return iOSNotificationTriggerType.Calendar; } }
 
         /// <summary>
-        /// Year
+        /// Specify the year to schedule the notification for or set to null to indicate any year.
         /// </summary>
+        /// <value>Number indicating year or null to ignore year</value>
         public int? Year { get; set; }
 
         /// <summary>
-        /// Month
+        /// Specify the month to schedule the notification for or set to null to indicate any month.
         /// </summary>
+        /// <value>Number indicating month or null to ignore month</value>
         public int? Month { get; set; }
 
         /// <summary>
-        /// Day
+        /// Specify the day to schedule the notification for or set to null to indicate any day.
         /// </summary>
+        /// <value>Number indicating day or null to ignore day</value>
         public int? Day { get; set; }
 
         /// <summary>
-        /// Hour
+        /// Specify the hour to schedule the notification for or set to null to indicate any hour.
         /// </summary>
+        /// <value>Number indicating hour or null to ignore hour</value>
         public int? Hour { get; set; }
 
         /// <summary>
-        /// Minute
+        /// Specify the minute to schedule the notification for or set to null to indicate any minute.
         /// </summary>
+        /// <value>Number indicating minute or null to ignore minute</value>
         public int? Minute { get; set; }
 
         /// <summary>
-        /// Second
+        /// Specify the second to schedule the notification for or set to null to indicate any second.
         /// </summary>
+        /// <value>Number indicating second or null to ignore second</value>
         public int? Second { get; set; }
 
         /// <summary>
         /// Are Date and Time field in UTC time. When false, use local time.
         /// </summary>
+        /// <value>If true, use UTC time.</value>
         public bool UtcTime { get; set; }
 
         /// <summary>
         /// Indicate whether the notification is repeated every defined time period. For instance if hour and minute fields are set the notification will be triggered every day at the specified hour and minute.
         /// </summary>
+        /// <value>If true, the notification repeats for each matching date and time. If false, the notification triggers only on the first match.</value>
         public bool Repeats { get; set; }
 
         /// <summary>
