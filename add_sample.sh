@@ -10,7 +10,7 @@ mkdir Samples
 
 cd Samples
 
-git clone https://github.com/Unity-Technologies/NotificationsSamples.git tmp
+git clone -b fix-line-endings https://github.com/Unity-Technologies/NotificationsSamples.git tmp
 
 rm -rf tmp/Assets/Editor
 rm tmp/Assets/Editor.meta
