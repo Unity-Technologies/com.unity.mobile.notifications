@@ -10,6 +10,10 @@ The following settings are available for Android notifications.
 
 By default, scheduled notifications are removed after the device restarts. To preserve scheduled notifications after the device restarts, you need to enable the **Reschedule Notifications on Device Restart** option. This adds the `RECEIVE_BOOT_COMPLETED` permissions to your app's manifest.
 
+### Schedule at exact time
+
+By default, notifications are scheduled to arrive at approximate time to optimize battery usage. This is the recommended behavior. For more information, refer to [Schedule notifications at exact time](Android.html#schedule-notifications-at-exact-time).
+
 ### Custom Activity
 
 You can enable the **Use Custom Activity** option to override the activity that opens when the user taps the notification. By default, your app will only use the active activity in your app. If more than one activity is available, it will either use `UnityPlayerActivity` or `UnityPlayerGameActivity` (Starting from Unity 2023.1), depending on their availability.
