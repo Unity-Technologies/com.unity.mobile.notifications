@@ -12,7 +12,7 @@ By default, scheduled notifications are removed after the device restarts. To pr
 
 ### Schedule at exact time
 
-By default notifications are scheduled to arrive at approximate time, to save batter time. This is recommended behavior. More details can be found [here](Android.html#schedule-notifications-at-exact-time).
+By default, notifications are scheduled to arrive at approximate time to optimize battery usage. This is the recommended behavior. For more information, refer to [Schedule notifications at exact time](Android.html#schedule-notifications-at-exact-time).
 
 ### Custom Activity
 
