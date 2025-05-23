@@ -19,23 +19,6 @@ utr:
   url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
 
 ---
-pack:
-  name: Pack
-  agent:
-    type: Unity::VM
-    image: package-ci/ubuntu-22.04:v4
-    flavor: b1.small
-
-  commands:
-    - ./add_sample.sh
-    - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
-    - upm-ci package pack --package-path com.unity.mobile.notifications
-    - upm-pvp xray --packages "upm-ci~/packages/*.tgz" --results upm-ci~/xray
-    - upm-pvp require "supported rme .yamato/xray-exemptions.json" --allow-missing --results upm-ci~/xray
-  artifacts:
-    packages:
-      paths:
-        - "upm-ci~/**/*"
 
 {% for editor in test_editors %}
 {% for platform in test_platforms %}
