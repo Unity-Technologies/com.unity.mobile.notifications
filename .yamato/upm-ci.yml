@@ -19,23 +19,6 @@ utr:
   url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
 
 ---
-pack:
-  name: Pack
-  agent:
-    type: Unity::VM
-    image: package-ci/ubuntu-22.04:v4
-    flavor: b1.small
-
-  commands:
-    - ./add_sample.sh
-    - npm install upm-ci-utils@stable -g --registry https://artifactory.prd.cds.internal.unity3d.com/artifactory/api/npm/upm-npm
-    - upm-ci package pack --package-path com.unity.mobile.notifications
-    - upm-pvp xray --packages "upm-ci~/packages/*.tgz" --results upm-ci~/xray
-    - upm-pvp require "supported rme .yamato/xray-exemptions.json" --allow-missing --results upm-ci~/xray
-  artifacts:
-    packages:
-      paths:
-        - "upm-ci~/**/*"
 
 {% for editor in test_editors %}
 {% for platform in test_platforms %}
@@ -56,7 +39,7 @@ test_{{ platform.name }}_{{ editor.version }}:
       paths:
         - "upm-ci~/packages/**/*"
   dependencies:
-    - .yamato/upm-ci.yml#pack
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
 {% endfor %}
 {% endfor %}
 
@@ -84,7 +67,7 @@ test_Android_{{ editor.version }}:
       paths:
         - "upm-ci~/**/*"
   dependencies:
-    - .yamato/upm-ci.yml#pack
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
 {% endfor %}
 
 {% for editor in test_editors %}
@@ -108,7 +91,7 @@ test_iOS_{{ editor.version }}:
       paths:
         - "upm-ci~/**/*"
   dependencies:
-    - .yamato/upm-ci.yml#pack
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
 {% endfor %}
 
 test_trigger:
@@ -131,7 +114,7 @@ test_trigger:
       paths:
         - "upm-ci~/packages/**/*"
   dependencies:
-    - .yamato/upm-ci.yml#pack
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
     {% for editor in test_editors %}
     {% for platform in test_platforms %}
     - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
@@ -162,7 +145,7 @@ publish:
       paths:
         - "upm-ci~/packages/*.tgz"
   dependencies:
-    - .yamato/upm-ci.yml#pack
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
     {% for editor in test_editors %}
     {% for platform in test_platforms %}
     - .yamato/upm-ci.yml#test_{{ platform.name }}_{{ editor.version }}
