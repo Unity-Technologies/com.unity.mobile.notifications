@@ -26,6 +26,7 @@
     "com.unity.mobile.notifications": [
       ".yamato/wrench/api-validation-jobs.yml#api_validation_-_mobile_notifications_-_2021_3_-_windows",
       ".yamato/wrench/preview-a-p-v.yml#all_preview_apv_jobs",
+      ".yamato/wrench/promotion-jobs.yml#mobile_notifications_custom_checks",
       ".yamato/wrench/promotion-jobs.yml#publish_dry_run_mobile_notifications"
     ]
   },
