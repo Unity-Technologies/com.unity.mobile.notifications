@@ -1,4 +1,5 @@
-﻿using RecipeEngine.Api.Settings;
+﻿using RecipeEngine.Api.Dependencies;
+using RecipeEngine.Api.Settings;
 using RecipeEngine.Modules.Wrench.Models;
 using RecipeEngine.Modules.Wrench.Settings;
 
@@ -14,7 +15,11 @@ public class UnityMobileNotificationsSettings : AnnotatedSettingsBase
     {
         {
             "com.unity.mobile.notifications",
-            new PackageOptions() { ReleaseOptions = new ReleaseOptions() { IsReleasing = true } }
+            new PackageOptions()
+            {
+                ReleaseOptions = new ReleaseOptions() { IsReleasing = true },
+                CustomChecks = new HashSet<Dependency>() { new Dependency("upm-ci", "test_trigger") }
+            }
         }
     };
 

@@ -4,6 +4,7 @@
 [Tt]emp/
 [Ll]ogs/
 DockerFile
+Tools/CI/bin/*
 .vs
 .vscode
 .DS_Store
