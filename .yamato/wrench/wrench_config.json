@@ -34,5 +34,5 @@
   "branch_pattern": "ReleaseSlash",
   "wrench_version": "0.10.32.0",
   "pvp_exemption_path": ".yamato/wrench/pvp-exemptions.json",
-  "cs_project_path": "\\Tools\\CI\\UnityMobileNotifications.Cookbook.csproj"
+  "cs_project_path": "Tools/CI/UnityMobileNotifications.Cookbook.csproj"
 }
