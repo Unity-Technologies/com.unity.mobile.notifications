@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
+## [2.4.1] - 2025-05-28
 
 ### Fixes:
 - [Android] Add missing proguard rule for NotificationChannelWrapper.
