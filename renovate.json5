@@ -2,7 +2,7 @@
     "packageRules": [
         {
             "matchDatasources": ["maven"],
-            "registryUrls": ["https://mvnrepository.com/repos/google"]
+            "registryUrls": ["https://maven.google.com/"]
         }
     ]
 }
