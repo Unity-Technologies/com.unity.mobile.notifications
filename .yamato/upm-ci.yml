@@ -26,7 +26,7 @@ test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
     type: Unity::mobile::shield
-    image: mobile/android-execution-base:v0.7.0
+    image: mobile/android-execution-base:v0.7.1
     flavor: b1.medium
   commands:
     - curl -s {{ utr.url_win }} --output utr.bat
