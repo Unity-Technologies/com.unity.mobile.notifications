@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.core:core:1.16.0'
 }
 
 android {
