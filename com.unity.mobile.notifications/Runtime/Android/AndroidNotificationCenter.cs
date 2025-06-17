@@ -1099,7 +1099,11 @@ namespace Unity.Notifications.Android
         }
 
         /// <summary>
-        /// Allows retrieving the notification used to open the app. You can save arbitrary string data in the 'AndroidNotification.IntentData' field.
+        /// Allows retrieving the notification used to open the app.
+        /// Unity sets notifications up to open app when tapped and put notification into the Intent.
+        /// This method checks the last Intent for the current activity and reconstructs notification if one is found.
+        /// Note, that bringing app from background to foreground from recent list is resume, not open, hence the Intent does not change and notification will remain present if it was there before.
+        /// If app receives many notifications, they get grouped by OS. Tapping such grouped notification will open the app, but no notification will be returned by this method, as app in this case was not opened by a specific notification.
         /// </summary>
         /// <returns>
         /// Returns the AndroidNotification used to open the app, returns null if the app was not opened with a notification.
