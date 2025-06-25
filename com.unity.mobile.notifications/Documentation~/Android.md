@@ -200,6 +200,6 @@ if (notificationIntentData != null)
 }
 ```
 
-If app is opened via notification and then sent to background, bringing it back to foreground from recent app list is considered resume, so app is still opened by tapping notification. If app receives multiple notifications, they can get grouped by the Operating System. In such case no notification will be available even if app was opened by tapping such grouped notification.
+If the user opens the app via notification, sends it to the background, then reopens it from the recent app list, the Android OS resumes the app instead of restarting it completely. If the app receives multiple notifications, the OS might group them. In this case, when the user taps such grouped notification, no individual notification data will be available.
 
 If the app is opened in any other way, [AndroidNotificationCenter.GetLastNotificationIntent](../api/Unity.Notifications.Android.AndroidNotificationCenter.html#Unity_Notifications_Android_AndroidNotificationCenter_GetLastNotificationIntent) returns null.
