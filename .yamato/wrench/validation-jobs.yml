@@ -58,10 +58,10 @@ validate_-_mobile_notifications_-_2021_3_-_macos:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -122,10 +122,10 @@ validate_-_mobile_notifications_-_2021_3_-_ubuntu:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -186,10 +186,10 @@ validate_-_mobile_notifications_-_2021_3_-_windows:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -250,10 +250,10 @@ validate_-_mobile_notifications_-_2022_3_-_macos:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -314,10 +314,10 @@ validate_-_mobile_notifications_-_2022_3_-_ubuntu:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -378,10 +378,10 @@ validate_-_mobile_notifications_-_2022_3_-_windows:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -442,10 +442,10 @@ validate_-_mobile_notifications_-_6000_0_-_macos:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -506,10 +506,10 @@ validate_-_mobile_notifications_-_6000_0_-_ubuntu:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -570,10 +570,10 @@ validate_-_mobile_notifications_-_6000_0_-_windows:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -634,10 +634,10 @@ validate_-_mobile_notifications_-_6000_2_-_macos:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -698,10 +698,10 @@ validate_-_mobile_notifications_-_6000_2_-_ubuntu:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -762,10 +762,10 @@ validate_-_mobile_notifications_-_6000_2_-_windows:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -826,10 +826,10 @@ validate_-_mobile_notifications_-_6000_3_-_macos:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -890,10 +890,10 @@ validate_-_mobile_notifications_-_6000_3_-_ubuntu:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -954,10 +954,10 @@ validate_-_mobile_notifications_-_6000_3_-_windows:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -1018,10 +1018,10 @@ validate_-_mobile_notifications_-_6000_4_-_macos:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -1082,10 +1082,10 @@ validate_-_mobile_notifications_-_6000_4_-_ubuntu:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
@@ -1146,10 +1146,10 @@ validate_-_mobile_notifications_-_6000_4_-_windows:
   - path: .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 1.1.1.0
+    UPMPVP_CONTEXT_WRENCH: 1.1.2.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 1.1.1.0
+    Wrench: 1.1.2.0
   labels:
   - Packages:mobile.notifications
 
