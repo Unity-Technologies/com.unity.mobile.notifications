@@ -112,30 +112,6 @@ publish_dry_run_mobile_notifications:
       pvp-results:
         location: results/pvp/validate-mobile.notifications-6000.0-windows
         unzip: true
-  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_1_-_macos
-    specific_options:
-      UTR:
-        location: results/UTR/validate-mobile.notifications-6000.1-macos
-        unzip: true
-      pvp-results:
-        location: results/pvp/validate-mobile.notifications-6000.1-macos
-        unzip: true
-  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_1_-_ubuntu
-    specific_options:
-      UTR:
-        location: results/UTR/validate-mobile.notifications-6000.1-ubuntu
-        unzip: true
-      pvp-results:
-        location: results/pvp/validate-mobile.notifications-6000.1-ubuntu
-        unzip: true
-  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_1_-_windows
-    specific_options:
-      UTR:
-        location: results/UTR/validate-mobile.notifications-6000.1-windows
-        unzip: true
-      pvp-results:
-        location: results/pvp/validate-mobile.notifications-6000.1-windows
-        unzip: true
   - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_2_-_macos
     specific_options:
       UTR:
@@ -159,6 +135,30 @@ publish_dry_run_mobile_notifications:
         unzip: true
       pvp-results:
         location: results/pvp/validate-mobile.notifications-6000.2-windows
+        unzip: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_3_-_macos
+    specific_options:
+      UTR:
+        location: results/UTR/validate-mobile.notifications-6000.3-macos
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-mobile.notifications-6000.3-macos
+        unzip: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_3_-_ubuntu
+    specific_options:
+      UTR:
+        location: results/UTR/validate-mobile.notifications-6000.3-ubuntu
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-mobile.notifications-6000.3-ubuntu
+        unzip: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_3_-_windows
+    specific_options:
+      UTR:
+        location: results/UTR/validate-mobile.notifications-6000.3-windows
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-mobile.notifications-6000.3-windows
         unzip: true
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
@@ -270,30 +270,6 @@ publish_mobile_notifications:
       pvp-results:
         location: results/pvp/validate-mobile.notifications-6000.0-windows
         unzip: true
-  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_1_-_macos
-    specific_options:
-      UTR:
-        location: results/UTR/validate-mobile.notifications-6000.1-macos
-        unzip: true
-      pvp-results:
-        location: results/pvp/validate-mobile.notifications-6000.1-macos
-        unzip: true
-  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_1_-_ubuntu
-    specific_options:
-      UTR:
-        location: results/UTR/validate-mobile.notifications-6000.1-ubuntu
-        unzip: true
-      pvp-results:
-        location: results/pvp/validate-mobile.notifications-6000.1-ubuntu
-        unzip: true
-  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_1_-_windows
-    specific_options:
-      UTR:
-        location: results/UTR/validate-mobile.notifications-6000.1-windows
-        unzip: true
-      pvp-results:
-        location: results/pvp/validate-mobile.notifications-6000.1-windows
-        unzip: true
   - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_2_-_macos
     specific_options:
       UTR:
@@ -317,6 +293,30 @@ publish_mobile_notifications:
         unzip: true
       pvp-results:
         location: results/pvp/validate-mobile.notifications-6000.2-windows
+        unzip: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_3_-_macos
+    specific_options:
+      UTR:
+        location: results/UTR/validate-mobile.notifications-6000.3-macos
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-mobile.notifications-6000.3-macos
+        unzip: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_3_-_ubuntu
+    specific_options:
+      UTR:
+        location: results/UTR/validate-mobile.notifications-6000.3-ubuntu
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-mobile.notifications-6000.3-ubuntu
+        unzip: true
+  - path: .yamato/wrench/validation-jobs.yml#validate_-_mobile_notifications_-_6000_3_-_windows
+    specific_options:
+      UTR:
+        location: results/UTR/validate-mobile.notifications-6000.3-windows
+        unzip: true
+      pvp-results:
+        location: results/pvp/validate-mobile.notifications-6000.3-windows
         unzip: true
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
