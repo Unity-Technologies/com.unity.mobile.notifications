@@ -2,6 +2,12 @@
 
 All notable changes to this package will be documented in this file.
 
+## [2.4.2] - 2025-09-12
+
+### Changes & Improvements:
+
+- Documentation updates.
+
 ## [2.4.1] - 2025-05-28
 
 ### Fixes:
