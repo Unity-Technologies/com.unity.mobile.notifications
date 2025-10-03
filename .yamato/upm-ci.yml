@@ -9,7 +9,7 @@ test_editors:
 test_platforms:
   - name: mac
     type: Unity::VM::osx
-    image: package-ci/macos-13:v4
+    image: package-ci/macos-13:default
     flavor: m1.mac
 
 artifactory:
@@ -53,15 +53,15 @@ test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
     type: Unity::VM::osx
-    image: mobile/ios-macos-11:latest
+    image: mobile/ios-macos-13:v2.4102903
     flavor: i1.large
   variables:
     IOS_SIMULATOR_SDK: 1
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
-    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
-    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - pip install --break-system-packages --user unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - /Users/bokken/Library/Python/3.13/bin/unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
   artifacts:
