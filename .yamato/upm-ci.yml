@@ -9,7 +9,7 @@ test_editors:
 test_platforms:
   - name: mac
     type: Unity::VM::osx
-    image: package-ci/macos-13:v4
+    image: package-ci/macos-13:default
     flavor: m1.mac
 
 artifactory:
@@ -53,7 +53,7 @@ test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
     type: Unity::VM::osx
-    image: mobile/ios-macos-11:latest
+    image: mobile/ios-macos-13:v2.4102903
     flavor: i1.large
   variables:
     IOS_SIMULATOR_SDK: 1
