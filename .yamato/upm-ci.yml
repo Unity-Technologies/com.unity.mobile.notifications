@@ -60,8 +60,8 @@ test_iOS_{{ editor.version }}:
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
-    - pip install unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
-    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - pip install --break-system-packages --user unity-downloader-cli --index-url {{ artifactory.production }}pypi/pypi/simple --upgrade
+    - /Users/bokken/Library/Python/3.13/bin/unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
   artifacts:
