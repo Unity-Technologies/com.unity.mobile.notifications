@@ -190,6 +190,9 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
     private static void PatchPreprocessor(string path, bool needLocationFramework, bool addPushNotificationCapability)
     {
+        if (!(needLocationFramework || addPushNotificationCapability))
+            return;
+
         var preprocessorPath = path + "/Classes/Preprocessor.h";
         var preprocessor = File.ReadAllText(preprocessorPath);
         var needsToWriteChanges = false;
