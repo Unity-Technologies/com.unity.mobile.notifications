@@ -1,5 +1,6 @@
 test_editors:
   - version: trunk
+  - version: 6000.4
   - version: 6000.3
   - version: 6000.2
   - version: 6000.0
