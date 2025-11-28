@@ -96,7 +96,7 @@
     }];
 }
 
-- (void)authorizationCompletedWithRequest: (void*)request registerRemote: (BOOL)registerRemote granted: (BOOL)granted error: (NSError* _Nullable)error
+- (void)authorizationCompletedWithRequest:(void*)request registerRemote:(BOOL)registerRemote granted:(BOOL)granted error:(NSError* _Nullable)error
 {
     BOOL authorizationRequestFinished = YES;
     struct iOSNotificationAuthorizationData authData;
@@ -415,7 +415,7 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
 }
 
 - (UNNotificationInterruptionLevel)unityInterruptionLevelToIos:(int)level
-    API_AVAILABLE(ios(15.0))
+    API_AVAILABLE (ios(15.0))
 {
     switch (level)
     {
