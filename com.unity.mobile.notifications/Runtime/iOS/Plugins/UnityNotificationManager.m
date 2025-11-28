@@ -14,6 +14,7 @@
 @implementation UnityNotificationManager
 {
     NSLock* _lock;
+    BOOL _remoteNotificationsEnabled;
     UNAuthorizationStatus _remoteNotificationsRegistered;
     NSInteger _remoteNotificationForegroundPresentationOptions;
     NSString* _deviceToken;
@@ -40,7 +41,10 @@
     _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
     _deviceToken = nil;
     _pendingRemoteAuthRequests = nil;
-    _remoteNotificationForegroundPresentationOptions = [[[NSBundle mainBundle] objectForInfoDictionaryKey: @"UnityRemoteNotificationForegroundPresentationOptions"] integerValue];
+
+    NSBundle* mainBundle = NSBundle.mainBundle;
+    _remoteNotificationsEnabled = [[mainBundle objectForInfoDictionaryKey: @"UnityAddRemoteNotificationCapability"] boolValue];
+    _remoteNotificationForegroundPresentationOptions = [[mainBundle objectForInfoDictionaryKey: @"UnityRemoteNotificationForegroundPresentationOptions"] integerValue];
     return self;
 }
 
@@ -153,6 +157,12 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification
     withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
+    const BOOL isPushNotification = [notification.request.trigger isKindOfClass: UNPushNotificationTrigger.class];
+    // Push notifications not enabled, the probably is other push notifications solution installed alongside
+    // we back off completely
+    if (isPushNotification && !_remoteNotificationsEnabled)
+        return;
+
     iOSNotificationData notificationData;
     BOOL haveNotificationData = NO;
     if (self.onNotificationReceivedCallback != NULL)
@@ -166,7 +176,7 @@
     NSInteger presentationOptions;
 
     showInForeground = [[notification.request.content.userInfo objectForKey: @"showInForeground"] boolValue];
-    if ([notification.request.trigger isKindOfClass: [UNPushNotificationTrigger class]])
+    if (isPushNotification)
     {
         presentationOptions = _remoteNotificationForegroundPresentationOptions;
         if (self.onRemoteNotificationReceivedCallback != NULL)
