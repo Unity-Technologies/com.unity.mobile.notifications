@@ -7,12 +7,6 @@ test_editors:
   - version: 2022.3
   - version: 2021.3
 
-test_platforms:
-  - name: mac
-    type: Unity::VM::osx
-    image: package-ci/macos-13:default
-    flavor: m1.mac
-
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
 
