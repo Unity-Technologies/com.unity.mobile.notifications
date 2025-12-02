@@ -101,7 +101,7 @@
     BOOL authorizationRequestFinished = YES;
     struct iOSNotificationAuthorizationData authData;
     authData.granted = granted;
-    authData.error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
+    authData.error =  error.localizedDescription.UTF8String;
     authData.deviceToken = "";
 
     if (granted)
@@ -117,11 +117,11 @@
                 [_pendingRemoteAuthRequests addPointer: request];
             }
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[UIApplication sharedApplication] registerForRemoteNotifications];
+                [UIApplication.sharedApplication registerForRemoteNotifications];
             });
         }
         else
-            authData.deviceToken = [_deviceToken UTF8String];
+            authData.deviceToken = _deviceToken.UTF8String;
         [_lock unlock];
     }
     else
