@@ -159,9 +159,12 @@
 {
     const BOOL isPushNotification = [notification.request.trigger isKindOfClass: UNPushNotificationTrigger.class];
     // Push notifications not enabled, the probably is other push notifications solution installed alongside
-    // we back off completely
+    // we back off and behave as if this method is not implemented, which is call completion handler with "None"
     if (isPushNotification && !_remoteNotificationsEnabled)
+    {
+        completionHandler(UNNotificationPresentationOptionNone);
         return;
+    }
 
     iOSNotificationData notificationData;
     BOOL haveNotificationData = NO;
