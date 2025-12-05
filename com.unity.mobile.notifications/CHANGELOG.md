@@ -2,6 +2,10 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+- [iOS] Fixed push notifications not being ignored by the package when they are disabled in settings.
+
 ## [2.4.2] - 2025-09-12
 
 ### Changes & Improvements:
