@@ -144,10 +144,10 @@ namespace Unity.Notifications
         }
 
         /// <summary>
-        /// An event that fires when notification is received.
-        /// Application must be running for this event to work.
-        /// On Android this even fires if application is in foreground or when it's brought back from background.
-        /// On iOS this even only fires when notification is received while app is in foreground.
+        /// An event that fires when a notification is received.
+        /// The application must be running for this event to work.
+        /// On Android, this event fires when the application is in the foreground or when it's brought back from the background.
+        /// On iOS, this event only fires when a notification is received while the application is in the foreground.
         /// </summary>
         /// <remarks>
         /// This event is the same as AndroidNotificationCenter.OnNotificationReceived and iOSNotificationCenter.OnNotificationReceived.
