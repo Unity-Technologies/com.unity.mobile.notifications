@@ -13,7 +13,6 @@
 
 @implementation UnityNotificationManager
 {
-    NSLock* _lock;
     BOOL _remoteNotificationsEnabled;
     UNAuthorizationStatus _remoteNotificationsRegistered;
     NSInteger _remoteNotificationForegroundPresentationOptions;
@@ -37,7 +36,6 @@
 
 - (id)init
 {
-    _lock = [[NSLock alloc] init];
     _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
     _deviceToken = nil;
     _pendingRemoteAuthRequests = nil;
@@ -67,12 +65,14 @@
         authData.deviceToken = [deviceToken UTF8String];
     }
 
-    [_lock lock];
-    _remoteNotificationsRegistered = status;
-    _deviceToken = deviceToken;
-    NSPointerArray* pointers = _pendingRemoteAuthRequests;
-    _pendingRemoteAuthRequests = nil;
-    [_lock unlock];
+    NSPointerArray* pointers;
+    @synchronized (self)
+    {
+        _remoteNotificationsRegistered = status;
+        _deviceToken = deviceToken;
+        pointers = _pendingRemoteAuthRequests;
+        _pendingRemoteAuthRequests = nil;
+    }
 
     while (pointers.count > 0)
     {
@@ -92,15 +92,22 @@
 
     [center requestAuthorizationWithOptions: authorizationOptions completionHandler:^(BOOL granted, NSError * _Nullable error)
     {
-        BOOL authorizationRequestFinished = YES;
-        struct iOSNotificationAuthorizationData authData;
-        authData.granted = granted;
-        authData.error =  [[error localizedDescription]cStringUsingEncoding: NSUTF8StringEncoding];
-        authData.deviceToken = "";
+        [self authorizationCompletedWithRequest: request registerRemote: registerRemote granted: granted error: error];
+    }];
+}
 
-        if (granted)
+- (void)authorizationCompletedWithRequest:(void*)request registerRemote:(BOOL)registerRemote granted:(BOOL)granted error:(NSError* _Nullable)error
+{
+    BOOL authorizationRequestFinished = YES;
+    struct iOSNotificationAuthorizationData authData;
+    authData.granted = granted;
+    authData.error =  error.localizedDescription.UTF8String;
+    authData.deviceToken = "";
+
+    if (granted)
+    {
+        @synchronized (self)
         {
-            [_lock lock];
             if (registerRemote && _remoteNotificationsRegistered == UNAuthorizationStatusNotDetermined)
             {
                 authorizationRequestFinished = NO;
@@ -111,20 +118,19 @@
                     [_pendingRemoteAuthRequests addPointer: request];
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [[UIApplication sharedApplication] registerForRemoteNotifications];
+                    [UIApplication.sharedApplication registerForRemoteNotifications];
                 });
             }
             else
-                authData.deviceToken = [_deviceToken UTF8String];
-            [_lock unlock];
+                authData.deviceToken = _deviceToken.UTF8String;
         }
-        else
-            NSLog(@"Requesting notification authorization failed with: %@", error);
+    }
+    else
+        NSLog(@"Requesting notification authorization failed with: %@", error);
 
-        if (authorizationRequestFinished)
-            [self finishAuthorization: &authData forRequest: request];
-        [self updateNotificationSettings];
-    }];
+    if (authorizationRequestFinished)
+        [self finishAuthorization: &authData forRequest: request];
+    [self updateNotificationSettings];
 }
 
 - (void)unregisterForRemoteNotifications
