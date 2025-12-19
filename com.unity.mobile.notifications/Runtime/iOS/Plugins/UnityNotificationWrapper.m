@@ -353,7 +353,13 @@ void _SetNotificationCategories(void* categorySet)
 
 void _OpenNotificationSettings()
 {
-    NSURL* url = [NSURL URLWithString: UIApplicationOpenSettingsURLString];
+    NSString* urlString;
+    if (@available(iOS 15.4, *))
+        urlString = UIApplicationOpenNotificationSettingsURLString;
+    else
+        urlString = UIApplicationOpenSettingsURLString;
+
+    NSURL* url = [NSURL URLWithString:urlString];
     UIApplication* app = [UIApplication sharedApplication];
     if ([app canOpenURL: url])
         [app openURL: url options: @{} completionHandler: nil];
