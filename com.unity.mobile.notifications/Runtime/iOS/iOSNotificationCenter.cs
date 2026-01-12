@@ -255,9 +255,9 @@ namespace Unity.Notifications.iOS
         }
 
         /// <summary>
-        /// Opens notifications page for this application in the Settings.
-        /// Opening notification settings specifically is supported since iOS 15.4. On older versions settings app with current application settings will be opened.
-        /// Note, that application will be suspended, since opening settings is switching to different application.
+        /// Opens the notification settings page for this application in the Settings app.
+        /// Opening the notification settings directly is supported on iOS 15.4 and later. On earlier versions, this method opens your application settings page in the Settings app.
+        /// Note that your application suspends as the system switches to the Settings app.
         /// </summary>
         public static void OpenNotificationSettings()
         {
