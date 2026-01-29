@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
+## [2.4.3] - 2026-01-29
 
 ### Changes & Improvements:
 - [iOS] iOSNotificationCenter.OpenNotificationSettings now directly opens the notification settings page for your app on iOS 15.4 and later.
