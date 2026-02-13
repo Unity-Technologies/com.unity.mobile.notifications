@@ -139,6 +139,15 @@ namespace NotificationSamples.Demo
             ShowNewsFeedLoadingIcon(false);
         }
 
+        private void Start()
+        {
+            Screen.autorotateToLandscapeLeft = true;
+            Screen.autorotateToLandscapeRight = true;
+            Screen.autorotateToPortrait = false;
+            Screen.autorotateToPortraitUpsideDown = false;
+            Screen.orientation = ScreenOrientation.AutoRotation;
+        }
+
         private void OnApplicationPause(bool pauseStatus)
         {
             if (pauseStatus)
