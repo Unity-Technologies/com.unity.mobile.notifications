@@ -103,12 +103,9 @@ namespace NotificationSamples
         /// </returns>
         public GameNotification GetLastNotification()
         {
-            var notification = NotificationCenter.LastRespondedNotification;
-
-            if (notification.HasValue)
-            {
-                return new GameNotification(notification.Value);
-            }
+            var query = NotificationCenter.QueryLastRespondedNotification();
+            if (query.State == QueryLastRespondedNotificationState.HaveRespondedNotification)
+                return new GameNotification(query.Notification);
 
             return null;
         }
