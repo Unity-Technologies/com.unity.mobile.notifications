@@ -11,6 +11,6 @@ android {
         namespace "com.unity.fileaccess"
     }
 
-    compileSdkVersion 33
+    compileSdkVersion 36
     buildToolsVersion project(':unityLibrary').extensions.getByName('android').buildToolsVersion
 }
