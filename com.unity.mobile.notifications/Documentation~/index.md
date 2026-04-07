@@ -10,7 +10,7 @@ Notification functionality works differently on Android and iOS platforms. The m
 
 ### Requirements
 
-- Compatible with Unity 2021.3 or above.
+- Compatible with Unity 6.0 or above.
 - Compatible with same minimum Android and iOS versions as the oldest supported Unity version.
 - Requires Android SDK with API level 33 or higher.
 - Requires Xcode with SDK for iOS 15.2 or newer.
