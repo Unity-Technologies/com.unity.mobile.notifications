@@ -4,13 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Android;
 
-#if UNITY_2022_2_OR_NEWER
 using JniMethodID = System.IntPtr;
 using JniFieldID = System.IntPtr;
-#else
-using JniMethodID = System.String;
-using JniFieldID = System.String;
-#endif
 
 namespace Unity.Notifications.Android
 {
@@ -160,13 +155,10 @@ namespace Unity.Notifications.Android
             {
                 if (color == null)
                     return null;
-#if UNITY_2022_2_OR_NEWER
+
                 int val;
                 AndroidJNIHelper.Unbox(color.GetRawObject(), out val);
                 return val.ToColor();
-#else
-                return color.Call<int>("intValue").ToColor();
-#endif
             }
         }
 
@@ -572,26 +564,18 @@ namespace Unity.Notifications.Android
 
         public static JniFieldID FindField(AndroidJavaClass clazz, string name, string signature, bool isStatic)
         {
-#if UNITY_2022_2_OR_NEWER
             var field = AndroidJNIHelper.GetFieldID(clazz.GetRawClass(), name, signature, isStatic);
             if (field == IntPtr.Zero)
                 throw new Exception($"Field {name} with signature {signature} not found");
             return field;
-#else
-            return name;
-#endif
         }
 
         public static JniMethodID FindMethod(AndroidJavaClass clazz, string name, string signature, bool isStatic)
         {
-#if UNITY_2022_2_OR_NEWER
             var method = AndroidJNIHelper.GetMethodID(clazz.GetRawClass(), name, signature, isStatic);
             if (method == IntPtr.Zero)
                 throw new Exception($"Method {name} with signature {signature} not found");
             return method;
-#else
-            return name;
-#endif
         }
     }
 
@@ -733,13 +717,7 @@ namespace Unity.Notifications.Android
                     return false;
 
                 if (CanRequestPermissionToPost)
-                {
-#if UNITY_2023_1_OR_NEWER
                     return Permission.ShouldShowRequestPermissionRationale(PERMISSION_POST_NOTIFICATIONS);
-#else
-                    return s_CurrentActivity.Call<bool>("shouldShowRequestPermissionRationale", PERMISSION_POST_NOTIFICATIONS);
-#endif
-                }
 
                 return false;
             }
