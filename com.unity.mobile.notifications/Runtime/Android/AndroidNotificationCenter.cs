@@ -566,7 +566,7 @@ namespace Unity.Notifications.Android
         {
             var field = AndroidJNIHelper.GetFieldID(clazz.GetRawClass(), name, signature, isStatic);
             if (field == IntPtr.Zero)
-                throw new Exception($"Field {name} with signature {signature} not found");
+                throw new MissingFieldException($"Field {name} with signature {signature} not found");
             return field;
         }
 
@@ -574,7 +574,7 @@ namespace Unity.Notifications.Android
         {
             var method = AndroidJNIHelper.GetMethodID(clazz.GetRawClass(), name, signature, isStatic);
             if (method == IntPtr.Zero)
-                throw new Exception($"Method {name} with signature {signature} not found");
+                throw new MissingMethodException($"Method {name} with signature {signature} not found");
             return method;
         }
     }
