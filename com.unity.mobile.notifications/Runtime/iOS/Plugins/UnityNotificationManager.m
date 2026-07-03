@@ -169,7 +169,7 @@
         return;
     }
 
-    iOSNotificationData notificationData;
+    iOSNotificationData notificationData = {};
     BOOL haveNotificationData = NO;
     if (self.onNotificationReceivedCallback != NULL)
     {
