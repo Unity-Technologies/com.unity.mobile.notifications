@@ -8,7 +8,15 @@
 #import <objc/runtime.h>
 
 #import "UnityNotificationManager.h"
+
+#if UNITY_XCODE_PROJECT_TYPE_SWIFT
+#import "UnityFramework/UnityFramework-Swift.h"
+#define kUnityWillFinishLaunchingWithOptions UnityNotifications.applicationWillFinishLaunching
+#define kUnityDidRegisterForRemoteNotificationsWithDeviceToken UnityNotifications.applicationDidRegisterForRemoteNotifications
+#define kUnityDidFailToRegisterForRemoteNotificationsWithError UnityNotifications.applicationDidFailToRegisterForRemoteNotifications
+#else
 #import "Classes/PluginBase/AppDelegateListener.h"
+#endif
 
 @interface UnityNotificationLifeCycleManager : NSObject
 
