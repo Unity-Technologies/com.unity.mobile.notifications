@@ -52,7 +52,7 @@
         self.onAuthorizationCompletionCallback(request, *authData);
 }
 
-- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status notification:(NSNotification*)notification
+- (void)finishRemoteNotificationRegistration:(UNAuthorizationStatus)status deviceToken:(NSData*)devToken
 {
     struct iOSNotificationAuthorizationData authData;
     authData.granted = status == UNAuthorizationStatusAuthorized;
@@ -61,7 +61,7 @@
     NSString* deviceToken = nil;
     if (authData.granted)
     {
-        deviceToken = [UnityNotificationManager deviceTokenFromNotification: notification];
+        deviceToken = [UnityNotificationManager deviceTokenToString: devToken];
         authData.deviceToken = [deviceToken UTF8String];
     }
 
@@ -139,12 +139,9 @@
     _remoteNotificationsRegistered = UNAuthorizationStatusNotDetermined;
 }
 
-+ (NSString*)deviceTokenFromNotification:(NSNotification*)notification
++ (NSString*)deviceTokenToString:(NSData*)deviceTokenData
 {
-    NSData* deviceTokenData;
-    if ([notification.userInfo isKindOfClass: [NSData class]])
-        deviceTokenData = (NSData*)notification.userInfo;
-    else
+    if (deviceTokenData == nil)
         return nil;
 
     NSUInteger len = deviceTokenData.length;
