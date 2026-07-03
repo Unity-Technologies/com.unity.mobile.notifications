@@ -128,33 +128,39 @@ namespace Unity.Notifications.Tests.Sample
                 .Gray($"isPaused = {isPaused}", 1);
             if (isPaused == false)
             {
-                var op = iOSNotificationCenter.QueryLastRespondedNotification();
-                iOSNotification notification = op.Notification;
-                if (notification != null)
+                StartCoroutine(CheckNotificationAfterPause());
+            }
+        }
+
+        IEnumerator CheckNotificationAfterPause()
+        {
+            var op = iOSNotificationCenter.QueryLastRespondedNotification();
+            yield return op;
+            iOSNotification notification = op.Notification;
+            if (notification != null)
+            {
+                m_LOGGER.Green($"Notification found:", 1);
+                if (notification.Data != "IGNORE")
                 {
-                    m_LOGGER.Green($"Notification found:", 1);
-                    if (notification.Data != "IGNORE")
+                    m_LOGGER
+                        .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
+                        .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
+                        .Properties(notification, 1);
+                    string lastAction = op.ActionId;
+                    string lastTextInput = op.UserText;
+                    if (lastAction != null)
                     {
+                        string output = lastTextInput != null ? $"Used action {lastAction} with input '{lastTextInput}'" : $"Used action {lastAction}";
                         m_LOGGER
-                            .Orange($"[{DateTime.Now.ToString("HH:mm:ss.ffffff")}] Received notification")
-                            .Orange($"Setting BADGE to {iOSNotificationCenter.GetDeliveredNotifications().Length + 1}", 1)
-                            .Properties(notification, 1);
-                        string lastAction = op.ActionId;
-                        string lastTextInput = op.UserText;
-                        if (lastAction != null)
-                        {
-                            string output = lastTextInput != null ? $"Used action {lastAction} with input '{lastTextInput}'" : $"Used action {lastAction}";
-                            m_LOGGER
-                                .Orange(output);
-                        }
-                        iOSNotificationCenter.ApplicationBadge =
-                            iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
+                            .Orange(output);
                     }
+                    iOSNotificationCenter.ApplicationBadge =
+                        iOSNotificationCenter.GetDeliveredNotifications().Length + 1;
                 }
-                else
-                {
-                    m_LOGGER.Red("Notification not found!", 1);
-                }
+            }
+            else
+            {
+                m_LOGGER.Red("Notification not found!", 1);
             }
         }
 
