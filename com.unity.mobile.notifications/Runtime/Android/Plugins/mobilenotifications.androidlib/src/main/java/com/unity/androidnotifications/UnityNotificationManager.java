@@ -425,7 +425,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Intent openAppIntent = new Intent(mContext, openActivity);
         openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         openAppIntent.putExtra(KEY_NOTIFICATION_ID, id);
-        PendingIntent pendingIntent = getActivityPendingIntent(id, openAppIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -499,10 +499,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Intent intent = new Intent(mContext, UnityNotificationManager.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         return intent;
-    }
-
-    private PendingIntent getActivityPendingIntent(int id, Intent intent, int flags) {
-        return PendingIntent.getActivity(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private PendingIntent getBroadcastPendingIntent(int id, Intent intent, int flags) {
