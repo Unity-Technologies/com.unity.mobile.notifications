@@ -72,7 +72,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public static final String KEY_SMALL_ICON = "smallIcon";
     public static final String KEY_CHANNEL_ID = "channelID";
     public static final String KEY_SHOW_IN_FOREGROUND = "com.unity.showInForeground";
-    public static final String KEY_NOTIFICATION_DISMISSED = "com.unity.NotificationDismissed";
     public static final String KEY_BIG_LARGE_ICON = "com.unity.BigLargeIcon";
     public static final String KEY_BIG_PICTURE = "com.unity.BigPicture";
     public static final String KEY_BIG_CONTENT_TITLE = "com.unity.BigContentTytle";
@@ -428,15 +427,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, id, openAppIntent, PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            // Can't check StatusBar notifications pre-M, so ask to be notified when dismissed
-            Intent deleteIntent = new Intent(mContext, UnityNotificationManager.class);
-            deleteIntent.setAction(KEY_NOTIFICATION_DISMISSED); // need action to distinguish intent from content one
-            deleteIntent.putExtra(KEY_NOTIFICATION_DISMISSED, id);
-            PendingIntent deletePending = getBroadcastPendingIntent(id, deleteIntent, 0);
-            builder.setDeleteIntent(deletePending);
-        }
-
         finalizeNotificationForDisplay(builder);
         return builder.build();
     }
@@ -677,15 +667,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public void onReceive(Intent intent) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (KEY_NOTIFICATION_DISMISSED.equals(intent.getAction())) {
-                int removedId = intent.getIntExtra(KEY_NOTIFICATION_DISMISSED, -1);
-                if (removedId > 0) synchronized (this) {
-                    mVisibleNotifications.remove(removedId);
-                }
-                return;
-            }
-        }
         showNotification(intent);
     }
 
