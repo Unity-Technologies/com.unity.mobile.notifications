@@ -23,7 +23,7 @@ android {
     buildToolsVersion unityLib.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 22
+        minSdkVersion 23
         consumerProguardFiles "proguard-rules.pro"
     }
 
