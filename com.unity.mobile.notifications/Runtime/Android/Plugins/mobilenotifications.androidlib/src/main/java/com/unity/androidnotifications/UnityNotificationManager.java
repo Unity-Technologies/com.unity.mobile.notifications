@@ -502,17 +502,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private PendingIntent getActivityPendingIntent(int id, Intent intent, int flags) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            return PendingIntent.getActivity(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
-        else
-            return PendingIntent.getActivity(mContext, id, intent, flags);
+        return PendingIntent.getActivity(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private PendingIntent getBroadcastPendingIntent(int id, Intent intent, int flags) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            return PendingIntent.getBroadcast(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
-        else
-            return PendingIntent.getBroadcast(mContext, id, intent, flags);
+        return PendingIntent.getBroadcast(mContext, id, intent, flags | PendingIntent.FLAG_IMMUTABLE);
     }
 
     // Save the notification intent to SharedPreferences if reschedule_on_restart is true,
