@@ -318,7 +318,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public NotificationChannelWrapper[] getNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             List<NotificationChannel> channels = getNotificationManager().getNotificationChannels();
-            if (channels.size() == 0)
+            if (channels.isEmpty())
                 return null;
             NotificationChannelWrapper[] channelList = new NotificationChannelWrapper[channels.size()];
             int i = 0;
@@ -330,7 +330,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         } else {
             SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
             Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<>());
-            if (channelIdsSet.size() == 0)
+            if (channelIdsSet.isEmpty())
                 return null;
             NotificationChannelWrapper[] channels = new NotificationChannelWrapper[channelIdsSet.size()];
             int i = 0;
@@ -513,7 +513,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
                 idsMarkedForRemoval.add(id);
         }
 
-        if (idsMarkedForRemoval.size() > 0) {
+        if (!idsMarkedForRemoval.isEmpty()) {
             ids = new HashSet<>(ids);
             for (String id : idsMarkedForRemoval) {
                 ids.remove(id);
@@ -754,7 +754,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private Object getIcon(String icon) {
-        if (icon == null || icon.length() == 0)
+        if (icon == null || icon.isEmpty())
             return null;
         if (icon.charAt(0) == '/') {
             return BitmapFactory.decodeFile(icon);
@@ -768,7 +768,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private Object getIconForUri(String uri) {
-        if (uri == null || uri.length() == 0)
+        if (uri == null || uri.isEmpty())
             return null;
         if (uri.indexOf("://") > 0) {
             return Icon.createWithContentUri(uri);
@@ -843,7 +843,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public static void setNotificationIcon(Notification.Builder notificationBuilder, String keyName, String icon) {
-        if (icon == null || icon.length() == 0 && notificationBuilder.getExtras().getString(keyName) != null)
+        if (icon == null || icon.isEmpty() && notificationBuilder.getExtras().getString(keyName) != null)
             notificationBuilder.getExtras().remove(keyName);
         else
             notificationBuilder.getExtras().putString(keyName, icon);
@@ -852,7 +852,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     public void setupBigPictureStyle(Notification.Builder builder,
             String largeIcon, String picture, String contentTitle, String contentDescription, String summaryText, boolean showWhenCollapsed) {
         Bundle extras = builder.getExtras();
-        if (picture == null || picture.length() == 0)
+        if (picture == null || picture.isEmpty())
             return;
         extras.putString(KEY_BIG_LARGE_ICON, largeIcon);
         extras.putString(KEY_BIG_PICTURE, picture);
@@ -1005,7 +1005,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
             settingsIntent.setData(uri);
         } else {
-            if (channelId != null && channelId.length() > 0) {
+            if (channelId != null && !channelId.isEmpty()) {
                 settingsIntent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
                 settingsIntent.putExtra(Settings.EXTRA_CHANNEL_ID, channelId);
             } else {
