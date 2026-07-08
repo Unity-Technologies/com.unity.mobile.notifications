@@ -540,9 +540,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     private boolean canScheduleExactAlarms(AlarmManager alarmManager) {
-        // exact scheduling supported since Android 6
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-            return false;
         if (mExactSchedulingSetting < 0) {
             Bundle metaData = getAppMetadata();
             if (metaData != null)
@@ -566,7 +563,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
         if (repeatInterval <= 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && canScheduleExactAlarms(alarmManager)) {
+            if (canScheduleExactAlarms(alarmManager)) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, fireTime, broadcast);
             } else {
                 alarmManager.set(AlarmManager.RTC_WAKEUP, fireTime, broadcast);
