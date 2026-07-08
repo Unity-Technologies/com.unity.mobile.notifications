@@ -89,7 +89,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         mActivity = activity;
         mNotificationCallback = notificationCallback;
         if (mScheduledNotifications == null)
-            mScheduledNotifications = new ConcurrentHashMap();
+            mScheduledNotifications = new ConcurrentHashMap<>();
         if (mBackgroundThread == null || !mBackgroundThread.isAlive())
             mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
         if (mRandom == null)
@@ -105,7 +105,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
         if (mUnityNotificationManager == null) {
             mUnityNotificationManager = new UnityNotificationManager();
-            mUnityNotificationManager.mScheduledNotifications = new ConcurrentHashMap();
+            mUnityNotificationManager.mScheduledNotifications = new ConcurrentHashMap<>();
         }
 
         // always assign context, as it might change
@@ -297,13 +297,13 @@ public class UnityNotificationManager extends BroadcastReceiver {
             getNotificationManager().deleteNotificationChannel(id);
         } else {
             SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-            Set<String> channelIds = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
+            Set<String> channelIds = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<>());
 
             if (!channelIds.contains(id))
                 return;
 
             // Remove from the notification channel ids SharedPreferences.
-            channelIds = new HashSet(channelIds);
+            channelIds = new HashSet<>(channelIds);
             channelIds.remove(id);
             SharedPreferences.Editor editor = prefs.edit().clear();
             editor.putStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, channelIds);
@@ -329,7 +329,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
             return channelList;
         } else {
             SharedPreferences prefs = mContext.getSharedPreferences(NOTIFICATION_CHANNELS_SHARED_PREFS, Context.MODE_PRIVATE);
-            Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet());
+            Set<String> channelIdsSet = prefs.getStringSet(NOTIFICATION_CHANNELS_SHARED_PREFS_KEY, new HashSet<>());
             if (channelIdsSet.size() == 0)
                 return null;
             NotificationChannelWrapper[] channels = new NotificationChannelWrapper[channelIdsSet.size()];
@@ -493,7 +493,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     synchronized List<Notification.Builder> loadSavedNotifications() {
         Set<String> ids = getScheduledNotificationIDs();
 
-        List<Notification.Builder> intent_data_list = new ArrayList();
+        List<Notification.Builder> intent_data_list = new ArrayList<>();
         Set<String> idsMarkedForRemoval = new HashSet<String>();
 
         for (String id : ids) {
