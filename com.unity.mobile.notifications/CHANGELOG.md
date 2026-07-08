@@ -5,7 +5,8 @@ All notable changes to this package will be documented in this file.
 ## [Unreleased]
 
 ### Changes & Improvements:
-- Unity 6.0 or later is required
+- Unity 6.0 or later is required.
+- [iOS] Package is now compatible with the Swift Xcode project type (introduced in Unity 6.5).
 
 ## [2.4.3] - 2026-01-29
 
