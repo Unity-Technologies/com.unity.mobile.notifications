@@ -245,7 +245,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         channel.id = id;
         channel.name = prefs.getString("title", "undefined");
-        channel.importance = prefs.getInt("importance", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.importance = prefs.getInt("importance", 3 /* NotificationManager.IMPORTANCE_DEFAULT */);
         channel.description = prefs.getString("description", "undefined");
         channel.enableLights = prefs.getBoolean("enableLights", false);
         channel.enableVibration = prefs.getBoolean("enableVibration", false);
