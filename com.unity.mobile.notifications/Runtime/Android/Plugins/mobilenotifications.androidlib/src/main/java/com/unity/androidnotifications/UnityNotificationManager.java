@@ -429,10 +429,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
         Log.d(TAG_UNITY, "Checking for invalid notification IDs still hanging around");
 
         Set<String> invalid = findInvalidNotificationIds(ids);
-        Set<String> currentIds = new HashSet<>(ids);
         for (String id : invalid) {
-            currentIds.remove(id);
-            mScheduledNotifications.remove(id);
+            ids.remove(id);
+            mScheduledNotifications.remove(Integer.valueOf(id));
         }
 
         // in case we have saved intents, clear them
