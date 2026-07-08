@@ -52,7 +52,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private Class mOpenActivity = null;
     private UnityNotificationBackgroundThread mBackgroundThread;
     private Random mRandom;
-    private HashSet<Integer> mVisibleNotifications;
     private ConcurrentHashMap<Integer, Notification.Builder> mScheduledNotifications;
     private NotificationCallback mNotificationCallback;
     private int mExactSchedulingSetting = -1;
@@ -95,8 +94,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
             mBackgroundThread = new UnityNotificationBackgroundThread(this, mScheduledNotifications);
         if (mRandom == null)
             mRandom = new Random();
-        if (mVisibleNotifications == null)
-            mVisibleNotifications = new HashSet<>();
 
         Bundle metaData = getAppMetadata();
 
@@ -110,7 +107,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
     static synchronized UnityNotificationManager getNotificationManagerImpl(Context context) {
         if (mUnityNotificationManager == null) {
             mUnityNotificationManager = new UnityNotificationManager();
-            mUnityNotificationManager.mVisibleNotifications = new HashSet<>();
             mUnityNotificationManager.mScheduledNotifications = new ConcurrentHashMap();
         }
 
@@ -458,19 +454,11 @@ public class UnityNotificationManager extends BroadcastReceiver {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            StatusBarNotification[] active = getNotificationManager().getActiveNotifications();
-            for (StatusBarNotification notification : active) {
-                // any notifications in status bar are still valid
-                String id = String.valueOf(notification.getId());
-                invalid.remove(id);
-            }
-        }
-        else synchronized (this) {
-            for (Integer visibleId : mVisibleNotifications) {
-                String id = String.valueOf(visibleId);
-                invalid.remove(id);
-            }
+        StatusBarNotification[] active = getNotificationManager().getActiveNotifications();
+        for (StatusBarNotification notification : active) {
+            // any notifications in status bar are still valid
+            String id = String.valueOf(notification.getId());
+            invalid.remove(id);
         }
 
         // if app is launched with notification, user still has access to it
@@ -575,16 +563,9 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
     // Check the notification status by id.
     public int checkNotificationStatus(int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (StatusBarNotification n : getNotificationManager().getActiveNotifications()) {
-                if (id == n.getId())
-                    return 2;
-            }
-        } else synchronized (this) {
-            for (Integer notificationId : mVisibleNotifications) {
-                if (notificationId.intValue() == id)
-                    return 2;
-            }
+        for (StatusBarNotification n : getNotificationManager().getActiveNotifications()) {
+            if (id == n.getId())
+                return 2;
         }
 
         if (mScheduledNotifications.containsKey(id))
@@ -718,9 +699,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         boolean showInForeground = notification.extras.getBoolean(KEY_SHOW_IN_FOREGROUND, true);
         if (!isInForeground() || showInForeground) {
             getNotificationManager().notify(id, notification);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) synchronized (this) {
-                mVisibleNotifications.add(Integer.valueOf(id));
-            }
         }
 
         long repeatInterval = notification.extras.getLong(KEY_REPEAT_INTERVAL, -1);
@@ -964,14 +942,12 @@ public class UnityNotificationManager extends BroadcastReceiver {
     }
 
     public Notification getNotificationFromIntent(Intent intent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
-                int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
-                StatusBarNotification[] shownNotifications = getNotificationManager().getActiveNotifications();
-                for (StatusBarNotification n : shownNotifications) {
-                    if (n.getId() == id) {
-                        return n.getNotification();
-                    }
+        if (intent.hasExtra(KEY_NOTIFICATION_ID)) {
+            int id = intent.getExtras().getInt(KEY_NOTIFICATION_ID);
+            StatusBarNotification[] shownNotifications = getNotificationManager().getActiveNotifications();
+            for (StatusBarNotification n : shownNotifications) {
+                if (n.getId() == id) {
+                    return n.getNotification();
                 }
             }
         }
