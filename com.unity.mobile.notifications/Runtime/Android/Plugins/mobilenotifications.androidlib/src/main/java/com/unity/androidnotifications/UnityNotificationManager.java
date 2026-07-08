@@ -95,8 +95,6 @@ public class UnityNotificationManager extends BroadcastReceiver {
         if (mRandom == null)
             mRandom = new Random();
 
-        Bundle metaData = getAppMetadata();
-
         mOpenActivity = UnityNotificationUtilities.getOpenAppActivity(mContext);
         if (mOpenActivity == null)
             throw new RuntimeException("Failed to determine Activity to be opened when tapping notification");
