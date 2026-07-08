@@ -755,7 +755,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private void finalizeNotificationForDisplay(Notification.Builder notificationBuilder) {
         String icon = notificationBuilder.getExtras().getString(KEY_SMALL_ICON);
         Object ico = getIconForUri(icon);
-        if (ico != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (ico != null) {
             notificationBuilder.setSmallIcon((Icon)ico);
         } else {
             int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, icon);
@@ -768,7 +768,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         icon = notificationBuilder.getExtras().getString(KEY_LARGE_ICON);
         Object largeIcon = getIcon(icon);
         if (largeIcon != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && largeIcon instanceof Icon)
+            if (largeIcon instanceof Icon)
                 notificationBuilder.setLargeIcon((Icon)largeIcon);
             else
                 notificationBuilder.setLargeIcon((Bitmap)largeIcon);
@@ -794,7 +794,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private Object getIconForUri(String uri) {
         if (uri == null || uri.length() == 0)
             return null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && uri.indexOf("://") > 0) {
+        if (uri.indexOf("://") > 0) {
             return Icon.createWithContentUri(uri);
         }
 
@@ -804,7 +804,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
     private Object getIconFromResources(String name, boolean forceBitmap) {
         int iconId = UnityNotificationUtilities.findResourceIdInContextByName(mContext, name);
         if (iconId != 0) {
-            if (!forceBitmap && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (!forceBitmap)
                 return Icon.createWithResource(mContext, iconId);
             return BitmapFactory.decodeResource(mContext.getResources(), iconId);
         }
@@ -895,7 +895,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
         String largeIcon = extras.getString(KEY_BIG_LARGE_ICON);
         Object ico = getIcon(largeIcon);
         if (ico != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ico instanceof Icon)
+            if (ico instanceof Icon)
                 style.bigLargeIcon((Icon)ico);
             else
                 style.bigLargeIcon((Bitmap)ico);
@@ -903,7 +903,7 @@ public class UnityNotificationManager extends BroadcastReceiver {
 
         if (picture.charAt(0) == '/') {
             style.bigPicture(BitmapFactory.decodeFile(picture));
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && picture.indexOf("://") > 0) {
+        } else if (picture.indexOf("://") > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Icon icon = Icon.createWithContentUri(picture);
                 style.bigPicture(icon);
