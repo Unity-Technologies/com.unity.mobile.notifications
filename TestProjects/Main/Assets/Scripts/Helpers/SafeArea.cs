@@ -33,6 +33,9 @@ namespace Unity.Notifications.Tests.Sample
 
         void ApplySafeArea(Rect r)
         {
+            // Very early in the load process screen size may not be determined yet
+            if (Screen.width == 0 || Screen.height == 0)
+                return;
             LastSafeArea = r;
 
             // Convert safe area rectangle from absolute pixels to normalised anchor coordinates
