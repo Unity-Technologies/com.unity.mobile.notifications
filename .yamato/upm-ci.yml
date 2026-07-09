@@ -6,6 +6,11 @@ test_editors:
   - version: 6000.3
   - version: 6000.0
 
+swift_trampoline_editors:
+  - version: trunk
+  - version: 6000.6
+  - version: 6000.5
+
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
 
@@ -57,6 +62,29 @@ test_iOS_{{ editor.version }}:
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
+{% endfor %}
+
+{% for editor in swift_trampoline_editors %}
+test_iOS_Swift_{{ editor.version }}:
+  name: Test {{ editor.version }} on iOS (Swift)
+  agent:
+    type: Unity::VM::osx
+    image: package-ci/macos-13:default
+    flavor: b1.xlarge
+  variables:
+    IOS_SIMULATOR_SDK: 1
+  commands:
+    - curl -s {{ utr.url_unix }} --output utr
+    - chmod u+x utr
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-save-path=build/players --build-only
+    - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-load-path=build/players
   artifacts:
     packages:
       paths:
