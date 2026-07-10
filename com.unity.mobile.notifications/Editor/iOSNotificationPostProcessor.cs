@@ -55,6 +55,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
     private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv, bool addTimeSensitiveEntitlement)
     {
         var pbxProjectPath = PBXProject.GetPBXProjectPath(path);
+        List<string> swiftPropertiesToAdd = new();
 
         var needsToWriteChanges = false;
 
@@ -87,6 +88,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (needLocationFramework && !pbxProject.ContainsFramework(unityFrameworkTarget, "CoreLocation.framework"))
         {
             pbxProject.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
+            swiftPropertiesToAdd.Add("-DUNITY_USES_LOCATION");
             needsToWriteChanges = true;
         }
 
@@ -100,6 +102,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         // Update the entitlements file.
         if (addPushNotificationCapability)
         {
+            swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
             var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, "Unity-iPhone");
             capManager.AddPushNotifications(!useReleaseAPSEnv);
             capManager.WriteToFile();
@@ -122,6 +125,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
                 needsToWriteChanges = true;
             }
+        }
+
+        if (swiftPropertiesToAdd.Count > 0)
+        {
+            pbxProject.UpdateBuildProperty(unityFrameworkTarget, "OTHER_SWIFT_FLAGS", swiftPropertiesToAdd, new string[0]);
+            needsToWriteChanges = true;
         }
 
         if (needsToWriteChanges)
