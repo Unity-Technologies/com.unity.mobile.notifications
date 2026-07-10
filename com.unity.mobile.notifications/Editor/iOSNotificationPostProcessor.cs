@@ -90,9 +90,6 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             needsToWriteChanges = true;
         }
 
-        if (needsToWriteChanges)
-            File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
-
         var entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
         if (entitlementsFileName == null)
         {
@@ -123,9 +120,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             if (pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS") == null)
             {
                 pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
-                pbxProject.WriteToFile(pbxProjectPath);
+                needsToWriteChanges = true;
             }
         }
+
+        if (needsToWriteChanges)
+            pbxProject.WriteToFile(pbxProjectPath);
     }
 
     private static void PatchPlist(string path, List<Unity.Notifications.NotificationSetting> settings, bool addPushNotificationCapability)
