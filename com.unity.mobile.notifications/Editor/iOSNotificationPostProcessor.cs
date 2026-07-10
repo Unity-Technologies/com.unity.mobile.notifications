@@ -193,7 +193,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (!(needLocationFramework || addPushNotificationCapability))
             return;
 
-        var preprocessorPath = path + "/Classes/Preprocessor.h";
+        var preprocessorPath = Path.Combine(path, "Classes/Preprocessor.h");
+#if UNITY_6000_5_OR_NEWER
+        if (PlayerSettings.xcodeProjectType == XcodeProjectType.Swift)
+            preprocessorPath = Path.Combine(path, "UnityFramework/Prefix/Preprocessor.h");
+#endif
+
         var preprocessor = File.ReadAllText(preprocessorPath);
         var needsToWriteChanges = false;
 
