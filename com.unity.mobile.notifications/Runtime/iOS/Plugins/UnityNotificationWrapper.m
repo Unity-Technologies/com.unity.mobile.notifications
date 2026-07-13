@@ -9,17 +9,17 @@
 #import "UnityNotificationManager.h"
 
 
-int _NativeSizeof_iOSNotificationAuthorizationData()
+int _NativeSizeof_iOSNotificationAuthorizationData(void)
 {
     return sizeof(iOSNotificationAuthorizationData);
 }
 
-int _NativeSizeof_iOSNotificationData()
+int _NativeSizeof_iOSNotificationData(void)
 {
     return sizeof(iOSNotificationData);
 }
 
-int _NativeSizeof_NotificationSettingsData()
+int _NativeSizeof_NotificationSettingsData(void)
 {
     return sizeof(NotificationSettingsData);
 }
@@ -57,12 +57,12 @@ void _RequestAuthorization(void* request, int options, BOOL registerRemote)
     center.delegate = manager;
 }
 
-int _RegisteredForRemoteNotifications()
+int _RegisteredForRemoteNotifications(void)
 {
     return [UIApplication sharedApplication].registeredForRemoteNotifications;
 }
 
-void _UnregisterForRemoteNotifications()
+void _UnregisterForRemoteNotifications(void)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     [manager unregisterForRemoteNotifications];
@@ -74,7 +74,7 @@ void _ScheduleLocalNotification(iOSNotificationData data)
     [manager scheduleLocalNotification: &data];
 }
 
-NotificationSettingsData _GetNotificationSettings()
+NotificationSettingsData _GetNotificationSettings(void)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     return UNNotificationSettingsToNotificationSettingsData(manager.cachedNotificationSettings);
@@ -133,7 +133,7 @@ void _RemoveScheduledNotification(const char* identifier)
     [[UnityNotificationManager sharedInstance] updateScheduledNotificationList];
 }
 
-void _RemoveAllScheduledNotifications()
+void _RemoveAllScheduledNotifications(void)
 {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     [center removeAllPendingNotificationRequests];
@@ -147,7 +147,7 @@ void _RemoveDeliveredNotification(const char* identifier)
     [[UnityNotificationManager sharedInstance] updateDeliveredNotificationList];
 }
 
-void _RemoveAllDeliveredNotifications()
+void _RemoveAllDeliveredNotifications(void)
 {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     [center removeAllDeliveredNotifications];
@@ -159,18 +159,18 @@ void _SetApplicationBadge(long badge)
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber: badge];
 }
 
-long _GetApplicationBadge()
+long _GetApplicationBadge(void)
 {
     return [UIApplication sharedApplication].applicationIconBadgeNumber;
 }
 
-int _GetAppOpenedUsingNotification()
+int _GetAppOpenedUsingNotification(void)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     return manager.launchedWithNotification;
 }
 
-iOSNotificationData* _GetLastNotificationData()
+iOSNotificationData* _GetLastNotificationData(void)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     UNNotification* notification = manager.lastReceivedNotification;
@@ -184,7 +184,7 @@ iOSNotificationData* _GetLastNotificationData()
     return ret;
 }
 
-const char* _GetLastRespondedNotificationAction()
+const char* _GetLastRespondedNotificationAction(void)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     NSString* action = manager.lastRespondedNotificationAction;
@@ -193,7 +193,7 @@ const char* _GetLastRespondedNotificationAction()
     return strdup(action.UTF8String);
 }
 
-const char* _GetLastRespondedNotificationUserText()
+const char* _GetLastRespondedNotificationUserText(void)
 {
     UnityNotificationManager* manager = [UnityNotificationManager sharedInstance];
     NSString* userText = manager.lastRespondedNotificationUserText;
@@ -351,7 +351,7 @@ void _SetNotificationCategories(void* categorySet)
     [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories: categories];
 }
 
-void _OpenNotificationSettings()
+void _OpenNotificationSettings(void)
 {
     NSString* urlString;
     if (@available(iOS 15.4, *))
