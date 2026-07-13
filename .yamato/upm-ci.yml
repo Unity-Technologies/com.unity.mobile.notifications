@@ -75,13 +75,17 @@ test_iOS_Swift_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS (Swift)
   agent:
     type: Unity::VM::osx
-    image: package-ci/macos-13:default
-    flavor: b1.xlarge
+    image: automation-tooling/macos-15-arm64-unity:v2.5604104
+    flavor: b1.medium
+    model: M1
   variables:
     IOS_SIMULATOR_SDK: 1
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
+    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew trust unity/unity
+    - brew install unity-downloader-cli
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-load-path=build/players
