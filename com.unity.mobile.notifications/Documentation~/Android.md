@@ -34,8 +34,6 @@ On devices that use Android versions prior to 8.0, this package emulates the sam
 
 ## Schedule notifications at exact time
 
-Before Android 6.0 notifications can be scheduled only at approximate time.
-
 Since Android 12.0 (API level 31) android.permission.SCHEDULE_EXACT_ALARM permission has to be added to the manifest to enable exact scheduling, see [documentation](https://developer.android.com/reference/android/Manifest.permission#SCHEDULE_EXACT_ALARM). Note, that adding this permission does not guarantee you'll be able to use exact scheduling. You can check it by calling AndroidNotificationCenter.UsingExactScheduling. You may need to request user permission to schedule at exact times by calling AndroidNotificationCenter.RequestExactScheduling().
 
 Since Android 13.0 (API level 33) the android.permission.USE_EXACT_ALARM is and alternative permission to enable exact scheduling.
@@ -130,7 +128,7 @@ Usually, Unity generates a unique id for each notification after you schedule it
 var id = AndroidNotificationCenter.SendNotification(notification, "channel_id");
 ```
 
-You can use this id to track, cancel, or update the notification. The following example shows how to check the notification status and perform any actions depending on the result. Notification status tracking only works on Android 6.0 Marshmallow and above.
+You can use this id to track, cancel, or update the notification. The following example shows how to check the notification status and perform any actions depending on the result.
 
 ```c#
 var notificationStatus = AndroidNotificationCenter.CheckScheduledNotificationStatus(id);
