@@ -42,6 +42,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         List<string> swiftPropertiesToAdd = new();
 
         var needsToWriteChanges = false;
+        var needsCodeSignEntitlements = false;
 
         var pbxProject = new PBXProject();
         pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
@@ -76,11 +77,16 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             needsToWriteChanges = true;
         }
 
-        var entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
-        if (entitlementsFileName == null)
+        string entitlementsFileName = null;
+        if (addPushNotificationCapability || addTimeSensitiveEntitlement)
         {
-            var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
-            entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+            entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
+            if (entitlementsFileName == null)
+            {
+                var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
+                entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+                needsCodeSignEntitlements = true;
+            }
         }
 
         // Update the entitlements file.
@@ -90,6 +96,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, "Unity-iPhone");
             capManager.AddPushNotifications(!useReleaseAPSEnv);
             capManager.WriteToFile();
+            needsToWriteChanges = true;
         }
 
         if (addTimeSensitiveEntitlement)
@@ -104,11 +111,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 entitlementsFile.root["com.apple.developer.usernotifications.time-sensitive"] = new PlistElementBoolean(true);
                 entitlementsFile.WriteToFile(entitlementsFilePath);
             }
-            if (pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS") == null)
-            {
-                pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
-                needsToWriteChanges = true;
-            }
+        }
+
+        if (needsCodeSignEntitlements)
+        {
+            pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
+            needsToWriteChanges = true;
         }
 
         if (swiftPropertiesToAdd.Count > 0)
