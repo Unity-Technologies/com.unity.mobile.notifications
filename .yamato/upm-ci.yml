@@ -75,7 +75,7 @@ test_iOS_Swift_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS (Swift)
   agent:
     type: Unity::VM::osx
-    image: automation-tooling/macos-15-arm64-unity:v2.5604104
+    image: automation-tooling/macos-14-arm64-unity:v2.6024956
     flavor: b1.medium
     model: M1
   variables:
