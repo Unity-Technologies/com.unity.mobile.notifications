@@ -12,9 +12,9 @@
 #if UNITY_XCODE_PROJECT_TYPE_SWIFT
 extern "C"
 {
-    NSString* UnityMobileNotifications_applicationWillFinishLaunchingName();
-    NSString* UnityMobileNotifications_applicationDidRegisterForRemoteNotificationsName();
-    NSString* UnityMobileNotifications_applicationDidFailToRegisterForRemoteNotificationsName();
+    NSNotificationName UnityMobileNotifications_applicationWillFinishLaunchingName();
+    NSNotificationName UnityMobileNotifications_applicationDidRegisterForRemoteNotificationsName();
+    NSNotificationName UnityMobileNotifications_applicationDidFailToRegisterForRemoteNotificationsName();
     NSString* UnityMobileNotifications_remoteNotificationsDeviceTokenKey();
 }
 #define kUnityWillFinishLaunchingWithOptions UnityMobileNotifications_applicationWillFinishLaunchingName()

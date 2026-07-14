@@ -3,23 +3,23 @@
 import Foundation
 
 @_cdecl("UnityMobileNotifications_applicationWillFinishLaunchingName")
-func applicationWillFinishLaunchingName() -> String {
-    UnityNotifications.applicationWillFinishLaunching.rawValue
+func applicationWillFinishLaunchingName() -> Notification.Name {
+    UnityNotifications.applicationWillFinishLaunching
 }
 
 @_cdecl("UnityMobileNotifications_applicationDidRegisterForRemoteNotificationsName")
-func applicationDidRegisterForRemoteNotificationsName() -> String {
-    UnityNotifications.applicationDidRegisterForRemoteNotifications.rawValue
+func applicationDidRegisterForRemoteNotificationsName() -> Notification.Name {
+    UnityNotifications.applicationDidRegisterForRemoteNotifications
 }
 
 @_cdecl("UnityMobileNotifications_applicationDidFailToRegisterForRemoteNotificationsName")
-func applicationDidFailToRegisterForRemoteNotificationsName() -> String {
-    UnityNotifications.applicationDidFailToRegisterForRemoteNotifications.rawValue
+func applicationDidFailToRegisterForRemoteNotificationsName() -> Notification.Name {
+    UnityNotifications.applicationDidFailToRegisterForRemoteNotifications
 }
 
 @_cdecl("UnityMobileNotifications_remoteNotificationsDeviceTokenKey")
-func remoteNotificationsDeviceTokenKey() -> String {
-    UnityNotifications.remoteNotificationsDeviceTokenKey
+func remoteNotificationsDeviceTokenKey() -> NSString {
+    UnityNotifications.remoteNotificationsDeviceTokenKey as NSString
 }
 
 #endif
