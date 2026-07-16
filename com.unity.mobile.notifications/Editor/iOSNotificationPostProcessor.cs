@@ -17,22 +17,6 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (buildTarget != BuildTarget.iOS)
             return;
 
-        // Check if we have the minimal iOS version set.
-        bool hasMinOSVersion;
-        try
-        {
-            var requiredVersion = new Version(10, 0);
-            var currentVersion = new Version(PlayerSettings.iOS.targetOSVersionString);
-            hasMinOSVersion = currentVersion >= requiredVersion;
-        }
-        catch (Exception)
-        {
-            hasMinOSVersion = false;
-        }
-
-        if (!hasMinOSVersion)
-            Debug.Log("UserNotifications framework is only available on iOS 10.0+, please make sure that you set a correct `Target minimum iOS Version` in Player Settings.");
-
         var settings = NotificationSettingsManager.Initialize().iOSNotificationSettingsFlat;
 
         var needLocationFramework = (bool)settings.Find(i => i.Key == NotificationSettings.iOSSettings.USE_LOCATION_TRIGGER).Value;
@@ -55,8 +39,10 @@ public class iOSNotificationPostProcessor : MonoBehaviour
     private static void PatchPBXProject(string path, bool needLocationFramework, bool addPushNotificationCapability, bool useReleaseAPSEnv, bool addTimeSensitiveEntitlement)
     {
         var pbxProjectPath = PBXProject.GetPBXProjectPath(path);
+        List<string> swiftPropertiesToAdd = new();
 
         var needsToWriteChanges = false;
+        var needsCodeSignEntitlements = false;
 
         var pbxProject = new PBXProject();
         pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
@@ -87,25 +73,30 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (needLocationFramework && !pbxProject.ContainsFramework(unityFrameworkTarget, "CoreLocation.framework"))
         {
             pbxProject.AddFrameworkToProject(unityFrameworkTarget, "CoreLocation.framework", false);
+            swiftPropertiesToAdd.Add("-DUNITY_USES_LOCATION");
             needsToWriteChanges = true;
         }
 
-        if (needsToWriteChanges)
-            File.WriteAllText(pbxProjectPath, pbxProject.WriteToString());
-
-        var entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
-        if (entitlementsFileName == null)
+        string entitlementsFileName = null;
+        if (addPushNotificationCapability || addTimeSensitiveEntitlement)
         {
-            var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
-            entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+            entitlementsFileName = pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS");
+            if (entitlementsFileName == null)
+            {
+                var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
+                entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
+                needsCodeSignEntitlements = true;
+            }
         }
 
         // Update the entitlements file.
         if (addPushNotificationCapability)
         {
+            swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
             var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, "Unity-iPhone");
             capManager.AddPushNotifications(!useReleaseAPSEnv);
             capManager.WriteToFile();
+            needsToWriteChanges = true;
         }
 
         if (addTimeSensitiveEntitlement)
@@ -120,12 +111,22 @@ public class iOSNotificationPostProcessor : MonoBehaviour
                 entitlementsFile.root["com.apple.developer.usernotifications.time-sensitive"] = new PlistElementBoolean(true);
                 entitlementsFile.WriteToFile(entitlementsFilePath);
             }
-            if (pbxProject.GetBuildPropertyForAnyConfig(mainTarget, "CODE_SIGN_ENTITLEMENTS") == null)
-            {
-                pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
-                pbxProject.WriteToFile(pbxProjectPath);
-            }
         }
+
+        if (needsCodeSignEntitlements)
+        {
+            pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
+            needsToWriteChanges = true;
+        }
+
+        if (swiftPropertiesToAdd.Count > 0)
+        {
+            pbxProject.UpdateBuildProperty(unityFrameworkTarget, "OTHER_SWIFT_FLAGS", swiftPropertiesToAdd, new string[0]);
+            needsToWriteChanges = true;
+        }
+
+        if (needsToWriteChanges)
+            pbxProject.WriteToFile(pbxProjectPath);
     }
 
     private static void PatchPlist(string path, List<Unity.Notifications.NotificationSetting> settings, bool addPushNotificationCapability)
@@ -193,7 +194,12 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         if (!(needLocationFramework || addPushNotificationCapability))
             return;
 
-        var preprocessorPath = path + "/Classes/Preprocessor.h";
+        var preprocessorPath = Path.Combine(path, "Classes/Preprocessor.h");
+#if UNITY_6000_5_OR_NEWER
+        if (PlayerSettings.xcodeProjectType == XcodeProjectType.Swift)
+            preprocessorPath = Path.Combine(path, "UnityFramework/Prefix/Preprocessor.h");
+#endif
+
         var preprocessor = File.ReadAllText(preprocessorPath);
         var needsToWriteChanges = false;
 
