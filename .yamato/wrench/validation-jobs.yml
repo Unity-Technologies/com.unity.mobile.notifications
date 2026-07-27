@@ -32,7 +32,10 @@ validate_-_mobile_notifications_-_6000_0_-_macos13:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -67,10 +70,10 @@ validate_-_mobile_notifications_-_6000_0_-_macos13:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -100,7 +103,10 @@ validate_-_mobile_notifications_-_6000_0_-_ubuntu2204:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -135,10 +141,10 @@ validate_-_mobile_notifications_-_6000_0_-_ubuntu2204:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -168,7 +174,10 @@ validate_-_mobile_notifications_-_6000_0_-_win10:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -203,10 +212,10 @@ validate_-_mobile_notifications_-_6000_0_-_win10:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -236,7 +245,10 @@ validate_-_mobile_notifications_-_6000_3_-_macos13:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -271,10 +283,10 @@ validate_-_mobile_notifications_-_6000_3_-_macos13:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -304,7 +316,10 @@ validate_-_mobile_notifications_-_6000_3_-_ubuntu2204:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -339,10 +354,10 @@ validate_-_mobile_notifications_-_6000_3_-_ubuntu2204:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -372,7 +387,10 @@ validate_-_mobile_notifications_-_6000_3_-_win10:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -407,10 +425,10 @@ validate_-_mobile_notifications_-_6000_3_-_win10:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -440,7 +458,10 @@ validate_-_mobile_notifications_-_6000_5_-_macos13:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -475,10 +496,10 @@ validate_-_mobile_notifications_-_6000_5_-_macos13:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -508,7 +529,10 @@ validate_-_mobile_notifications_-_6000_5_-_ubuntu2204:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -543,10 +567,10 @@ validate_-_mobile_notifications_-_6000_5_-_ubuntu2204:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -576,7 +600,10 @@ validate_-_mobile_notifications_-_6000_5_-_win10:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -611,10 +638,10 @@ validate_-_mobile_notifications_-_6000_5_-_win10:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -645,7 +672,10 @@ validate_-_mobile_notifications_-_6000_6_-_macos13arm:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -680,10 +710,10 @@ validate_-_mobile_notifications_-_6000_6_-_macos13arm:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -713,7 +743,10 @@ validate_-_mobile_notifications_-_6000_6_-_ubuntu2204:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -748,10 +781,10 @@ validate_-_mobile_notifications_-_6000_6_-_ubuntu2204:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -781,7 +814,10 @@ validate_-_mobile_notifications_-_6000_6_-_win10:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -816,10 +852,10 @@ validate_-_mobile_notifications_-_6000_6_-_win10:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -850,7 +886,10 @@ validate_-_mobile_notifications_-_6000_7_-_macos13arm:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -885,10 +924,10 @@ validate_-_mobile_notifications_-_6000_7_-_macos13arm:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -918,7 +957,10 @@ validate_-_mobile_notifications_-_6000_7_-_ubuntu2204:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -953,10 +995,10 @@ validate_-_mobile_notifications_-_6000_7_-_ubuntu2204:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
@@ -986,7 +1028,10 @@ validate_-_mobile_notifications_-_6000_7_-_win10:
     timeout: 5
     retries: 0
   - command: echo No additional PVP profiles to declared to check.
-  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts --suite=Editor --suite=Playmode "--ff={ops.upmpvpevidence.enable=true}" '
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/editor --suite=editor "--ff={ops.upmpvpevidence.enable=true}" '
+    timeout: 20
+    retries: 1
+  - command: 'UnifiedTestRunner.exe --testproject=test-mobile.notifications --editor-location=.Editor --clean-library --reruncount=1 --clean-library-on-rerun --artifacts-path=artifacts/playmode --suite=playmode "--ff={ops.upmpvpevidence.enable=true}" '
     timeout: 20
     retries: 1
   after:
@@ -1021,10 +1066,10 @@ validate_-_mobile_notifications_-_6000_7_-_win10:
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.3.1.0
+    UPMPVP_CONTEXT_WRENCH: 3.4.0.0
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.3.1.0
+    Wrench: 3.4.0.0
   labels:
   - Packages:mobile.notifications
 
