@@ -208,6 +208,39 @@ class iOSNotificationTests
 
     [UnityTest]
     [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator SendNotificationUsingCalendarTrigger_WeekDay_NotificationIsReceived()
+    {
+        var dt = DateTime.Now.AddSeconds(5);
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Weekday = dt.DayOfWeek,
+            Hour = dt.Hour,
+            Minute = dt.Minute,
+            Second = dt.Second,
+        };
+
+        var notification = new iOSNotification()
+        {
+            Title = "Weekday",
+            Body = "Day of the week",
+            ShowInForeground = true,
+            ForegroundPresentationOption = PresentationOption.Alert,
+            Trigger = trigger,
+        };
+
+        iOSNotificationCenter.ScheduleNotification(notification);
+        Debug.Log($"SendNotificationUsingCalendarTrigger_WeekDay_NotificationIsReceived, Notification should arrive on: {dt}");
+        yield return WaitForNotification(20.0f);
+        Debug.Log($"SendNotificationUsingCalendarTrigger_WeekDay_NotificationIsReceived, wait finished at: {DateTime.Now}");
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsNotNull(lastReceivedNotification);
+        Assert.AreEqual("Weekday", lastReceivedNotification.Title);
+        var retTrigger = (iOSNotificationCalendarTrigger)lastReceivedNotification.Trigger;
+        Assert.AreEqual(dt.DayOfWeek, retTrigger.Weekday);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendNotification_AllPropertiesRoundtrip()
     {
         var trigger = new iOSNotificationTimeIntervalTrigger()
