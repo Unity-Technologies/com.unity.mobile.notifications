@@ -212,6 +212,9 @@ namespace Unity.Notifications.iOS
         /// <value>Number indicating second or null to ignore second</value>
         public int? Second { get; set; }
 
+        /// <summary>
+        /// Day of week to schedule notification for or null to ignore this property.
+        /// </summary>
         public DayOfWeek? Weekday { get; set; }
 
         /// <summary>
