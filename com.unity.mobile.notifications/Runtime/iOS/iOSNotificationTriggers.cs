@@ -302,7 +302,7 @@ namespace Unity.Notifications.iOS
                 if (value <= 0 || value > 7)
                     Weekday = null;
                 else
-                    Weekday = (DayOfWeek)value - 1;
+                    Weekday = (DayOfWeek)(value - 1);
             }
         }
     }
