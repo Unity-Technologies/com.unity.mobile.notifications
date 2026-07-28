@@ -212,6 +212,8 @@ namespace Unity.Notifications.iOS
         /// <value>Number indicating second or null to ignore second</value>
         public int? Second { get; set; }
 
+        public DayOfWeek? Weekday { get; set; }
+
         /// <summary>
         /// Are Date and Time field in UTC time. When false, use local time.
         /// </summary>
@@ -281,6 +283,32 @@ namespace Unity.Notifications.iOS
                 Minute = dt.Minute;
             if (Second != null)
                 Second = dt.Second;
+        }
+
+        internal int iOSWeekday
+        {
+            get
+            {
+                if (!Weekday.HasValue)
+                    return -1;
+                // In C# Monday=1, on iOS Sunday=1
+                int ret = 1 + (int)Weekday.Value;
+                if (ret > 7)
+                    ret = 1;
+                return ret;
+            }
+            set
+            {
+                if (value <= 0 || value > 7)
+                    Weekday = null;
+                else
+                {
+                    value = value - 1;
+                    if (value == 0)
+                        value = 7;
+                    Weekday = (DayOfWeek)value;
+                }
+            }
         }
     }
 }
