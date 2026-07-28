@@ -294,23 +294,15 @@ namespace Unity.Notifications.iOS
             {
                 if (!Weekday.HasValue)
                     return -1;
-                // In C# Monday=1, on iOS Sunday=1
-                int ret = 1 + (int)Weekday.Value;
-                if (ret > 7)
-                    ret = 1;
-                return ret;
+                // In C# Sunday=0, Saturday=6, on iOS Sunday=1, Saturday=7
+                return 1 + (int)Weekday.Value;
             }
             set
             {
                 if (value <= 0 || value > 7)
                     Weekday = null;
                 else
-                {
-                    value = value - 1;
-                    if (value == 0)
-                        value = 7;
-                    Weekday = (DayOfWeek)value;
-                }
+                    Weekday = (DayOfWeek)value - 1;
             }
         }
     }
