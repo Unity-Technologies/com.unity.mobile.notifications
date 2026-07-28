@@ -106,6 +106,12 @@ namespace Unity.Notifications
         /// </summary>
         /// <seealso cref="AndroidChannelId"/>
         public string AndroidChannelDescription { get; set; }
+
+        /// <summary>
+        /// Small icon to be used for all notifications on Android. Optional, application icon will be used if not set.
+        /// This value will be assigned to <see cref="Unity.Notifications.Android.AndroidNotification.SmallIcon"/>.
+        /// </summary>
+        public string AndroidSmallIcon { get; set; }
     }
 
     /// <summary>
@@ -275,6 +281,7 @@ namespace Unity.Notifications
 #if UNITY_ANDROID
             var n = (AndroidNotification)notification;
             schedule.Schedule(ref n);
+            n.SmallIcon = s_Args.AndroidSmallIcon;
             if (notification.Identifier.HasValue)
             {
                 AndroidNotificationCenter.SendNotificationWithExplicitID(n, category, notification.Identifier.Value);

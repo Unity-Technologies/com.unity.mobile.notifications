@@ -41,6 +41,7 @@ public class UnifiedTest : MonoBehaviour
         args.AndroidChannelId = "UnifiedNotifications";
         args.AndroidChannelName = "Unified notifications";
         args.AndroidChannelDescription = "Unified test scene channel";
+        args.AndroidSmallIcon = "icon_0";
         args.PresentationOptions = presentationOptions;
         NotificationCenter.Initialize(args);
         NotificationCenter.OnNotificationReceived += OnNotificationReceived;
