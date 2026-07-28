@@ -531,4 +531,22 @@ class iOSNotificationTests
         Assert.AreEqual(5, result.Day);
         Assert.IsFalse(result.UtcTime);
     }
+
+    [Test]
+    public void iOSCalendarTrigger_HandlesWeekday()
+    {
+        var trigger = new iOSNotificationCalendarTrigger();
+        Assert.AreEqual(-1, trigger.iOSWeekday);
+
+        // On iOS week starts on Sunday=1, C# Sunday=0
+        trigger.Weekday = DayOfWeek.Sunday;
+        Assert.AreEqual(1, trigger.iOSWeekday);
+        trigger.Weekday = DayOfWeek.Wednesday;
+        Assert.AreEqual(4, trigger.iOSWeekday);
+
+        trigger.iOSWeekday = 7;
+        Assert.AreEqual(DayOfWeek.Saturday, trigger.Weekday);
+        trigger.iOSWeekday = 1;
+        Assert.AreEqual(DayOfWeek.Sunday, trigger.Weekday);
+    }
 }
