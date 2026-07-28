@@ -85,7 +85,7 @@ namespace Unity.Notifications
         /// A custom non-empty string to identify notification channel. Required, Android only.
         /// All notifications will be sent to this channel.
         /// Channel is created automatically during initialization if <see cref="AndroidChannelName"/> and <see cref="AndroidChannelDescription"/> are both set.
-        /// If name and description are left null, channel with given identifier has to be created manually (for example using <see cref="AndroidNotificationCenter.RegisterNotificationChannel(AndroidNotificationChannel)"/>).
+        /// If name and description are left null, channel with given identifier has to be created manually (for example using <see cref="Unity.Notifications.Android.AndroidNotificationCenter.RegisterNotificationChannel(AndroidNotificationChannel)"/>).
         /// </summary>
         public string AndroidChannelId { get; set; }
 
