@@ -238,10 +238,12 @@ namespace Unity.Notifications.iOS
             if (UtcTime)
                 return this;
 
-            var notificationTime = AssignDateTimeComponents(DateTimeOffset.Now).ToUniversalTime();
+            var now = DateTimeOffset.Now;
+            var notificationTime = AssignDateTimeComponents(now).ToUniversalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = true;
             result.AssignNonEmptyComponents(notificationTime);
+            result.Weekday = WeekdayToUtc(Weekday, now);
             return result;
         }
 
@@ -254,10 +256,12 @@ namespace Unity.Notifications.iOS
             if (!UtcTime)
                 return this;
 
-            var notificationTime = AssignDateTimeComponents(DateTimeOffset.UtcNow).ToLocalTime();
+            var now = DateTimeOffset.UtcNow;
+            var notificationTime = AssignDateTimeComponents(now).ToLocalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = false;
             result.AssignNonEmptyComponents(notificationTime);
+            result.Weekday = WeekdayToLocal(Weekday, now);
             return result;
         }
 
@@ -286,6 +290,26 @@ namespace Unity.Notifications.iOS
                 Minute = dt.Minute;
             if (Second != null)
                 Second = dt.Second;
+        }
+
+        internal static DayOfWeek? WeekdayToUtc(DayOfWeek? weekday, DateTimeOffset start)
+        {
+            return WeekdayTZAdjust(weekday, start, d => d.ToUniversalTime());
+        }
+
+        internal static DayOfWeek? WeekdayToLocal(DayOfWeek? weekday, DateTimeOffset start)
+        {
+            return WeekdayTZAdjust(weekday, start, d => d.ToLocalTime());
+        }
+
+        internal static DayOfWeek? WeekdayTZAdjust(DayOfWeek? weekday, DateTimeOffset start, Func<DateTimeOffset, DateTimeOffset> convertTZ)
+        {
+            if (weekday == null)
+                return null;
+            var day = weekday.Value;
+            while (start.DayOfWeek != day)
+                start = start.AddDays(1);
+            return convertTZ(start).DayOfWeek;
         }
 
         internal int iOSWeekday
