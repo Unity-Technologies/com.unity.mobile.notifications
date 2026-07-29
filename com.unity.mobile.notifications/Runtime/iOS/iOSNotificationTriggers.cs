@@ -238,7 +238,7 @@ namespace Unity.Notifications.iOS
             if (UtcTime)
                 return this;
 
-            var notificationTime = AssignDateTimeComponents(DateTime.Now).ToUniversalTime();
+            var notificationTime = AssignDateTimeComponents(DateTimeOffset.Now).ToUniversalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = true;
             result.AssignNonEmptyComponents(notificationTime);
@@ -254,14 +254,14 @@ namespace Unity.Notifications.iOS
             if (!UtcTime)
                 return this;
 
-            var notificationTime = AssignDateTimeComponents(DateTime.UtcNow).ToLocalTime();
+            var notificationTime = AssignDateTimeComponents(DateTimeOffset.UtcNow).ToLocalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = false;
             result.AssignNonEmptyComponents(notificationTime);
             return result;
         }
 
-        internal DateTime AssignDateTimeComponents(DateTime dt)
+        internal DateTimeOffset AssignDateTimeComponents(DateTimeOffset dt)
         {
             int year = Year != null ? Year.Value : dt.Year;
             int month = Month != null ? Month.Value : dt.Month;
@@ -269,10 +269,10 @@ namespace Unity.Notifications.iOS
             int hour = Hour != null ? Hour.Value : dt.Hour;
             int minute = Minute != null ? Minute.Value : dt.Minute;
             int second = Second != null ? Second.Value : dt.Second;
-            return new DateTime(year, month, day, hour, minute, second, dt.Kind);
+            return new DateTimeOffset(year, month, day, hour, minute, second, dt.Offset);
         }
 
-        internal void AssignNonEmptyComponents(DateTime dt)
+        internal void AssignNonEmptyComponents(DateTimeOffset dt)
         {
             if (Year != null)
                 Year = dt.Year;
