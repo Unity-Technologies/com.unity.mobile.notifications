@@ -238,12 +238,12 @@ namespace Unity.Notifications.iOS
             if (UtcTime)
                 return this;
 
-            var now = DateTimeOffset.Now;
-            var notificationTime = AssignDateTimeComponents(now).ToUniversalTime();
+            var nowWithComponents= AssignDateTimeComponents(DateTimeOffset.Now);
+            var notificationTime = nowWithComponents.ToUniversalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = true;
             result.AssignNonEmptyComponents(notificationTime);
-            result.Weekday = WeekdayToUtc(Weekday, now);
+            result.Weekday = WeekdayToUtc(Weekday, nowWithComponents);
             return result;
         }
 
@@ -256,12 +256,12 @@ namespace Unity.Notifications.iOS
             if (!UtcTime)
                 return this;
 
-            var now = DateTimeOffset.UtcNow;
-            var notificationTime = AssignDateTimeComponents(now).ToLocalTime();
+            var nowWithComponents = AssignDateTimeComponents(DateTimeOffset.UtcNow);
+            var notificationTime = nowWithComponents.ToLocalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = false;
             result.AssignNonEmptyComponents(notificationTime);
-            result.Weekday = WeekdayToLocal(Weekday, now);
+            result.Weekday = WeekdayToLocal(Weekday, nowWithComponents);
             return result;
         }
 
