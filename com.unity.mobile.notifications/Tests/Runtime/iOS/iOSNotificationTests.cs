@@ -208,6 +208,39 @@ class iOSNotificationTests
 
     [UnityTest]
     [UnityPlatform(RuntimePlatform.IPhonePlayer)]
+    public IEnumerator SendNotificationUsingCalendarTrigger_WeekDay_NotificationIsReceived()
+    {
+        var dt = DateTime.Now.AddSeconds(5);
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Weekday = dt.DayOfWeek,
+            Hour = dt.Hour,
+            Minute = dt.Minute,
+            Second = dt.Second,
+        };
+
+        var notification = new iOSNotification()
+        {
+            Title = "Weekday",
+            Body = "Day of the week",
+            ShowInForeground = true,
+            ForegroundPresentationOption = PresentationOption.Alert,
+            Trigger = trigger,
+        };
+
+        iOSNotificationCenter.ScheduleNotification(notification);
+        Debug.Log($"SendNotificationUsingCalendarTrigger_WeekDay_NotificationIsReceived, Notification should arrive on: {dt}");
+        yield return WaitForNotification(20.0f);
+        Debug.Log($"SendNotificationUsingCalendarTrigger_WeekDay_NotificationIsReceived, wait finished at: {DateTime.Now}");
+        Assert.AreEqual(1, receivedNotificationCount);
+        Assert.IsNotNull(lastReceivedNotification);
+        Assert.AreEqual("Weekday", lastReceivedNotification.Title);
+        var retTrigger = (iOSNotificationCalendarTrigger)lastReceivedNotification.Trigger;
+        Assert.AreEqual(dt.DayOfWeek, retTrigger.Weekday);
+    }
+
+    [UnityTest]
+    [UnityPlatform(RuntimePlatform.IPhonePlayer)]
     public IEnumerator SendNotification_AllPropertiesRoundtrip()
     {
         var trigger = new iOSNotificationTimeIntervalTrigger()
@@ -497,5 +530,61 @@ class iOSNotificationTests
         var result = (iOSNotificationCalendarTrigger)notification.Trigger;
         Assert.AreEqual(5, result.Day);
         Assert.IsFalse(result.UtcTime);
+    }
+
+    [Test]
+    public void iOSCalendarTrigger_HandlesWeekday()
+    {
+        var trigger = new iOSNotificationCalendarTrigger();
+        Assert.AreEqual(-1, trigger.iOSWeekday);
+
+        // On iOS week starts on Sunday=1, C# Sunday=0
+        trigger.Weekday = DayOfWeek.Sunday;
+        Assert.AreEqual(1, trigger.iOSWeekday);
+        trigger.Weekday = DayOfWeek.Wednesday;
+        Assert.AreEqual(4, trigger.iOSWeekday);
+
+        trigger.iOSWeekday = 7;
+        Assert.AreEqual(DayOfWeek.Saturday, trigger.Weekday);
+        trigger.iOSWeekday = 1;
+        Assert.AreEqual(DayOfWeek.Sunday, trigger.Weekday);
+    }
+
+    [Test]
+    public void iOSCalendarTrigger_TimezoneHandling_HandlesWeekend()
+    {
+        var trigger = new iOSNotificationCalendarTrigger();
+        trigger.Year = 2020;
+        trigger.Month = 10;
+        trigger.Day = 20;
+
+        // Convert to UTC, Weekday stays null
+        var trigger2 = trigger.ToUtc();
+        Assert.IsNull(trigger2.Weekday);
+
+        // convert to UTC with Weekday, it stays
+        trigger.Weekday = DayOfWeek.Wednesday;
+        trigger2 = trigger.ToUtc();
+        Assert.IsNotNull(trigger2.Weekday);
+
+        // Convert to local, Weekday preserved
+        trigger = trigger2.ToLocal();
+        Assert.IsNotNull(trigger.Weekday);
+
+        // Convert to local without Weekday, stays null
+        trigger2.Weekday = null;
+        trigger = trigger2.ToLocal();
+        Assert.IsNull(trigger.Weekday);
+    }
+
+    [Test]
+    public void iOSCalendarTrigger_WeekdayHandling()
+    {
+        var date = new DateTimeOffset(2025, 1, 2, 23, 50, 0, TimeSpan.FromHours(-2));
+        Assert.IsNull(iOSNotificationCalendarTrigger.WeekdayToUtc(null, date));
+        Assert.AreEqual(DayOfWeek.Saturday, iOSNotificationCalendarTrigger.WeekdayToUtc(DayOfWeek.Friday, date));
+
+        date = new DateTimeOffset(2025, 1, 2, 0, 50, 0, TimeSpan.FromHours(0));
+        Assert.AreEqual(DayOfWeek.Saturday, iOSNotificationCalendarTrigger.WeekdayTZAdjust(DayOfWeek.Sunday, date, date => date.ToOffset(TimeSpan.FromHours(-3))));
     }
 }

@@ -115,6 +115,7 @@ namespace Unity.Notifications.iOS
         public Int32 hour;
         public Int32 minute;
         public Int32 second;
+        public Int32 weekday;
         public Byte repeats;
     }
 
@@ -403,6 +404,7 @@ namespace Unity.Notifications.iOS
                             data.trigger.calendar.hour = trigger.Hour != null ? trigger.Hour.Value : -1;
                             data.trigger.calendar.minute = trigger.Minute != null ? trigger.Minute.Value : -1;
                             data.trigger.calendar.second = trigger.Second != null ? trigger.Second.Value : -1;
+                            data.trigger.calendar.weekday = trigger.iOSWeekday;
                             data.trigger.calendar.repeats = (byte)(trigger.Repeats ? 1 : 0);
                             break;
                         }
@@ -446,6 +448,7 @@ namespace Unity.Notifications.iOS
                                 Hour = (data.trigger.calendar.hour >= 0) ? (int?)data.trigger.calendar.hour : null,
                                 Minute = (data.trigger.calendar.minute >= 0) ? (int?)data.trigger.calendar.minute : null,
                                 Second = (data.trigger.calendar.second >= 0) ? (int?)data.trigger.calendar.second : null,
+                                iOSWeekday = data.trigger.calendar.weekday,
                                 UtcTime = false,
                                 Repeats = data.trigger.calendar.repeats != 0
                             };

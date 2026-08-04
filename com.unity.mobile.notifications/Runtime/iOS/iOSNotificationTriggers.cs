@@ -213,6 +213,11 @@ namespace Unity.Notifications.iOS
         public int? Second { get; set; }
 
         /// <summary>
+        /// Day of week to schedule notification for or null to ignore this property.
+        /// </summary>
+        public DayOfWeek? Weekday { get; set; }
+
+        /// <summary>
         /// Are Date and Time field in UTC time. When false, use local time.
         /// </summary>
         /// <value>If true, use UTC time.</value>
@@ -233,10 +238,12 @@ namespace Unity.Notifications.iOS
             if (UtcTime)
                 return this;
 
-            var notificationTime = AssignDateTimeComponents(DateTime.Now).ToUniversalTime();
+            var nowWithComponents= AssignDateTimeComponents(DateTimeOffset.Now);
+            var notificationTime = nowWithComponents.ToUniversalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = true;
             result.AssignNonEmptyComponents(notificationTime);
+            result.Weekday = WeekdayToUtc(Weekday, nowWithComponents);
             return result;
         }
 
@@ -249,14 +256,16 @@ namespace Unity.Notifications.iOS
             if (!UtcTime)
                 return this;
 
-            var notificationTime = AssignDateTimeComponents(DateTime.UtcNow).ToLocalTime();
+            var nowWithComponents = AssignDateTimeComponents(DateTimeOffset.UtcNow);
+            var notificationTime = nowWithComponents.ToLocalTime();
             iOSNotificationCalendarTrigger result = this;
             result.UtcTime = false;
             result.AssignNonEmptyComponents(notificationTime);
+            result.Weekday = WeekdayToLocal(Weekday, nowWithComponents);
             return result;
         }
 
-        internal DateTime AssignDateTimeComponents(DateTime dt)
+        internal DateTimeOffset AssignDateTimeComponents(DateTimeOffset dt)
         {
             int year = Year != null ? Year.Value : dt.Year;
             int month = Month != null ? Month.Value : dt.Month;
@@ -264,10 +273,10 @@ namespace Unity.Notifications.iOS
             int hour = Hour != null ? Hour.Value : dt.Hour;
             int minute = Minute != null ? Minute.Value : dt.Minute;
             int second = Second != null ? Second.Value : dt.Second;
-            return new DateTime(year, month, day, hour, minute, second, dt.Kind);
+            return new DateTimeOffset(year, month, day, hour, minute, second, dt.Offset);
         }
 
-        internal void AssignNonEmptyComponents(DateTime dt)
+        internal void AssignNonEmptyComponents(DateTimeOffset dt)
         {
             if (Year != null)
                 Year = dt.Year;
@@ -281,6 +290,44 @@ namespace Unity.Notifications.iOS
                 Minute = dt.Minute;
             if (Second != null)
                 Second = dt.Second;
+        }
+
+        internal static DayOfWeek? WeekdayToUtc(DayOfWeek? weekday, DateTimeOffset start)
+        {
+            return WeekdayTZAdjust(weekday, start, d => d.ToUniversalTime());
+        }
+
+        internal static DayOfWeek? WeekdayToLocal(DayOfWeek? weekday, DateTimeOffset start)
+        {
+            return WeekdayTZAdjust(weekday, start, d => d.ToLocalTime());
+        }
+
+        internal static DayOfWeek? WeekdayTZAdjust(DayOfWeek? weekday, DateTimeOffset start, Func<DateTimeOffset, DateTimeOffset> convertTZ)
+        {
+            if (weekday == null)
+                return null;
+            var day = weekday.Value;
+            while (start.DayOfWeek != day)
+                start = start.AddDays(1);
+            return convertTZ(start).DayOfWeek;
+        }
+
+        internal int iOSWeekday
+        {
+            get
+            {
+                if (!Weekday.HasValue)
+                    return -1;
+                // In C# Sunday=0, Saturday=6, on iOS Sunday=1, Saturday=7
+                return 1 + (int)Weekday.Value;
+            }
+            set
+            {
+                if (value <= 0 || value > 7)
+                    Weekday = null;
+                else
+                    Weekday = (DayOfWeek)(value - 1);
+            }
         }
     }
 }

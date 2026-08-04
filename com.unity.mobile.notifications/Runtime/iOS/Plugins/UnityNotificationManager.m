@@ -338,6 +338,8 @@ bool validateAuthorizationStatus(UnityNotificationManager* manager)
             date.minute = data->trigger.calendar.minute;
         if (data->trigger.calendar.second >= 0)
             date.second = data->trigger.calendar.second;
+        if (data->trigger.calendar.weekday > 0)
+            date.weekday = data->trigger.calendar.weekday;
 
         date.calendar = [NSCalendar calendarWithIdentifier: NSCalendarIdentifierGregorian];
         if ([@"1" isEqualToString: [userInfo objectForKey: @"OriginalUtc"]])
