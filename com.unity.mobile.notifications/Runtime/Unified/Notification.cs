@@ -38,7 +38,9 @@ namespace Unity.Notifications
             return n.notification;
 #else
             var ret = n.notification;
-            if (ret != null && n.Identifier.HasValue)
+            if (ret == null)
+                return null;
+            if (n.Identifier.HasValue)
                 ret.Identifier = n.Identifier.Value.ToString(CultureInfo.InvariantCulture);
             ret.ShowInForeground = n.ShowInForeground;
             return ret;
