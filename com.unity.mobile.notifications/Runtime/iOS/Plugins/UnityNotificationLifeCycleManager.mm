@@ -10,16 +10,10 @@
 #import "UnityNotificationManager.h"
 
 #if UNITY_XCODE_PROJECT_TYPE_SWIFT
-extern "C"
-{
-    NSNotificationName UnityMobileNotifications_applicationWillFinishLaunchingName();
-    NSNotificationName UnityMobileNotifications_applicationDidRegisterForRemoteNotificationsName();
-    NSNotificationName UnityMobileNotifications_applicationDidFailToRegisterForRemoteNotificationsName();
-    NSString* UnityMobileNotifications_remoteNotificationsDeviceTokenKey();
-}
-#define kUnityWillFinishLaunchingWithOptions UnityMobileNotifications_applicationWillFinishLaunchingName()
-#define kUnityDidRegisterForRemoteNotificationsWithDeviceToken UnityMobileNotifications_applicationDidRegisterForRemoteNotificationsName()
-#define kUnityDidFailToRegisterForRemoteNotificationsWithError UnityMobileNotifications_applicationDidFailToRegisterForRemoteNotificationsName()
+#import <UnityAPI/UnityAPI-Swift.h>
+#define kUnityWillFinishLaunchingWithOptions UnityNotifications.applicationWillFinishLaunching
+#define kUnityDidRegisterForRemoteNotificationsWithDeviceToken UnityNotifications.applicationDidRegisterForRemoteNotifications
+#define kUnityDidFailToRegisterForRemoteNotificationsWithError UnityNotifications.applicationDidFailToRegisterForRemoteNotifications
 #else
 #import "Classes/PluginBase/AppDelegateListener.h"
 #endif
@@ -110,7 +104,7 @@ extern "C"
     NSData* deviceToken = nil;
 
 #if UNITY_XCODE_PROJECT_TYPE_SWIFT
-    id token = [notification.userInfo objectForKey: UnityMobileNotifications_remoteNotificationsDeviceTokenKey()];
+    id token = [notification.userInfo objectForKey: UnityNotifications.remoteNotificationsDeviceTokenKey];
 #else
     id token = notification.userInfo;
 #endif
