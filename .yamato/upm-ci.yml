@@ -120,3 +120,6 @@ test_trigger:
     - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
     - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
     {% endfor %}
+    {% for editor in swift_trampoline_editors %}
+    - .yamato/upm-ci.yml#test_iOS_Swift_{{ editor.version }}
+    {% endfor %}
