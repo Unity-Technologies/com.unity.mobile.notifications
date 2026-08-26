@@ -8,8 +8,6 @@ test_editors:
 
 swift_trampoline_editors:
   - version: trunk
-  - version: 6000.6
-  - version: 6000.5
 
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
