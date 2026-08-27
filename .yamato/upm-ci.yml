@@ -6,6 +6,10 @@ test_editors:
   - version: 6000.3
   - version: 6000.0
 
+swift_trampoline_editors:
+  - version: trunk
+  - version: 6000.6
+
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
 
@@ -65,6 +69,33 @@ test_iOS_{{ editor.version }}:
     - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
 {% endfor %}
 
+{% for editor in swift_trampoline_editors %}
+test_iOS_Swift_{{ editor.version }}:
+  name: Test {{ editor.version }} on iOS (Swift)
+  agent:
+    type: Unity::VM::osx
+    image: automation-tooling/macos-14-arm64-unity:v2.7891464
+    flavor: b1.medium
+    model: M1
+  variables:
+    IOS_SIMULATOR_SDK: 1
+  commands:
+    - curl -s {{ utr.url_unix }} --output utr
+    - chmod u+x utr
+    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew trust unity/unity
+    - brew install unity/unity/unity-downloader-cli
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-save-path=build/players --build-only
+    - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-load-path=build/players
+  artifacts:
+    packages:
+      paths:
+        - "upm-ci~/**/*"
+  dependencies:
+    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
+{% endfor %}
+
 test_trigger:
   name: Tests Trigger
   agent:
@@ -89,4 +120,7 @@ test_trigger:
     {% for editor in test_editors %}
     - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
     - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
+    {% endfor %}
+    {% for editor in swift_trampoline_editors %}
+    - .yamato/upm-ci.yml#test_iOS_Swift_{{ editor.version }}
     {% endfor %}
