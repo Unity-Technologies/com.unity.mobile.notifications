@@ -82,6 +82,7 @@ test_iOS_Swift_{{ editor.version }}:
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
+    - brew tap unity/unity git@github.cds.internal.unity3d.com:unity/unity.git
     - brew trust unity/unity
     - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
     - brew install unity/unity/unity-downloader-cli
