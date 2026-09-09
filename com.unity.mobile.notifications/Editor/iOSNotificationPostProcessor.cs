@@ -131,7 +131,13 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
     private static void PatchPlist(string path, List<Unity.Notifications.NotificationSetting> settings, bool addPushNotificationCapability)
     {
-        var plistPath = path + "/Info.plist";
+        var plistPath = Path.Combine(path, "Info.plist");
+        if (!File.Exists(plistPath))
+        {
+            // When using Swift trampoline since 6.7 the file is under MainApp subdir, fallback to that
+            path = Path.Combine(path, "MainApp");
+            plistPath = Path.Combine(path, "Info.plist");
+        }
         var plist = new PlistDocument();
         plist.ReadFromString(File.ReadAllText(plistPath));
 
