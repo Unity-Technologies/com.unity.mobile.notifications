@@ -7,7 +7,6 @@ test_editors:
   - version: 6000.0
 
 swift_trampoline_editors:
-  - version: trunk
   - version: 6000.6
 
 artifactory:
@@ -79,12 +78,10 @@ test_iOS_Swift_{{ editor.version }}:
     model: M1
   variables:
     IOS_SIMULATOR_SDK: 1
-    HOMEBREW_NO_AUTO_UPDATE: 1
-    HOMEBREW_NO_INSTALL_FROM_API: 1
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
-    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew tap unity/unity https://github.cds.internal.unity3d.com/unity/homebrew-unity
     - brew trust unity/unity
     - brew install unity/unity/unity-downloader-cli
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
@@ -118,11 +115,6 @@ test_trigger:
       paths:
         - "upm-ci~/packages/**/*"
   dependencies:
-    - .yamato/wrench/package-pack-jobs.yml#package_pack_-_mobile_notifications
-    {% for editor in test_editors %}
-    - .yamato/upm-ci.yml#test_Android_{{ editor.version }}
-    - .yamato/upm-ci.yml#test_iOS_{{ editor.version }}
-    {% endfor %}
     {% for editor in swift_trampoline_editors %}
     - .yamato/upm-ci.yml#test_iOS_Swift_{{ editor.version }}
     {% endfor %}
