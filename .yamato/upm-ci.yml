@@ -81,8 +81,8 @@ test_iOS_Swift_{{ editor.version }}:
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
-    - brew tap unity/unity https://github.cds.internal.unity3d.com/unity/homebrew-unity
-    - brew trust unity/unity
+    - brew trust git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew tap unity/unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
     - brew install unity/unity/unity-downloader-cli
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-save-path=build/players --build-only
