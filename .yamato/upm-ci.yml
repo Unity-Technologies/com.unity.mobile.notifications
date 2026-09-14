@@ -51,14 +51,15 @@ test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
     type: Unity::VM::osx
-    image: package-ci/macos-13:default
-    flavor: b1.xlarge
+    image: package-ci/macos-13-arm64:v4
+    flavor: m1.mac
+    model: M1
   variables:
     IOS_SIMULATOR_SDK: 1
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
-    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast --arch arm64
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
   artifacts:
