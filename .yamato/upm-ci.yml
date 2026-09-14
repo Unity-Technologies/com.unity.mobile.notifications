@@ -51,8 +51,8 @@ test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
     type: Unity::VM::osx
-    image: package-ci/macos-13-arm64:v4
-    flavor: m1.mac
+    image: automation-tooling/macos-14-arm64-unity:v2.7891464
+    flavor: b1.medium
     model: M1
   variables:
     IOS_SIMULATOR_SDK: 1
