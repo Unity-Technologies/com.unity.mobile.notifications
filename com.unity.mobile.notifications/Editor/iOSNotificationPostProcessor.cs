@@ -42,7 +42,6 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         List<string> swiftPropertiesToAdd = new();
 
         var needsToWriteChanges = false;
-        var needsCodeSignEntitlements = false;
 
         var pbxProject = new PBXProject();
         pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
@@ -77,6 +76,20 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             needsToWriteChanges = true;
         }
 
+        void SavePbxProjectWithSwiftProperties()
+        {
+            if (swiftPropertiesToAdd.Count > 0)
+            {
+                pbxProject.UpdateBuildProperty(unityFrameworkTarget, "OTHER_SWIFT_FLAGS", swiftPropertiesToAdd, new string[0]);
+                needsToWriteChanges = true;
+            }
+
+            if (needsToWriteChanges)
+                pbxProject.WriteToFile(pbxProjectPath);
+            needsToWriteChanges = false;
+            pbxProject = null;
+        }
+
         string entitlementsFileName = null;
         if (addPushNotificationCapability || addTimeSensitiveEntitlement)
         {
@@ -85,55 +98,28 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             {
                 var bundleIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.iOS);
                 entitlementsFileName = string.Format("{0}.entitlements", bundleIdentifier.Substring(bundleIdentifier.LastIndexOf(".") + 1));
-                needsCodeSignEntitlements = true;
             }
-        }
 
-        // Update the entitlements file.
-        if (addPushNotificationCapability)
-        {
-            // write changes because ProjectCapabilityManager loads and saves too
-            if (needsToWriteChanges)
-                pbxProject.WriteToFile(pbxProjectPath);
-            needsToWriteChanges = false;
-            swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
-            var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, targetGuid: mainTarget);
-            capManager.AddPushNotifications(!useReleaseAPSEnv);
-            capManager.WriteToFile();
-
-            // ProjectCapabilityManager wrote updates, need to reload in case we further modify
-            pbxProject = new PBXProject();
-            pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
-        }
-
-        if (addTimeSensitiveEntitlement)
-        {
-            var entitlementsFile = new PlistDocument();
-            var entitlementsFilePath = Path.Combine(path, entitlementsFileName);
-            if (File.Exists(entitlementsFilePath))
-                entitlementsFile.ReadFromFile(entitlementsFilePath);
-            var entitlement = entitlementsFile.root["com.apple.developer.usernotifications.time-sensitive"] as PlistElementBoolean;
-            if (entitlement == null || entitlement.AsBoolean() == false)
+            if (addPushNotificationCapability)
             {
-                entitlementsFile.root["com.apple.developer.usernotifications.time-sensitive"] = new PlistElementBoolean(true);
-                entitlementsFile.WriteToFile(entitlementsFilePath);
+                swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
+                needsToWriteChanges = true;
             }
+
+            // ProjectCapabilityManager writes PBXProject, so we need to save before adding caps
+            SavePbxProjectWithSwiftProperties();
+            var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, targetGuid: mainTarget);
+            if (addPushNotificationCapability)
+            {
+                swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
+                capManager.AddPushNotifications(!useReleaseAPSEnv);
+            }
+            if (addTimeSensitiveEntitlement)
+                capManager.AddTimeSensitiveNotifications();
+            capManager.WriteToFile();
         }
 
-        if (needsCodeSignEntitlements)
-        {
-            pbxProject.AddBuildProperty(mainTarget, "CODE_SIGN_ENTITLEMENTS", entitlementsFileName);
-            needsToWriteChanges = true;
-        }
-
-        if (swiftPropertiesToAdd.Count > 0)
-        {
-            pbxProject.UpdateBuildProperty(unityFrameworkTarget, "OTHER_SWIFT_FLAGS", swiftPropertiesToAdd, new string[0]);
-            needsToWriteChanges = true;
-        }
-
-        if (needsToWriteChanges)
-            pbxProject.WriteToFile(pbxProjectPath);
+        SavePbxProjectWithSwiftProperties();
     }
 
     private static void PatchPlist(string path, List<Unity.Notifications.NotificationSetting> settings, bool addPushNotificationCapability)
