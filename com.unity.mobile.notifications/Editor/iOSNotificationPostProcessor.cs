@@ -86,6 +86,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
 
             if (needsToWriteChanges)
                 pbxProject.WriteToFile(pbxProjectPath);
+            swiftPropertiesToAdd.Clear();
             needsToWriteChanges = false;
             pbxProject = null;
         }
@@ -110,10 +111,7 @@ public class iOSNotificationPostProcessor : MonoBehaviour
             SavePbxProjectWithSwiftProperties();
             var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, targetGuid: mainTarget);
             if (addPushNotificationCapability)
-            {
-                swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
                 capManager.AddPushNotifications(!useReleaseAPSEnv);
-            }
             if (addTimeSensitiveEntitlement)
                 capManager.AddTimeSensitiveNotifications();
             capManager.WriteToFile();
