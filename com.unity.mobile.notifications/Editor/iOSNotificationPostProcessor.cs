@@ -92,11 +92,18 @@ public class iOSNotificationPostProcessor : MonoBehaviour
         // Update the entitlements file.
         if (addPushNotificationCapability)
         {
+            // write changes because ProjectCapabilityManager loads and saves too
+            if (needsToWriteChanges)
+                pbxProject.WriteToFile(pbxProjectPath);
+            needsToWriteChanges = false;
             swiftPropertiesToAdd.Add("-DUNITY_USES_REMOTE_NOTIFICATIONS");
-            var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, "Unity-iPhone");
+            var capManager = new ProjectCapabilityManager(pbxProjectPath, entitlementsFileName, targetGuid: mainTarget);
             capManager.AddPushNotifications(!useReleaseAPSEnv);
             capManager.WriteToFile();
-            needsToWriteChanges = true;
+
+            // ProjectCapabilityManager wrote updates, need to reload in case we further modify
+            pbxProject = new PBXProject();
+            pbxProject.ReadFromString(File.ReadAllText(pbxProjectPath));
         }
 
         if (addTimeSensitiveEntitlement)
