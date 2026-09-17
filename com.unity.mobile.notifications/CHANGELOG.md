@@ -2,7 +2,7 @@
 
 All notable changes to this package will be documented in this file.
 
-## [Unreleased]
+## [2.5.0] - 2026-09-08
 
 ### Changes & Improvements:
 - Unity 6.0 or later is required.
