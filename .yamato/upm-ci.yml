@@ -35,6 +35,7 @@ test_Android_{{ editor.version }}:
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
        start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
        utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp  --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
+    - have failure here
   after:
     - androidlog.bat
   artifacts:
