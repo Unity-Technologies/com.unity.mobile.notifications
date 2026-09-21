@@ -51,14 +51,20 @@ test_iOS_{{ editor.version }}:
   name: Test {{ editor.version }} on iOS
   agent:
     type: Unity::VM::osx
-    image: package-ci/macos-13:default
-    flavor: b1.xlarge
+    image: automation-tooling/macos-14-arm64-unity:v2.7891464
+    flavor: b1.medium
+    model: M1
   variables:
     IOS_SIMULATOR_SDK: 1
+    HOMEBREW_NO_AUTO_UPDATE: 1
+    HOMEBREW_NO_INSTALL_FROM_API: 1
   commands:
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
-    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew trust unity/unity
+    - brew install unity/unity/unity-downloader-cli
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast --arch arm64
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
   artifacts:
@@ -87,7 +93,7 @@ test_iOS_Swift_{{ editor.version }}:
     - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
     - brew trust unity/unity
     - brew install unity/unity/unity-downloader-cli
-    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast
+    - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast --arch arm64
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-load-path=build/players
   artifacts:
