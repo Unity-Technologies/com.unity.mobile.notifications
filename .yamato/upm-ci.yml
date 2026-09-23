@@ -4,9 +4,9 @@ swift_trampoline_editors:
   - version: 6000.6
 
 test_editors:
-{% for editor in swift_trampoline_editors %}
-  - version: {{ editor.version }}
-{% endfor %}
+  - version: trunk
+  - version: 6000.7
+  - version: 6000.6
   - version: 6000.3
   - version: 6000.0
 
