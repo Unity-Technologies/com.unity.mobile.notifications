@@ -7,8 +7,6 @@ test_editors:
 {% for editor in swift_trampoline_editors %}
   - version: {{ editor.version }}
 {% endfor %}
-  - version: 6000.5
-  - version: 6000.4
   - version: 6000.3
   - version: 6000.0
 
