@@ -1,14 +1,14 @@
-test_editors:
-  - version: trunk
-  - version: 6000.6
-  - version: 6000.5
-  - version: 6000.4
-  - version: 6000.3
-  - version: 6000.0
-
 swift_trampoline_editors:
   - version: trunk
+  - version: 6000.7
   - version: 6000.6
+
+test_editors:
+  - version: trunk
+  - version: 6000.7
+  - version: 6000.6
+  - version: 6000.3
+  - version: 6000.0
 
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
