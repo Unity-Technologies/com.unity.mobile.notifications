@@ -1,14 +1,14 @@
-test_editors:
-  - version: trunk
-  - version: 6000.6
-  - version: 6000.5
-  - version: 6000.4
-  - version: 6000.3
-  - version: 6000.0
-
 swift_trampoline_editors:
   - version: trunk
+  - version: 6000.7
   - version: 6000.6
+
+test_editors:
+  - version: trunk
+  - version: 6000.7
+  - version: 6000.6
+  - version: 6000.3
+  - version: 6000.0
 
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
@@ -33,7 +33,8 @@ test_Android_{{ editor.version }}:
     - utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
-       start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
+       %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -b all -c
        utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp  --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
   after:
     - start %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
