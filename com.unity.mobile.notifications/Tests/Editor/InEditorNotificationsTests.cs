@@ -9,7 +9,22 @@ namespace Unity.Notifications.Tests
     internal class InEditorNotificationsTests
     {
         [Test]
-        public void Notification_CanSetAllProperties()
+        public void CanGetAllPropertiesOnDefaultCreatedNotification()
+        {
+            foreach (var prop in typeof(Notification).GetProperties())
+                try
+                {
+                    Notification n = default;
+                    prop.GetValue(n);
+                }
+                catch (Exception e)
+                {
+                    Assert.Fail($"Failed to get property {prop.Name}, {e.Message}");
+                }
+        }
+
+        [Test]
+        public void CanSetAllPropertiesOnDefaultCreatedNotification()
         {
             foreach (var prop in typeof(Notification).GetProperties())
                 SetProperty(prop);
