@@ -87,7 +87,7 @@ namespace Unity.Notifications
         {
             get
             {
-#if UNITY_IOS
+#if !UNITY_ANDROID
                 if (notification == null)
                     return null;
 #endif
@@ -95,11 +95,12 @@ namespace Unity.Notifications
             }
             set
             {
-#if UNITY_IOS
-                if (notification == null)
-                    notification = new PlatformNotification();
+#if UNITY_ANDROID
+                notification
+#else
+                GetNotification()
 #endif
-                notification.Title = value;
+                    .Title = value;
             }
         }
 
