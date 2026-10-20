@@ -191,11 +191,11 @@ publish_dry_run_mobile_notifications:
         unzip: true
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.14.1.0
-    WRENCH_LOCALAPV_URL: https://artifactory.prd.it.unity3d.com/artifactory/stevedore-unity-internal/wrench-localapv/1-3-23_c74d5d10014b178e02fb36a6fa739897d49c2772d974a5f1a08a86b68e41e3a9.zip
+    UPMPVP_CONTEXT_WRENCH: 3.16.0.0
+    WRENCH_LOCALAPV_URL: https://artifactory.prd.it.unity3d.com/artifactory/stevedore-unity-internal/wrench-localapv/1-3-24_008f0c6a8e05e445cb5f9241c71be252b18146168373aba8c412fe211bb7fafa.zip
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.14.1.0
+    Wrench: 3.16.0.0
 
 # Publish  for mobile.notifications to https://artifactory-slo.bf.unity3d.com/artifactory/api/npm/upm-npm
 publish_mobile_notifications:
@@ -374,10 +374,10 @@ publish_mobile_notifications:
         unzip: true
   variables:
     UPMPVP_ACK_UPMPVP_DOES_NO_API_VALIDATION: 1
-    UPMPVP_CONTEXT_WRENCH: 3.14.1.0
-    WRENCH_LOCALAPV_URL: https://artifactory.prd.it.unity3d.com/artifactory/stevedore-unity-internal/wrench-localapv/1-3-23_c74d5d10014b178e02fb36a6fa739897d49c2772d974a5f1a08a86b68e41e3a9.zip
+    UPMPVP_CONTEXT_WRENCH: 3.16.0.0
+    WRENCH_LOCALAPV_URL: https://artifactory.prd.it.unity3d.com/artifactory/stevedore-unity-internal/wrench-localapv/1-3-24_008f0c6a8e05e445cb5f9241c71be252b18146168373aba8c412fe211bb7fafa.zip
   allow_on: branch match "^release/.*"
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.14.1.0
+    Wrench: 3.16.0.0
 
