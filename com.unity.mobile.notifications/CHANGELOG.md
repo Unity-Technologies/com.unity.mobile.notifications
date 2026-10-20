@@ -2,6 +2,11 @@
 
 All notable changes to this package will be documented in this file.
 
+## [Unreleased]
+
+### Fixes:
+- Fixed NullReferenceException in unified Notification in Editor with active platform other than Android or iOS.
+
 ## [2.5.0] - 2026-09-21
 
 ### Changes & Improvements:
