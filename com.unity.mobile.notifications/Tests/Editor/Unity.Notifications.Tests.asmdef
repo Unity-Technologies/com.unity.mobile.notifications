@@ -2,7 +2,8 @@
     "name": "Unity.Notifications.Tests",
     "references": [
         "Unity.Notifications",
-        "Unity.Notifications.iOS"
+        "Unity.Notifications.iOS",
+        "Unity.Notifications.Unified"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
