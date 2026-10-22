@@ -60,9 +60,9 @@ api_validation_-_mobile_notifications_-_6000_0_-_win10:
     UNITY_LICENSING_SERVER_DELETE_NUL: 0
     UNITY_LICENSING_SERVER_DELETE_ULF: 0
     UNITY_LICENSING_SERVER_TOOLSET: pro
-    UPMPVP_CONTEXT_WRENCH: 3.16.0.0
-    WRENCH_LOCALAPV_URL: https://artifactory.prd.it.unity3d.com/artifactory/stevedore-unity-internal/wrench-localapv/1-3-24_008f0c6a8e05e445cb5f9241c71be252b18146168373aba8c412fe211bb7fafa.zip
+    UPMPVP_CONTEXT_WRENCH: 3.22.0.0
+    WRENCH_LOCALAPV_URL: https://artifactory.prd.it.unity3d.com/artifactory/stevedore-unity-internal/wrench-localapv/1-3-25_62e5de96ec03d5fbee3cd2b34aeef6e7c8b2437b7c040a16abb49a9653654cf9.zip
   metadata:
     Job Maintainers: '#rm-packageworks'
-    Wrench: 3.16.0.0
+    Wrench: 3.22.0.0
 
