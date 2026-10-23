@@ -23,15 +23,20 @@ utr:
 test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
-    type: Unity::mobile::samsung
-    image: mobile/android-windows-unity:v2.9233056
-    flavor: b1.xlarge
-    model: s20-fe-v2
+    type: Unity::metal::macmini
+    image: mobile/android-emulator-macos-base-slim-unity:v2.9302489
+    flavor: b1.large
+    model: M2-macos14
   commands:
-    - curl -s {{ utr.url_win }} --output utr.bat
-    - gsudo choco install unity-downloader-cli -y -s https://artifactory-slo.bf.unity3d.com/artifactory/api/nuget/choco
-    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
-    - utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - curl -s {{ utr.url_unix }} --output utr
+    - chmod u+x utr
+    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+    - brew trust unity/unity
+    - brew install unity/unity/unity-downloader-cli
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast --arch arm64
+    - echo $ANDROID_SDK_ROOT
+    - ./utr --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - echo $ANDROID_SDK_ROOT
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
        %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
