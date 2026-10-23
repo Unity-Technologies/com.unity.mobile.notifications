@@ -23,9 +23,10 @@ utr:
 test_Android_{{ editor.version }}:
   name: Test {{ editor.version }} on Android
   agent:
-    type: Unity::mobile::shield
-    image: mobile/android-execution-base:v0.7.1
-    flavor: b1.medium
+    type: Unity::mobile::samsung
+    image: mobile/android-windows-unity:v2.9233056
+    flavor: b1.xlarge
+    model: s20-fe-v2
   commands:
     - curl -s {{ utr.url_win }} --output utr.bat
     - gsudo choco install unity-downloader-cli -y -s https://artifactory-slo.bf.unity3d.com/artifactory/api/nuget/choco
