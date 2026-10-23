@@ -28,6 +28,7 @@ test_Android_{{ editor.version }}:
     flavor: b1.large
     model: M2-macos14
   commands:
+    - unset ANDROID_SDK_ROOT
     - echo $ANDROID_SDK_ROOT
     - curl -s {{ utr.url_unix }} --output utr
     - chmod u+x utr
