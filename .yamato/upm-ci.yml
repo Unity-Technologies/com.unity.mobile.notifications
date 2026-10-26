@@ -20,6 +20,11 @@ infrastructure_setup:
   - command: brew trust unity/unity
   - command: brew install unity/unity/unity-downloader-cli
 
+android_paths:
+  jdk: /Users/bokken/build/output/Unity-Technologies/com.unity.mobile.notifications/.Editor/PlaybackEngines/AndroidPlayer/OpenJDK
+  sdk: /Users/bokken/build/output/Unity-Technologies/com.unity.mobile.notifications/.Editor/PlaybackEngines/AndroidPlayer/SDK
+  ndk: /Users/bokken/build/output/Unity-Technologies/com.unity.mobile.notifications/.Editor/PlaybackEngines/AndroidPlayer/NDK
+
 ---
 
 {% for editor in test_editors %}
@@ -35,7 +40,11 @@ test_Android_{{ editor.version }}:
     - {{ cmd.command }}
 {% endfor %}
     - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast --arch arm64
-    - utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
+    - |
+       export JAVA_HOME={{ android_paths.jdk }}
+       export ANDROID_SDK_ROOT={{ android_paths.sdk }}
+       export ANDROID_NDK_ROOT={{ android_paths.ndk }}
+       ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
        %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
