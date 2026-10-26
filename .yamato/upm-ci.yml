@@ -13,9 +13,12 @@ test_editors:
 artifactory:
   production: https://artifactory.prd.it.unity3d.com/artifactory/api/
 
-utr:
-  url_win: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr.bat
-  url_unix: https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr
+infrastructure_setup:
+  - command: curl -s https://artifactory.prd.it.unity3d.com/artifactory/unity-tools-local/utr-standalone/utr --output utr
+  - command: chmod u+x utr
+  - command: brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
+  - command: brew trust unity/unity
+  - command: brew install unity/unity/unity-downloader-cli
 
 ---
 
@@ -28,9 +31,10 @@ test_Android_{{ editor.version }}:
     flavor: b1.large
     model: M2-macos14
   commands:
-    - curl -s {{ utr.url_win }} --output utr.bat
-    - gsudo choco install unity-downloader-cli -y -s https://artifactory-slo.bf.unity3d.com/artifactory/api/nuget/choco
-    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast
+{% for cmd in infrastructure_setup %}
+    - {{ cmd.command }}
+{% endfor %}
+    - unity-downloader-cli -c Editor -c Android -u {{ editor.version }} --wait --fast --arch arm64
     - utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
        set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
@@ -62,11 +66,9 @@ test_iOS_{{ editor.version }}:
     HOMEBREW_NO_AUTO_UPDATE: 1
     HOMEBREW_NO_INSTALL_FROM_API: 1
   commands:
-    - curl -s {{ utr.url_unix }} --output utr
-    - chmod u+x utr
-    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
-    - brew trust unity/unity
-    - brew install unity/unity/unity-downloader-cli
+{% for cmd in infrastructure_setup %}
+    - {{ cmd.command }}
+{% endfor %}
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast --arch arm64
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --player-load-path=build/players
@@ -91,11 +93,9 @@ test_iOS_Swift_{{ editor.version }}:
     HOMEBREW_NO_AUTO_UPDATE: 1
     HOMEBREW_NO_INSTALL_FROM_API: 1
   commands:
-    - curl -s {{ utr.url_unix }} --output utr
-    - chmod u+x utr
-    - brew tap unity/homebrew-unity git@github.cds.internal.unity3d.com:unity/homebrew-unity.git
-    - brew trust unity/unity
-    - brew install unity/unity/unity-downloader-cli
+{% for cmd in infrastructure_setup %}
+    - {{ cmd.command }}
+{% endfor %}
     - unity-downloader-cli -c Editor -c iOS -u {{ editor.version }} --wait --fast --arch arm64
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-upmNoDefaultPackages" --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-save-path=build/players --build-only
     - ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=ios --artifacts_path=upm-ci~/test-results/ios --timeout=900 --extra-editor-arg="-executeMethod" --extra-editor-arg=UnityEditor.iOS.iOSTests.UseSwiftTrampoline --player-load-path=build/players
