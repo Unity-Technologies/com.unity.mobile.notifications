@@ -46,10 +46,13 @@ test_Android_{{ editor.version }}:
        export ANDROID_NDK_ROOT={{ android_paths.ndk }}
        ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900  --extra-editor-arg="-upmNoDefaultPackages" --player-save-path=build/players --build-only
     - |
-       set ANDROID_DEVICE_CONNECTION=%BOKKEN_DEVICE_IP%
-       %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
-       %ANDROID_SDK_ROOT%\platform-tools\adb.exe logcat -b all -c
-       utr.bat --testproject=TestProjects\AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp  --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
+       export BOKKEN_ANDROID_EMULATOR_CONNECTION=1
+       export JAVA_HOME={{ android_paths.jdk }}
+       export ANDROID_SDK_ROOT={{ android_paths.sdk }}
+       export ANDROID_NDK_ROOT={{ android_paths.ndk }}
+       sh /Users/bokken/tools-uploader.sh $BOKKEN_DEVICE_IP
+       sh /Users/bokken/emulator-host-launcher.sh $BOKKEN_DEVICE_IP --img "system-images\;android-26\;google_apis\;arm64-v8a" --skin pixel_3 --device pixel_3 --prop device_type=regular_emulator --extra "-gpu swiftshader_indirect -feature GLESDynamicVersion"
+       ./utr --testproject=TestProjects/AutomatedTests --editor-location=.Editor --suite=playmode --platform=android --scripting-backend=il2cpp  --architecture=arm64 --artifacts_path=upm-ci~/test-results/android --timeout=900 --player-load-path=build/players
   after:
     - |
        start /wait %ANDROID_SDK_ROOT%\platform-tools\adb.exe connect %BOKKEN_DEVICE_IP%
