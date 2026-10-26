@@ -29,7 +29,7 @@ android_paths:
 
 {% for editor in test_editors %}
 test_Android_{{ editor.version }}:
-  name: Test {{ editor.version }} on Android
+  name: Test {{ editor.version }} on Android 8 - Emulator - ARM64
   agent:
     type: Unity::metal::macmini
     image: mobile/android-emulator-macos-base-slim-unity:v2.9302489
