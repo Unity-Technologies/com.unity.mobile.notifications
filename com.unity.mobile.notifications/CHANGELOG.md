@@ -6,6 +6,7 @@ All notable changes to this package will be documented in this file.
 
 ### Fixes:
 - Fixed NullReferenceException in unified Notification in Editor with active platform other than Android or iOS.
+- [iOS] Fixed ArgumentOutOfRangeException in iOSNotificationCalendarTrigger time zone conversion when using Feb 29 without specifying year.
 
 ## [2.5.0] - 2026-09-21
 
