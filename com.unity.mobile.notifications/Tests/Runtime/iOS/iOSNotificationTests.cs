@@ -437,6 +437,27 @@ class iOSNotificationTests
     }
 
     [Test]
+    public void CalendarTrigger_AssignDateTimeComponents_HandlesYearlessFeb29()
+    {
+        var dt = new DateTime(2025, 5, 5, 6, 6, 6);
+
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Month = 2,
+            Day = 29,
+            Hour = 15,
+        };
+
+        var check = trigger.AssignDateTimeComponents(dt);
+        Assert.AreEqual(2028, check.Year);  // should be forwarded to leap year
+        Assert.AreEqual(2, check.Month);
+        Assert.AreEqual(29, check.Day);
+        Assert.AreEqual(15, check.Hour);
+        Assert.AreEqual(6, check.Minute);
+        Assert.AreEqual(6, check.Second);
+    }
+
+    [Test]
     public void iOSNotificationCalendarTrigger_AssignNonEmptyComponents_Works()
     {
         var dt = new DateTime(2025, 1, 2, 3, 4, 5);
