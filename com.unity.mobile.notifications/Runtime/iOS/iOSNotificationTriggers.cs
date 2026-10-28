@@ -273,6 +273,15 @@ namespace Unity.Notifications.iOS
             int hour = Hour != null ? Hour.Value : dt.Hour;
             int minute = Minute != null ? Minute.Value : dt.Minute;
             int second = Second != null ? Second.Value : dt.Second;
+
+            // special case as not every year has Feb 29, but API allows setting that without year
+            // in such case we get here current year and exception will be thrown if it is non leap year
+            if (day == 29 && month == 2)
+            {
+                while (!DateTime.IsLeapYear(year))
+                    ++year;
+            }
+
             return new DateTimeOffset(year, month, day, hour, minute, second, dt.Offset);
         }
 
