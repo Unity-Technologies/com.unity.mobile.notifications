@@ -437,6 +437,27 @@ class iOSNotificationTests
     }
 
     [Test]
+    public void CalendarTrigger_AssignDateTimeComponents_HandlesYearlessFeb29()
+    {
+        var dt = new DateTime(2025, 5, 5, 6, 6, 6);
+
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Month = 2,
+            Day = 29,
+            Hour = 15,
+        };
+
+        var check = trigger.AssignDateTimeComponents(dt);
+        Assert.AreEqual(2028, check.Year);  // should be forwarded to leap year
+        Assert.AreEqual(2, check.Month);
+        Assert.AreEqual(29, check.Day);
+        Assert.AreEqual(15, check.Hour);
+        Assert.AreEqual(6, check.Minute);
+        Assert.AreEqual(6, check.Second);
+    }
+
+    [Test]
     public void iOSNotificationCalendarTrigger_AssignNonEmptyComponents_Works()
     {
         var dt = new DateTime(2025, 1, 2, 3, 4, 5);
@@ -530,6 +551,88 @@ class iOSNotificationTests
         var result = (iOSNotificationCalendarTrigger)notification.Trigger;
         Assert.AreEqual(5, result.Day);
         Assert.IsFalse(result.UtcTime);
+    }
+
+    [TestCase(true, true)]
+    [TestCase(true, false)]
+    [TestCase(false, true)]
+    [TestCase(false, false)]
+    public void iOSNotificationCalendarTrigger_DateTimeValidation(bool utc, bool toUtc)
+    {
+        // month only
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 13));
+        TriggerDateValidation(true, true, month: 6);
+
+        // day only
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, day: 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, day: 32));
+        TriggerDateValidation(utc, toUtc, day: 15);
+
+        // month and day
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 0, day: 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 13, day: 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 1, day: 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 1, day: 32));
+        TriggerDateValidation(utc, toUtc, month: 1, day: 31);
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 4, day: 31));
+        TriggerDateValidation(utc, toUtc, month: 4, day: 30);
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, month: 2, day: 30));
+        TriggerDateValidation(utc, toUtc, month: 2, day: 29);
+
+        // full date
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerDateValidation(utc, toUtc, 2025, 2, 29));
+        TriggerDateValidation(utc, toUtc, 2025, 2, 28);
+
+        // time validation can be individual
+
+        // hour
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerTimeValidation(utc, toUtc, hour: -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerTimeValidation(utc, toUtc, hour: 24));
+        TriggerTimeValidation(utc, toUtc, hour: 12);
+
+        // minute
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerTimeValidation(utc, toUtc, minute: -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerTimeValidation(utc, toUtc, minute: 60));
+        TriggerTimeValidation(utc, toUtc, minute: 15);
+
+        // second
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerTimeValidation(utc, toUtc, second: -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TriggerTimeValidation(utc, toUtc, second: 60));
+        TriggerTimeValidation(utc, toUtc, second: 15);
+    }
+
+    void TriggerDateValidation(bool utc, bool toUtc, int? year = null, int? month = null, int? day = null)
+    {
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Year = year,
+            Month = month,
+            Day = day,
+            UtcTime = utc,
+        };
+
+        if (toUtc)
+            trigger.ToUtc();
+        else
+            trigger.ToLocal();
+    }
+
+    void TriggerTimeValidation(bool utc, bool toUtc, int? hour = null, int? minute = null, int? second = null)
+    {
+        var trigger = new iOSNotificationCalendarTrigger()
+        {
+            Hour = hour,
+            Minute = minute,
+            Second = second,
+            UtcTime = utc,
+        };
+
+        if (toUtc)
+            trigger.ToUtc();
+        else
+            trigger.ToLocal();
+
     }
 
     [Test]

@@ -235,6 +235,7 @@ namespace Unity.Notifications.iOS
         /// <returns>A new trigger with UtcTime set to true and other field adjusted accordingly.</returns>
         public iOSNotificationCalendarTrigger ToUtc()
         {
+            Validate();
             if (UtcTime)
                 return this;
 
@@ -253,6 +254,7 @@ namespace Unity.Notifications.iOS
         /// <returns>A new trigger with UtcTime set to false and other field adjusted accordingly.</returns>
         public iOSNotificationCalendarTrigger ToLocal()
         {
+            Validate();
             if (!UtcTime)
                 return this;
 
@@ -265,6 +267,39 @@ namespace Unity.Notifications.iOS
             return result;
         }
 
+        void Validate()
+        {
+            bool IsInRange(int? val, int min, int max)
+            {
+                if (val.HasValue)
+                    return val.Value >= min && val.Value <= max;
+                return true;
+            }
+
+            if (Year.HasValue && Month.HasValue && Day.HasValue)
+            {
+                // throws if date is invalid
+                new DateTimeOffset(Year.Value, Month.Value, Day.Value, 0, 0, 0, new TimeSpan());
+            }
+            else
+            {
+                if (!IsInRange(Month, 1, 12))
+                    throw new ArgumentOutOfRangeException("Month has to be 1-12");
+
+                // have no year here, so use leap year in case month is 2
+                int daysInMonth = Month.HasValue ? DateTime.DaysInMonth(2000, Month.Value) : 31;
+                if (!IsInRange(Day, 1, daysInMonth))
+                    throw new ArgumentOutOfRangeException($"Month has to be 1-{daysInMonth}");
+            }
+
+            if (!IsInRange(Hour, 0, 23))
+                throw new ArgumentOutOfRangeException("Hour has to be 0-23");
+            if (!IsInRange(Minute, 0, 59))
+                throw new ArgumentOutOfRangeException("Minute has to be 0-59");
+            if (!IsInRange(Second, 0, 59))
+                throw new ArgumentOutOfRangeException("Second has to be 0-59");
+        }
+
         internal DateTimeOffset AssignDateTimeComponents(DateTimeOffset dt)
         {
             int year = Year != null ? Year.Value : dt.Year;
@@ -273,6 +308,15 @@ namespace Unity.Notifications.iOS
             int hour = Hour != null ? Hour.Value : dt.Hour;
             int minute = Minute != null ? Minute.Value : dt.Minute;
             int second = Second != null ? Second.Value : dt.Second;
+
+            // special case as not every year has Feb 29, but API allows setting that without year
+            // in such case we get here current year and exception will be thrown if it is non leap year
+            if (day == 29 && month == 2)
+            {
+                while (!DateTime.IsLeapYear(year))
+                    ++year;
+            }
+
             return new DateTimeOffset(year, month, day, hour, minute, second, dt.Offset);
         }
 
