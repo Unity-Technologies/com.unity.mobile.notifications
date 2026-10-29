@@ -176,6 +176,8 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public class iOSNotification
     {
+        static System.Random gRandom = new();
+
         /// <summary>
         /// The unique identifier for this notification request.
         /// </summary>
@@ -483,7 +485,9 @@ namespace Unity.Notifications.iOS
 
         private static string GenerateUniqueID()
         {
-            return Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()).ToString();
+            var timeStr = DateTime.Now.ToString("yyMMddHHmmssffffff");
+            var rndSuffix = gRandom.Next();
+            return Math.Abs($"{timeStr}{rndSuffix}".GetHashCode()).ToString();
         }
 
         /// <summary>
