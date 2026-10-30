@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 using UnityEngine;
 
 namespace Unity.Notifications.iOS
@@ -176,6 +177,8 @@ namespace Unity.Notifications.iOS
     /// </remarks>
     public class iOSNotification
     {
+        static System.Random gRandom = new();
+
         /// <summary>
         /// The unique identifier for this notification request.
         /// </summary>
@@ -483,7 +486,10 @@ namespace Unity.Notifications.iOS
 
         private static string GenerateUniqueID()
         {
-            return Math.Abs(DateTime.Now.ToString("yyMMddHHmmssffffff").GetHashCode()).ToString();
+            var timeStr = DateTime.Now.ToString("yyMMddHHmmssffffff");
+            var rndSuffix = gRandom.Next();
+            var threadId = Thread.CurrentThread.ManagedThreadId;
+            return Math.Abs($"{timeStr}{rndSuffix}{threadId}".GetHashCode()).ToString();
         }
 
         /// <summary>
