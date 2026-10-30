@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 using UnityEngine;
 
 namespace Unity.Notifications.iOS
@@ -487,7 +488,8 @@ namespace Unity.Notifications.iOS
         {
             var timeStr = DateTime.Now.ToString("yyMMddHHmmssffffff");
             var rndSuffix = gRandom.Next();
-            return Math.Abs($"{timeStr}{rndSuffix}".GetHashCode()).ToString();
+            var threadId = Thread.CurrentThread.ManagedThreadId;
+            return Math.Abs($"{timeStr}{rndSuffix}{threadId}".GetHashCode()).ToString();
         }
 
         /// <summary>
