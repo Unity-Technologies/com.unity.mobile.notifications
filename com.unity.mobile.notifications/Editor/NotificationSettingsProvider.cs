@@ -76,6 +76,11 @@ namespace Unity.Notifications
 
             Undo.undoRedoPerformed += () =>
             {
+                if (m_SettingsManagerObject == null || m_SettingsManagerObject.targetObject == null)
+                {
+                    return;
+                }
+                
                 m_SettingsManagerObject.UpdateIfRequiredOrScript();
                 Repaint();
             };
