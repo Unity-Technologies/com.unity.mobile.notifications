@@ -35,11 +35,9 @@ SubShader {
     }
 
 
-    Lighting Off
     Cull Off
     ZTest [unity_GUIZTestMode]
     ZWrite Off
-    Fog { Mode Off }
     Blend SrcAlpha OneMinusSrcAlpha
     ColorMask[_ColorMask]
 
@@ -126,17 +124,67 @@ SubShader {
 
 SubShader {
     Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
-    Lighting Off Cull Off ZTest Always ZWrite Off Fog { Mode Off }
+    Cull Off ZTest Always ZWrite Off
     Blend SrcAlpha OneMinusSrcAlpha
-    BindChannels {
-        Bind "Color", color
-        Bind "Vertex", vertex
-        Bind "TexCoord", texcoord0
-    }
     Pass {
-        SetTexture [_MainTex] {
-            constantColor [_Color] combine constant * primary, constant * texture
+        CGPROGRAM
+        #pragma vertex vert
+        #pragma fragment frag
+        #pragma target 2.0
+        #include "UnityCG.cginc"
+
+        // uniforms
+        float4 _MainTex_ST;
+
+        // vertex shader input data
+        struct appdata {
+          float3 pos : POSITION;
+          half4 color : COLOR;
+          float3 uv0 : TEXCOORD0;
+          UNITY_VERTEX_INPUT_INSTANCE_ID
+        };
+
+        // vertex-to-fragment interpolators
+        struct v2f {
+          fixed4 color : COLOR0;
+          float2 uv0 : TEXCOORD0;
+          float4 pos : SV_POSITION;
+          UNITY_VERTEX_OUTPUT_STEREO
+        };
+
+        // vertex shader
+        v2f vert (appdata IN) {
+          v2f o;
+          UNITY_SETUP_INSTANCE_ID(IN);
+          UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+          half4 color = IN.color;
+          half3 viewDir = 0.0;
+          o.color = saturate(color);
+          // compute texture coordinates
+          o.uv0 = IN.uv0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
+          // transform position
+          o.pos = UnityObjectToClipPos(IN.pos);
+          return o;
         }
+
+        // textures
+        sampler2D _MainTex;
+        fixed4 _Color;
+
+        // fragment shader
+        fixed4 frag (v2f IN) : SV_Target {
+          fixed4 col;
+          fixed4 tex, tmp0, tmp1, tmp2;
+          // SetTexture #0
+          tex = tex2D (_MainTex, IN.uv0.xy);
+          col.rgb = _Color * IN.color;
+          col.a = _Color.a * tex.a;
+          return col;
+        }
+
+        // texenvs
+        //! TexEnv0: 01020103 01060105 [_MainTex] [_Color]
+        ENDCG
     }
 }
 
