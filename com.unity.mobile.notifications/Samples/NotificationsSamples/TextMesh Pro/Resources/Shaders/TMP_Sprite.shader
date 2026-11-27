@@ -38,7 +38,6 @@ Shader "TextMeshPro/Sprite"
         }
 
         Cull Off
-        Lighting Off
         ZWrite Off
         ZTest [unity_GUIZTestMode]
         Blend SrcAlpha OneMinusSrcAlpha

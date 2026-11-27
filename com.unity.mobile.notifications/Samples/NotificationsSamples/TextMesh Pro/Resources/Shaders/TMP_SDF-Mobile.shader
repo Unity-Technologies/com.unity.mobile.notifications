@@ -71,8 +71,6 @@ SubShader {
 
     Cull [_CullMode]
     ZWrite Off
-    Lighting Off
-    Fog { Mode Off }
     ZTest [unity_GUIZTestMode]
     Blend One OneMinusSrcAlpha
     ColorMask [_ColorMask]
